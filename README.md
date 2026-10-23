@@ -1,8 +1,10 @@
 # Mailrun
 
-Mailrun is the performance-focused migration of [Mailflare](https://github.com/ilbertt/mailflare) to TanStack Start and Bun.
+Mailrun is a runtime port of [Mailflare](https://github.com/ilbertt/mailflare) to TanStack Start and Bun. Mailflare’s existing UI, URLs, workflows, permissions and feature behavior are the specification. This is not a redesign or a reduced feature set.
 
-**This branch is a working migration preview, not a replacement for an existing production installation yet. Use a test domain.**
+**This branch is incomplete. The preview does not yet have full Mailflare parity and must not replace an existing production installation.**
+
+The source baseline is Mailflare `71aa49b` (version 0.5.2). Reuse its components and business behavior; adapt framework navigation, typed data access and infrastructure boundaries. Preserve desktop/mobile layouts, persistent preferences, dialogs and interactions. Replacing a source screen with an approximation does not count as migration.
 
 ## Architecture
 
@@ -70,7 +72,8 @@ Implemented:
 
 - Owner bootstrap, login, logout, existing password hashes and TOTP/recovery-code verification.
 - Session isolation, disabled-account checks, owner/domain-owner/shared-mailbox reads, and write-permission checks.
-- Mailflare-style sidebar, folder lists, split conversation view, rich composer, recipient chips, alias/routing/forwarding settings and responsive layouts. Mailbox selection, paginated messages, FTS search, read/star/archive/trash mutations, inbox/draft counts and custom-folder creation.
+- Original Mailflare dashboard navigation, resizable sidebar, mobile drawer, reorderable navigation, More/Folders sections, folder colors, command palette, shortcut preference and theme handling. Source language provider and local translation catalogs are retained.
+- Partial ports of the folder list, conversation, composer and alias/routing/forwarding settings. These still need source-by-source UI and interaction parity work. Mailbox selection, paginated messages, FTS search, read/star/archive/trash mutations, folder counts, custom-folder creation and drag-to-folder moves are available.
 - Local incoming MIME/attachment storage, duplicate delivery handling, authenticated original/attachment downloads.
 - Rich HTML/plain-text drafts with autosave and revision conflicts, send-as aliases, To/Cc/Bcc, reply/reply-all/forward with thread headers, local attachment uploads/removal and independent attachment copies for forwarded messages.
 - Immediate and nibrun-scheduled Cloudflare delivery with attachments. Small files are base64 attachments; larger files use opaque local download links expiring after 30 days. Failed sends return to editable drafts.
@@ -89,7 +92,7 @@ Still to migrate before production cutover:
 - Live Cloudflare delivery verification and complete deployment/restart tests on nibrun.
 - Original-app/browser performance baseline, full data migration rehearsal, and production cutover.
 
-The cron launcher and persistent job state are in place; the remaining handlers above are not represented by no-op jobs. The migrated UI currently uses English; broader settings, themes and locale management remain in the next slices.
+The cron launcher and persistent job state are in place; the remaining handlers above are not represented by no-op jobs. Existing source components use the selected locale; the remaining replacement screens still contain English text and must be restored from source. Account/admin settings, persisted branding and the full original message/composer interactions are not yet at parity.
 
 ## Data and backups
 

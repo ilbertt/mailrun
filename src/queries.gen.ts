@@ -460,6 +460,7 @@ export interface IUpsertRoutingRuleResult {
 
 /** Result of query `CreateCustomFolder`. */
 export interface ICreateCustomFolderResult {
+    id: IFoldersColumns["id"];
 }
 
 /** Result of query `RemovableRule`. */
@@ -471,6 +472,30 @@ export interface IRemovableRuleResult {
 
 /** Result of query `DeleteRoutingRule`. */
 export interface IDeleteRoutingRuleResult {
+}
+
+/** Result of query `NavigationCounts`. */
+export interface INavigationCountsResult {
+    status: IMessagesColumns["status"];
+    folder_id: IMessagesColumns["folder_id"];
+    starred: IMessagesColumns["starred"];
+    read: IMessagesColumns["read"];
+    snoozed: unknown | null;
+    total: unknown | null;
+}
+
+/** Result of query `MoveNavigationMessage`. */
+export interface IMoveNavigationMessageResult {
+    id: string | null;
+}
+
+/** Result of query `UpdateKeyboardShortcuts`. */
+export interface IUpdateKeyboardShortcutsResult {
+}
+
+/** Result of query `KeyboardShortcuts`. */
+export interface IKeyboardShortcutsResult {
+    keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
 }
 
 /** Result of query `ListMailboxes`. */
@@ -504,6 +529,7 @@ export interface IInboxMessagesResult {
     starred: IMessagesColumns["starred"];
     status: IMessagesColumns["status"];
     thread_id: IMessagesColumns["thread_id"];
+    direction: IMessagesColumns["direction"];
 }
 
 /** Result of query `ListMessages`. */
@@ -518,6 +544,7 @@ export interface IListMessagesResult {
     starred: IMessagesColumns["starred"];
     status: IMessagesColumns["status"];
     thread_id: IMessagesColumns["thread_id"];
+    direction: IMessagesColumns["direction"];
 }
 
 /** Result of query `AuthorizedMessage`. */
@@ -800,6 +827,10 @@ export interface Queries {
     CreateCustomFolder: ICreateCustomFolderResult;
     RemovableRule: IRemovableRuleResult;
     DeleteRoutingRule: IDeleteRoutingRuleResult;
+    NavigationCounts: INavigationCountsResult;
+    MoveNavigationMessage: IMoveNavigationMessageResult;
+    UpdateKeyboardShortcuts: IUpdateKeyboardShortcutsResult;
+    KeyboardShortcuts: IKeyboardShortcutsResult;
     ListMailboxes: IListMailboxesResult;
     MailboxCounts: IMailboxCountsResult;
     InboxMessages: IInboxMessagesResult;

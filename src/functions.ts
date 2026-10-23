@@ -1,3 +1,9 @@
+import { getRequestLocale, loadServerMessages } from "./lib/i18n/server";
+import {
+	navigationCounts,
+	moveMessages,
+	shortcutSettings,
+} from "./server/mail/navigation";
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, deleteCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
@@ -173,6 +179,35 @@ export const createFolderFn = createServerFn({ method: "POST" })
 		z.object({
 			mailboxId: z.string(),
 			name: z.string().trim().min(1).max(100),
+			color: z.string().optional(),
 		}),
 	)
 	.handler(async ({ data }) => createFolder(await requireUser(), data));
+
+export const navigationCountsFn = createServerFn({ method: "GET" })
+	.validator(z.object({ mailboxId: z.string() }))
+	.handler(async ({ data }) =>
+		navigationCounts(await requireUser(), data.mailboxId),
+	);
+export const bulkMessageActionFn = createServerFn({ method: "POST" })
+	.validator(
+		z.object({
+			messageIds: z.array(z.string().min(1)).min(1).max(1000),
+			action: z.enum(["archive", "spam", "trash", "folder"]),
+			folderId: z.string().optional(),
+		}),
+	)
+	.handler(async ({ data }) => moveMessages(await requireUser(), data));
+export const shortcutSettingsFn = createServerFn({ method: "GET" }).handler(
+	async () => shortcutSettings(await requireUser()),
+);
+export const updateShortcutSettingsFn = createServerFn({ method: "POST" })
+	.validator(z.object({ enabled: z.boolean() }))
+	.handler(async ({ data }) =>
+		shortcutSettings(await requireUser(), data.enabled),
+	);
+
+export const localeFn = createServerFn({ method: "GET" }).handler(async () => {
+	const locale = await getRequestLocale();
+	return { locale, messages: await loadServerMessages(locale) };
+});

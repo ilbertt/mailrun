@@ -1,9 +1,11 @@
+import { setMessageDragData } from "../lib/messages/drag-utils";
 import {
 	Link,
 	Outlet,
 	useLocation,
 	useNavigate,
 	useSearch,
+	useParams,
 } from "@tanstack/react-router";
 import {
 	useMutation,
@@ -26,7 +28,13 @@ import { listInputSchema, type Folder } from "../shared/contracts";
 import { messagesQuery } from "../queries";
 import { messageActionFn } from "../functions";
 import { getRecipientLabel } from "./compose/recipient-utils";
-export function MessageFolderPage({ folder }: { folder: Folder }) {
+export function MessageFolderPage({
+	folder,
+	folderId,
+}: {
+	folder: Folder;
+	folderId?: string;
+}) {
 	const { user, mailboxId, openComposer } = useMail();
 	const search = useSearch({ strict: false });
 	const navigate = useNavigate();
@@ -34,12 +42,11 @@ export function MessageFolderPage({ folder }: { folder: Folder }) {
 	const input = listInputSchema.parse({
 		...search,
 		folder,
+		folderId: folderId ?? search.folderId,
 		mailboxId: search.mailboxId ?? mailboxId,
 	});
 	const pathname = useLocation({ select: (location) => location.pathname });
-	const selectedId = pathname.startsWith("/inbox/")
-		? decodeURIComponent(pathname.split("/")[2] ?? "")
-		: null;
+	const selectedId = useParams({ strict: false }).messageId ?? null;
 	const { data, isFetching } = useSuspenseQuery(messagesQuery(user.id, input));
 	const [selection, setSelection] = useState<string[]>([]);
 	const [bulkError, setBulkError] = useState("");
@@ -50,7 +57,12 @@ export function MessageFolderPage({ folder }: { folder: Folder }) {
 	});
 	const page = (offset: number) => {
 		void navigate({
-			to: folder === "inbox" ? "/inbox" : `/${folder}`,
+			to: input.folderId
+				? "/folders/$folderId"
+				: folder === "inbox"
+					? "/inbox"
+					: `/${folder}`,
+			params: { folderId: input.folderId ?? "" },
 			search: { ...input, offset },
 		});
 	};
@@ -205,6 +217,14 @@ export function MessageFolderPage({ folder }: { folder: Folder }) {
 					{data.messages.map((message) => (
 						<div
 							key={message.id}
+							draggable={folder === "inbox" && message.direction === "inbound"}
+							onDragStart={(event) =>
+								setMessageDragData(event.dataTransfer, {
+									messageIds: selection.includes(message.id)
+										? selection
+										: [message.id],
+								})
+							}
 							className={`group relative flex items-start gap-3 border-b border-neutral-100 px-5 ${selectedId ? "py-4" : "py-3"} ${selectedId === message.id ? "border-l-2 border-l-blue-600 bg-blue-50" : message.read ? "bg-[#f2f6fc]" : "bg-white"} hover:shadow-[inset_0_1px_0_#dadce0,inset_0_-1px_0_#dadce0]`}
 						>
 							<input
@@ -239,8 +259,15 @@ export function MessageFolderPage({ folder }: { folder: Folder }) {
 								/>
 							</button>
 							<Link
-								to="/inbox/$messageId"
-								params={{ messageId: message.id }}
+								to={
+									input.folderId
+										? "/folders/$folderId/$messageId"
+										: "/inbox/$messageId"
+								}
+								params={{
+									messageId: message.id,
+									folderId: input.folderId ?? "",
+								}}
 								search={input}
 								preload={folder === "drafts" ? false : "intent"}
 								onClick={(event) => {

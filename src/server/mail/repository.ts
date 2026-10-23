@@ -74,7 +74,7 @@ export async function listMessages(user: User, input: ListInput) {
 	if (input.folder === "inbox" && !input.q && !input.folderId) {
 		const rows = await withDatabase(
 			(sql) => sql.InboxMessages`
-			SELECT id,from_addr,to_addr,subject,snippet,created_at,read,starred,status,thread_id
+			SELECT id,from_addr,to_addr,subject,snippet,created_at,read,starred,status,thread_id,direction
 			FROM messages WHERE mailbox_id=${mailboxId} AND status='received' AND folder_id IS NULL
 			AND (snoozed_until IS NULL OR snoozed_until<=${seconds()})
 			ORDER BY created_at DESC,id DESC LIMIT 51 OFFSET ${input.offset}`,
@@ -85,7 +85,7 @@ export async function listMessages(user: User, input: ListInput) {
 	const match = input.q ? ftsQuery(input.q) : '""';
 	const rows = await withDatabase(
 		(sql) => sql.ListMessages`
-		SELECT id,from_addr,to_addr,subject,snippet,created_at,read,starred,status,thread_id
+		SELECT id,from_addr,to_addr,subject,snippet,created_at,read,starred,status,thread_id,direction
 		FROM messages WHERE mailbox_id=${mailboxId}
 		AND (${input.folderId ?? null} IS NULL OR folder_id=${input.folderId ?? null})
 		AND (${status}='' OR status=${status})

@@ -140,15 +140,31 @@ export async function saveRule(user: User, input: z.infer<typeof ruleSchema>) {
 }
 export async function createFolder(
 	user: User,
-	input: { mailboxId: string; name: string },
+	input: { mailboxId: string; name: string; color?: string },
 ) {
 	const name = z.string().trim().min(1).max(100).parse(input.name);
-	await mailboxAccess(user, input.mailboxId, "manage");
-	await withDatabase(
-		(sql) =>
-			sql.CreateCustomFolder`INSERT INTO folders (id,user_id,mailbox_id,name,color,created_at) VALUES (${id("folder")},${user.id},${input.mailboxId},${name},'blue',${seconds()})`,
+	const mailbox = await mailboxAccess(user, input.mailboxId, "manage");
+	const folderId = id("folder");
+	const color = z
+		.enum([
+			"#2563eb",
+			"#7c3aed",
+			"#db2777",
+			"#dc2626",
+			"#ea580c",
+			"#d97706",
+			"#16a34a",
+			"#0d9488",
+		])
+		.parse(input.color ?? "#2563eb");
+	const created = await withDatabase(
+		(sql) => sql.CreateCustomFolder`
+ INSERT INTO folders (id,user_id,mailbox_id,name,color,created_at)
+ SELECT ${folderId},${mailbox.user_id},${input.mailboxId},${name},${color},${seconds()}
+ WHERE NOT EXISTS(SELECT 1 FROM folders WHERE mailbox_id=${input.mailboxId} AND name=${name}) RETURNING id`,
 	);
-	return { ok: true };
+	if (!created.length) throw new Error("Folder already exists");
+	return { id: folderId, mailboxId: input.mailboxId, name, color };
 }
 export async function removeRule(user: User, ruleId: string) {
 	const [rule] = await withDatabase(
