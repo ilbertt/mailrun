@@ -1,66 +1,157 @@
 import { z } from "zod";
-import { sendSchema, type User } from "../../shared/contracts";
+import { sendSchema, userSchema, type User } from "../../shared/contracts";
 import { withDatabase, id, seconds } from "../db";
 import { getInstallation } from "../cloudflare/installation";
-import { cloudflare } from "../cloudflare/client";
+import { cloudflare, type CloudflareFetch } from "../cloudflare/client";
+import { draftLock, getDraft, saveDraft, senderAddress } from "./drafts";
+import { deliveryPayloadSchema } from "../../shared/mail-contracts";
+import { prepareAttachments } from "./attachment-send";
+import { getEmailAddress } from "../../lib/email/address";
 
-const storedSendSchema = z.object({
-	from: z.email(), to: z.union([z.email(), z.array(z.string())]), subject: z.string(),
-	text: z.string().optional(), html: z.string().optional(),
-	cc: z.array(z.string()).optional(), bcc: z.array(z.string()).optional(),
-});
-export async function sendMessage(user: User, input: z.infer<typeof sendSchema>) {
+export async function sendMessage(
+	user: User,
+	input: z.infer<typeof sendSchema>,
+) {
 	const data = sendSchema.parse(input);
-	const mailbox = await withDatabase(async sql => (await sql.SendingMailbox`
-		SELECT b.local_part,d.hostname FROM mailboxes b JOIN domains d ON d.id=b.domain_id
-		WHERE b.id=${data.mailboxId} AND b.disabled=0 AND d.sending_enabled=1
-		AND (b.user_id=${user.id} OR d.user_id=${user.id}
-			OR EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission IN ('full_access','send_as','send_on_behalf'))) LIMIT 1`)[0]);
-	if (!mailbox) throw new Error("Sending is not enabled or permitted for this mailbox");
-	const from = `${mailbox.local_part}@${mailbox.hostname}`;
-	const messageId = id("msg");
-	const jobId = id("job");
-	const due = data.scheduledAt ? Math.max(seconds(), Math.floor(Date.parse(data.scheduledAt) / 1000)) : seconds();
-	const payload = JSON.stringify({ from, to: data.to, subject: data.subject, text: data.text });
-	await withDatabase(sql => sql.begin(async sql => {
-		await sql.InsertSentMessage`
-			INSERT INTO messages (id,user_id,mailbox_id,direction,from_addr,to_addr,subject,snippet,text_body,status,read,created_at)
-			VALUES (${messageId},${user.id},${data.mailboxId},'outbound',${from},${data.to},${data.subject},${data.text.slice(0, 200)},${data.text},'queued',1,${seconds()})`;
-		await sql.InsertOutboundJob`
-			INSERT INTO outbound_jobs (id,user_id,message_id,status,payload,created_at,updated_at,scheduled_at)
-			VALUES (${jobId},${user.id},${messageId},'queued',${payload},${seconds()},${seconds()},${due})`;
-	}));
-	if (due <= seconds()) await deliverJob(jobId);
-	return { messageId, scheduled: due > seconds() };
+	const draft = await saveDraft(user, {
+		...data,
+		html: data.html ?? "",
+		cc: data.cc ?? "",
+		bcc: data.bcc ?? "",
+	});
+	return sendDraft(user, draft.id, draft.draft_revision);
 }
-export async function deliverJob(jobId: string) {
-	const installation = await getInstallation();
-	if (!installation) throw new Error("Cloudflare email is not configured");
-	const [job] = await withDatabase(sql => sql.ClaimOutbound`
+export async function sendDraft(
+	user: User,
+	draftId: string,
+	revision: number,
+	request: CloudflareFetch = fetch,
+) {
+	if (!(await getInstallation()))
+		throw new Error("Cloudflare email is not configured");
+	const result = await draftLock(draftId, async () => {
+		const draft = await getDraft(user, draftId);
+		if (draft.draft_revision !== revision)
+			throw new Error("Draft changed. Save the latest version before sending.");
+		await senderAddress(user, draft.mailbox_id, draft.from_addr);
+		const payload = deliveryPayloadSchema.parse({
+			from: draft.from_addr,
+			to: draft.to_addr,
+			cc: draft.cc_addr ?? "",
+			bcc: draft.bcc_addr ?? "",
+			subject: draft.subject ?? "",
+			text: draft.text_body ?? "",
+			html: draft.html_body ?? "",
+			inReplyTo: draft.in_reply_to,
+			references: draft.references_header,
+			threadId: draft.thread_id,
+			returnToDraft: true,
+		});
+		if (
+			!payload.text?.trim() &&
+			!payload.html?.trim() &&
+			!draft.attachments.length
+		)
+			throw new Error("Enter a message or attach a file");
+		const due = Math.max(seconds(), draft.draft_scheduled_at ?? seconds());
+		const jobId = id("job");
+		await withDatabase((sql) =>
+			sql.begin(async (sql) => {
+				const changed =
+					await sql.QueueDraft`UPDATE messages SET status='queued',created_at=${seconds()} WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND draft_revision=${revision} RETURNING id`;
+				if (!changed.length) throw new Error("Draft is no longer editable");
+				await sql.InsertOutboundJob`INSERT INTO outbound_jobs (id,user_id,message_id,status,payload,created_at,updated_at,scheduled_at) VALUES (${jobId},${user.id},${draftId},'queued',${JSON.stringify(payload)},${seconds()},${seconds()},${due})`;
+			}),
+		);
+		return { jobId, due };
+	});
+	if (result.due <= seconds()) await deliverJob(result.jobId, request);
+	return { messageId: draftId, scheduled: result.due > seconds() };
+}
+export async function deliverJob(
+	jobId: string,
+	request: CloudflareFetch = fetch,
+) {
+	const [job] = await withDatabase(
+		(sql) => sql.ClaimOutbound`
 		UPDATE outbound_jobs SET status='sending',updated_at=${seconds()}
 		WHERE id=${jobId} AND status='queued' AND (scheduled_at IS NULL OR scheduled_at<=${seconds()})
-		RETURNING id,message_id,payload`);
+		AND EXISTS (SELECT 1 FROM messages WHERE messages.id=outbound_jobs.message_id AND messages.status='queued')
+		RETURNING id,user_id,message_id,payload`,
+	);
 	if (!job) return;
+	let restoreDraft = false;
 	try {
-		const payload = storedSendSchema.parse(JSON.parse(job.payload));
-		// Existing scheduled jobs with attachments require the attachment-send port;
-		// never silently send a message with missing files.
-		const attachments = await withDatabase(sql => sql.OutboundAttachmentCheck`SELECT id FROM message_attachments WHERE message_id=${job.message_id} LIMIT 1`);
-		if (attachments.length) throw new Error("Scheduled attachments require the attachment-send migration");
-		const result = await cloudflare(installation.api_token, `/accounts/${installation.account_id}/email/sending/send`,
-			z.object({ message_id: z.string().optional(), messageId: z.string().optional() }),
-			{ method: "POST", body: JSON.stringify({ ...payload, headers: { "Message-ID": `<${job.id}@${installation.hostname}>` } }) });
-		const providerId = result.message_id ?? result.messageId ?? `<${job.id}@${installation.hostname}>`;
-		await withDatabase(sql => sql.begin(async sql => {
-			await sql.CompleteOutbound`UPDATE outbound_jobs SET status='sent',error=NULL,updated_at=${seconds()} WHERE id=${job.id}`;
-			await sql.CompleteSentMessage`UPDATE messages SET status='sent',provider_message_id=${providerId},thread_id=coalesce(thread_id,${providerId}) WHERE id=${job.message_id}`;
-		}));
+		const payload = deliveryPayloadSchema.parse(JSON.parse(job.payload));
+		restoreDraft = !!payload.returnToDraft;
+		const installation = await getInstallation();
+		if (!installation) throw new Error("Cloudflare email is not configured");
+		const [account] = await withDatabase(
+			(sql) =>
+				sql.SendingAccount`SELECT id,name,email,role,is_primary_admin FROM users WHERE id=${job.user_id} AND disabled=0`,
+		);
+		const [message] = await withDatabase(
+			(sql) =>
+				sql.SendingMessage`SELECT mailbox_id FROM messages WHERE id=${job.message_id}`,
+		);
+		if (!account || !message?.mailbox_id)
+			throw new Error("Sender account or mailbox is no longer available");
+		const user = userSchema.parse({
+			...account,
+			isPrimaryAdmin: !!account.is_primary_admin,
+		});
+		await senderAddress(user, message.mailbox_id, payload.from);
+		const [domain] = await withDatabase(
+			(sql) =>
+				sql.SendingDomain`SELECT id FROM domains WHERE hostname=${getEmailAddress(payload.from).split("@")[1] ?? ""} AND sending_enabled=1 AND status='active'`,
+		);
+		if (!domain)
+			throw new Error("Cloudflare sending is not enabled for this domain");
+		const headers: Record<string, string> = {
+			"Message-ID": `<${job.id}@${installation.hostname}>`,
+		};
+		if (payload.inReplyTo)
+			headers["In-Reply-To"] = payload.inReplyTo.startsWith("<")
+				? payload.inReplyTo
+				: `<${payload.inReplyTo}>`;
+		if (payload.references) headers.References = payload.references;
+		const prepared = await prepareAttachments(job.message_id ?? "", {
+			subject: payload.subject,
+			text: payload.text,
+			html: payload.html,
+			headers,
+		});
+		const result = await cloudflare(
+			installation.api_token,
+			`/accounts/${installation.account_id}/email/sending/send`,
+			z.object({ message_id: z.string() }),
+			{
+				method: "POST",
+				body: JSON.stringify({
+					from: payload.from,
+					to: payload.to,
+					cc: payload.cc,
+					bcc: payload.bcc,
+					subject: payload.subject,
+					headers,
+					...prepared,
+				}),
+			},
+			request,
+		);
+		await withDatabase((sql) =>
+			sql.begin(async (sql) => {
+				await sql.CompleteOutbound`UPDATE outbound_jobs SET status='sent',error=NULL,updated_at=${seconds()} WHERE id=${job.id}`;
+				await sql.CompleteSentMessage`UPDATE messages SET status='sent',provider_message_id=${result.message_id},thread_id=coalesce(thread_id,${result.message_id.replace(/^<|>$/g, "")}),text_body=${prepared.text ?? null},html_body=${prepared.html ?? null} WHERE id=${job.message_id}`;
+			}),
+		);
 	} catch (error) {
-		const message = error instanceof Error ? error.message : "Sending failed";
-		await withDatabase(sql => sql.begin(async sql => {
-			await sql.FailOutbound`UPDATE outbound_jobs SET status='failed',error=${message},updated_at=${seconds()} WHERE id=${job.id}`;
-			await sql.FailSentMessage`UPDATE messages SET status='failed' WHERE id=${job.message_id}`;
-		}));
+		await withDatabase((sql) =>
+			sql.begin(async (sql) => {
+				await sql.FailOutbound`UPDATE outbound_jobs SET status='failed',error=${error instanceof Error ? error.message : "Sending failed"},updated_at=${seconds()} WHERE id=${job.id}`;
+				await sql.FailSentMessage`UPDATE messages SET status=${restoreDraft ? "draft" : "failed"} WHERE id=${job.message_id}`;
+			}),
+		);
 		throw error;
 	}
 }

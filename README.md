@@ -31,7 +31,7 @@ To connect email, the app needs a public HTTPS URL (`APP_URL`, or nibrun's suppl
 
 Setup persists a unique Worker name and signing secret, uploads the bundled relay, and checks signed connectivity back to the application. Routing is activated only when explicitly selected in the form. Existing foreign MX records are not automatically removed. A retry reuses the installation's Worker and secret.
 
-The relay signs the envelope addresses, timestamp and MIME bytes. Incoming messages are parsed and persisted in the request, with deterministic delivery IDs for duplicate handling. Files are written locally; SQLite records are committed before success is returned.
+The relay signs the envelope addresses, timestamp and MIME bytes. Incoming messages are parsed and persisted in the request, with deterministic delivery IDs for duplicate handling. For forwarding, the relay forwards within the original Cloudflare email event and confirms the outcome to Mailrun with a signed request when a copy is needed. Failed forwarding preserves a local copy when the rule has a destination mailbox; otherwise delivery fails. Files are written locally; SQLite records are committed before a store result is returned.
 
 ## Checks and builds
 
@@ -70,33 +70,35 @@ Implemented:
 
 - Owner bootstrap, login, logout, existing password hashes and TOTP/recovery-code verification.
 - Session isolation, disabled-account checks, owner/domain-owner/shared-mailbox reads, and write-permission checks.
-- Mailbox selection, basic folder views, paginated message lists, FTS text search, conversation reading, read/star/archive/trash mutations.
+- Mailflare-style sidebar, folder lists, split conversation view, rich composer, recipient chips, alias/routing/forwarding settings and responsive layouts. Mailbox selection, paginated messages, FTS search, read/star/archive/trash mutations, inbox/draft counts and custom-folder creation.
 - Local incoming MIME/attachment storage, duplicate delivery handling, authenticated original/attachment downloads.
-- Plain-text compose, Cloudflare sending, and scheduled plain-text delivery.
-- Setup-driven relay deployment and signed connectivity checks, optional routing activation and sending-domain setup.
+- Rich HTML/plain-text drafts with autosave and revision conflicts, send-as aliases, To/Cc/Bcc, reply/reply-all/forward with thread headers, local attachment uploads/removal and independent attachment copies for forwarded messages.
+- Immediate and nibrun-scheduled Cloudflare delivery with attachments. Small files are base64 attachments; larger files use opaque local download links expiring after 30 days. Failed sends return to editable drafts.
+- Normalized exact/explicit/cross-domain aliases, domain rules and catch-all routing, sender/recipient/subject/content conditions, account forwarding, keep-copy/failure fallback and forwarding-loop protection. Mailbox rules route to custom folders, Spam or Trash.
+- Setup-driven relay deployment and signed connectivity checks, optional routing activation and sending-domain setup. Existing installations can update their relay from Settings without re-entering credentials.
 - Local scheduled backups, old full-backup restore, internal lease exclusion, and atomic restore rollback.
 - Maintenance for expired sessions/challenges, expired/stalled assistant approvals, and old assistant conversations.
 - Native binary builds, isolated HTTP smoke test, SQL coverage checks, and CI.
 
 Still to migrate before production cutover:
 
-- Full incoming routing/aliases, forwarding, folder rules, spam checks, auto-replies, and contact updates. The preview currently receives exact configured mailbox addresses.
-- Rich compose, attachment sending, drafts, reply-all/thread headers, complete conversation grouping/pagination, search operators, counts, snooze/custom folders, and all existing URL aliases.
+- Automatic spam checks, auto-replies and contact updates.
+- Complete conversation grouping/pagination, search operators, snooze controls, custom-folder rename/delete/move controls, and all existing URL aliases.
 - WebSocket/push notifications, webhook retry processing, AI generation/recovery, mail/Drive retention.
 - Calendar/booking, Drive, account/settings/admin screens, password reset/MFA management, translations, branding/PWA, API keys, public API, JMAP and MCP.
 - Live Cloudflare delivery verification and complete deployment/restart tests on nibrun.
 - Original-app/browser performance baseline, full data migration rehearsal, and production cutover.
 
-The cron launcher and persistent job state are in place, but the remaining handlers above are not silently represented by no-op jobs. Existing scheduled messages with attachments are explicitly rejected by the preview sender rather than delivered without their files.
+The cron launcher and persistent job state are in place; the remaining handlers above are not represented by no-op jobs. The migrated UI currently uses English; broader settings, themes and locale management remain in the next slices.
 
 ## Data and backups
 
 The original 65 Mailflare SQL migrations are retained under their original names. The runtime and code generator apply filename order; the `d1_migrations` ledger preserves the identity of already-applied migrations.
 
-The additional migration adds installation configuration and expiring process leases. Installation configuration belongs to the system backup group. Process leases, migration bookkeeping, FTS tables and JMAP revision counters are internally managed or derived and are excluded from record backups.
+The additional migrations add installation configuration, expiring process leases, and draft revision/scheduling columns on the existing messages table. Installation configuration belongs to the system backup group. Process leases, migration bookkeeping, FTS tables and JMAP revision counters are internally managed or derived and are excluded from record backups.
 
 Record backups preserve the `mailflare-database-backup` version 1 format. Older full backups that omit newly added tables remain restorable. File objects must be copied separately into `blobs/`, preserving their object keys. A nibrun export includes the persistent filesystem; keep recovery copies outside the app's disk.
 
 ## Source and license
 
-Ported schema/authentication/backup code comes from Mailflare commit `71aa49b`; see `NOTICE`. The combined application uses AGPL-3.0-or-later. The original Mailrun repository's public-domain dedication is retained in `LICENSE-MAILRUN`.
+Ported schema/authentication/backup code, UI primitives, recipient editor and email renderer comes from Mailflare commit `71aa49b`; see `NOTICE`. The combined application uses AGPL-3.0-or-later. The original Mailrun repository's public-domain dedication is retained in `LICENSE-MAILRUN`.

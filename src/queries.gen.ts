@@ -91,6 +91,10 @@ export interface IActivateDomainResult {
 export interface IEnableSendingResult {
 }
 
+/** Result of query `UpdateRelayVersion`. */
+export interface IUpdateRelayVersionResult {
+}
+
 /** Result of query `BackupSettings`. */
 export interface IBackupSettingsResult {
     enabled: IBackupSettingsColumns["enabled"];
@@ -135,7 +139,7 @@ export interface IClaimCronLeaseResult {
 
 /** Result of query `DueOutboundJobs`. */
 export interface IDueOutboundJobsResult {
-    id: IOutboundJobsColumns["id"];
+    id: string;
 }
 
 /** Result of query `ExpireApprovals`. */
@@ -162,10 +166,184 @@ export interface IPruneLoginChallengesResult {
 export interface IReleaseCronLeaseResult {
 }
 
-/** Result of query `InboundMailbox`. */
-export interface IInboundMailboxResult {
+/** Result of query `MailboxPermission`. */
+export interface IMailboxPermissionResult {
     id: string;
     user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    hostname: IDomainsColumns["hostname"];
+    domain_owner: string | null;
+}
+
+/** Result of query `ManagedDomain`. */
+export interface IManagedDomainResult {
+    id: IDomainsColumns["id"];
+    hostname: IDomainsColumns["hostname"];
+    user_id: IDomainsColumns["user_id"];
+}
+
+/** Result of query `SendingAttachments`. */
+export interface ISendingAttachmentsResult {
+    id: IMessageAttachmentsColumns["id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+}
+
+/** Result of query `ExpiredAttachmentLink`. */
+export interface IExpiredAttachmentLinkResult {
+}
+
+/** Result of query `CreateAttachmentLink`. */
+export interface ICreateAttachmentLinkResult {
+}
+
+/** Result of query `GetAttachmentLink`. */
+export interface IGetAttachmentLinkResult {
+    id: ISharedAttachmentLinksColumns["id"];
+}
+
+/** Result of query `PublicAttachment`. */
+export interface IPublicAttachmentResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+}
+
+/** Result of query `ClaimDraftLock`. */
+export interface IClaimDraftLockResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `ReleaseDraftLock`. */
+export interface IReleaseDraftLockResult {
+}
+
+/** Result of query `SenderAliases`. */
+export interface ISenderAliasesResult {
+    local_part: IMailboxAliasesColumns["local_part"];
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `SenderDomainAlias`. */
+export interface ISenderDomainAliasResult {
+    id: IDomainsColumns["id"];
+}
+
+/** Result of query `SenderAddressOccupied`. */
+export interface ISenderAddressOccupiedResult {
+    id: string | null;
+}
+
+/** Result of query `OwnDraft`. */
+export interface IOwnDraftResult {
+    id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    direction: IMessagesColumns["direction"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    subject: IMessagesColumns["subject"];
+    snippet: IMessagesColumns["snippet"];
+    status: IMessagesColumns["status"];
+    thread_id: IMessagesColumns["thread_id"];
+    created_at: IMessagesColumns["created_at"];
+    read: IMessagesColumns["read"];
+    folder_id: IMessagesColumns["folder_id"];
+    snoozed_until: IMessagesColumns["snoozed_until"];
+    starred: IMessagesColumns["starred"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    bcc_addr: IMessagesColumns["bcc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    spam_score: IMessagesColumns["spam_score"];
+    spam_verdict: IMessagesColumns["spam_verdict"];
+    spam_signals: IMessagesColumns["spam_signals"];
+    spam_analyzed_at: IMessagesColumns["spam_analyzed_at"];
+    spam_analysis_error: IMessagesColumns["spam_analysis_error"];
+    trashed_at: IMessagesColumns["trashed_at"];
+    reply_to: IMessagesColumns["reply_to"];
+    draft_revision: IMessagesColumns["draft_revision"];
+    draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
+}
+
+/** Result of query `DraftAttachments`. */
+export interface IDraftAttachmentsResult {
+    id: IMessageAttachmentsColumns["id"];
+    message_id: IMessageAttachmentsColumns["message_id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+}
+
+/** Result of query `OutgoingAttachmentLimit`. */
+export interface IOutgoingAttachmentLimitResult {
+    outbound_attachment_max_mb: IAppSettingsColumns["outbound_attachment_max_mb"];
+}
+
+/** Result of query `UpdateDraft`. */
+export interface IUpdateDraftResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `CreateDraft`. */
+export interface ICreateDraftResult {
+}
+
+/** Result of query `RollbackNewDraft`. */
+export interface IRollbackNewDraftResult {
+}
+
+/** Result of query `ForwardAttachments`. */
+export interface IForwardAttachmentsResult {
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+}
+
+/** Result of query `CopyForwardAttachment`. */
+export interface ICopyForwardAttachmentResult {
+}
+
+/** Result of query `TouchDraftUpload`. */
+export interface ITouchDraftUploadResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `UploadDraftAttachment`. */
+export interface IUploadDraftAttachmentResult {
+}
+
+/** Result of query `RemoveDraftAttachment`. */
+export interface IRemoveDraftAttachmentResult {
+}
+
+/** Result of query `TouchDraftRemoval`. */
+export interface ITouchDraftRemovalResult {
+}
+
+/** Result of query `DeleteOwnedDraft`. */
+export interface IDeleteOwnedDraftResult {
+}
+
+/** Result of query `InboundForwarding`. */
+export interface IInboundForwardingResult {
+    forwarding_email: IUsersColumns["forwarding_email"];
 }
 
 /** Result of query `InboundExists`. */
@@ -188,6 +366,113 @@ export interface IInsertInboundResult {
 export interface IInsertInboundAttachmentResult {
 }
 
+/** Result of query `SettingsDomains`. */
+export interface ISettingsDomainsResult {
+    id: string;
+    hostname: IDomainsColumns["hostname"];
+    user_id: string;
+}
+
+/** Result of query `SettingsAliases`. */
+export interface ISettingsAliasesResult {
+    id: string;
+    mailbox_id: string;
+    domain_id: string;
+    local_part: string;
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `SettingsRules`. */
+export interface ISettingsRulesResult {
+    id: string;
+    user_id: string | null;
+    domain_id: IRoutingRulesColumns["domain_id"];
+    pattern: IRoutingRulesColumns["pattern"];
+    mailbox_id: string | null;
+    action: IRoutingRulesColumns["action"];
+    forward_to: IRoutingRulesColumns["forward_to"];
+    priority: IRoutingRulesColumns["priority"];
+    created_at: number | null;
+    folder_id: IRoutingRulesColumns["folder_id"];
+    match_field: IRoutingRulesColumns["match_field"];
+    match_operator: IRoutingRulesColumns["match_operator"];
+    match_value: IRoutingRulesColumns["match_value"];
+    scope: IRoutingRulesColumns["scope"];
+    name: IRoutingRulesColumns["name"];
+    enabled: IRoutingRulesColumns["enabled"];
+    keep_copy: IRoutingRulesColumns["keep_copy"];
+    reject_reason: IRoutingRulesColumns["reject_reason"];
+    last_matched_at: IRoutingRulesColumns["last_matched_at"];
+    match_count: IRoutingRulesColumns["match_count"];
+}
+
+/** Result of query `SettingsForwarding`. */
+export interface ISettingsForwardingResult {
+    forwarding_email: IUsersColumns["forwarding_email"];
+}
+
+/** Result of query `SettingsFolders`. */
+export interface ISettingsFoldersResult {
+    id: string;
+    name: IFoldersColumns["name"];
+    color: IFoldersColumns["color"];
+    mailbox_id: string | null;
+}
+
+/** Result of query `CreateAlias`. */
+export interface ICreateAliasResult {
+    id: string | null;
+}
+
+/** Result of query `FindAlias`. */
+export interface IFindAliasResult {
+    mailbox_id: IMailboxAliasesColumns["mailbox_id"];
+}
+
+/** Result of query `RemoveAlias`. */
+export interface IRemoveAliasResult {
+}
+
+/** Result of query `SetAllDomains`. */
+export interface ISetAllDomainsResult {
+}
+
+/** Result of query `SetForwarding`. */
+export interface ISetForwardingResult {
+}
+
+/** Result of query `ManagedRuleFolder`. */
+export interface IManagedRuleFolderResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `ExistingRule`. */
+export interface IExistingRuleResult {
+    id: IRoutingRulesColumns["id"];
+    domain_id: IRoutingRulesColumns["domain_id"];
+    scope: IRoutingRulesColumns["scope"];
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+}
+
+/** Result of query `UpsertRoutingRule`. */
+export interface IUpsertRoutingRuleResult {
+}
+
+/** Result of query `CreateCustomFolder`. */
+export interface ICreateCustomFolderResult {
+}
+
+/** Result of query `RemovableRule`. */
+export interface IRemovableRuleResult {
+    domain_id: IRoutingRulesColumns["domain_id"];
+    scope: IRoutingRulesColumns["scope"];
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+}
+
+/** Result of query `DeleteRoutingRule`. */
+export interface IDeleteRoutingRuleResult {
+}
+
 /** Result of query `ListMailboxes`. */
 export interface IListMailboxesResult {
     id: string;
@@ -195,6 +480,16 @@ export interface IListMailboxesResult {
     display_name: IMailboxesColumns["display_name"];
     hostname: IDomainsColumns["hostname"];
     user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    signature: IMailboxesColumns["signature"];
+    permission: unknown | null;
+}
+
+/** Result of query `MailboxCounts`. */
+export interface IMailboxCountsResult {
+    inbox_unread: unknown | null;
+    drafts: unknown | null;
 }
 
 /** Result of query `InboxMessages`. */
@@ -237,6 +532,8 @@ export interface IThreadMessagesResult {
     id: IMessagesColumns["id"];
     from_addr: IMessagesColumns["from_addr"];
     to_addr: IMessagesColumns["to_addr"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    reply_to: IMessagesColumns["reply_to"];
     subject: IMessagesColumns["subject"];
     text_body: IMessagesColumns["text_body"];
     html_body: IMessagesColumns["html_body"];
@@ -244,6 +541,11 @@ export interface IThreadMessagesResult {
     read: IMessagesColumns["read"];
     starred: IMessagesColumns["starred"];
     status: IMessagesColumns["status"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    thread_id: IMessagesColumns["thread_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
 }
 
 /** Result of query `ThreadAttachments`. */
@@ -252,6 +554,8 @@ export interface IThreadAttachmentsResult {
     message_id: IMessageAttachmentsColumns["message_id"];
     filename: IMessageAttachmentsColumns["filename"];
     size: IMessageAttachmentsColumns["size"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    content_type: IMessageAttachmentsColumns["content_type"];
 }
 
 /** Result of query `DownloadAttachment`. */
@@ -271,14 +575,104 @@ export interface IChangeMessageResult {
     id: string | null;
 }
 
-/** Result of query `SendingMailbox`. */
-export interface ISendingMailboxResult {
-    local_part: IMailboxesColumns["local_part"];
+/** Result of query `CancelTrashedSend`. */
+export interface ICancelTrashedSendResult {
+}
+
+/** Result of query `RoutingDomain`. */
+export interface IRoutingDomainResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
     hostname: IDomainsColumns["hostname"];
 }
 
-/** Result of query `InsertSentMessage`. */
-export interface IInsertSentMessageResult {
+/** Result of query `DomainRoutingRules`. */
+export interface IDomainRoutingRulesResult {
+    id: IRoutingRulesColumns["id"];
+    user_id: IRoutingRulesColumns["user_id"];
+    domain_id: IRoutingRulesColumns["domain_id"];
+    pattern: IRoutingRulesColumns["pattern"];
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+    action: IRoutingRulesColumns["action"];
+    forward_to: IRoutingRulesColumns["forward_to"];
+    priority: IRoutingRulesColumns["priority"];
+    created_at: IRoutingRulesColumns["created_at"];
+    folder_id: IRoutingRulesColumns["folder_id"];
+    match_field: IRoutingRulesColumns["match_field"];
+    match_operator: IRoutingRulesColumns["match_operator"];
+    match_value: IRoutingRulesColumns["match_value"];
+    scope: IRoutingRulesColumns["scope"];
+    name: IRoutingRulesColumns["name"];
+    enabled: IRoutingRulesColumns["enabled"];
+    keep_copy: IRoutingRulesColumns["keep_copy"];
+    reject_reason: IRoutingRulesColumns["reject_reason"];
+    last_matched_at: IRoutingRulesColumns["last_matched_at"];
+    match_count: IRoutingRulesColumns["match_count"];
+}
+
+/** Result of query `RecordRoutingMatch`. */
+export interface IRecordRoutingMatchResult {
+}
+
+/** Result of query `RoutingMailboxes`. */
+export interface IRoutingMailboxesResult {
+    id: string;
+    user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    domain_owner: string | null;
+}
+
+/** Result of query `RoutingAliases`. */
+export interface IRoutingAliasesResult {
+    id: string;
+    user_id: IMailboxesColumns["user_id"];
+    domain_id: string | null;
+    local_part: string | null;
+    alias_local_part: string | null;
+}
+
+/** Result of query `RuleTarget`. */
+export interface IRuleTargetResult {
+    id: string;
+    user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+}
+
+/** Result of query `InboxRoutingRules`. */
+export interface IInboxRoutingRulesResult {
+    id: IRoutingRulesColumns["id"];
+    user_id: IRoutingRulesColumns["user_id"];
+    domain_id: IRoutingRulesColumns["domain_id"];
+    pattern: IRoutingRulesColumns["pattern"];
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+    action: IRoutingRulesColumns["action"];
+    forward_to: IRoutingRulesColumns["forward_to"];
+    priority: IRoutingRulesColumns["priority"];
+    created_at: IRoutingRulesColumns["created_at"];
+    folder_id: IRoutingRulesColumns["folder_id"];
+    match_field: IRoutingRulesColumns["match_field"];
+    match_operator: IRoutingRulesColumns["match_operator"];
+    match_value: IRoutingRulesColumns["match_value"];
+    scope: IRoutingRulesColumns["scope"];
+    name: IRoutingRulesColumns["name"];
+    enabled: IRoutingRulesColumns["enabled"];
+    keep_copy: IRoutingRulesColumns["keep_copy"];
+    reject_reason: IRoutingRulesColumns["reject_reason"];
+    last_matched_at: IRoutingRulesColumns["last_matched_at"];
+    match_count: IRoutingRulesColumns["match_count"];
+}
+
+/** Result of query `RuleFolder`. */
+export interface IRuleFolderResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `QueueDraft`. */
+export interface IQueueDraftResult {
+    id: IMessagesColumns["id"];
 }
 
 /** Result of query `InsertOutboundJob`. */
@@ -287,14 +681,29 @@ export interface IInsertOutboundJobResult {
 
 /** Result of query `ClaimOutbound`. */
 export interface IClaimOutboundResult {
-    id: IOutboundJobsColumns["id"];
+    id: string | null;
+    user_id: string | null;
     message_id: IOutboundJobsColumns["message_id"];
     payload: IOutboundJobsColumns["payload"];
 }
 
-/** Result of query `OutboundAttachmentCheck`. */
-export interface IOutboundAttachmentCheckResult {
-    id: IMessageAttachmentsColumns["id"];
+/** Result of query `SendingAccount`. */
+export interface ISendingAccountResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+}
+
+/** Result of query `SendingMessage`. */
+export interface ISendingMessageResult {
+    mailbox_id: IMessagesColumns["mailbox_id"];
+}
+
+/** Result of query `SendingDomain`. */
+export interface ISendingDomainResult {
+    id: IDomainsColumns["id"];
 }
 
 /** Result of query `CompleteOutbound`. */
@@ -329,6 +738,7 @@ export interface Queries {
     InsertSetupMailbox: IInsertSetupMailboxResult;
     ActivateDomain: IActivateDomainResult;
     EnableSending: IEnableSendingResult;
+    UpdateRelayVersion: IUpdateRelayVersionResult;
     BackupSettings: IBackupSettingsResult;
     ExpiredBackups: IExpiredBackupsResult;
     DeleteExpiredBackup: IDeleteExpiredBackupResult;
@@ -344,12 +754,54 @@ export interface Queries {
     PruneSessions: IPruneSessionsResult;
     PruneLoginChallenges: IPruneLoginChallengesResult;
     ReleaseCronLease: IReleaseCronLeaseResult;
-    InboundMailbox: IInboundMailboxResult;
+    MailboxPermission: IMailboxPermissionResult;
+    ManagedDomain: IManagedDomainResult;
+    SendingAttachments: ISendingAttachmentsResult;
+    ExpiredAttachmentLink: IExpiredAttachmentLinkResult;
+    CreateAttachmentLink: ICreateAttachmentLinkResult;
+    GetAttachmentLink: IGetAttachmentLinkResult;
+    PublicAttachment: IPublicAttachmentResult;
+    ClaimDraftLock: IClaimDraftLockResult;
+    ReleaseDraftLock: IReleaseDraftLockResult;
+    SenderAliases: ISenderAliasesResult;
+    SenderDomainAlias: ISenderDomainAliasResult;
+    SenderAddressOccupied: ISenderAddressOccupiedResult;
+    OwnDraft: IOwnDraftResult;
+    DraftAttachments: IDraftAttachmentsResult;
+    OutgoingAttachmentLimit: IOutgoingAttachmentLimitResult;
+    UpdateDraft: IUpdateDraftResult;
+    CreateDraft: ICreateDraftResult;
+    RollbackNewDraft: IRollbackNewDraftResult;
+    ForwardAttachments: IForwardAttachmentsResult;
+    CopyForwardAttachment: ICopyForwardAttachmentResult;
+    TouchDraftUpload: ITouchDraftUploadResult;
+    UploadDraftAttachment: IUploadDraftAttachmentResult;
+    RemoveDraftAttachment: IRemoveDraftAttachmentResult;
+    TouchDraftRemoval: ITouchDraftRemovalResult;
+    DeleteOwnedDraft: IDeleteOwnedDraftResult;
+    InboundForwarding: IInboundForwardingResult;
     InboundExists: IInboundExistsResult;
     InboundParent: IInboundParentResult;
     InsertInbound: IInsertInboundResult;
     InsertInboundAttachment: IInsertInboundAttachmentResult;
+    SettingsDomains: ISettingsDomainsResult;
+    SettingsAliases: ISettingsAliasesResult;
+    SettingsRules: ISettingsRulesResult;
+    SettingsForwarding: ISettingsForwardingResult;
+    SettingsFolders: ISettingsFoldersResult;
+    CreateAlias: ICreateAliasResult;
+    FindAlias: IFindAliasResult;
+    RemoveAlias: IRemoveAliasResult;
+    SetAllDomains: ISetAllDomainsResult;
+    SetForwarding: ISetForwardingResult;
+    ManagedRuleFolder: IManagedRuleFolderResult;
+    ExistingRule: IExistingRuleResult;
+    UpsertRoutingRule: IUpsertRoutingRuleResult;
+    CreateCustomFolder: ICreateCustomFolderResult;
+    RemovableRule: IRemovableRuleResult;
+    DeleteRoutingRule: IDeleteRoutingRuleResult;
     ListMailboxes: IListMailboxesResult;
+    MailboxCounts: IMailboxCountsResult;
     InboxMessages: IInboxMessagesResult;
     ListMessages: IListMessagesResult;
     AuthorizedMessage: IAuthorizedMessageResult;
@@ -358,11 +810,21 @@ export interface Queries {
     DownloadAttachment: IDownloadAttachmentResult;
     DownloadOriginal: IDownloadOriginalResult;
     ChangeMessage: IChangeMessageResult;
-    SendingMailbox: ISendingMailboxResult;
-    InsertSentMessage: IInsertSentMessageResult;
+    CancelTrashedSend: ICancelTrashedSendResult;
+    RoutingDomain: IRoutingDomainResult;
+    DomainRoutingRules: IDomainRoutingRulesResult;
+    RecordRoutingMatch: IRecordRoutingMatchResult;
+    RoutingMailboxes: IRoutingMailboxesResult;
+    RoutingAliases: IRoutingAliasesResult;
+    RuleTarget: IRuleTargetResult;
+    InboxRoutingRules: IInboxRoutingRulesResult;
+    RuleFolder: IRuleFolderResult;
+    QueueDraft: IQueueDraftResult;
     InsertOutboundJob: IInsertOutboundJobResult;
     ClaimOutbound: IClaimOutboundResult;
-    OutboundAttachmentCheck: IOutboundAttachmentCheckResult;
+    SendingAccount: ISendingAccountResult;
+    SendingMessage: ISendingMessageResult;
+    SendingDomain: ISendingDomainResult;
     CompleteOutbound: ICompleteOutboundResult;
     CompleteSentMessage: ICompleteSentMessageResult;
     FailOutbound: IFailOutboundResult;
@@ -1065,6 +1527,8 @@ export interface IMessagesColumns {
     spam_analysis_error: string | null;
     trashed_at: number | null;
     reply_to: string | null;
+    draft_revision: number;
+    draft_scheduled_at: number | null;
 }
 
 /** Schema of `messages`. */
@@ -2105,7 +2569,9 @@ export const schema = {
             spam_analyzed_at: { _columnName: "spam_analyzed_at", _foreignKeys: {} },
             spam_analysis_error: { _columnName: "spam_analysis_error", _foreignKeys: {} },
             trashed_at: { _columnName: "trashed_at", _foreignKeys: {} },
-            reply_to: { _columnName: "reply_to", _foreignKeys: {} }
+            reply_to: { _columnName: "reply_to", _foreignKeys: {} },
+            draft_revision: { _columnName: "draft_revision", _foreignKeys: {} },
+            draft_scheduled_at: { _columnName: "draft_scheduled_at", _foreignKeys: {} }
         },
         _indexes: {
             messages_folder_idx: { _indexName: "messages_folder_idx" },

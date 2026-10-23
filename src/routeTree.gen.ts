@@ -13,12 +13,25 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MailRouteImport } from './routes/_mail'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SetupRouteImport } from './routes/setup'
+import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
+import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
+import { Route as MailScheduledRouteImport } from './routes/_mail.scheduled'
+import { Route as MailSentRouteImport } from './routes/_mail.sent'
+import { Route as MailSettingsRouteImport } from './routes/_mail.settings'
+import { Route as MailSnoozedRouteImport } from './routes/_mail.snoozed'
+import { Route as MailSpamRouteImport } from './routes/_mail.spam'
+import { Route as MailStarredRouteImport } from './routes/_mail.starred'
+import { Route as MailTrashRouteImport } from './routes/_mail.trash'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiInboundRouteImport } from './routes/api.inbound'
 import { Route as ApiRelayHealthRouteImport } from './routes/api.relay-health'
 import { Route as MailInboxIndexRouteImport } from './routes/_mail.inbox.index'
 import { Route as MailInboxMessageIdRouteImport } from './routes/_mail.inbox.$messageId'
+import { Route as MailSettingsForwardingRouteImport } from './routes/_mail.settings.forwarding'
+import { Route as MailSettingsMailboxesRouteImport } from './routes/_mail.settings.mailboxes'
+import { Route as MailSettingsRulesRouteImport } from './routes/_mail.settings.rules'
+import { Route as ApiSharedFilesTokenRouteImport } from './routes/api.shared-files.$token'
 import { Route as ApiMessagesMessageIdOriginalRouteImport } from './routes/api.messages.$messageId.original'
 import { Route as ApiMessagesMessageIdAttachmentsAttachmentIdRouteImport } from './routes/api.messages.$messageId.attachments.$attachmentId'
 
@@ -41,9 +54,54 @@ const SetupRoute = SetupRouteImport.update({
   path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MailArchivedRoute = MailArchivedRouteImport.update({
+  id: '/archived',
+  path: '/archived',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailDraftsRoute = MailDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => MailRoute,
+} as any)
 const MailInboxRoute = MailInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailScheduledRoute = MailScheduledRouteImport.update({
+  id: '/scheduled',
+  path: '/scheduled',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailSentRoute = MailSentRouteImport.update({
+  id: '/sent',
+  path: '/sent',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailSettingsRoute = MailSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailSnoozedRoute = MailSnoozedRouteImport.update({
+  id: '/snoozed',
+  path: '/snoozed',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailSpamRoute = MailSpamRouteImport.update({
+  id: '/spam',
+  path: '/spam',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailStarredRoute = MailStarredRouteImport.update({
+  id: '/starred',
+  path: '/starred',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailTrashRoute = MailTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
   getParentRoute: () => MailRoute,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -71,6 +129,26 @@ const MailInboxMessageIdRoute = MailInboxMessageIdRouteImport.update({
   path: '/$messageId',
   getParentRoute: () => MailInboxRoute,
 } as any)
+const MailSettingsForwardingRoute = MailSettingsForwardingRouteImport.update({
+  id: '/forwarding',
+  path: '/forwarding',
+  getParentRoute: () => MailSettingsRoute,
+} as any)
+const MailSettingsMailboxesRoute = MailSettingsMailboxesRouteImport.update({
+  id: '/mailboxes',
+  path: '/mailboxes',
+  getParentRoute: () => MailSettingsRoute,
+} as any)
+const MailSettingsRulesRoute = MailSettingsRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => MailSettingsRoute,
+} as any)
+const ApiSharedFilesTokenRoute = ApiSharedFilesTokenRouteImport.update({
+  id: '/api/shared-files/$token',
+  path: '/api/shared-files/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMessagesMessageIdOriginalRoute =
   ApiMessagesMessageIdOriginalRouteImport.update({
     id: '/api/messages/$messageId/original',
@@ -88,11 +166,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
+  '/archived': typeof MailArchivedRoute
+  '/drafts': typeof MailDraftsRoute
   '/inbox': typeof MailInboxRouteWithChildren
+  '/scheduled': typeof MailScheduledRoute
+  '/sent': typeof MailSentRoute
+  '/settings': typeof MailSettingsRouteWithChildren
+  '/snoozed': typeof MailSnoozedRoute
+  '/spam': typeof MailSpamRoute
+  '/starred': typeof MailStarredRoute
+  '/trash': typeof MailTrashRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/inbox/$messageId': typeof MailInboxMessageIdRoute
+  '/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/settings/mailboxes': typeof MailSettingsMailboxesRoute
+  '/settings/rules': typeof MailSettingsRulesRoute
+  '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/inbox/': typeof MailInboxIndexRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
   '/api/messages/$messageId/attachments/$attachmentId': typeof ApiMessagesMessageIdAttachmentsAttachmentIdRoute
@@ -101,10 +192,23 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
+  '/archived': typeof MailArchivedRoute
+  '/drafts': typeof MailDraftsRoute
+  '/scheduled': typeof MailScheduledRoute
+  '/sent': typeof MailSentRoute
+  '/settings': typeof MailSettingsRouteWithChildren
+  '/snoozed': typeof MailSnoozedRoute
+  '/spam': typeof MailSpamRoute
+  '/starred': typeof MailStarredRoute
+  '/trash': typeof MailTrashRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/inbox/$messageId': typeof MailInboxMessageIdRoute
+  '/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/settings/mailboxes': typeof MailSettingsMailboxesRoute
+  '/settings/rules': typeof MailSettingsRulesRoute
+  '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/inbox': typeof MailInboxIndexRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
   '/api/messages/$messageId/attachments/$attachmentId': typeof ApiMessagesMessageIdAttachmentsAttachmentIdRoute
@@ -115,11 +219,24 @@ export interface FileRoutesById {
   '/_mail': typeof MailRouteWithChildren
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
+  '/_mail/archived': typeof MailArchivedRoute
+  '/_mail/drafts': typeof MailDraftsRoute
   '/_mail/inbox': typeof MailInboxRouteWithChildren
+  '/_mail/scheduled': typeof MailScheduledRoute
+  '/_mail/sent': typeof MailSentRoute
+  '/_mail/settings': typeof MailSettingsRouteWithChildren
+  '/_mail/snoozed': typeof MailSnoozedRoute
+  '/_mail/spam': typeof MailSpamRoute
+  '/_mail/starred': typeof MailStarredRoute
+  '/_mail/trash': typeof MailTrashRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/_mail/inbox/$messageId': typeof MailInboxMessageIdRoute
+  '/_mail/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/_mail/settings/mailboxes': typeof MailSettingsMailboxesRoute
+  '/_mail/settings/rules': typeof MailSettingsRulesRoute
+  '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/_mail/inbox/': typeof MailInboxIndexRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
   '/api/messages/$messageId/attachments/$attachmentId': typeof ApiMessagesMessageIdAttachmentsAttachmentIdRoute
@@ -130,11 +247,24 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/setup'
+    | '/archived'
+    | '/drafts'
     | '/inbox'
+    | '/scheduled'
+    | '/sent'
+    | '/settings'
+    | '/snoozed'
+    | '/spam'
+    | '/starred'
+    | '/trash'
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
     | '/inbox/$messageId'
+    | '/settings/forwarding'
+    | '/settings/mailboxes'
+    | '/settings/rules'
+    | '/api/shared-files/$token'
     | '/inbox/'
     | '/api/messages/$messageId/original'
     | '/api/messages/$messageId/attachments/$attachmentId'
@@ -143,10 +273,23 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/setup'
+    | '/archived'
+    | '/drafts'
+    | '/scheduled'
+    | '/sent'
+    | '/settings'
+    | '/snoozed'
+    | '/spam'
+    | '/starred'
+    | '/trash'
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
     | '/inbox/$messageId'
+    | '/settings/forwarding'
+    | '/settings/mailboxes'
+    | '/settings/rules'
+    | '/api/shared-files/$token'
     | '/inbox'
     | '/api/messages/$messageId/original'
     | '/api/messages/$messageId/attachments/$attachmentId'
@@ -156,11 +299,24 @@ export interface FileRouteTypes {
     | '/_mail'
     | '/login'
     | '/setup'
+    | '/_mail/archived'
+    | '/_mail/drafts'
     | '/_mail/inbox'
+    | '/_mail/scheduled'
+    | '/_mail/sent'
+    | '/_mail/settings'
+    | '/_mail/snoozed'
+    | '/_mail/spam'
+    | '/_mail/starred'
+    | '/_mail/trash'
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
     | '/_mail/inbox/$messageId'
+    | '/_mail/settings/forwarding'
+    | '/_mail/settings/mailboxes'
+    | '/_mail/settings/rules'
+    | '/api/shared-files/$token'
     | '/_mail/inbox/'
     | '/api/messages/$messageId/original'
     | '/api/messages/$messageId/attachments/$attachmentId'
@@ -174,6 +330,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   ApiInboundRoute: typeof ApiInboundRoute
   ApiRelayHealthRoute: typeof ApiRelayHealthRoute
+  ApiSharedFilesTokenRoute: typeof ApiSharedFilesTokenRoute
   ApiMessagesMessageIdOriginalRoute: typeof ApiMessagesMessageIdOriginalRoute
   ApiMessagesMessageIdAttachmentsAttachmentIdRoute: typeof ApiMessagesMessageIdAttachmentsAttachmentIdRoute
 }
@@ -208,11 +365,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_mail/archived': {
+      id: '/_mail/archived'
+      path: '/archived'
+      fullPath: '/archived'
+      preLoaderRoute: typeof MailArchivedRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/drafts': {
+      id: '/_mail/drafts'
+      path: '/drafts'
+      fullPath: '/drafts'
+      preLoaderRoute: typeof MailDraftsRouteImport
+      parentRoute: typeof MailRoute
+    }
     '/_mail/inbox': {
       id: '/_mail/inbox'
       path: '/inbox'
       fullPath: '/inbox'
       preLoaderRoute: typeof MailInboxRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/scheduled': {
+      id: '/_mail/scheduled'
+      path: '/scheduled'
+      fullPath: '/scheduled'
+      preLoaderRoute: typeof MailScheduledRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/sent': {
+      id: '/_mail/sent'
+      path: '/sent'
+      fullPath: '/sent'
+      preLoaderRoute: typeof MailSentRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/settings': {
+      id: '/_mail/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof MailSettingsRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/snoozed': {
+      id: '/_mail/snoozed'
+      path: '/snoozed'
+      fullPath: '/snoozed'
+      preLoaderRoute: typeof MailSnoozedRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/spam': {
+      id: '/_mail/spam'
+      path: '/spam'
+      fullPath: '/spam'
+      preLoaderRoute: typeof MailSpamRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/starred': {
+      id: '/_mail/starred'
+      path: '/starred'
+      fullPath: '/starred'
+      preLoaderRoute: typeof MailStarredRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/trash': {
+      id: '/_mail/trash'
+      path: '/trash'
+      fullPath: '/trash'
+      preLoaderRoute: typeof MailTrashRouteImport
       parentRoute: typeof MailRoute
     }
     '/api/health': {
@@ -250,6 +470,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailInboxMessageIdRouteImport
       parentRoute: typeof MailInboxRoute
     }
+    '/_mail/settings/forwarding': {
+      id: '/_mail/settings/forwarding'
+      path: '/forwarding'
+      fullPath: '/settings/forwarding'
+      preLoaderRoute: typeof MailSettingsForwardingRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
+    '/_mail/settings/mailboxes': {
+      id: '/_mail/settings/mailboxes'
+      path: '/mailboxes'
+      fullPath: '/settings/mailboxes'
+      preLoaderRoute: typeof MailSettingsMailboxesRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
+    '/_mail/settings/rules': {
+      id: '/_mail/settings/rules'
+      path: '/rules'
+      fullPath: '/settings/rules'
+      preLoaderRoute: typeof MailSettingsRulesRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
+    '/api/shared-files/$token': {
+      id: '/api/shared-files/$token'
+      path: '/api/shared-files/$token'
+      fullPath: '/api/shared-files/$token'
+      preLoaderRoute: typeof ApiSharedFilesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/messages/$messageId/original': {
       id: '/api/messages/$messageId/original'
       path: '/api/messages/$messageId/original'
@@ -281,12 +529,46 @@ const MailInboxRouteWithChildren = MailInboxRoute._addFileChildren(
   MailInboxRouteChildren,
 )
 
+interface MailSettingsRouteChildren {
+  MailSettingsForwardingRoute: typeof MailSettingsForwardingRoute
+  MailSettingsMailboxesRoute: typeof MailSettingsMailboxesRoute
+  MailSettingsRulesRoute: typeof MailSettingsRulesRoute
+}
+
+const MailSettingsRouteChildren: MailSettingsRouteChildren = {
+  MailSettingsForwardingRoute: MailSettingsForwardingRoute,
+  MailSettingsMailboxesRoute: MailSettingsMailboxesRoute,
+  MailSettingsRulesRoute: MailSettingsRulesRoute,
+}
+
+const MailSettingsRouteWithChildren = MailSettingsRoute._addFileChildren(
+  MailSettingsRouteChildren,
+)
+
 interface MailRouteChildren {
+  MailArchivedRoute: typeof MailArchivedRoute
+  MailDraftsRoute: typeof MailDraftsRoute
   MailInboxRoute: typeof MailInboxRouteWithChildren
+  MailScheduledRoute: typeof MailScheduledRoute
+  MailSentRoute: typeof MailSentRoute
+  MailSettingsRoute: typeof MailSettingsRouteWithChildren
+  MailSnoozedRoute: typeof MailSnoozedRoute
+  MailSpamRoute: typeof MailSpamRoute
+  MailStarredRoute: typeof MailStarredRoute
+  MailTrashRoute: typeof MailTrashRoute
 }
 
 const MailRouteChildren: MailRouteChildren = {
+  MailArchivedRoute: MailArchivedRoute,
+  MailDraftsRoute: MailDraftsRoute,
   MailInboxRoute: MailInboxRouteWithChildren,
+  MailScheduledRoute: MailScheduledRoute,
+  MailSentRoute: MailSentRoute,
+  MailSettingsRoute: MailSettingsRouteWithChildren,
+  MailSnoozedRoute: MailSnoozedRoute,
+  MailSpamRoute: MailSpamRoute,
+  MailStarredRoute: MailStarredRoute,
+  MailTrashRoute: MailTrashRoute,
 }
 
 const MailRouteWithChildren = MailRoute._addFileChildren(MailRouteChildren)
@@ -299,6 +581,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   ApiInboundRoute: ApiInboundRoute,
   ApiRelayHealthRoute: ApiRelayHealthRoute,
+  ApiSharedFilesTokenRoute: ApiSharedFilesTokenRoute,
   ApiMessagesMessageIdOriginalRoute: ApiMessagesMessageIdOriginalRoute,
   ApiMessagesMessageIdAttachmentsAttachmentIdRoute:
     ApiMessagesMessageIdAttachmentsAttachmentIdRoute,
