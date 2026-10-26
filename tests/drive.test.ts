@@ -542,3 +542,45 @@ test("an expired finalizer cannot overwrite a newer completed file", async () =>
 		probe.mockRestore();
 	}
 });
+
+test("the native upload handler preserves cookie/Bearer authentication and origin checks", async () => {
+	const { serveDriveUpload } = await import("../src/server/api/drive-upload");
+	const { createSession } = await import("../src/server/auth/service");
+	const { publicOrigin } = await import("../src/server/config");
+	const token = await createSession(owner.id),
+		body = JSON.stringify({ name: "empty", size: 0 });
+	const request = (headers: HeadersInit) =>
+		new Request("http://localhost/api/drive/upload", {
+			method: "POST",
+			headers,
+			body,
+		});
+	expect(
+		(
+			await serveDriveUpload(
+				request({
+					Cookie: `ep_session=${token}`,
+					Origin: "https://untrusted.example",
+				}),
+			)
+		).status,
+	).toBe(403);
+	expect(
+		(await serveDriveUpload(request({ Cookie: `ep_session=${token}` }))).status,
+	).toBe(403);
+	expect(
+		(await serveDriveUpload(request({ Authorization: "Bearer invalid" })))
+			.status,
+	).toBe(401);
+	expect(
+		(
+			await serveDriveUpload(
+				request({ Cookie: `ep_session=${token}`, Origin: publicOrigin() }),
+			)
+		).status,
+	).toBe(200);
+	expect(
+		(await serveDriveUpload(request({ Authorization: `Bearer ${token}` })))
+			.status,
+	).toBe(200);
+});

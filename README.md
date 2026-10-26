@@ -70,6 +70,7 @@ SQLite leases exclude overlapping runs. Scheduled work is queried by persisted d
 
 Implemented:
 
+- Original account list/details/permissions/password/inbox screens and admin mailbox URL aliases. Native creation commits the user, primary inbox, explicit aliases and booking username together; seat limits and primary-admin transfers serialize under SQLite. Delegated admins retain their original limits, resets revoke sessions/challenges, account avatars follow the original management scope, and disabled accounts cannot sign in.
 - Original Drive and public sharing screens with local streamed multipart uploads, three-day resume, atomic quota reservations, inherited view/edit permissions, owner-only sharing/moves/restores, folder breadcrumbs, search/type filters, previews/downloads, Range/HEAD support, trash and 30-day retention. Email attachments keep mailbox permissions and have independent trash/restore/delete actions. Upload leases and staged publication prevent an expired writer from replacing a completed file.
 - Original Calendar and booking screens, recurring-series edits and occurrence moves, public booking pages at both original URL forms, time-zone/DST-aware availability and atomic multi-host reservations. Calendar invitations use local ICS attachments and durable outbound jobs; calendar API keys enforce read/write and send scopes.
 - Original Mailflare dashboard and section layouts, navigation, list rows, split reader, rich composer, attachment viewer, contacts dialogs, account menu, login/MFA challenge screen and settings forms for Account, Inbox, Security, Mailboxes, aliases and routing rules. TanStack navigation replaces Next navigation; the components, styles and translations come from the source baseline.
@@ -81,13 +82,13 @@ Implemented:
 - Bun WebSocket revision checks/live notifications, the original notification popup, Web Push encryption/subscriptions, packaged PWA assets and local fonts. Notification delivery rechecks active sessions and mailbox access.
 - Normalized exact/explicit/cross-domain aliases, domain rules/catch-all routing, forwarding with keep-copy/failure fallback and loop protection. Setup deploys and verifies the Cloudflare relay.
 - Local backups and older full-backup restore, internal lease exclusion, atomic restore rollback, and owner-configured Trash/Spam retention. Object cleanup preserves files still referenced by other records.
-- Native builds, an isolated compiled HTTP/WebSocket smoke check including a 192 MiB streamed Drive file, SQL generation/coverage checks and behavioral tests. The benchmark exercises the restored UI's list query rather than the obsolete route-loader query.
+- Native builds, an isolated compiled HTTP/WebSocket smoke check including managed-account login/reset revocation and a 192 MiB streamed Drive file, SQL generation/coverage checks and behavioral tests. The benchmark exercises the restored UI's list query rather than the obsolete route-loader query.
 
 Still to migrate before production cutover:
 
-- Complete account/domain/admin management; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
+- Domain management and remaining administration screens; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
 - Agent configuration/chat/tools, approval workflows, automatic draft generation/recovery, webhooks/retries. The original assistant layout is present; its remaining endpoints are not yet ported.
-- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit. Calendar, booking and Drive were compared against the original on desktop; the current browser viewport override did not take effect, so phone layouts remain unverified.
+- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit. Calendar, booking and Drive were compared against the original on desktop; the current browser viewport override did not take effect, so phone layouts remain unverified. Account lists/details were also compared on desktop and a saved name change was verified after reload.
 - Real Cloudflare delivery checks, a full migration/restore rehearsal, original-app end-to-end performance comparison, nibrun restart/durability verification and production cutover.
 
 Full parity remains the acceptance criterion. The preview is an incomplete migration checkpoint; visible source navigation includes features whose native handlers are still being ported. Missing jobs are not represented by no-op implementations.

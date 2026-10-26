@@ -27,7 +27,7 @@ import {
 } from "../drive/sharing";
 import { streamDriveFile } from "../drive/content";
 import { driveAttachment, changeDriveAttachments } from "../drive/attachments";
-import { imageResponse } from "./avatars";
+import { imageResponse } from "../images";
 export async function driveApi(
 	request: Request,
 	user: User,

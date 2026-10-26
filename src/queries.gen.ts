@@ -26,6 +26,174 @@ export interface ISpamSenderReputationResult {
     hamCount: number;
 }
 
+/** Result of query `NativeAdminWriteFence`. */
+export interface INativeAdminWriteFenceResult {
+}
+
+/** Result of query `NativeManagedAccountActor`. */
+export interface INativeManagedAccountActorResult {
+    id: IUsersColumns["id"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    can_manage_users: IUsersColumns["can_manage_users"];
+    disabled: IUsersColumns["disabled"];
+}
+
+/** Result of query `NativeAccountsLicense`. */
+export interface INativeAccountsLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
+    seat_limit: ILicenseSettingsColumns["seat_limit"];
+}
+
+/** Result of query `NativeManagedAccountRecord`. */
+export interface INativeManagedAccountRecordResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    password_hash: IUsersColumns["password_hash"];
+    name: IUsersColumns["name"];
+    created_at: IUsersColumns["created_at"];
+    reset_email: IUsersColumns["reset_email"];
+    role: IUsersColumns["role"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+    disabled: IUsersColumns["disabled"];
+    avatar_key: IUsersColumns["avatar_key"];
+    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
+    forwarding_email: IUsersColumns["forwarding_email"];
+    keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
+    spam_protection_enabled: IUsersColumns["spam_protection_enabled"];
+    totp_secret: IUsersColumns["totp_secret"];
+    totp_enabled: IUsersColumns["totp_enabled"];
+    totp_confirmed_at: IUsersColumns["totp_confirmed_at"];
+    time_zone: IUsersColumns["time_zone"];
+    booking_username: IUsersColumns["booking_username"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    can_manage_domains: IUsersColumns["can_manage_domains"];
+    can_manage_users: IUsersColumns["can_manage_users"];
+    show_full_recipient_addresses: IUsersColumns["show_full_recipient_addresses"];
+    trash_retention_days: IUsersColumns["trash_retention_days"];
+}
+
+/** Result of query `NativeAccountsList`. */
+export interface INativeAccountsListResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    password_hash: IUsersColumns["password_hash"];
+    name: IUsersColumns["name"];
+    created_at: IUsersColumns["created_at"];
+    reset_email: IUsersColumns["reset_email"];
+    role: IUsersColumns["role"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+    disabled: IUsersColumns["disabled"];
+    avatar_key: IUsersColumns["avatar_key"];
+    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
+    forwarding_email: IUsersColumns["forwarding_email"];
+    keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
+    spam_protection_enabled: IUsersColumns["spam_protection_enabled"];
+    totp_secret: IUsersColumns["totp_secret"];
+    totp_enabled: IUsersColumns["totp_enabled"];
+    totp_confirmed_at: IUsersColumns["totp_confirmed_at"];
+    time_zone: IUsersColumns["time_zone"];
+    booking_username: IUsersColumns["booking_username"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    can_manage_domains: IUsersColumns["can_manage_domains"];
+    can_manage_users: IUsersColumns["can_manage_users"];
+    show_full_recipient_addresses: IUsersColumns["show_full_recipient_addresses"];
+    trash_retention_days: IUsersColumns["trash_retention_days"];
+}
+
+/** Result of query `NativeAccountSeatUsage`. */
+export interface INativeAccountSeatUsageResult {
+    total: number | null;
+}
+
+/** Result of query `NativeAccountCreateDomains`. */
+export interface INativeAccountCreateDomainsResult {
+    id: IDomainsColumns["id"];
+    hostname: IDomainsColumns["hostname"];
+    status: IDomainsColumns["status"];
+}
+
+/** Result of query `NativeAccountOccupiedAddresses`. */
+export interface INativeAccountOccupiedAddressesResult {
+    domain_id: string | null;
+    local_part: string;
+}
+
+/** Result of query `NativeAccountRegisteredEmail`. */
+export interface INativeAccountRegisteredEmailResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeInsertManagedAccount`. */
+export interface INativeInsertManagedAccountResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    password_hash: IUsersColumns["password_hash"];
+    name: IUsersColumns["name"];
+    created_at: IUsersColumns["created_at"];
+    reset_email: IUsersColumns["reset_email"];
+    role: IUsersColumns["role"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+    disabled: IUsersColumns["disabled"];
+    avatar_key: IUsersColumns["avatar_key"];
+    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
+    forwarding_email: IUsersColumns["forwarding_email"];
+    keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
+    spam_protection_enabled: IUsersColumns["spam_protection_enabled"];
+    totp_secret: IUsersColumns["totp_secret"];
+    totp_enabled: IUsersColumns["totp_enabled"];
+    totp_confirmed_at: IUsersColumns["totp_confirmed_at"];
+    time_zone: IUsersColumns["time_zone"];
+    booking_username: IUsersColumns["booking_username"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    can_manage_domains: IUsersColumns["can_manage_domains"];
+    can_manage_users: IUsersColumns["can_manage_users"];
+    show_full_recipient_addresses: IUsersColumns["show_full_recipient_addresses"];
+    trash_retention_days: IUsersColumns["trash_retention_days"];
+}
+
+/** Result of query `NativeInsertManagedPrimaryMailbox`. */
+export interface INativeInsertManagedPrimaryMailboxResult {
+}
+
+/** Result of query `NativeInsertManagedAlias`. */
+export interface INativeInsertManagedAliasResult {
+}
+
+/** Result of query `NativeUpdateManagedAccount`. */
+export interface INativeUpdateManagedAccountResult {
+}
+
+/** Result of query `NativeUpdateManagedMailboxNames`. */
+export interface INativeUpdateManagedMailboxNamesResult {
+}
+
+/** Result of query `NativeRevokeManagedSessions`. */
+export interface INativeRevokeManagedSessionsResult {
+}
+
+/** Result of query `NativeRevokeManagedResetTokens`. */
+export interface INativeRevokeManagedResetTokensResult {
+}
+
+/** Result of query `NativeRevokeManagedLoginChallenges`. */
+export interface INativeRevokeManagedLoginChallengesResult {
+}
+
+/** Result of query `NativeTransferPrimaryAccount`. */
+export interface INativeTransferPrimaryAccountResult {
+}
+
+/** Result of query `NativeManagedAccountMailboxes`. */
+export interface INativeManagedAccountMailboxesResult {
+    id: string;
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    domain_id: IMailboxesColumns["domain_id"];
+    hostname: IDomainsColumns["hostname"];
+}
+
 /** Result of query `NativeDomainListActor`. */
 export interface INativeDomainListActorResult {
     created_by_user_id: IUsersColumns["created_by_user_id"];
@@ -47,23 +215,6 @@ export interface INativeListDomainsResult {
     sending_requested: IDomainsColumns["sending_requested"];
     sending_provider: IDomainsColumns["sending_provider"];
     receiving_provider: IDomainsColumns["receiving_provider"];
-}
-
-/** Result of query `NativeListAccounts`. */
-export interface INativeListAccountsResult {
-    id: IUsersColumns["id"];
-    email: IUsersColumns["email"];
-    name: IUsersColumns["name"];
-    role: IUsersColumns["role"];
-    is_primary_admin: IUsersColumns["is_primary_admin"];
-    disabled: IUsersColumns["disabled"];
-    created_by_user_id: IUsersColumns["created_by_user_id"];
-    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
-    can_manage_domains: IUsersColumns["can_manage_domains"];
-    can_manage_users: IUsersColumns["can_manage_users"];
-    forwarding_email: IUsersColumns["forwarding_email"];
-    avatar_key: IUsersColumns["avatar_key"];
-    created_at: IUsersColumns["created_at"];
 }
 
 /** Result of query `NativeBookingHostAvatar`. */
@@ -2590,9 +2741,27 @@ export interface Queries {
     SpamTrainingTokens: ISpamTrainingTokensResult;
     SpamSenderContact: ISpamSenderContactResult;
     SpamSenderReputation: ISpamSenderReputationResult;
+    NativeAdminWriteFence: INativeAdminWriteFenceResult;
+    NativeManagedAccountActor: INativeManagedAccountActorResult;
+    NativeAccountsLicense: INativeAccountsLicenseResult;
+    NativeManagedAccountRecord: INativeManagedAccountRecordResult;
+    NativeAccountsList: INativeAccountsListResult;
+    NativeAccountSeatUsage: INativeAccountSeatUsageResult;
+    NativeAccountCreateDomains: INativeAccountCreateDomainsResult;
+    NativeAccountOccupiedAddresses: INativeAccountOccupiedAddressesResult;
+    NativeAccountRegisteredEmail: INativeAccountRegisteredEmailResult;
+    NativeInsertManagedAccount: INativeInsertManagedAccountResult;
+    NativeInsertManagedPrimaryMailbox: INativeInsertManagedPrimaryMailboxResult;
+    NativeInsertManagedAlias: INativeInsertManagedAliasResult;
+    NativeUpdateManagedAccount: INativeUpdateManagedAccountResult;
+    NativeUpdateManagedMailboxNames: INativeUpdateManagedMailboxNamesResult;
+    NativeRevokeManagedSessions: INativeRevokeManagedSessionsResult;
+    NativeRevokeManagedResetTokens: INativeRevokeManagedResetTokensResult;
+    NativeRevokeManagedLoginChallenges: INativeRevokeManagedLoginChallengesResult;
+    NativeTransferPrimaryAccount: INativeTransferPrimaryAccountResult;
+    NativeManagedAccountMailboxes: INativeManagedAccountMailboxesResult;
     NativeDomainListActor: INativeDomainListActorResult;
     NativeListDomains: INativeListDomainsResult;
-    NativeListAccounts: INativeListAccountsResult;
     NativeBookingHostAvatar: INativeBookingHostAvatarResult;
     NativeUserAvatar: INativeUserAvatarResult;
     NativeMailboxAvatar: INativeMailboxAvatarResult;

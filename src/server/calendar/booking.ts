@@ -80,22 +80,27 @@ export async function ensureBookingUsername(user: User) {
 	if (!assigned) throw new Response("User not found", { status: 404 });
 	if (assigned.booking_username) return assigned.booking_username;
 	return withDatabase((sql) =>
-		sql.begin(async (tx) => {
-			const [current] =
-				await tx.NativeBookingUsername`UPDATE users SET booking_username=booking_username WHERE id=${user.id} AND disabled=0 RETURNING booking_username`;
-			if (!current) throw new Response("User not found", { status: 404 });
-			if (current.booking_username) return current.booking_username;
-			const base = bookingUsernameFromEmail(user.email);
-			for (let number = 1; number < 100000; number++) {
-				const candidate = number === 1 ? base : base + number;
-				const [updated] =
-					await tx.NativeAssignBookingUsername`UPDATE users SET booking_username=${candidate} WHERE id=${user.id} AND booking_username IS NULL AND NOT EXISTS(SELECT 1 FROM users WHERE booking_username=${candidate}) RETURNING booking_username`;
-				if (updated?.booking_username) return updated.booking_username;
-			}
-			throw new Error("Could not assign a booking username");
-		}),
+		sql.begin((tx) => assignBookingUsername(tx, user)),
 	);
 }
+export async function assignBookingUsername(
+	sql: AppSQL,
+	user: Pick<User, "id" | "email">,
+) {
+	const [current] =
+		await sql.NativeBookingUsername`UPDATE users SET booking_username=booking_username WHERE id=${user.id} AND disabled=0 RETURNING booking_username`;
+	if (!current) throw new Response("User not found", { status: 404 });
+	if (current.booking_username) return current.booking_username;
+	const base = bookingUsernameFromEmail(user.email);
+	for (let number = 1; number < 100000; number++) {
+		const candidate = number === 1 ? base : base + number;
+		const [updated] =
+			await sql.NativeAssignBookingUsername`UPDATE users SET booking_username=${candidate} WHERE id=${user.id} AND booking_username IS NULL AND NOT EXISTS(SELECT 1 FROM users WHERE booking_username=${candidate}) RETURNING booking_username`;
+		if (updated?.booking_username) return updated.booking_username;
+	}
+	throw new Error("Could not assign a booking username");
+}
+
 export async function updateBookingUsername(user: User, value: unknown) {
 	if (user.role !== "admin")
 		throw new Response("Only administrators can change booking usernames.", {

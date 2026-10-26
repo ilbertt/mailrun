@@ -1,3 +1,7 @@
+import {
+	isDriveUploadPath,
+	serveDriveUpload,
+} from "../src/server/api/drive-upload";
 import { clearDriveRuntimeLeases } from "../src/server/drive/files";
 import {
 	closeRealtimeConnections,
@@ -5,7 +9,7 @@ import {
 	type RealtimeSession,
 } from "../src/server/realtime";
 import { getUser } from "../src/server/auth/service";
-import { sessionToken } from "../src/server/api/settings";
+import { sessionToken } from "../src/server/auth/request-token";
 import { publicOrigin } from "../src/server/config";
 import { migrate } from "../src/server/db";
 import { runJob } from "../src/server/jobs/runner";
@@ -50,6 +54,8 @@ if (name) {
 					return;
 				return new Response("Expected WebSocket upgrade", { status: 426 });
 			}
+			if (isDriveUploadPath(new URL(request.url).pathname))
+				return serveDriveUpload(request);
 			return handler.fetch(request);
 		},
 	});

@@ -94,6 +94,107 @@ try {
 		"Content-Type": "application/json",
 	};
 
+	state.db.exec(
+		"INSERT INTO license_settings(id,instance_id,plan,state,updated_at) VALUES('default','http-smoke','team','active',1) ON CONFLICT(id) DO UPDATE SET plan='team',state='active'",
+	);
+	const accountPassword = crypto.randomUUID(),
+		createdAccount = await fetch(`${base}/api/accounts`, {
+			method: "POST",
+			headers: calendarHeaders,
+			body: JSON.stringify({
+				username: "standalone-account",
+				domainId: "domain",
+				password: accountPassword,
+				aliases: [{ domainId: "domain", localPart: "standalone-alias" }],
+			}),
+		});
+	const managed = z
+		.object({ account: z.object({ id: z.string(), email: z.string() }) })
+		.parse(await createdAccount.json()).account;
+	if (createdAccount.status !== 201) throw new Error("Account creation failed");
+	const accountDetails = await fetch(`${base}/api/accounts/${managed.id}`, {
+		headers: { Cookie: sessionCookie },
+	});
+	if (
+		!accountDetails.ok ||
+		!z
+			.object({
+				account: z.object({
+					editable: z.literal(true),
+					canChangeRole: z.literal(true),
+				}),
+			})
+			.safeParse(await accountDetails.json()).success
+	)
+		throw new Error("Managed account details failed");
+	const managedLogin = await fetch(`${base}/api/auth/login`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({ email: managed.email, password: accountPassword }),
+	});
+	const managedCookie = managedLogin.headers
+		.getSetCookie()
+		.find((value) => value.startsWith("ep_session="))
+		?.split(";")[0];
+	if (!managedLogin.ok || !managedCookie)
+		throw new Error("Created account could not sign in");
+	const reset = await fetch(`${base}/api/accounts/${managed.id}`, {
+		method: "PATCH",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "Standalone account",
+			role: "user",
+			disabled: false,
+			canManageMailboxes: false,
+			password: crypto.randomUUID(),
+		}),
+	});
+	if (
+		!reset.ok ||
+		(
+			await fetch(`${base}/api/drive/items`, {
+				headers: { Cookie: managedCookie },
+			})
+		).status !== 401
+	)
+		throw new Error("Administrative password reset did not revoke sessions");
+	for (const route of [
+		"/accounts",
+		`/accounts/${managed.id}`,
+		`/accounts/${managed.id}/permissions`,
+		`/accounts/${managed.id}/password`,
+		`/accounts/${managed.id}/mailboxes`,
+		"/mailboxes",
+		"/mailboxes/mailbox",
+	]) {
+		const page = await fetch(base + route, {
+			headers: { Cookie: sessionCookie },
+		});
+		if (!page.ok)
+			throw new Error(`Original admin route failed: ${route} (${page.status})`);
+	}
+
+	for (const sample of [
+		{
+			headers: new Headers({
+				Cookie: sessionCookie,
+				Origin: "https://untrusted.example",
+			}),
+			status: 403,
+		},
+		{ headers: new Headers({ Cookie: sessionCookie }), status: 403 },
+		{ headers: new Headers({ Authorization: "Bearer invalid" }), status: 401 },
+	]) {
+		const response = await fetch(`${base}/api/drive/upload`, {
+			method: "POST",
+			headers: sample.headers,
+			body: JSON.stringify({ name: "Unauthorized", size: 0 }),
+		});
+		if (response.status !== sample.status)
+			throw new Error(
+				`Native upload authentication/origin check returned ${response.status}`,
+			);
+	}
 	const memorySamples: Record<string, number> = {};
 	const sampleMemory = async (label: string) => {
 		const probe = Bun.spawn(["ps", "-o", "rss=", "-p", String(child.pid)], {
@@ -605,7 +706,11 @@ try {
 				originalRestLogin: "passed",
 				originalMessageApi: "passed",
 				calendarEvents: "passed",
+				managedAccountCreation: "passed",
+				adminPasswordResetRevocation: "passed",
+				originalAccountScreens: "passed",
 				drive192MiBStreaming: "passed",
+				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",
 				driveRangeAndHead: "passed",
 				driveSharingAndRevocation: "passed",

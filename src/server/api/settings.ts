@@ -14,12 +14,8 @@ import { isValidTimeZone, normalizeTimeZone } from "../../lib/time/utils";
 import { hash, rateLimit } from "../auth/service";
 import { readLimitedBody } from "../mail/inbound";
 import { mfaApi } from "./settings-mfa";
-export function sessionToken(request: Request) {
-	return (
-		request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1] ??
-		request.headers.get("cookie")?.match(/(?:^|;\s*)ep_session=([^;]+)/)?.[1]
-	);
-}
+import { sessionToken } from "../auth/request-token";
+export { sessionToken };
 export async function currentProfile(user: User) {
 	const [row] = await withDatabase(
 		(sql) =>

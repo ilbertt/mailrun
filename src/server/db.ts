@@ -7,8 +7,23 @@ import { getMigrations } from "./assets";
 import type { Queries } from "../queries.gen";
 
 export type AppSQL = TypedSQL<Queries>;
-const initialized = new Set<string>();
-const initializing = new Map<string, Promise<void>>();
+// The compiled Bun entrypoint and Start's bundle must serialize the same SQLite
+// callbacks; separate locks can block the event loop while another bundle awaits.
+declare global {
+	var __mailrunDatabaseState:
+		| {
+				initialized: Set<string>;
+				initializing: Map<string, Promise<void>>;
+				operations: Map<string, Promise<void>>;
+		  }
+		| undefined;
+}
+const state = (globalThis.__mailrunDatabaseState ??= {
+	initialized: new Set(),
+	initializing: new Map(),
+	operations: new Map(),
+});
+const { initialized, initializing } = state;
 
 export function databasePath() {
 	return join(dataDirectory(), "mailflare.sqlite");
@@ -55,7 +70,7 @@ export async function migrate(path = databasePath()) {
 // short database callbacks prevents another request from blocking this process
 // while an async transaction is waiting to resume. Network and file work stays
 // outside these callbacks. Separate cron processes use SQLite's busy timeout.
-const databaseOperations = new Map<string, Promise<void>>();
+const databaseOperations = state.operations;
 export async function withDatabase<T>(
 	run: (sql: AppSQL) => Promise<T>,
 	path = databasePath(),
