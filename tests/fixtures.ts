@@ -64,3 +64,9 @@ export async function fixture() {
 		},
 	};
 }
+
+export function enableTeamSharing(db: Database) {
+	db.exec(
+		"UPDATE mailboxes SET type='shared' WHERE id='mailbox'; INSERT INTO license_settings (id,instance_id,plan,state,updated_at) VALUES ('default','fixture','team','active',1) ON CONFLICT(id) DO UPDATE SET plan='team',state='active'",
+	);
+}

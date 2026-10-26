@@ -1,5 +1,5 @@
 import { test, expect, beforeEach, afterEach } from "bun:test";
-import { fixture, owner, stranger } from "./fixtures";
+import { fixture, owner, stranger, enableTeamSharing } from "./fixtures";
 import {
 	navigationCounts,
 	moveMessages,
@@ -39,6 +39,7 @@ test("navigation counts keep snoozed/custom folders distinct and drafts private"
 		html: "",
 		text: "",
 	});
+	enableTeamSharing(state.db);
 	state.db.exec(
 		"INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_at) VALUES ('share','mailbox','stranger','read_only',1)",
 	);

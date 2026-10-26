@@ -1,3 +1,6 @@
+import { MailNotifications } from "../components/mail-notifications";
+import { BrandingProvider } from "../components/branding-provider";
+import { AuthClientSync } from "../components/auth-client-sync";
 import { localeFn } from "../functions";
 import { getDirection } from "../lib/i18n/utils";
 import { sidebarBootstrapScript } from "../components/sidebar-state-utils";
@@ -20,10 +23,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 			meta: [
 				{ charSet: "utf-8" },
 				{ name: "viewport", content: "width=device-width, initial-scale=1" },
-				{ title: "Mailrun" },
+				{ title: "Mailflare" },
 				{ name: "robots", content: "noindex,nofollow" },
 			],
-			links: [{ rel: "stylesheet", href: styles }],
+			links: [
+				{ rel: "stylesheet", href: styles },
+				{ rel: "icon", href: "/api/branding/icon" },
+				{ rel: "apple-touch-icon", href: "/icon-192.png" },
+				{ rel: "manifest", href: "/manifest.webmanifest" },
+			],
 		}),
 		component: Root,
 		notFoundComponent: () => (
@@ -53,9 +61,13 @@ function Root() {
 			</head>
 			<body className="antialiased">
 				<QueryClientProvider client={queryClient}>
+					<AuthClientSync />
 					<LanguageProvider initialLocale={locale} initialMessages={messages}>
-						<ThemeSync />
-						<Outlet />
+						<BrandingProvider>
+							<ThemeSync />
+							<Outlet />
+							<MailNotifications />
+						</BrandingProvider>
 					</LanguageProvider>
 				</QueryClientProvider>
 				<Scripts />

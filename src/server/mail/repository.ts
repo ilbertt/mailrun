@@ -1,3 +1,7 @@
+import {
+	resolveMailboxDisplayName,
+	resolveMailboxAvatarKey,
+} from "../../lib/profile/identity-utils";
 import { withDatabase, seconds, type AppSQL } from "../db";
 import {
 	type User,
@@ -8,23 +12,74 @@ import {
 import { z } from "zod";
 
 export async function listMailboxes(user: User) {
-	const rows = await withDatabase(
-		(sql) => sql.ListMailboxes`
-		/* @notNull id */
-		/* @notNull user_id */
-		SELECT m.id,m.local_part,m.display_name,d.hostname,m.user_id,m.domain_id,m.use_all_domains,m.signature,
-		CASE WHEN m.user_id=${user.id} OR d.user_id=${user.id} THEN 'full_access' ELSE (SELECT permission FROM mailbox_access WHERE mailbox_id=m.id AND user_id=${user.id} LIMIT 1) END AS permission
-		FROM mailboxes m JOIN domains d ON d.id=m.domain_id
-		WHERE m.disabled=0 AND (m.user_id=${user.id} OR d.user_id=${user.id}
-			OR EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id}))
-		ORDER BY m.created_at,m.id`,
-	);
-	return rows.map((row) => ({
-		...row,
-		permission: z
-			.enum(["full_access", "send_as", "send_on_behalf", "read_only"])
-			.parse(row.permission),
-	}));
+	return withDatabase(async (sql) => {
+		const rows = await sql.ListMailboxes`
+ /* @notNull id */
+ /* @notNull user_id */
+ /* @notNull domain_owner */
+ SELECT m.id,m.local_part,m.display_name,d.hostname,m.user_id,m.domain_id,d.user_id AS domain_owner,m.use_all_domains,m.signature,m.type,m.avatar_key,m.auto_reply_enabled,m.auto_reply_subject,m.auto_reply_body,u.email AS owner_email,u.name AS owner_name,u.avatar_key AS owner_avatar,
+ CASE WHEN m.user_id=${user.id} THEN 'full_access' ELSE (SELECT permission FROM mailbox_access WHERE mailbox_id=m.id AND user_id=${user.id} LIMIT 1) END AS permission
+ FROM mailboxes m JOIN domains d ON d.id=m.domain_id JOIN users u ON u.id=m.user_id WHERE m.disabled=0 AND (m.user_id=${user.id} OR (m.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id}))) ORDER BY m.created_at,m.id`;
+		if (!rows.length) return [];
+		const owners = JSON.stringify([
+				...new Set(rows.map((row) => row.domain_owner)),
+			]),
+			ids = JSON.stringify(rows.map((row) => row.id));
+		const [domains, aliases, occupied] = await Promise.all([
+			sql.MailboxSenderDomains`SELECT id,hostname,user_id FROM domains WHERE status='active' AND user_id IN(SELECT value FROM json_each(${owners})) ORDER BY hostname,id`,
+			sql.MailboxSenderAliases`SELECT a.mailbox_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id IN(SELECT value FROM json_each(${ids})) ORDER BY a.created_at,a.id`,
+			sql.MailboxSenderOccupied`/* @notNull local_part */ SELECT b.id AS mailbox_id,b.local_part,b.domain_id FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners})) UNION ALL SELECT a.mailbox_id,a.local_part,a.domain_id FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners}))`,
+		]);
+		const normalize = (value: string) =>
+			(value.split("+")[0] ?? "").replaceAll(".", "").toLowerCase();
+		return rows.map((row) => {
+			const senders = new Set([
+				`${row.local_part}@${row.hostname}`,
+				...aliases
+					.filter((alias) => alias.mailbox_id === row.id)
+					.map((alias) => `${alias.local_part}@${alias.hostname}`),
+			]);
+			if (row.use_all_domains)
+				for (const domain of domains) {
+					if (domain.user_id !== row.domain_owner) continue;
+					if (
+						occupied.some(
+							(address) =>
+								address.domain_id === domain.id &&
+								address.mailbox_id !== row.id &&
+								normalize(address.local_part) === normalize(row.local_part),
+						)
+					)
+						continue;
+					senders.add(`${row.local_part}@${domain.hostname}`);
+				}
+			const identity = {
+				localPart: row.local_part,
+				hostname: row.hostname,
+				type: row.type,
+				displayName: row.display_name,
+				avatarKey: row.avatar_key,
+			};
+			const { owner_email, owner_name, owner_avatar, ...mailbox } = row;
+			return {
+				...mailbox,
+				display_name: resolveMailboxDisplayName(
+					identity,
+					owner_email,
+					owner_name,
+				),
+				avatar_key: resolveMailboxAvatarKey(
+					identity,
+					owner_email,
+					owner_avatar,
+				),
+				permission: z
+					.enum(["full_access", "send_as", "send_on_behalf", "read_only"])
+					.parse(row.permission),
+				senderAddresses: [...senders],
+			};
+		});
+	});
 }
 export async function mailCounts(user: User, mailboxId: string) {
 	await requireMailbox(user, mailboxId);
@@ -105,8 +160,8 @@ async function authorizeMessage(sql: AppSQL, user: User, messageId: string) {
 			SELECT m.id,m.mailbox_id,m.thread_id FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id
 			JOIN domains d ON d.id=b.domain_id WHERE m.id=${messageId} AND b.disabled=0
 			AND (m.status!='draft' OR m.user_id=${user.id})
-			AND (b.user_id=${user.id} OR d.user_id=${user.id}
-				OR EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id})) LIMIT 1`;
+			AND (b.user_id=${user.id}
+				OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id}))) LIMIT 1`;
 	if (!message) throw new Error("Message not found");
 	return message;
 }
@@ -114,18 +169,15 @@ export async function getThread(user: User, messageId: string) {
 	return withDatabase(async (sql) => {
 		const message = await authorizeMessage(sql, user, messageId);
 		const rows = await sql.ThreadMessages`
-			SELECT id,from_addr,to_addr,cc_addr,reply_to,subject,text_body,html_body,created_at,read,starred,status,provider_message_id,in_reply_to,references_header,thread_id,mailbox_id
+			SELECT id,user_id,folder_id,direction,bcc_addr,snippet,snoozed_until,spam_score,spam_verdict,spam_signals,spam_analyzed_at,spam_analysis_error,from_addr,to_addr,cc_addr,reply_to,subject,text_body,html_body,created_at,read,starred,status,provider_message_id,in_reply_to,references_header,thread_id,mailbox_id
 			FROM messages WHERE mailbox_id=${message.mailbox_id}
-			AND (status!='draft' OR user_id=${user.id})
-			AND (id=${message.id} OR (${message.thread_id} IS NOT NULL AND thread_id=${message.thread_id}))
-			ORDER BY created_at DESC,id DESC LIMIT 100`;
+			AND ((${message.thread_id} IS NULL AND id=${message.id}) OR (${message.thread_id} IS NOT NULL AND thread_id=${message.thread_id} AND status NOT IN ('draft','trash')))
+			ORDER BY created_at ASC,id ASC LIMIT 200`;
+
 		const attachments = await sql.ThreadAttachments`
-			/* @notNull id */
-			SELECT a.id,a.message_id,a.filename,a.size,a.content_id,a.content_type FROM message_attachments a JOIN messages m ON m.id=a.message_id
-			WHERE m.mailbox_id=${message.mailbox_id} AND a.trashed_at IS NULL
-			AND (m.status!='draft' OR m.user_id=${user.id})
-			AND (m.id=${message.id} OR (${message.thread_id} IS NOT NULL AND m.thread_id=${message.thread_id}))`;
-		return rows.reverse().map((row) => ({
+ SELECT a.id,a.message_id,a.filename,a.size,a.content_id,a.content_type,a.disposition FROM message_attachments a WHERE a.message_id IN(SELECT value FROM json_each(${JSON.stringify(rows.map((row) => row.id))})) AND a.trashed_at IS NULL`;
+
+		return rows.map((row) => ({
 			...row,
 			attachments: attachments.filter(
 				(attachment) => attachment.message_id === row.id,
@@ -143,13 +195,14 @@ export async function messageFile(
 		await authorizeMessage(sql, user, messageId);
 		if (attachmentId) {
 			const [attachment] = await sql.DownloadAttachment`
-				SELECT r2_key,filename,content_type FROM message_attachments
+				SELECT r2_key,filename,content_type,disposition FROM message_attachments
 				WHERE id=${attachmentId} AND message_id=${messageId} AND trashed_at IS NULL LIMIT 1`;
 			if (!attachment) throw new Error("Attachment not found");
 			return {
 				key: attachment.r2_key,
 				filename: attachment.filename,
 				contentType: attachment.content_type,
+				disposition: attachment.disposition,
 			};
 		}
 		const [message] =
@@ -176,9 +229,9 @@ export async function changeMessage(
 			trashed_at=CASE WHEN ${data.action}='trash' THEN ${seconds()} WHEN ${data.action}='inbox' THEN NULL ELSE trashed_at END
 		WHERE id=${data.id} AND mailbox_id IN (
 			SELECT b.id FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE b.disabled=0
-			AND (b.user_id=${user.id} OR d.user_id=${user.id} OR EXISTS (
+			AND (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS (
 				SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission='full_access'
-			))
+			)))
 		) AND (status!='draft' OR user_id=${user.id}) RETURNING id`,
 	);
 	if (!rows.length)

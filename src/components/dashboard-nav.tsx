@@ -5,11 +5,7 @@ import { useLanguage } from "./language-provider";
 import { folderColorKeys } from "@/lib/folders/color-keys";
 import type { TranslationKey } from "@/lib/i18n/types";
 import { useEffect, useState } from "react";
-import { useLocation } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { navigationCountsFn, createFolderFn } from "../functions";
-import { mailSettingsQuery } from "../queries";
-import { emptyNavigationCounts } from "../shared/navigation";
+import { usePathname } from "@/lib/navigation";
 import {
 	Archive,
 	CalendarClock,
@@ -24,7 +20,7 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
-import { useMail } from "./mail-context";
+import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -36,7 +32,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { useMessageCounts } from "@/hooks/use-message-counts";
+import { authFetch } from "@/lib/auth/client";
 import {
 	DEFAULT_FOLDER_COLOR,
 	FOLDER_COLOR_OPTIONS,
@@ -116,35 +113,14 @@ function NavToggle({
 export function DashboardNav({ className }: { className?: string }) {
 	const { t } = useLanguage();
 	const { minimal } = useSidebar();
-	const pathname = useLocation({ select: (location) => location.pathname });
+	const pathname = usePathname();
 	const [moreOpen, setMoreOpen] = useState(false);
 	const [foldersOpen, setFoldersOpen] = useState(false);
 	const [foldersSectionOpen, toggleFoldersSection] = useSectionOpen(
 		"mailflare:nav:folders-section-open",
 	);
-	const { user, mailboxes, mailboxId } = useMail();
-	const client = useQueryClient();
-	const selectedMailbox = mailboxes.find((mailbox) => mailbox.id === mailboxId);
-	const countsQuery = useQuery({
-		queryKey: ["messages", user.id, "navigation", mailboxId],
-		queryFn: () => navigationCountsFn({ data: { mailboxId } }),
-		enabled: !!mailboxId,
-		staleTime: 30000,
-	});
-	const counts = countsQuery.data ?? emptyNavigationCounts();
-	const [moveError, setMoveError] = useState("");
-	const reportMove = (request: Promise<unknown>) => {
-		setMoveError("");
-		void request
-			.then(() => client.invalidateQueries({ queryKey: ["messages", user.id] }))
-			.catch((error) =>
-				setMoveError(
-					error instanceof Error ? error.message : "Unable to move messages",
-				),
-			);
-	};
-
-	const settings = useQuery(mailSettingsQuery(user.id));
+	const { selectedMailbox, isLoading } = useSelectedMailbox();
+	const { counts } = useMessageCounts(selectedMailbox?.id, !isLoading);
 	const [folders, setFolders] = useState<CustomFolder[]>([]);
 	const [newFolderName, setNewFolderName] = useState("");
 	const [newFolderColor, setNewFolderColor] =
@@ -181,7 +157,7 @@ export function DashboardNav({ className }: { className?: string }) {
 					...link,
 					count: getFolderNavCount("archived", counts.folders),
 					onMessageDrop: (messageIds: string[]) =>
-						reportMove(moveMessagesToSystemFolder(messageIds, "archive")),
+						void moveMessagesToSystemFolder(messageIds, "archive"),
 				};
 			}
 			if (link.href === "/spam") {
@@ -189,7 +165,7 @@ export function DashboardNav({ className }: { className?: string }) {
 					...link,
 					count: getFolderNavCount("spam", counts.folders),
 					onMessageDrop: (messageIds: string[]) =>
-						reportMove(moveMessagesToSystemFolder(messageIds, "spam")),
+						void moveMessagesToSystemFolder(messageIds, "spam"),
 				};
 			}
 			if (link.href === "/trash") {
@@ -197,7 +173,7 @@ export function DashboardNav({ className }: { className?: string }) {
 					...link,
 					count: getFolderNavCount("trash", counts.folders),
 					onMessageDrop: (messageIds: string[]) =>
-						reportMove(moveMessagesToSystemFolder(messageIds, "trash")),
+						void moveMessagesToSystemFolder(messageIds, "trash"),
 				};
 			}
 			return link;
@@ -232,41 +208,52 @@ export function DashboardNav({ className }: { className?: string }) {
 	const foldersOverflow = !minimal && folders.length > MAX_VISIBLE_FOLDERS;
 
 	useEffect(() => {
-		setFolders(
-			settings.data?.folders
-				.filter((folder) => folder.mailbox_id === mailboxId)
-				.map((folder) => ({
-					id: folder.id,
-					name: folder.name,
-					color: folder.color,
-				})) ?? [],
-		);
-	}, [settings.data, mailboxId]);
-	const [folderError, setFolderError] = useState("");
+		if (!selectedMailbox?.id) {
+			setFolders([]);
+			return;
+		}
+
+		let cancelled = false;
+		const params = new URLSearchParams({ mailboxId: selectedMailbox.id });
+		authFetch(`/api/folders?${params.toString()}`)
+			.then(
+				(response) => response.json() as Promise<{ folders?: CustomFolder[] }>,
+			)
+			.then((data) => {
+				if (!cancelled) setFolders(data.folders ?? []);
+			})
+			.catch(() => {
+				if (!cancelled) setFolders([]);
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [selectedMailbox?.id]);
+
 	async function createFolder(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (!selectedMailbox?.id || !newFolderName.trim()) return;
+
 		setAddingFolder(true);
-		setFolderError("");
 		try {
-			const folder = await createFolderFn({
-				data: {
+			const response = await authFetch("/api/folders", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
 					mailboxId: selectedMailbox.id,
 					name: newFolderName,
 					color: newFolderColor,
-				},
+				}),
 			});
+			if (!response.ok) return;
+			const folder = (await response.json()) as CustomFolder;
 			setFolders((items) =>
 				[...items, folder].sort((a, b) => a.name.localeCompare(b.name)),
 			);
 			setNewFolderName("");
 			setNewFolderColor(DEFAULT_FOLDER_COLOR);
 			setFolderDialogOpen(false);
-			await client.invalidateQueries({ queryKey: ["mail-settings", user.id] });
-		} catch (error) {
-			setFolderError(
-				error instanceof Error ? error.message : "Unable to create folder",
-			);
 		} finally {
 			setAddingFolder(false);
 		}
@@ -278,11 +265,6 @@ export function DashboardNav({ className }: { className?: string }) {
 			header={<SidebarHeader href="/inbox" />}
 			footer={<SidebarFooter />}
 		>
-			{moveError && (
-				<p role="alert" className="px-4 py-2 text-xs text-red-600">
-					{moveError}
-				</p>
-			)}
 			{composeLink && (
 				<NavItem labelClassName="font-medium" link={composeLink} />
 			)}
@@ -321,7 +303,7 @@ export function DashboardNav({ className }: { className?: string }) {
 					open={foldersSectionOpen}
 					onToggle={toggleFoldersSection}
 				>
-					{selectedMailbox?.permission === "full_access" && (
+					{selectedMailbox && (
 						<Dialog open={folderDialogOpen} onOpenChange={setFolderDialogOpen}>
 							<DialogTrigger asChild>
 								<button
@@ -378,11 +360,6 @@ export function DashboardNav({ className }: { className?: string }) {
 											))}
 										</div>
 									</div>
-									{folderError && (
-										<p role="alert" className="text-sm text-red-600">
-											{folderError}
-										</p>
-									)}
 									<Button
 										type="submit"
 										disabled={addingFolder || !newFolderName.trim()}
@@ -430,9 +407,7 @@ export function DashboardNav({ className }: { className?: string }) {
 											iconColor: folder.color,
 											count: counts.customFolders[folder.id]?.unread,
 											onMessageDrop: (messageIds: string[]) =>
-												reportMove(
-													moveMessagesToCustomFolder(messageIds, folder.id),
-												),
+												void moveMessagesToCustomFolder(messageIds, folder.id),
 										}}
 									/>
 								),

@@ -62,7 +62,7 @@ nib run ./dist/mailrun --name mailrun-preview --env SETUP_TOKEN=YOUR_RANDOM_VALU
 
 Subsequent deployments must target the existing app with `--app`.
 
-Normal startup registers three nibrun cron jobs: due sends every minute, maintenance every five minutes, and the backup schedule check at 02:00 UTC. Jobs are registered using the OS-backed form of `Bun.cron`. The compiled entrypoint dispatches its `--cron-title` argument before starting HTTP, then exits. Manual invocation also supports `jobs scheduled`, `jobs maintenance`, and `jobs backup`. Registration happens again after each deployment. Local development does not install cron jobs.
+Normal startup registers three nibrun cron jobs: due sends every minute, maintenance every minute, and the backup schedule check at 02:00 UTC. Jobs are registered using the OS-backed form of `Bun.cron`. The compiled entrypoint dispatches its `--cron-title` argument before starting HTTP, then exits. Manual invocation also supports `jobs scheduled`, `jobs maintenance`, and `jobs backup`. Registration happens again after each deployment. Local development does not install cron jobs.
 
 SQLite leases exclude overlapping runs. Scheduled work is queried by persisted due time; it does not depend on an in-process timer. Backup settings, retention, and daily/weekly/monthly eligibility are respected.
 
@@ -70,29 +70,25 @@ SQLite leases exclude overlapping runs. Scheduled work is queried by persisted d
 
 Implemented:
 
-- Owner bootstrap, login, logout, existing password hashes and TOTP/recovery-code verification.
-- Session isolation, disabled-account checks, owner/domain-owner/shared-mailbox reads, and write-permission checks.
-- Original Mailflare dashboard navigation, resizable sidebar, mobile drawer, reorderable navigation, More/Folders sections, folder colors, command palette, shortcut preference and theme handling. Source language provider and local translation catalogs are retained.
-- Partial ports of the folder list, conversation, composer and alias/routing/forwarding settings. These still need source-by-source UI and interaction parity work. Mailbox selection, paginated messages, FTS search, read/star/archive/trash mutations, folder counts, custom-folder creation and drag-to-folder moves are available.
-- Local incoming MIME/attachment storage, duplicate delivery handling, authenticated original/attachment downloads.
-- Rich HTML/plain-text drafts with autosave and revision conflicts, send-as aliases, To/Cc/Bcc, reply/reply-all/forward with thread headers, local attachment uploads/removal and independent attachment copies for forwarded messages.
-- Immediate and nibrun-scheduled Cloudflare delivery with attachments. Small files are base64 attachments; larger files use opaque local download links expiring after 30 days. Failed sends return to editable drafts.
-- Normalized exact/explicit/cross-domain aliases, domain rules and catch-all routing, sender/recipient/subject/content conditions, account forwarding, keep-copy/failure fallback and forwarding-loop protection. Mailbox rules route to custom folders, Spam or Trash.
-- Setup-driven relay deployment and signed connectivity checks, optional routing activation and sending-domain setup. Existing installations can update their relay from Settings without re-entering credentials.
-- Local scheduled backups, old full-backup restore, internal lease exclusion, and atomic restore rollback.
-- Maintenance for expired sessions/challenges, expired/stalled assistant approvals, and old assistant conversations.
-- Native binary builds, isolated HTTP smoke test, SQL coverage checks, and CI.
+- Original Mailflare dashboard and section layouts, navigation, list rows, split reader, rich composer, attachment viewer, contacts dialogs, account menu, login/MFA challenge screen and settings forms for Account, Inbox, Security, Mailboxes, aliases and routing rules. TanStack navigation replaces Next navigation; the components, styles and translations come from the source baseline.
+- Native source-compatible REST contracts for mail lists/counts/navigation, grouped pagination, Gmail-style search operators, read/star/snooze/move/delete actions, drafts, attachments, templates, contacts/avatars, mailbox configuration/sharing/aliases, routing rules, account preferences, password/MFA management, browser account switching, licenses and branding.
+- Owner/shared-mailbox permissions, private drafts, disabled-account checks and the original Team-sharing entitlement. Domain ownership does not grant access to another account's mailbox contents.
+- MIME parsing, quote-aware snippets, References-based threading, original local spam analysis/training/reputation, contact updates and loop-safe, rate-limited auto-replies. Raw MIME and attachments remain on local disk.
+- Rich drafts with revision conflicts, To/Cc/Bcc, send-as/on-behalf identities, reply/reply-all/forward and independent attachment copies. Closing the composer waits for saves; failed saves keep the content visible. Send failures restore editable drafts.
+- Immediate and nibrun-scheduled Cloudflare sends. Small attachments are embedded; large files use expiring local links. Platform-controlled Message-ID is omitted, and threading headers respect Cloudflare's size limit.
+- Bun WebSocket revision checks/live notifications, the original notification popup, Web Push encryption/subscriptions, packaged PWA assets and local fonts. Notification delivery rechecks active sessions and mailbox access.
+- Normalized exact/explicit/cross-domain aliases, domain rules/catch-all routing, forwarding with keep-copy/failure fallback and loop protection. Setup deploys and verifies the Cloudflare relay.
+- Local backups and older full-backup restore, internal lease exclusion, atomic restore rollback, and owner-configured Trash/Spam retention. Object cleanup preserves files still referenced by other records.
+- Native builds, an isolated compiled HTTP/WebSocket smoke check, SQL generation/coverage checks and behavioral tests. The benchmark exercises the restored UI's list query rather than the obsolete route-loader query.
 
 Still to migrate before production cutover:
 
-- Automatic spam checks, auto-replies and contact updates.
-- Complete conversation grouping/pagination, search operators, snooze controls, custom-folder rename/delete/move controls, and all existing URL aliases.
-- WebSocket/push notifications, webhook retry processing, AI generation/recovery, mail/Drive retention.
-- Calendar/booking, Drive, account/settings/admin screens, password reset/MFA management, translations, branding/PWA, API keys, public API, JMAP and MCP.
-- Live Cloudflare delivery verification and complete deployment/restart tests on nibrun.
-- Original-app/browser performance baseline, full data migration rehearsal, and production cutover.
+- Calendar/booking, Drive and their public pages; complete account/domain/admin management; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
+- Agent configuration/chat/tools, approval workflows, automatic draft generation/recovery, webhooks/retries and Drive retention. The original assistant layout is present; its remaining endpoints are not yet ported.
+- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit.
+- Real Cloudflare delivery checks, a full migration/restore rehearsal, original-app end-to-end performance comparison, nibrun restart/durability verification and production cutover.
 
-The cron launcher and persistent job state are in place; the remaining handlers above are not represented by no-op jobs. Existing source components use the selected locale; the remaining replacement screens still contain English text and must be restored from source. Account/admin settings, persisted branding and the full original message/composer interactions are not yet at parity.
+Full parity remains the acceptance criterion. The preview is an incomplete migration checkpoint; visible source navigation includes features whose native handlers are still being ported. Missing jobs are not represented by no-op implementations.
 
 ## Data and backups
 

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @font-face { font-family: "Geist Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/fonts/geist.woff2") format("woff2"); }
 
+@font-face { font-family: "Geist Mono Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/fonts/geist-mono.woff2") format("woff2"); }
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -514,7 +516,7 @@ button {
 	}
 }
 
-:root { --font-geist-sans: "Geist Variable"; --font-geist-mono: monospace; }
+:root { --font-geist-sans: "Geist Variable"; --font-geist-mono: "Geist Mono Variable"; }
 button:not(:disabled) { cursor: pointer; }
 .auth { margin: 7vh auto; width:min(460px,calc(100% - 32px)); padding:36px; border:1px solid #e5e7eb; background:white; border-radius:20px; }
 .auth.wide { width:min(580px,calc(100% - 32px)); }.auth h1 {font-size:24px;margin:24px 0 12px}.auth .brand {font-size:24px;font-weight:600}.auth form,.auth label {display:grid;gap:8px}.auth form {gap:18px}.auth input {border:1px solid #d5dfea;border-radius:8px;padding:10px}.auth button {padding:10px;border-radius:8px;background:#2563eb;color:white}.auth .check {display:flex;align-items:start}.auth .check input {margin-top:6px}.auth .source {display:block;margin-top:24px;font-size:12px;color:#64748b}.notice {padding:12px;background:#edf5ff;border-radius:8px}.error {color:#b91c1c;background:#fef2f2;padding:10px;border-radius:8px}.hint {font-size:12px;color:#64748b}.empty {display:grid;place-content:center;text-align:center;height:100%;color:#737373;padding:48px}.empty h1{font-size:24px}

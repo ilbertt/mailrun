@@ -1,5 +1,5 @@
 import { test, expect, beforeEach, afterEach } from "bun:test";
-import { fixture, owner, stranger } from "./fixtures";
+import { fixture, owner, stranger, enableTeamSharing } from "./fixtures";
 import {
 	saveDraft,
 	getDraft,
@@ -49,6 +49,7 @@ test("drafts survive save/reopen; stale revisions and shared readers cannot over
 			revision: draft.draft_revision,
 		}),
 	).rejects.toThrow("another tab");
+	enableTeamSharing(state.db);
 	state.db.exec(
 		"INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_at) VALUES ('share','mailbox','stranger','full_access',1)",
 	);
@@ -160,6 +161,7 @@ test("send snapshots recipients, reply headers and base64 attachments", async ()
 	const sent = sentSchema.parse(payload);
 	expect(sent.to).toEqual(["Maya <maya@example.net>"]);
 	expect(sent.bcc).toEqual(["hidden@example.net"]);
+	expect(sent.headers).not.toHaveProperty("Message-ID");
 	expect(sent.headers["In-Reply-To"]).toBe("<source@example.org>");
 	expect(sent.attachments[0]?.content).toBe("aGVsbG8=");
 	expect(
@@ -259,6 +261,7 @@ test("unconfigured sending preserves a draft; thread reads and counts keep draft
 		sendDraft(owner, draft.id, draft.draft_revision),
 	).rejects.toThrow("not configured");
 	expect((await getDraft(owner, draft.id)).status).toBe("draft");
+	enableTeamSharing(state.db);
 	state.db.exec(
 		"UPDATE messages SET thread_id='shared-thread' WHERE id='message'; INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_at) VALUES ('share','mailbox','stranger','full_access',1)",
 	);

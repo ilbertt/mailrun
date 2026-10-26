@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useMemo } from "react";
-import { useRouter as useTanstackRouter } from "@tanstack/react-router";
+import { useRouter } from "@/lib/navigation";
 import {
 	Inbox,
 	Star,
@@ -16,7 +16,7 @@ import {
 	HelpCircle,
 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
-import { useMail } from "../mail-context";
+import { useCompose } from "@/components/compose/compose-context";
 import type { ShortcutDefinition, CommandItem } from "./types";
 import { useHotkeys } from "./use-hotkeys";
 import { CommandPalette } from "./command-palette";
@@ -58,15 +58,8 @@ export function ShortcutsProvider({
 	extraCommands?: CommandItem[];
 }) {
 	const { t } = useLanguage();
-	const navigation = useTanstackRouter();
-	const { mailboxId } = useMail();
-	const router = {
-		push: (href: string) =>
-			void navigation.navigate({
-				href: href + "?mailboxId=" + encodeURIComponent(mailboxId),
-			}),
-	};
-	const { openComposer } = useMail();
+	const router = useRouter();
+	const { openComposer } = useCompose();
 	const {
 		enabled: shortcutsEnabled,
 		error: shortcutsPreferenceError,
@@ -292,6 +285,14 @@ export function ShortcutsProvider({
 				icon: Trash2,
 				shortcut: "g x",
 				perform: () => router.push("/trash"),
+			},
+			{
+				id: "settings-account",
+				title: t("palette.accountTitle"),
+				subtitle: t("palette.accountSubtitle"),
+				category: "Settings",
+				icon: Settings,
+				perform: () => router.push("/settings/account"),
 			},
 			{
 				id: "show-help",

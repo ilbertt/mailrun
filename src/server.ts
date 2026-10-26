@@ -21,11 +21,12 @@ export default createServerEntry({
 		headers.set("Cache-Control", "private, no-store");
 		headers.set("X-Content-Type-Options", "nosniff");
 		headers.set("Referrer-Policy", "same-origin");
-		headers.set("X-Frame-Options", "DENY");
-		headers.set(
-			"Content-Security-Policy",
-			"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; frame-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
-		);
+		if (!headers.has("X-Frame-Options")) headers.set("X-Frame-Options", "DENY");
+		if (!headers.has("Content-Security-Policy"))
+			headers.set(
+				"Content-Security-Policy",
+				"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; frame-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+			);
 		headers.set(
 			"Server-Timing",
 			`app;dur=${(performance.now() - started).toFixed(1)}`,

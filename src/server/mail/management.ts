@@ -1,3 +1,5 @@
+import { listMailboxes } from "./repository";
+import { licenseEntitlements } from "../licenses";
 import { z } from "zod";
 import safeRegex from "safe-regex2";
 import { withDatabase, id, seconds } from "../db";
@@ -7,21 +9,28 @@ import { mailboxAccess, managedDomain } from "./access";
 import { normalizeLocalPart } from "./routing";
 
 export async function mailSettings(user: User) {
+	const accessible = await listMailboxes(user),
+		ids = JSON.stringify(accessible.map((box) => box.id)),
+		managed = JSON.stringify(
+			accessible
+				.filter((box) => box.permission === "full_access")
+				.map((box) => box.id),
+		);
 	return withDatabase(async (sql) => {
 		const domains = await sql.SettingsDomains`/* @notNull id */
 /* @notNull user_id */
-SELECT id,hostname,user_id FROM domains WHERE user_id=${user.id} OR id IN (SELECT b.domain_id FROM mailboxes b JOIN mailbox_access a ON a.mailbox_id=b.id WHERE a.user_id=${user.id})`;
+SELECT id,hostname,user_id FROM domains WHERE user_id=${user.id} OR id IN (SELECT b.domain_id FROM mailboxes b WHERE b.id IN(SELECT value FROM json_each(${ids})))`;
 		const aliases = await sql.SettingsAliases`/* @notNull id */
 /* @notNull mailbox_id */
 /* @notNull domain_id */
 /* @notNull local_part */
-SELECT a.id,a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id JOIN mailboxes b ON b.id=a.mailbox_id WHERE b.user_id=${user.id} OR d.user_id=${user.id} OR EXISTS (SELECT 1 FROM mailbox_access access WHERE access.mailbox_id=b.id AND access.user_id=${user.id} )`;
+SELECT a.id,a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id JOIN mailboxes b ON b.id=a.mailbox_id WHERE b.id IN(SELECT value FROM json_each(${ids}))`;
 		const rules = await sql.SettingsRules`/* @notNull id */
-SELECT r.* FROM routing_rules r WHERE r.domain_id IN (SELECT id FROM domains WHERE user_id=${user.id}) OR (r.scope='mailbox' AND r.mailbox_id IN (SELECT mailbox_id FROM mailbox_access WHERE user_id=${user.id} AND permission='full_access')) ORDER BY r.priority DESC,r.created_at,r.id`;
+SELECT r.* FROM routing_rules r WHERE r.domain_id IN (SELECT id FROM domains WHERE user_id=${user.id}) OR (r.scope='mailbox' AND r.mailbox_id IN (SELECT value FROM json_each(${managed}))) ORDER BY r.priority DESC,r.created_at,r.id`;
 		const [account] =
 			await sql.SettingsForwarding`SELECT forwarding_email FROM users WHERE id=${user.id}`;
 		const folders = await sql.SettingsFolders`/* @notNull id */
-SELECT f.id,f.name,f.color,f.mailbox_id FROM folders f JOIN mailboxes b ON b.id=f.mailbox_id JOIN domains d ON d.id=b.domain_id WHERE b.user_id=${user.id} OR d.user_id=${user.id} OR EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id}) ORDER BY f.name`;
+SELECT f.id,f.name,f.color,f.mailbox_id FROM folders f JOIN mailboxes b ON b.id=f.mailbox_id JOIN domains d ON d.id=b.domain_id WHERE b.id IN(SELECT value FROM json_each(${ids})) ORDER BY f.name`;
 		return {
 			domains,
 			aliases,
@@ -34,7 +43,11 @@ SELECT f.id,f.name,f.color,f.mailbox_id FROM folders f JOIN mailboxes b ON b.id=
 export async function addAlias(user: User, input: z.infer<typeof aliasSchema>) {
 	const data = aliasSchema.parse(input);
 	const mailbox = await mailboxAccess(user, data.mailboxId, "manage");
-	const domain = await managedDomain(user, data.domainId);
+	const [domain] = await withDatabase(
+		(sql) =>
+			sql.NativeManagedAliasDomain`SELECT id,hostname,user_id FROM domains WHERE id=${data.domainId} AND user_id=${mailbox.domain_owner} AND status='active'`,
+	);
+	if (!domain) throw new Response("Domain not found", { status: 404 });
 	if (mailbox.domain_owner !== domain.user_id)
 		throw new Error("Aliases must stay within the same domain owner");
 	const normalized = normalizeLocalPart(data.localPart);
@@ -72,6 +85,11 @@ export async function setDomainAliases(
 	);
 }
 export async function setForwarding(user: User, email: string) {
+	if (!(await licenseEntitlements()).canForwardEmail)
+		throw new Response(
+			"A Pro or Team license is required for email forwarding",
+			{ status: 403 },
+		);
 	const value = z.email().or(z.literal("")).parse(email.trim().toLowerCase());
 	if (value === user.email.toLowerCase())
 		throw new Error("Forwarding destination must differ from your own address");

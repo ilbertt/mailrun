@@ -6,11 +6,12 @@ export const Route = createFileRoute(
 	server: {
 		handlers: {
 			GET: ({ params, request }) =>
-				downloadMessageFile(
-					params.messageId,
-					params.attachmentId,
-					new URL(request.url).searchParams.get("inline") === "1",
-				),
+				downloadMessageFile(params.messageId, params.attachmentId, {
+					preview:
+						new URL(request.url).searchParams.get("preview") === "1" ||
+						new URL(request.url).searchParams.get("inline") === "1",
+					download: new URL(request.url).searchParams.get("download") === "1",
+				}),
 		},
 	},
 });

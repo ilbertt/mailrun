@@ -1,13 +1,21 @@
-import type { ComponentProps } from "react";
+import { useContext, type ComponentProps } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { useMail } from "./mail-context";
+import { MailContext } from "./mail-context";
 export function MailLink({
 	href,
 	onClick,
+	prefetch,
+	replace,
+	scroll,
 	...props
-}: ComponentProps<"a"> & { href: string }) {
+}: ComponentProps<"a"> & {
+	href: string;
+	prefetch?: boolean;
+	replace?: boolean;
+	scroll?: boolean;
+}) {
 	const router = useRouter();
-	const { mailboxId } = useMail();
+	const mailboxId = useContext(MailContext)?.mailboxId;
 	const url = new URL(href, "https://mailflare.invalid");
 	if (mailboxId && url.origin === "https://mailflare.invalid")
 		url.searchParams.set("mailboxId", mailboxId);
@@ -33,7 +41,7 @@ export function MailLink({
 				)
 					return;
 				event.preventDefault();
-				void router.navigate({ href: target });
+				void router.navigate({ href: target, replace, resetScroll: scroll });
 			}}
 		/>
 	);

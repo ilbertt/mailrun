@@ -62,6 +62,8 @@ export const deliveryPayloadSchema = z
 		references: header.max(10000).nullable().optional(),
 		threadId: z.string().nullable().optional(),
 		returnToDraft: z.boolean().optional(),
+		autoReplyMailboxId: z.string().optional(),
+		autoReplyRecipient: z.email().optional(),
 	})
 	.refine(
 		(value) =>

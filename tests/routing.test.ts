@@ -221,6 +221,9 @@ test("loop-marked messages are stored without forwarding again", async () => {
 	});
 });
 test("account forwarding keeps a local copy and refuses self-forwarding", async () => {
+	state.db.exec(
+		"INSERT INTO license_settings (id,instance_id,plan,state,updated_at) VALUES ('default','fixture','pro','active',1)",
+	);
 	await setForwarding(owner, "destination@example.net");
 	expect(
 		await storeInbound("sender@example.org", "hello@example.com", raw()),

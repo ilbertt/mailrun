@@ -1,9 +1,22 @@
+import { upsertContact } from "./contacts";
+import { buildSnippet } from "../../lib/email/parse";
+import {
+	parseMessageIdList,
+	formatMessageIdHeader,
+	normalizeMessageId,
+} from "../../lib/email/threading";
 import { z } from "zod";
 import { sendSchema, userSchema, type User } from "../../shared/contracts";
 import { withDatabase, id, seconds } from "../db";
 import { getInstallation } from "../cloudflare/installation";
 import { cloudflare, type CloudflareFetch } from "../cloudflare/client";
-import { draftLock, getDraft, saveDraft, senderAddress } from "./drafts";
+import {
+	draftLock,
+	getDraft,
+	saveDraft,
+	senderAddress,
+	formattedSender,
+} from "./drafts";
 import { deliveryPayloadSchema } from "../../shared/mail-contracts";
 import { prepareAttachments } from "./attachment-send";
 import { getEmailAddress } from "../../lib/email/address";
@@ -31,6 +44,7 @@ export async function sendDraft(
 		throw new Error("Cloudflare email is not configured");
 	const result = await draftLock(draftId, async () => {
 		const draft = await getDraft(user, draftId);
+		if (!draft.mailbox_id) throw new Error("Select a mailbox before sending");
 		if (draft.draft_revision !== revision)
 			throw new Error("Draft changed. Save the latest version before sending.");
 		await senderAddress(user, draft.mailbox_id, draft.from_addr);
@@ -100,21 +114,35 @@ export async function deliverJob(
 			...account,
 			isPrimaryAdmin: !!account.is_primary_admin,
 		});
-		await senderAddress(user, message.mailbox_id, payload.from);
+		const from = await formattedSender(user, message.mailbox_id, payload.from);
 		const [domain] = await withDatabase(
 			(sql) =>
 				sql.SendingDomain`SELECT id FROM domains WHERE hostname=${getEmailAddress(payload.from).split("@")[1] ?? ""} AND sending_enabled=1 AND status='active'`,
 		);
 		if (!domain)
 			throw new Error("Cloudflare sending is not enabled for this domain");
-		const headers: Record<string, string> = {
-			"Message-ID": `<${job.id}@${installation.hostname}>`,
-		};
-		if (payload.inReplyTo)
-			headers["In-Reply-To"] = payload.inReplyTo.startsWith("<")
-				? payload.inReplyTo
-				: `<${payload.inReplyTo}>`;
-		if (payload.references) headers.References = payload.references;
+		// Cloudflare owns Message-ID; only threading headers are supplied.
+		const headers: Record<string, string> = {};
+		if (payload.autoReplyMailboxId && payload.autoReplyRecipient) {
+			headers["Auto-Submitted"] = "auto-replied";
+			headers["X-Auto-Response-Suppress"] = "All";
+		}
+		const parent = normalizeMessageId(payload.inReplyTo);
+		if (parent) {
+			const value = formatMessageIdHeader([parent]);
+			if (Buffer.byteLength(value) <= 2048) headers["In-Reply-To"] = value;
+		}
+		const references = parseMessageIdList(payload.references);
+		while (
+			references.length > 1 &&
+			Buffer.byteLength(formatMessageIdHeader(references)) > 2048
+		)
+			references.splice(1, 1);
+		if (
+			references.length &&
+			Buffer.byteLength(formatMessageIdHeader(references)) <= 2048
+		)
+			headers.References = formatMessageIdHeader(references);
 		const prepared = await prepareAttachments(job.message_id ?? "", {
 			subject: payload.subject,
 			text: payload.text,
@@ -128,7 +156,7 @@ export async function deliverJob(
 			{
 				method: "POST",
 				body: JSON.stringify({
-					from: payload.from,
+					from,
 					to: payload.to,
 					cc: payload.cc,
 					bcc: payload.bcc,
@@ -141,10 +169,20 @@ export async function deliverJob(
 		);
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {
+				if (payload.autoReplyMailboxId && payload.autoReplyRecipient)
+					await sql.NativeRecordAutoReply`INSERT INTO auto_reply_deliveries (id,mailbox_id,recipient,sent_at) VALUES (${id("arp")},${payload.autoReplyMailboxId},${payload.autoReplyRecipient},${seconds()}) ON CONFLICT(mailbox_id,recipient) DO UPDATE SET sent_at=excluded.sent_at`;
 				await sql.CompleteOutbound`UPDATE outbound_jobs SET status='sent',error=NULL,updated_at=${seconds()} WHERE id=${job.id}`;
-				await sql.CompleteSentMessage`UPDATE messages SET status='sent',provider_message_id=${result.message_id},thread_id=coalesce(thread_id,${result.message_id.replace(/^<|>$/g, "")}),text_body=${prepared.text ?? null},html_body=${prepared.html ?? null} WHERE id=${job.message_id}`;
+				await sql.CompleteSentMessage`UPDATE messages SET status='sent',from_addr=${from},snippet=${buildSnippet(prepared.text ?? null, prepared.html ?? null)},provider_message_id=${result.message_id},thread_id=coalesce(thread_id,${result.message_id.replace(/^<|>$/g, "")}),text_body=${prepared.text ?? null},html_body=${prepared.html ?? null} WHERE id=${job.message_id}`;
 			}),
 		);
+		for (const recipient of [
+			...payload.to,
+			...(payload.cc ?? []),
+			...(payload.bcc ?? []),
+		])
+			await upsertContact(user.id, recipient, "outbound").catch((error) =>
+				console.error("Sent contact update failed", error),
+			);
 	} catch (error) {
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {

@@ -62,7 +62,7 @@ export async function moveMessages(
   trashed_at=CASE WHEN ${input.action}='trash' THEN ${seconds()} ELSE NULL END
   WHERE id=${messageId} AND status NOT IN ('draft','queued') AND mailbox_id IN (
    SELECT b.id FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE b.disabled=0 AND
-   (b.user_id=${user.id} OR d.user_id=${user.id} OR EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission='full_access'))
+   (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission='full_access')))
    AND (${input.action}!='folder' OR EXISTS (SELECT 1 FROM folders f WHERE f.id=${input.folderId ?? null} AND f.mailbox_id=b.id))
   ) RETURNING id`;
 				changed += rows.length;

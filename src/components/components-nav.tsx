@@ -3,10 +3,10 @@ import type { DragEvent } from "react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { useLocation } from "@tanstack/react-router";
+import { usePathname } from "@/lib/navigation";
 import { getMessageDragData } from "@/lib/messages/drag-utils";
 import { useSidebar } from "./sidebar-state";
-import { useMail } from "./mail-context";
+import { useCompose } from "./compose/compose-context";
 import { Tooltip } from "./ui/tooltip";
 import type { NavLink } from "./components-nav-types";
 
@@ -17,8 +17,8 @@ type Props = {
 	wrap?: boolean;
 };
 export function NavItem({ link, iconClassName, labelClassName, wrap }: Props) {
-	const pathname = useLocation({ select: (location) => location.pathname });
-	const { openComposer } = useMail();
+	const pathname = usePathname();
+	const { openComposer } = useCompose();
 	const { minimal } = useSidebar();
 	const [dragOver, setDragOver] = useState(false);
 
@@ -64,7 +64,7 @@ export function NavItem({ link, iconClassName, labelClassName, wrap }: Props) {
 		const composeButton = (
 			<button
 				type="button"
-				onClick={() => openComposer()}
+				onClick={openComposer}
 				className={cn(!minimal && "ml-3", classes)}
 				aria-label={minimal ? link.label : undefined}
 				{...dropProps}

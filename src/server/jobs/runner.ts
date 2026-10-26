@@ -1,3 +1,4 @@
+import { runTrashRetention } from "./retention";
 import { z } from "zod";
 import { withDatabase, seconds, id } from "../db";
 import { deliverJob } from "../mail/send";
@@ -24,6 +25,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 					console.error(`Scheduled send ${job.id} failed`, error),
 				);
 		} else if (name === "maintenance") {
+			await runTrashRetention();
 			await withDatabase(async (sql) => {
 				await sql.ExpireApprovals`UPDATE agent_send_approvals SET status='expired' WHERE status='pending' AND expires_at<${seconds()}`;
 				await sql.StalledApprovals`UPDATE agent_send_approvals SET status='unknown' WHERE status='claimed' AND claimed_at<${seconds() - 180}`;

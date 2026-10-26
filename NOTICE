@@ -1,5 +1,5 @@
-Mailrun includes schema migrations and adapted authentication/backup code, UI primitives, recipient/rich-text
-editors, email rendering and stylesheet code from
+Mailrun includes schema migrations and adapted authentication/backup code, original application layouts,
+mail and settings components, recipient/rich-text editors, email rendering, spam algorithms and stylesheet code from
 Mailflare, https://github.com/ilbertt/mailflare, commit 71aa49b.
 Mailflare - Email for professionals and teams
 Copyright (C) 2026 Hieu Nguyen

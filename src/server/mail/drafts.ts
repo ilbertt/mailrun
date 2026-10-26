@@ -1,9 +1,11 @@
+import { formatEmailAddress } from "../../lib/email/address";
+import { resolveMailboxDisplayName } from "../../lib/profile/identity-utils";
 import { z } from "zod";
 import { withDatabase, seconds, id } from "../db";
 import { mailboxAccess } from "./access";
 import { draftSchema } from "../../shared/mail-contracts";
 import type { User } from "../../shared/contracts";
-import { LocalStorage } from "../storage";
+import { deleteUnreferencedObjects, LocalStorage } from "../storage";
 import { getThread } from "./repository";
 import { normalizeLocalPart } from "./routing";
 import { getEmailAddress } from "../../lib/email/address";
@@ -66,13 +68,36 @@ export async function senderAddress(
 	}
 	throw new Error("Sender address is not assigned to this mailbox");
 }
+export async function formattedSender(
+	user: User,
+	mailboxId: string,
+	requested?: string,
+) {
+	const address = await senderAddress(user, mailboxId, requested),
+		mailbox = await mailboxAccess(user, mailboxId, "send");
+	const name = resolveMailboxDisplayName(
+		{
+			localPart: mailbox.local_part,
+			hostname: mailbox.hostname,
+			type: mailbox.type,
+			displayName: mailbox.display_name,
+		},
+		mailbox.owner_email,
+		mailbox.owner_name,
+	);
+	return formatEmailAddress(
+		address,
+		mailbox.permission === "send_on_behalf"
+			? `${user.name} on behalf of ${name || address}`
+			: name,
+	);
+}
 export async function getDraft(user: User, draftId: string) {
 	const [draft] = await withDatabase(
 		(sql) =>
 			sql.OwnDraft`SELECT * FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND direction='outbound'`,
 	);
-	if (!draft?.mailbox_id) throw new Error("Draft not found");
-	await mailboxAccess(user, draft.mailbox_id, "send");
+	if (!draft) throw new Error("Draft not found");
 	const attachments = await withDatabase(
 		(sql) =>
 			sql.DraftAttachments`SELECT id,message_id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${draft.id} AND trashed_at IS NULL ORDER BY created_at,id`,
@@ -91,7 +116,7 @@ export async function saveDraft(
 	input: z.infer<typeof draftSchema>,
 ) {
 	const data = draftSchema.parse(input);
-	const from = await senderAddress(user, data.mailboxId, data.from);
+	const from = await formattedSender(user, data.mailboxId, data.from);
 	const draftId = data.id ?? id("msg");
 	return draftLock(draftId, async () => {
 		if (data.id) {
@@ -163,9 +188,17 @@ export async function uploadAttachments(
 	user: User,
 	draftId: string,
 	files: File[],
+	expectedRevision?: number,
 ) {
 	return draftLock(draftId, async () => {
 		const draft = await getDraft(user, draftId);
+		if (
+			expectedRevision !== undefined &&
+			draft.draft_revision !== expectedRevision
+		)
+			throw new Error(
+				"This draft changed in another tab. Reopen it before saving.",
+			);
 		const limit = await attachmentLimit();
 		if (
 			!files.length ||
@@ -221,9 +254,17 @@ export async function removeAttachment(
 	user: User,
 	draftId: string,
 	attachmentId: string,
+	expectedRevision?: number,
 ) {
 	return draftLock(draftId, async () => {
 		const draft = await getDraft(user, draftId);
+		if (
+			expectedRevision !== undefined &&
+			draft.draft_revision !== expectedRevision
+		)
+			throw new Error(
+				"This draft changed in another tab. Reopen it before saving.",
+			);
 		const attachment = draft.attachments.find(
 			(attachment) => attachment.id === attachmentId,
 		);
@@ -234,21 +275,31 @@ export async function removeAttachment(
 				await sql.TouchDraftRemoval`UPDATE messages SET draft_revision=draft_revision+1 WHERE id=${draftId} AND status='draft'`;
 			}),
 		);
-		await new LocalStorage().delete(attachment.r2_key);
+		await deleteUnreferencedObjects([attachment.r2_key]);
 		return getDraft(user, draftId);
 	});
 }
-export async function deleteDraft(user: User, draftId: string) {
+export async function deleteDraft(
+	user: User,
+	draftId: string,
+	expectedRevision?: number,
+) {
 	return draftLock(draftId, async () => {
 		const draft = await getDraft(user, draftId);
+		if (
+			expectedRevision !== undefined &&
+			draft.draft_revision !== expectedRevision
+		)
+			throw new Error(
+				"This draft changed in another tab. Reopen it before saving.",
+			);
 		await withDatabase(
 			(sql) =>
 				sql.DeleteOwnedDraft`DELETE FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft'`,
 		);
-		await Promise.all(
-			draft.attachments.map((attachment) =>
-				new LocalStorage().delete(attachment.r2_key),
-			),
-		);
+		await deleteUnreferencedObjects([
+			...draft.attachments.map((attachment) => attachment.r2_key),
+			...(draft.raw_r2_key ? [draft.raw_r2_key] : []),
+		]);
 	});
 }

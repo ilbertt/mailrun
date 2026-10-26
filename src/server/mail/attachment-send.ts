@@ -29,7 +29,7 @@ export async function prepareAttachments(
 		disposition: string;
 		contentId?: string;
 	}> = [];
-	const linked: Array<{ filename: string; url: string }> = [];
+	const linked: Array<{ filename: string; size: number; url: string }> = [];
 	let size =
 		Buffer.byteLength(
 			message.subject +
@@ -68,32 +68,43 @@ export async function prepareAttachments(
 			if (!link) throw new Error("Could not share attachment");
 			linked.push({
 				filename: row.filename,
+				size: row.size,
 				url: `${publicOrigin()}/api/shared-files/${encodeURIComponent(link.id)}`,
 			});
 		}
 	}
+	const intro =
+		"Files shared through Mailflare (download links expire after 30 days):";
+	const textLinks = linked
+		.map(
+			(file) =>
+				`${file.filename} (${(file.size / 1_000_000).toFixed(1)} MB): ${file.url}`,
+		)
+		.join("\n");
+	const htmlLinks = linked
+		.map(
+			(file) =>
+				`<li>${escapeHtml(file.filename)} (${(file.size / 1_000_000).toFixed(1)} MB): <a href="${escapeHtml(file.url)}">Download file</a></li>`,
+		)
+		.join("");
 	const text = linked.length
-		? [
-				message.text,
-				"Files shared through Mailrun (download links expire after 30 days):",
-				...linked.map((file) => `${file.filename}: ${file.url}`),
-			]
-				.filter(Boolean)
-				.join("\n\n")
+		? [message.text?.trim(), intro, textLinks].filter(Boolean).join("\n\n")
 		: message.text;
 	const html = linked.length
-		? `${message.html ?? ""}<p>Files shared through Mailrun (download links expire after 30 days):</p><ul>${linked.map((file) => `<li>${escapeHtml(file.filename)}: <a href="${escapeHtml(file.url)}">Download file</a></li>`).join("")}</ul>`
+		? `${message.html ?? ""}<div><p>${escapeHtml(intro)}</p><ul>${htmlLinks}</ul></div>`
 		: message.html;
 	if (
 		size +
-			Math.max(
-				0,
-				Buffer.byteLength((text ?? "") + (html ?? "")) -
-					Buffer.byteLength((message.text ?? "") + (message.html ?? "")),
-			) >
+			(linked.length
+				? Buffer.byteLength(textLinks + htmlLinks + intro + intro) + 4096
+				: 0) >
 		max
 	)
-		throw new Error("Message exceeds Cloudflare's 5 MiB limit");
+		throw new Error(
+			linked.length
+				? "Message exceeds Cloudflare's 5 MiB email size limit even with download links"
+				: "Message exceeds Cloudflare's 5 MiB email size limit",
+		);
 	return { attachments, text, html };
 }
 export async function sharedFile(token: string) {

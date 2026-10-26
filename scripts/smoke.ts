@@ -3,7 +3,8 @@ import { fixture } from "../tests/fixtures";
 import { seconds } from "../src/server/db";
 import { hash } from "../src/server/auth/service";
 import bcrypt from "bcryptjs";
-import { toJSON } from "seroval";
+import { z } from "zod";
+import { signRelay } from "../src/shared/relay-signature";
 
 const state = await fixture();
 const token = crypto.randomUUID();
@@ -48,48 +49,208 @@ try {
 	const base = log.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
 	if (!base) throw new Error(`Unexpected startup output: ${log}`);
 	reader.releaseLock();
-	let loginId: string | undefined;
-	for await (const path of new Bun.Glob("dist/server/assets/*.js").scan()) {
-		const source = await Bun.file(path).text();
-		loginId ??= source.match(
-			/var loginFn_createServerFn_handler = createServerRpc\(\{\s*id:\s*"([^"]+)"/,
-		)?.[1];
-	}
-	if (!loginId) throw new Error("Login server function missing from the build");
-	const payload = JSON.stringify(
-		toJSON({ data: { email: "owner@example.com", password } }),
-	);
-	const csrf = await fetch(`${base}/_serverFn/${loginId}`, {
+	const csrf = await fetch(`${base}/api/auth/login`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			Origin: "https://untrusted.example",
 		},
-		body: payload,
+		body: JSON.stringify({ email: "owner@example.com", password }),
 	});
 	if (csrf.status !== 403)
-		throw new Error(`Cross-origin mutation returned ${csrf.status}`);
-	const login = await fetch(`${base}/_serverFn/${loginId}`, {
+		throw new Error(`Cross-origin login returned ${csrf.status}`);
+	const login = await fetch(`${base}/api/auth/login`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json", Origin: publicBase },
+		body: JSON.stringify({ email: "owner@example.com", password }),
+	});
+	const cookie = login.headers
+		.getSetCookie()
+		.find((value) => value.startsWith("ep_session="));
+	if (!login.ok || !cookie?.toLowerCase().includes("httponly"))
+		throw new Error(`HTTP login failed: ${login.status}`);
+	const sessionCookie = cookie.split(";")[0] ?? "";
+	const mailResponse = await fetch(
+		`${base}/api/messages?mailboxId=mailbox&status=received`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	const mail = await mailResponse.json();
+	if (
+		!mailResponse.ok ||
+		!z
+			.object({
+				messages: z.array(
+					z.object({ id: z.string(), subject: z.string().nullable() }),
+				),
+			})
+			.parse(mail)
+			.messages.some((message) => message.subject === "A searchable subject")
+	)
+		throw new Error("Source-compatible message list failed");
+	const draftInput = {
+		mailboxId: "mailbox",
+		to: "maya@example.net",
+		subject: "Smoke draft",
+		html: "<p>Draft</p>",
+		text: "Draft",
+	};
+	const saved = await fetch(`${base}/api/drafts`, {
 		method: "POST",
 		headers: {
+			Authorization: `Bearer ${token}`,
 			"Content-Type": "application/json",
-			Origin: publicBase,
-			"x-tsr-serverfn": "true",
 		},
-		body: payload,
+		body: JSON.stringify(draftInput),
 	});
-	const cookie = login.headers.get("set-cookie");
+	const savedDraft = z
+		.object({ draft: z.object({ id: z.string() }) })
+		.parse(await saved.json()).draft;
+	if (!saved.ok || !saved.headers.get("etag"))
+		throw new Error("Draft creation or revision headers failed");
+	const updated = await fetch(`${base}/api/drafts/${savedDraft.id}`, {
+		method: "PATCH",
+		headers: {
+			Cookie: sessionCookie,
+			Origin: publicBase,
+			"Content-Type": "application/json",
+			"If-Match": saved.headers.get("etag") ?? "",
+		},
+		body: JSON.stringify({ ...draftInput, subject: "Updated smoke draft" }),
+	});
+	if (!updated.ok) throw new Error(`Draft update failed: ${updated.status}`);
+	const stale = await fetch(`${base}/api/drafts/${savedDraft.id}`, {
+		method: "PATCH",
+		headers: {
+			Cookie: sessionCookie,
+			Origin: publicBase,
+			"Content-Type": "application/json",
+			"If-Match": saved.headers.get("etag") ?? "",
+		},
+		body: JSON.stringify(draftInput),
+	});
+	if (stale.status !== 409)
+		throw new Error(`Stale draft returned ${stale.status}`);
+	const files = new FormData();
+	files.append(
+		"attachments",
+		new File(["%PDF-1.4\n%%EOF"], "smoke.pdf", { type: "application/pdf" }),
+	);
+	const uploaded = await fetch(
+		`${base}/api/drafts/${savedDraft.id}/attachments`,
+		{
+			method: "POST",
+			headers: {
+				Cookie: sessionCookie,
+				Origin: publicBase,
+				"If-Match": updated.headers.get("etag") ?? "",
+			},
+			body: files,
+		},
+	);
+	const attachment = z
+		.object({ attachments: z.array(z.object({ id: z.string() })) })
+		.parse(await uploaded.json()).attachments[0];
+	if (!uploaded.ok || !attachment) throw new Error("Draft attachment failed");
+	const preview = await fetch(
+		`${base}/api/messages/${savedDraft.id}/attachments/${attachment.id}?preview=1`,
+		{ headers: { Cookie: sessionCookie } },
+	);
 	if (
-		!login.ok ||
-		!cookie?.includes("ep_session=") ||
-		!cookie.toLowerCase().includes("httponly")
+		!preview.ok ||
+		!preview.headers.get("content-disposition")?.startsWith("inline") ||
+		preview.headers.get("x-frame-options") !== "SAMEORIGIN"
 	)
-		throw new Error(`HTTP login failed: ${login.status} ${await login.text()}`);
-	const loggedIn = await fetch(`${base}/inbox`, {
-		headers: { Cookie: cookie.split(";")[0] ?? "" },
+		throw new Error("Protected attachment preview failed");
+	const foreignPreview = await fetch(
+		`${base}/api/messages/${savedDraft.id}/attachments/${attachment.id}?preview=1`,
+		{ headers: { Cookie: `ep_session=invalid` } },
+	);
+	if (foreignPreview.status !== 401)
+		throw new Error("Attachment authorization failed");
+	// Exercise the compiled Bun websocket and the Start handler in the same process.
+	state.db.exec(
+		"INSERT INTO mailrun_installation VALUES ('primary','account','zone','example.com','relay','https://mailrun-smoke.example','synthetic-token','synthetic-secret','v1','ready',1)",
+	);
+	// DOM globals hide Bun's documented headers overload in this shared TS project.
+	const NativeWebSocket = WebSocket as typeof WebSocket & {
+		new (url: string, options: Bun.WebSocketOptions): WebSocket;
+	};
+	const socket = new NativeWebSocket(
+		base.replace("http:", "ws:") + "/api/realtime",
+		{ headers: { Cookie: sessionCookie, Origin: publicBase } },
+	);
+	const frames: string[] = [];
+	socket.addEventListener("message", (event) =>
+		frames.push(String(event.data)),
+	);
+	await new Promise<void>((resolve, reject) => {
+		const timeout = setTimeout(
+			() => reject(new Error("WebSocket did not connect")),
+			5000,
+		);
+		socket.addEventListener(
+			"open",
+			() => {
+				clearTimeout(timeout);
+				resolve();
+			},
+			{ once: true },
+		);
+		socket.addEventListener(
+			"error",
+			() => {
+				clearTimeout(timeout);
+				reject(new Error("WebSocket connection failed"));
+			},
+			{ once: true },
+		);
 	});
-	if (!loggedIn.ok || !(await loggedIn.text()).includes("A searchable subject"))
-		throw new Error("HTTP login session was not accepted");
+	const nextFrame = (type: string) =>
+		new Promise<unknown>((resolve, reject) => {
+			const timeout = setTimeout(() => {
+				socket.removeEventListener("message", receive);
+				reject(new Error("Missing websocket " + type));
+			}, 5000);
+			const receive = (event: MessageEvent) => {
+				const data: unknown = JSON.parse(String(event.data));
+				const parsed = z.object({ type: z.string() }).passthrough().parse(data);
+				if (parsed.type === type) {
+					clearTimeout(timeout);
+					socket.removeEventListener("message", receive);
+					resolve(parsed);
+				}
+			};
+			socket.addEventListener("message", receive);
+		});
+	const revision = nextFrame("revision");
+	socket.send(JSON.stringify({ type: "ping", revision: null }));
+	await revision;
+	const newMail = nextFrame("new_message");
+	const raw = new TextEncoder().encode(
+		"From: sender@example.org\r\nTo: hello@example.com\r\nSubject: Live notification\r\nMessage-ID: <smoke-live@example.org>\r\n\r\nSynthetic realtime test",
+	);
+	const timestamp = String(Date.now());
+	const delivered = await fetch(`${base}/api/inbound`, {
+		method: "POST",
+		headers: {
+			"x-mailrun-from": "sender@example.org",
+			"x-mailrun-to": "hello@example.com",
+			"x-mailrun-timestamp": timestamp,
+			"x-mailrun-signature": await signRelay(
+				"synthetic-secret",
+				timestamp,
+				"sender@example.org",
+				"hello@example.com",
+				raw,
+			),
+			"x-mailrun-relay": "2",
+		},
+		body: raw,
+	});
+	if (!delivered.ok) throw new Error("Signed relay delivery failed");
+	await newMail;
+	socket.close();
+
 	const health = await fetch(`${base}/api/health`);
 	if (!health.ok)
 		throw new Error(`Health failed: ${health.status} ${await health.text()}`);
@@ -100,7 +261,7 @@ try {
 		headers: { Cookie: `ep_session=${token}` },
 	});
 	const html = await authenticated.text();
-	if (!authenticated.ok || !html.includes("A searchable subject"))
+	if (!authenticated.ok || !html.includes("Mailflare"))
 		throw new Error(
 			`Inbox SSR failed: ${authenticated.status} ${html.slice(0, 1000)}`,
 		);
@@ -140,7 +301,7 @@ try {
 			binary,
 			"run",
 			"--cron-title=mailrun-maintenance",
-			"--cron-period=*/5 * * * *",
+			"--cron-period=* * * * *",
 		],
 		{
 			cwd: state.directory,
@@ -166,7 +327,11 @@ try {
 				binary,
 				health: "passed",
 				csrfProtection: "passed",
-				serverFunctionLogin: "passed",
+				originalRestLogin: "passed",
+				originalMessageApi: "passed",
+				conditionalDraftWrites: "passed",
+				attachmentPreviews: "passed",
+				liveEmailNotifications: "passed",
 				unauthenticatedRedirect: "passed",
 				authenticatedInboxSsr: "passed",
 				embeddedAssets: "passed",
