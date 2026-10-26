@@ -70,6 +70,7 @@ SQLite leases exclude overlapping runs. Scheduled work is queried by persisted d
 
 Implemented:
 
+- Original Calendar and booking screens, recurring-series edits and occurrence moves, public booking pages at both original URL forms, time-zone/DST-aware availability and atomic multi-host reservations. Calendar invitations use local ICS attachments and durable outbound jobs; calendar API keys enforce read/write and send scopes.
 - Original Mailflare dashboard and section layouts, navigation, list rows, split reader, rich composer, attachment viewer, contacts dialogs, account menu, login/MFA challenge screen and settings forms for Account, Inbox, Security, Mailboxes, aliases and routing rules. TanStack navigation replaces Next navigation; the components, styles and translations come from the source baseline.
 - Native source-compatible REST contracts for mail lists/counts/navigation, grouped pagination, Gmail-style search operators, read/star/snooze/move/delete actions, drafts, attachments, templates, contacts/avatars, mailbox configuration/sharing/aliases, routing rules, account preferences, password/MFA management, browser account switching, licenses and branding.
 - Owner/shared-mailbox permissions, private drafts, disabled-account checks and the original Team-sharing entitlement. Domain ownership does not grant access to another account's mailbox contents.
@@ -83,9 +84,9 @@ Implemented:
 
 Still to migrate before production cutover:
 
-- Calendar/booking, Drive and their public pages; complete account/domain/admin management; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
+- Drive and its public pages; complete account/domain/admin management; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
 - Agent configuration/chat/tools, approval workflows, automatic draft generation/recovery, webhooks/retries and Drive retention. The original assistant layout is present; its remaining endpoints are not yet ported.
-- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit.
+- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit. Calendar and booking were compared against the original on desktop; the current browser viewport override did not take effect, so phone layouts remain unverified.
 - Real Cloudflare delivery checks, a full migration/restore rehearsal, original-app end-to-end performance comparison, nibrun restart/durability verification and production cutover.
 
 Full parity remains the acceptance criterion. The preview is an incomplete migration checkpoint; visible source navigation includes features whose native handlers are still being ported. Missing jobs are not represented by no-op implementations.

@@ -1,3 +1,4 @@
+import { licenseEntitlements } from "../licenses";
 import { z } from "zod";
 import type { User } from "../../shared/contracts";
 import { withDatabase } from "../db";
@@ -53,13 +54,30 @@ export async function avatarsApi(
 		method = request.method;
 	const mailboxMatch = /^\/api\/mailboxes\/([^/]+)\/avatar$/.exec(path);
 	const userMatch = /^\/api\/auth\/accounts\/([^/]+)\/avatar$/.exec(path);
+	const managedMatch = /^\/api\/accounts\/([^/]+)\/avatar$/.exec(path);
 	if (
 		path !== "/api/profile/avatar" &&
 		path !== "/api/contacts/avatar" &&
 		!mailboxMatch &&
-		!userMatch
+		!userMatch &&
+		!managedMatch
 	)
 		return null;
+	if (managedMatch) {
+		if (method !== "GET") return null;
+		if (
+			user.role !== "admin" ||
+			!(await licenseEntitlements()).canManageAccounts
+		)
+			throw new Response("Forbidden", { status: 403 });
+		const [account] = await withDatabase(
+			(sql) =>
+				sql.NativeBookingHostAvatar`SELECT avatar_key FROM users WHERE id=${decodeURIComponent(managedMatch[1] ?? "")}`,
+		);
+		return account?.avatar_key
+			? imageResponse(request, account.avatar_key)
+			: new Response("Not found", { status: 404 });
+	}
 	const storage = new LocalStorage();
 	let key: string | null = null;
 	let save: (key: string | null) => Promise<unknown>;
@@ -201,6 +219,7 @@ async function storeImages(
 		throw new Response("A valid WebP image and preview are required", {
 			status: 400,
 		});
+
 	const storage = new LocalStorage();
 	await storage.put(key + ":preview", previewBytes);
 	await storage.put(key, fullBytes);

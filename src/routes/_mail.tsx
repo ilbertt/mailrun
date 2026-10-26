@@ -94,7 +94,7 @@ function MailLayout() {
 		? AdminLayout
 		: pathname.startsWith("/settings")
 			? SettingsLayout
-			: pathname.startsWith("/calendar")
+			: pathname.startsWith("/calendar") || pathname === "/booking"
 				? CalendarLayout
 				: pathname.startsWith("/drive")
 					? DriveLayout

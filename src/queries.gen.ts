@@ -66,6 +66,11 @@ export interface INativeListAccountsResult {
     created_at: IUsersColumns["created_at"];
 }
 
+/** Result of query `NativeBookingHostAvatar`. */
+export interface INativeBookingHostAvatarResult {
+    avatar_key: IUsersColumns["avatar_key"];
+}
+
 /** Result of query `NativeUserAvatar`. */
 export interface INativeUserAvatarResult {
     avatar_key: IUsersColumns["avatar_key"];
@@ -534,6 +539,28 @@ export interface INativeDeleteTemplateResult {
     id: IMessagesColumns["id"];
 }
 
+/** Result of query `NativeApiKeyCandidates`. */
+export interface INativeApiKeyCandidatesResult {
+    id: string;
+    key_hash: IApiKeysColumns["key_hash"];
+    scopes: IApiKeysColumns["scopes"];
+    mailbox_scope_enabled: IApiKeysColumns["mailbox_scope_enabled"];
+    user_id: IApiKeysColumns["user_id"];
+    name: string | null;
+    email: IUsersColumns["email"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+}
+
+/** Result of query `NativeKeyMailboxScope`. */
+export interface INativeKeyMailboxScopeResult {
+    mailbox_id: IMcpKeyMailboxesColumns["mailbox_id"];
+}
+
+/** Result of query `NativeTouchApiKey`. */
+export interface INativeTouchApiKeyResult {
+}
+
 /** Result of query `BrowserAccountUsers`. */
 export interface IBrowserAccountUsersResult {
     id: string;
@@ -625,6 +652,310 @@ export interface INativeBrandingResult {
 
 /** Result of query `NativeUpdateBranding`. */
 export interface INativeUpdateBrandingResult {
+}
+
+/** Result of query `NativeReadBookingUsername`. */
+export interface INativeReadBookingUsernameResult {
+    booking_username: IUsersColumns["booking_username"];
+}
+
+/** Result of query `NativeBookingUsername`. */
+export interface INativeBookingUsernameResult {
+    booking_username: IUsersColumns["booking_username"];
+}
+
+/** Result of query `NativeAssignBookingUsername`. */
+export interface INativeAssignBookingUsernameResult {
+    booking_username: IUsersColumns["booking_username"];
+}
+
+/** Result of query `NativeRenameBookingUsername`. */
+export interface INativeRenameBookingUsernameResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeBookingHosts`. */
+export interface INativeBookingHostsResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+}
+
+/** Result of query `NativeBookingEditActor`. */
+export interface INativeBookingEditActorResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeBookingSlug`. */
+export interface INativeBookingSlugResult {
+    id: IBookingEventsColumns["id"];
+}
+
+/** Result of query `NativeUpdateBooking`. */
+export interface INativeUpdateBookingResult {
+    id: IBookingEventsColumns["id"];
+    user_id: IBookingEventsColumns["user_id"];
+    name: IBookingEventsColumns["name"];
+    slug: IBookingEventsColumns["slug"];
+    description: IBookingEventsColumns["description"];
+    color: IBookingEventsColumns["color"];
+    host_ids: IBookingEventsColumns["host_ids"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    start_time: IBookingEventsColumns["start_time"];
+    end_time: IBookingEventsColumns["end_time"];
+    time_ranges: IBookingEventsColumns["time_ranges"];
+    time_zone: IBookingEventsColumns["time_zone"];
+    enabled: IBookingEventsColumns["enabled"];
+    created_at: IBookingEventsColumns["created_at"];
+    updated_at: IBookingEventsColumns["updated_at"];
+}
+
+/** Result of query `NativeCreateBooking`. */
+export interface INativeCreateBookingResult {
+    id: IBookingEventsColumns["id"];
+    user_id: IBookingEventsColumns["user_id"];
+    name: IBookingEventsColumns["name"];
+    slug: IBookingEventsColumns["slug"];
+    description: IBookingEventsColumns["description"];
+    color: IBookingEventsColumns["color"];
+    host_ids: IBookingEventsColumns["host_ids"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    start_time: IBookingEventsColumns["start_time"];
+    end_time: IBookingEventsColumns["end_time"];
+    time_ranges: IBookingEventsColumns["time_ranges"];
+    time_zone: IBookingEventsColumns["time_zone"];
+    enabled: IBookingEventsColumns["enabled"];
+    created_at: IBookingEventsColumns["created_at"];
+    updated_at: IBookingEventsColumns["updated_at"];
+}
+
+/** Result of query `NativeOwnedBookings`. */
+export interface INativeOwnedBookingsResult {
+    id: IBookingEventsColumns["id"];
+    user_id: IBookingEventsColumns["user_id"];
+    name: IBookingEventsColumns["name"];
+    slug: IBookingEventsColumns["slug"];
+    description: IBookingEventsColumns["description"];
+    color: IBookingEventsColumns["color"];
+    host_ids: IBookingEventsColumns["host_ids"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    start_time: IBookingEventsColumns["start_time"];
+    end_time: IBookingEventsColumns["end_time"];
+    time_ranges: IBookingEventsColumns["time_ranges"];
+    time_zone: IBookingEventsColumns["time_zone"];
+    enabled: IBookingEventsColumns["enabled"];
+    created_at: IBookingEventsColumns["created_at"];
+    updated_at: IBookingEventsColumns["updated_at"];
+}
+
+/** Result of query `NativeBookingProfile`. */
+export interface INativeBookingProfileResult {
+    avatar_key: IUsersColumns["avatar_key"];
+}
+
+/** Result of query `NativeDeleteBooking`. */
+export interface INativeDeleteBookingResult {
+    id: IBookingEventsColumns["id"];
+}
+
+/** Result of query `NativePublicBookingUser`. */
+export interface INativePublicBookingUserResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    booking_username: IUsersColumns["booking_username"];
+}
+
+/** Result of query `NativePublicBookings`. */
+export interface INativePublicBookingsResult {
+    id: IBookingEventsColumns["id"];
+    slug: IBookingEventsColumns["slug"];
+    name: IBookingEventsColumns["name"];
+    description: IBookingEventsColumns["description"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    time_zone: IBookingEventsColumns["time_zone"];
+}
+
+/** Result of query `NativePublicBookingHosts`. */
+export interface INativePublicBookingHostsResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+}
+
+/** Result of query `NativePublicBookingEvent`. */
+export interface INativePublicBookingEventResult {
+    id: string | null;
+    user_id: IBookingEventsColumns["user_id"];
+    name: string | null;
+    slug: IBookingEventsColumns["slug"];
+    description: IBookingEventsColumns["description"];
+    color: IBookingEventsColumns["color"];
+    host_ids: IBookingEventsColumns["host_ids"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    start_time: IBookingEventsColumns["start_time"];
+    end_time: IBookingEventsColumns["end_time"];
+    time_ranges: IBookingEventsColumns["time_ranges"];
+    time_zone: string | null;
+    enabled: IBookingEventsColumns["enabled"];
+    created_at: number | null;
+    updated_at: IBookingEventsColumns["updated_at"];
+}
+
+/** Result of query `NativeBookingCalendarConflicts`. */
+export interface INativeBookingCalendarConflictsResult {
+    id: ICalendarEventsColumns["id"];
+    user_id: ICalendarEventsColumns["user_id"];
+    mailbox_id: ICalendarEventsColumns["mailbox_id"];
+    title: ICalendarEventsColumns["title"];
+    description: ICalendarEventsColumns["description"];
+    location: ICalendarEventsColumns["location"];
+    attendees: ICalendarEventsColumns["attendees"];
+    starts_at: ICalendarEventsColumns["starts_at"];
+    ends_at: ICalendarEventsColumns["ends_at"];
+    created_at: ICalendarEventsColumns["created_at"];
+    updated_at: ICalendarEventsColumns["updated_at"];
+    color: ICalendarEventsColumns["color"];
+    repeat: ICalendarEventsColumns["repeat"];
+    repeat_until: ICalendarEventsColumns["repeat_until"];
+    repeat_days: ICalendarEventsColumns["repeat_days"];
+    repeat_anchor_day: ICalendarEventsColumns["repeat_anchor_day"];
+    excluded_occurrences: ICalendarEventsColumns["excluded_occurrences"];
+    time_zone: ICalendarEventsColumns["time_zone"];
+}
+
+/** Result of query `NativeClaimPublicBooking`. */
+export interface INativeClaimPublicBookingResult {
+    id: IBookingEventsColumns["id"];
+    user_id: IBookingEventsColumns["user_id"];
+    name: IBookingEventsColumns["name"];
+    slug: IBookingEventsColumns["slug"];
+    description: IBookingEventsColumns["description"];
+    color: IBookingEventsColumns["color"];
+    host_ids: IBookingEventsColumns["host_ids"];
+    duration_minutes: IBookingEventsColumns["duration_minutes"];
+    location: IBookingEventsColumns["location"];
+    weekdays: IBookingEventsColumns["weekdays"];
+    start_time: IBookingEventsColumns["start_time"];
+    end_time: IBookingEventsColumns["end_time"];
+    time_ranges: IBookingEventsColumns["time_ranges"];
+    time_zone: IBookingEventsColumns["time_zone"];
+    enabled: IBookingEventsColumns["enabled"];
+    created_at: IBookingEventsColumns["created_at"];
+    updated_at: IBookingEventsColumns["updated_at"];
+}
+
+/** Result of query `NativeReserveBooking`. */
+export interface INativeReserveBookingResult {
+}
+
+/** Result of query `NativeCalendarEvents`. */
+export interface INativeCalendarEventsResult {
+    id: ICalendarEventsColumns["id"];
+    user_id: ICalendarEventsColumns["user_id"];
+    mailbox_id: ICalendarEventsColumns["mailbox_id"];
+    title: ICalendarEventsColumns["title"];
+    description: ICalendarEventsColumns["description"];
+    location: ICalendarEventsColumns["location"];
+    attendees: ICalendarEventsColumns["attendees"];
+    starts_at: ICalendarEventsColumns["starts_at"];
+    ends_at: ICalendarEventsColumns["ends_at"];
+    created_at: ICalendarEventsColumns["created_at"];
+    updated_at: ICalendarEventsColumns["updated_at"];
+    color: ICalendarEventsColumns["color"];
+    repeat: ICalendarEventsColumns["repeat"];
+    repeat_until: ICalendarEventsColumns["repeat_until"];
+    repeat_days: ICalendarEventsColumns["repeat_days"];
+    repeat_anchor_day: ICalendarEventsColumns["repeat_anchor_day"];
+    excluded_occurrences: ICalendarEventsColumns["excluded_occurrences"];
+    time_zone: ICalendarEventsColumns["time_zone"];
+}
+
+/** Result of query `NativeInsertCalendarEvent`. */
+export interface INativeInsertCalendarEventResult {
+}
+
+/** Result of query `NativeOwnedCalendarEvent`. */
+export interface INativeOwnedCalendarEventResult {
+    id: ICalendarEventsColumns["id"];
+    user_id: ICalendarEventsColumns["user_id"];
+    mailbox_id: ICalendarEventsColumns["mailbox_id"];
+    title: ICalendarEventsColumns["title"];
+    description: ICalendarEventsColumns["description"];
+    location: ICalendarEventsColumns["location"];
+    attendees: ICalendarEventsColumns["attendees"];
+    starts_at: ICalendarEventsColumns["starts_at"];
+    ends_at: ICalendarEventsColumns["ends_at"];
+    created_at: ICalendarEventsColumns["created_at"];
+    updated_at: ICalendarEventsColumns["updated_at"];
+    color: ICalendarEventsColumns["color"];
+    repeat: ICalendarEventsColumns["repeat"];
+    repeat_until: ICalendarEventsColumns["repeat_until"];
+    repeat_days: ICalendarEventsColumns["repeat_days"];
+    repeat_anchor_day: ICalendarEventsColumns["repeat_anchor_day"];
+    excluded_occurrences: ICalendarEventsColumns["excluded_occurrences"];
+    time_zone: ICalendarEventsColumns["time_zone"];
+}
+
+/** Result of query `NativeCalendarMutationGuard`. */
+export interface INativeCalendarMutationGuardResult {
+    id: ICalendarEventsColumns["id"];
+    user_id: ICalendarEventsColumns["user_id"];
+    mailbox_id: ICalendarEventsColumns["mailbox_id"];
+    title: ICalendarEventsColumns["title"];
+    description: ICalendarEventsColumns["description"];
+    location: ICalendarEventsColumns["location"];
+    attendees: ICalendarEventsColumns["attendees"];
+    starts_at: ICalendarEventsColumns["starts_at"];
+    ends_at: ICalendarEventsColumns["ends_at"];
+    created_at: ICalendarEventsColumns["created_at"];
+    updated_at: ICalendarEventsColumns["updated_at"];
+    color: ICalendarEventsColumns["color"];
+    repeat: ICalendarEventsColumns["repeat"];
+    repeat_until: ICalendarEventsColumns["repeat_until"];
+    repeat_days: ICalendarEventsColumns["repeat_days"];
+    repeat_anchor_day: ICalendarEventsColumns["repeat_anchor_day"];
+    excluded_occurrences: ICalendarEventsColumns["excluded_occurrences"];
+    time_zone: ICalendarEventsColumns["time_zone"];
+}
+
+/** Result of query `NativeExcludeCalendarOccurrence`. */
+export interface INativeExcludeCalendarOccurrenceResult {
+}
+
+/** Result of query `NativeSplitCalendarSeries`. */
+export interface INativeSplitCalendarSeriesResult {
+}
+
+/** Result of query `NativeUpdateCalendarEvent`. */
+export interface INativeUpdateCalendarEventResult {
+}
+
+/** Result of query `NativeEndCalendarSeries`. */
+export interface INativeEndCalendarSeriesResult {
+}
+
+/** Result of query `NativeDeleteCalendarEvent`. */
+export interface INativeDeleteCalendarEventResult {
+}
+
+/** Result of query `NativeCalendarInvitationMessage`. */
+export interface INativeCalendarInvitationMessageResult {
+}
+
+/** Result of query `NativeCalendarInvitationFile`. */
+export interface INativeCalendarInvitationFileResult {
+}
+
+/** Result of query `NativeCalendarInvitationJob`. */
+export interface INativeCalendarInvitationJobResult {
 }
 
 /** Result of query `GetInstallation`. */
@@ -1770,6 +2101,7 @@ export interface Queries {
     NativeDomainListActor: INativeDomainListActorResult;
     NativeListDomains: INativeListDomainsResult;
     NativeListAccounts: INativeListAccountsResult;
+    NativeBookingHostAvatar: INativeBookingHostAvatarResult;
     NativeUserAvatar: INativeUserAvatarResult;
     NativeMailboxAvatar: INativeMailboxAvatarResult;
     NativeSetMailboxAvatar: INativeSetMailboxAvatarResult;
@@ -1848,6 +2180,9 @@ export interface Queries {
     NativeListTemplates: INativeListTemplatesResult;
     NativeCreateTemplate: INativeCreateTemplateResult;
     NativeDeleteTemplate: INativeDeleteTemplateResult;
+    NativeApiKeyCandidates: INativeApiKeyCandidatesResult;
+    NativeKeyMailboxScope: INativeKeyMailboxScopeResult;
+    NativeTouchApiKey: INativeTouchApiKeyResult;
     BrowserAccountUsers: IBrowserAccountUsersResult;
     ChallengeAccount: IChallengeAccountResult;
     SourceLoginChallenge: ISourceLoginChallengeResult;
@@ -1864,6 +2199,37 @@ export interface Queries {
     DeleteSession: IDeleteSessionResult;
     NativeBranding: INativeBrandingResult;
     NativeUpdateBranding: INativeUpdateBrandingResult;
+    NativeReadBookingUsername: INativeReadBookingUsernameResult;
+    NativeBookingUsername: INativeBookingUsernameResult;
+    NativeAssignBookingUsername: INativeAssignBookingUsernameResult;
+    NativeRenameBookingUsername: INativeRenameBookingUsernameResult;
+    NativeBookingHosts: INativeBookingHostsResult;
+    NativeBookingEditActor: INativeBookingEditActorResult;
+    NativeBookingSlug: INativeBookingSlugResult;
+    NativeUpdateBooking: INativeUpdateBookingResult;
+    NativeCreateBooking: INativeCreateBookingResult;
+    NativeOwnedBookings: INativeOwnedBookingsResult;
+    NativeBookingProfile: INativeBookingProfileResult;
+    NativeDeleteBooking: INativeDeleteBookingResult;
+    NativePublicBookingUser: INativePublicBookingUserResult;
+    NativePublicBookings: INativePublicBookingsResult;
+    NativePublicBookingHosts: INativePublicBookingHostsResult;
+    NativePublicBookingEvent: INativePublicBookingEventResult;
+    NativeBookingCalendarConflicts: INativeBookingCalendarConflictsResult;
+    NativeClaimPublicBooking: INativeClaimPublicBookingResult;
+    NativeReserveBooking: INativeReserveBookingResult;
+    NativeCalendarEvents: INativeCalendarEventsResult;
+    NativeInsertCalendarEvent: INativeInsertCalendarEventResult;
+    NativeOwnedCalendarEvent: INativeOwnedCalendarEventResult;
+    NativeCalendarMutationGuard: INativeCalendarMutationGuardResult;
+    NativeExcludeCalendarOccurrence: INativeExcludeCalendarOccurrenceResult;
+    NativeSplitCalendarSeries: INativeSplitCalendarSeriesResult;
+    NativeUpdateCalendarEvent: INativeUpdateCalendarEventResult;
+    NativeEndCalendarSeries: INativeEndCalendarSeriesResult;
+    NativeDeleteCalendarEvent: INativeDeleteCalendarEventResult;
+    NativeCalendarInvitationMessage: INativeCalendarInvitationMessageResult;
+    NativeCalendarInvitationFile: INativeCalendarInvitationFileResult;
+    NativeCalendarInvitationJob: INativeCalendarInvitationJobResult;
     GetInstallation: IGetInstallationResult;
     SaveInstallation: ISaveInstallationResult;
     SetInstallationPhase: ISetInstallationPhaseResult;

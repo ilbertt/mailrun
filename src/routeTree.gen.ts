@@ -14,6 +14,8 @@ import { Route as MailRouteImport } from './routes/_mail'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
+import { Route as MailBookingRouteImport } from './routes/_mail.booking'
+import { Route as MailCalendarRouteImport } from './routes/_mail.calendar'
 import { Route as MailComposeRouteImport } from './routes/_mail.compose'
 import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
@@ -45,6 +47,10 @@ import { Route as MailSpamMessageIdRouteImport } from './routes/_mail.spam.$mess
 import { Route as MailStarredMessageIdRouteImport } from './routes/_mail.starred.$messageId'
 import { Route as MailTrashMessageIdRouteImport } from './routes/_mail.trash.$messageId'
 import { Route as ApiSharedFilesTokenRouteImport } from './routes/api.shared-files.$token'
+import { Route as BookUserIdIndexRouteImport } from './routes/book.$userId.index'
+import { Route as BookUserIdEventIdRouteImport } from './routes/book.$userId.$eventId'
+import { Route as CUsernameIndexRouteImport } from './routes/c.$username.index'
+import { Route as CUsernameSlugRouteImport } from './routes/c.$username.$slug'
 import { Route as MailFoldersFolderIdMessageIdRouteImport } from './routes/_mail.folders.$folderId.$messageId'
 import { Route as MailSettingsMailboxesIndexRouteImport } from './routes/_mail.settings.mailboxes.index'
 import { Route as MailSettingsMailboxesIdRouteImport } from './routes/_mail.settings.mailboxes.$id'
@@ -73,6 +79,16 @@ const SetupRoute = SetupRouteImport.update({
 const MailArchivedRoute = MailArchivedRouteImport.update({
   id: '/archived',
   path: '/archived',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailBookingRoute = MailBookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailCalendarRoute = MailCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
   getParentRoute: () => MailRoute,
 } as any)
 const MailComposeRoute = MailComposeRouteImport.update({
@@ -230,6 +246,26 @@ const ApiSharedFilesTokenRoute = ApiSharedFilesTokenRouteImport.update({
   path: '/api/shared-files/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookUserIdIndexRoute = BookUserIdIndexRouteImport.update({
+  id: '/book/$userId/',
+  path: '/book/$userId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookUserIdEventIdRoute = BookUserIdEventIdRouteImport.update({
+  id: '/book/$userId/$eventId',
+  path: '/book/$userId/$eventId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CUsernameIndexRoute = CUsernameIndexRouteImport.update({
+  id: '/c/$username/',
+  path: '/c/$username/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CUsernameSlugRoute = CUsernameSlugRouteImport.update({
+  id: '/c/$username/$slug',
+  path: '/c/$username/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MailFoldersFolderIdMessageIdRoute =
   MailFoldersFolderIdMessageIdRouteImport.update({
     id: '/$messageId',
@@ -265,6 +301,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/archived': typeof MailArchivedRouteWithChildren
+  '/booking': typeof MailBookingRoute
+  '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/drafts': typeof MailDraftsRouteWithChildren
   '/inbox': typeof MailInboxRouteWithChildren
@@ -295,7 +333,11 @@ export interface FileRoutesByFullPath {
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
+  '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
+  '/c/$username/$slug': typeof CUsernameSlugRoute
   '/inbox/': typeof MailInboxIndexRoute
+  '/book/$userId/': typeof BookUserIdIndexRoute
+  '/c/$username/': typeof CUsernameIndexRoute
   '/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -307,6 +349,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/archived': typeof MailArchivedRouteWithChildren
+  '/booking': typeof MailBookingRoute
+  '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/drafts': typeof MailDraftsRouteWithChildren
   '/scheduled': typeof MailScheduledRouteWithChildren
@@ -336,7 +380,11 @@ export interface FileRoutesByTo {
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
+  '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
+  '/c/$username/$slug': typeof CUsernameSlugRoute
   '/inbox': typeof MailInboxIndexRoute
+  '/book/$userId': typeof BookUserIdIndexRoute
+  '/c/$username': typeof CUsernameIndexRoute
   '/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -350,6 +398,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
   '/_mail/archived': typeof MailArchivedRouteWithChildren
+  '/_mail/booking': typeof MailBookingRoute
+  '/_mail/calendar': typeof MailCalendarRoute
   '/_mail/compose': typeof MailComposeRoute
   '/_mail/drafts': typeof MailDraftsRouteWithChildren
   '/_mail/inbox': typeof MailInboxRouteWithChildren
@@ -380,7 +430,11 @@ export interface FileRoutesById {
   '/_mail/starred/$messageId': typeof MailStarredMessageIdRoute
   '/_mail/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
+  '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
+  '/c/$username/$slug': typeof CUsernameSlugRoute
   '/_mail/inbox/': typeof MailInboxIndexRoute
+  '/book/$userId/': typeof BookUserIdIndexRoute
+  '/c/$username/': typeof CUsernameIndexRoute
   '/_mail/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/_mail/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -394,6 +448,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/archived'
+    | '/booking'
+    | '/calendar'
     | '/compose'
     | '/drafts'
     | '/inbox'
@@ -424,7 +480,11 @@ export interface FileRouteTypes {
     | '/starred/$messageId'
     | '/trash/$messageId'
     | '/api/shared-files/$token'
+    | '/book/$userId/$eventId'
+    | '/c/$username/$slug'
     | '/inbox/'
+    | '/book/$userId/'
+    | '/c/$username/'
     | '/folders/$folderId/$messageId'
     | '/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -436,6 +496,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/archived'
+    | '/booking'
+    | '/calendar'
     | '/compose'
     | '/drafts'
     | '/scheduled'
@@ -465,7 +527,11 @@ export interface FileRouteTypes {
     | '/starred/$messageId'
     | '/trash/$messageId'
     | '/api/shared-files/$token'
+    | '/book/$userId/$eventId'
+    | '/c/$username/$slug'
     | '/inbox'
+    | '/book/$userId'
+    | '/c/$username'
     | '/folders/$folderId/$messageId'
     | '/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -478,6 +544,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/setup'
     | '/_mail/archived'
+    | '/_mail/booking'
+    | '/_mail/calendar'
     | '/_mail/compose'
     | '/_mail/drafts'
     | '/_mail/inbox'
@@ -508,7 +576,11 @@ export interface FileRouteTypes {
     | '/_mail/starred/$messageId'
     | '/_mail/trash/$messageId'
     | '/api/shared-files/$token'
+    | '/book/$userId/$eventId'
+    | '/c/$username/$slug'
     | '/_mail/inbox/'
+    | '/book/$userId/'
+    | '/c/$username/'
     | '/_mail/folders/$folderId/$messageId'
     | '/_mail/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -526,6 +598,10 @@ export interface RootRouteChildren {
   ApiInboundRoute: typeof ApiInboundRoute
   ApiRelayHealthRoute: typeof ApiRelayHealthRoute
   ApiSharedFilesTokenRoute: typeof ApiSharedFilesTokenRoute
+  BookUserIdEventIdRoute: typeof BookUserIdEventIdRoute
+  CUsernameSlugRoute: typeof CUsernameSlugRoute
+  BookUserIdIndexRoute: typeof BookUserIdIndexRoute
+  CUsernameIndexRoute: typeof CUsernameIndexRoute
   ApiMessagesMessageIdOriginalRoute: typeof ApiMessagesMessageIdOriginalRoute
   ApiMessagesMessageIdAttachmentsAttachmentIdRoute: typeof ApiMessagesMessageIdAttachmentsAttachmentIdRoute
 }
@@ -565,6 +641,20 @@ declare module '@tanstack/react-router' {
       path: '/archived'
       fullPath: '/archived'
       preLoaderRoute: typeof MailArchivedRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/booking': {
+      id: '/_mail/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof MailBookingRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/calendar': {
+      id: '/_mail/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof MailCalendarRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/compose': {
@@ -784,6 +874,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSharedFilesTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/book/$userId/': {
+      id: '/book/$userId/'
+      path: '/book/$userId'
+      fullPath: '/book/$userId/'
+      preLoaderRoute: typeof BookUserIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/$userId/$eventId': {
+      id: '/book/$userId/$eventId'
+      path: '/book/$userId/$eventId'
+      fullPath: '/book/$userId/$eventId'
+      preLoaderRoute: typeof BookUserIdEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$username/': {
+      id: '/c/$username/'
+      path: '/c/$username'
+      fullPath: '/c/$username/'
+      preLoaderRoute: typeof CUsernameIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$username/$slug': {
+      id: '/c/$username/$slug'
+      path: '/c/$username/$slug'
+      fullPath: '/c/$username/$slug'
+      preLoaderRoute: typeof CUsernameSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_mail/folders/$folderId/$messageId': {
       id: '/_mail/folders/$folderId/$messageId'
       path: '/$messageId'
@@ -969,6 +1087,8 @@ const MailFoldersFolderIdRouteWithChildren =
 
 interface MailRouteChildren {
   MailArchivedRoute: typeof MailArchivedRouteWithChildren
+  MailBookingRoute: typeof MailBookingRoute
+  MailCalendarRoute: typeof MailCalendarRoute
   MailComposeRoute: typeof MailComposeRoute
   MailDraftsRoute: typeof MailDraftsRouteWithChildren
   MailInboxRoute: typeof MailInboxRouteWithChildren
@@ -984,6 +1104,8 @@ interface MailRouteChildren {
 
 const MailRouteChildren: MailRouteChildren = {
   MailArchivedRoute: MailArchivedRouteWithChildren,
+  MailBookingRoute: MailBookingRoute,
+  MailCalendarRoute: MailCalendarRoute,
   MailComposeRoute: MailComposeRoute,
   MailDraftsRoute: MailDraftsRouteWithChildren,
   MailInboxRoute: MailInboxRouteWithChildren,
@@ -1009,6 +1131,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInboundRoute: ApiInboundRoute,
   ApiRelayHealthRoute: ApiRelayHealthRoute,
   ApiSharedFilesTokenRoute: ApiSharedFilesTokenRoute,
+  BookUserIdEventIdRoute: BookUserIdEventIdRoute,
+  CUsernameSlugRoute: CUsernameSlugRoute,
+  BookUserIdIndexRoute: BookUserIdIndexRoute,
+  CUsernameIndexRoute: CUsernameIndexRoute,
   ApiMessagesMessageIdOriginalRoute: ApiMessagesMessageIdOriginalRoute,
   ApiMessagesMessageIdAttachmentsAttachmentIdRoute:
     ApiMessagesMessageIdAttachmentsAttachmentIdRoute,

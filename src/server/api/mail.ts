@@ -1,3 +1,6 @@
+import { calendarApi, isCalendarPath } from "./calendar";
+import { bookingApi, publicBookingApi } from "./booking";
+import { authenticateApiKey } from "../auth/api-key";
 import { getRequestTimeZone } from "../../lib/time/utils";
 import { licensesApi } from "./licenses";
 import { adminReadApi } from "./admin-read";
@@ -70,6 +73,10 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const calendar = await calendarApi(request, user);
+	if (calendar) return calendar;
+	const booking = await bookingApi(request, user);
+	if (booking) return booking;
 	const brand = await brandingApi(
 		request,
 		user.role === "admin" && user.isPrimaryAdmin,
@@ -315,6 +322,19 @@ export async function dispatchMailApi(
 }
 export async function serveMailApi(request: Request) {
 	try {
+		const publicBooking = await publicBookingApi(request);
+		if (publicBooking) return publicBooking;
+		const authorization = request.headers.get("authorization") ?? "";
+		if (
+			isCalendarPath(new URL(request.url).pathname) &&
+			(authorization.startsWith("Bearer ep_") ||
+				authorization.startsWith("Basic "))
+		) {
+			const key = await authenticateApiKey(request);
+			if (!key) throw new Response("Unauthorized", { status: 401 });
+			const response = await calendarApi(request, key.user, key);
+			return response ?? Response.json({ error: "Not found" }, { status: 404 });
+		}
 		const bearer = request.headers
 			.get("authorization")
 			?.match(/^Bearer (.+)$/)?.[1];

@@ -20,7 +20,11 @@ export function useRouter() {
 				if (mail?.mailboxes.some((item) => item.id === selected))
 					mailboxId = selected ?? mailboxId;
 			} catch {}
-			if (mailboxId && !url.searchParams.has("mailboxId"))
+			if (
+				mailboxId &&
+				!url.searchParams.has("mailboxId") &&
+				!/^\/(c|book)(\/|$)/.test(url.pathname)
+			)
 				url.searchParams.set("mailboxId", mailboxId);
 			return url.pathname + url.search + url.hash;
 		};

@@ -17,7 +17,11 @@ export function MailLink({
 	const router = useRouter();
 	const mailboxId = useContext(MailContext)?.mailboxId;
 	const url = new URL(href, "https://mailflare.invalid");
-	if (mailboxId && url.origin === "https://mailflare.invalid")
+	if (
+		mailboxId &&
+		url.origin === "https://mailflare.invalid" &&
+		!/^\/(c|book)(\/|$)/.test(url.pathname)
+	)
 		url.searchParams.set("mailboxId", mailboxId);
 	const target =
 		url.origin === "https://mailflare.invalid"

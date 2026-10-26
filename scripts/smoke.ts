@@ -87,6 +87,116 @@ try {
 			.messages.some((message) => message.subject === "A searchable subject")
 	)
 		throw new Error("Source-compatible message list failed");
+	const calendarHeaders = {
+		Cookie: sessionCookie,
+		Origin: publicBase,
+		"Content-Type": "application/json",
+	};
+	const savedEvent = await fetch(`${base}/api/calendar/events`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			title: "Standalone calendar",
+			startsAt: "2030-01-07T09:00:00Z",
+			endsAt: "2030-01-07T10:00:00Z",
+			repeat: "daily",
+			timeZone: "UTC",
+		}),
+	});
+	const calendarEvent = z
+		.object({ event: z.object({ id: z.string(), repeat: z.literal("daily") }) })
+		.parse(await savedEvent.json()).event;
+	if (!savedEvent.ok) throw new Error("Calendar event creation failed");
+	const calendarList = await fetch(
+		`${base}/api/calendar/events?start=2030-01-01T00:00:00Z&end=2030-02-01T00:00:00Z`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	if (
+		!calendarList.ok ||
+		!z
+			.object({ events: z.array(z.object({ id: z.string() })) })
+			.parse(await calendarList.json())
+			.events.some((event) => event.id === calendarEvent.id)
+	)
+		throw new Error("Calendar event retrieval failed");
+	const calendarKey = "ep_standalone-calendar-key";
+	state.db
+		.query(
+			"INSERT INTO api_keys (id,user_id,name,key_hash,prefix,scopes,created_at) VALUES (?,?,?,?,?,?,?)",
+		)
+		.run(
+			"calendar-key",
+			"owner",
+			"Calendar smoke",
+			await bcrypt.hash(calendarKey, 4),
+			calendarKey.slice(0, 12),
+			'["calendar:read"]',
+			1,
+		);
+	const basicCalendar = await fetch(`${base}/api/calendar/events`, {
+		headers: { Authorization: "Basic " + btoa("ignored:" + calendarKey) },
+	});
+	if (!basicCalendar.ok)
+		throw new Error("Calendar API key authentication failed");
+	const deniedCalendar = await fetch(`${base}/api/calendar/events`, {
+		method: "POST",
+		headers: {
+			Authorization: "Bearer " + calendarKey,
+			"Content-Type": "application/json",
+		},
+		body: "{}",
+	});
+	if (deniedCalendar.status !== 403)
+		throw new Error("Calendar read key could mutate events");
+	const bookingInput = {
+		name: "Standalone booking",
+		slug: "standalone",
+		description: "Synthetic compiled test",
+		hostIds: ["owner"],
+		durationMinutes: 30,
+		location: "Test room",
+		weekdays: [0, 1, 2, 3, 4, 5, 6],
+		timeRanges: [{ startTime: "09:00", endTime: "17:00" }],
+		timeZone: "UTC",
+		enabled: true,
+	};
+	const createdBooking = await fetch(`${base}/api/booking`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify(bookingInput),
+	});
+	const bookingId = z
+		.object({ event: z.object({ id: z.string() }) })
+		.parse(await createdBooking.json()).event.id;
+	if (!createdBooking.ok) throw new Error("Booking creation failed");
+	const publicEvent = await fetch(`${base}/api/public/booking/${bookingId}`);
+	const publicSlots = z
+		.object({ slots: z.array(z.object({ startsAt: z.string() })) })
+		.parse(await publicEvent.json());
+	const slot = publicSlots.slots[0];
+	if (!publicEvent.ok || !slot)
+		throw new Error("Public booking availability failed");
+	const reservationInput = {
+		name: "Synthetic guest",
+		email: "guest@example.net",
+		startsAt: slot.startsAt,
+		notes: "Standalone smoke",
+	};
+	const reserve = () =>
+		fetch(`${base}/api/public/booking/${bookingId}`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(reservationInput),
+		});
+	const reserved = await reserve();
+	if (!reserved.ok)
+		throw new Error(`Public reservation failed: ${reserved.status}`);
+	const duplicate = await reserve();
+	if (duplicate.status !== 409)
+		throw new Error("Duplicate reservation did not conflict");
+	const publicPage = await fetch(`${base}/book/owner/${bookingId}`);
+	if (!publicPage.ok || !(await publicPage.text()).includes("Mailflare"))
+		throw new Error("Public booking route failed");
 	const draftInput = {
 		mailboxId: "mailbox",
 		to: "maya@example.net",
@@ -329,6 +439,10 @@ try {
 				csrfProtection: "passed",
 				originalRestLogin: "passed",
 				originalMessageApi: "passed",
+				calendarEvents: "passed",
+				calendarApiKeys: "passed",
+				publicBooking: "passed",
+				bookingConflict: "passed",
 				conditionalDraftWrites: "passed",
 				attachmentPreviews: "passed",
 				liveEmailNotifications: "passed",
