@@ -1,4 +1,5 @@
-"use client";
+import { clearDriveListings } from "../../app/(drive)/drive-cache";
+("use client");
 
 import { getUserTimeZone } from "@/lib/time/utils";
 import { clearUserTimeZonePreference } from "@/lib/time/client";
@@ -32,6 +33,7 @@ export function getClientSessionToken(): string | null {
 
 export function setClientSessionToken(token: string): void {
 	draftRevisions.clear();
+	clearDriveListings();
 	const previousToken = getClientSessionToken();
 	try {
 		localStorage.setItem(SESSION_STORAGE_KEY, token);
@@ -42,6 +44,7 @@ export function setClientSessionToken(token: string): void {
 
 export function clearClientSessionToken(): void {
 	draftRevisions.clear();
+	clearDriveListings();
 	try {
 		localStorage.removeItem(SESSION_STORAGE_KEY);
 	} catch {}

@@ -12,7 +12,7 @@ import {
 import { normalizeEmailAddress } from "../../lib/email/address";
 import { getContactId } from "../../lib/contacts/utils";
 import { currentProfile } from "./settings";
-async function imageResponse(request: Request, key: string) {
+export async function imageResponse(request: Request, key: string) {
 	const url = new URL(request.url),
 		file = new LocalStorage().file(
 			url.searchParams.get("variant") === "preview" ? key + ":preview" : key,

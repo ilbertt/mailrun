@@ -7,6 +7,9 @@ export type DriveRow = {
 	r2Key: string | null;
 	size: number;
 	contentType: string;
+	uploadId?: string | null;
+	uploadPartSize?: number | null;
+	uploadFingerprint?: string | null;
 	linkToken: string | null;
 	trashedAt: Date | null;
 	createdAt: Date;

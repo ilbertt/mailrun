@@ -1,3 +1,5 @@
+import { driveApi } from "./drive";
+import { publicDriveApi } from "../drive/sharing";
 import { calendarApi, isCalendarPath } from "./calendar";
 import { bookingApi, publicBookingApi } from "./booking";
 import { authenticateApiKey } from "../auth/api-key";
@@ -73,6 +75,8 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const drive = await driveApi(request, user);
+	if (drive) return drive;
 	const calendar = await calendarApi(request, user);
 	if (calendar) return calendar;
 	const booking = await bookingApi(request, user);
@@ -322,6 +326,8 @@ export async function dispatchMailApi(
 }
 export async function serveMailApi(request: Request) {
 	try {
+		const publicDrive = await publicDriveApi(request);
+		if (publicDrive) return publicDrive;
 		const publicBooking = await publicBookingApi(request);
 		if (publicBooking) return publicBooking;
 		const authorization = request.headers.get("authorization") ?? "";

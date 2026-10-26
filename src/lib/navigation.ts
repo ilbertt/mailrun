@@ -23,7 +23,7 @@ export function useRouter() {
 			if (
 				mailboxId &&
 				!url.searchParams.has("mailboxId") &&
-				!/^\/(c|book)(\/|$)/.test(url.pathname)
+				!/^\/(c|book|d)(\/|$)/.test(url.pathname)
 			)
 				url.searchParams.set("mailboxId", mailboxId);
 			return url.pathname + url.search + url.hash;

@@ -153,6 +153,11 @@ export interface ICancelScheduledJobResult {
 export interface IReturnScheduledToDraftResult {
 }
 
+/** Result of query `NativeDriveOwnerAvatar`. */
+export interface INativeDriveOwnerAvatarResult {
+    avatar_key: IUsersColumns["avatar_key"];
+}
+
 /** Result of query `NativeAgentAvailability`. */
 export interface INativeAgentAvailabilityResult {
     agent_enabled: IAppSettingsColumns["agent_enabled"];
@@ -1005,6 +1010,493 @@ export interface IEnableSendingResult {
 
 /** Result of query `UpdateRelayVersion`. */
 export interface IUpdateRelayVersionResult {
+}
+
+/** Result of query `NativeDriveAccessibleMailboxes`. */
+export interface INativeDriveAccessibleMailboxesResult {
+    id: string | null;
+    permission: unknown | null;
+}
+
+/** Result of query `NativeDriveEmailAttachments`. */
+export interface INativeDriveEmailAttachmentsResult {
+    id: string;
+    message_id: IMessageAttachmentsColumns["message_id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    created_at: number | null;
+    trashed_at: number | null;
+    from_addr: IMessagesColumns["from_addr"];
+    subject: IMessagesColumns["subject"];
+    direction: IMessagesColumns["direction"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    message_date: number;
+    category: unknown | null;
+    video_match: unknown | null;
+}
+
+/** Result of query `NativeDriveAttachmentMutationRows`. */
+export interface INativeDriveAttachmentMutationRowsResult {
+    id: string | null;
+    message_id: IMessageAttachmentsColumns["message_id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    created_at: number | null;
+    trashed_at: number | null;
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    status: IMessagesColumns["status"];
+}
+
+/** Result of query `NativeDriveDeleteEmailAttachments`. */
+export interface INativeDriveDeleteEmailAttachmentsResult {
+}
+
+/** Result of query `NativeDriveTrashEmailAttachments`. */
+export interface INativeDriveTrashEmailAttachmentsResult {
+}
+
+/** Result of query `NativeDriveAttachmentContent`. */
+export interface INativeDriveAttachmentContentResult {
+    id: string;
+    message_id: IMessageAttachmentsColumns["message_id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    created_at: number;
+    trashed_at: number | null;
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    status: IMessagesColumns["status"];
+}
+
+/** Result of query `NativeClearDriveRuntimeLeases`. */
+export interface INativeClearDriveRuntimeLeasesResult {
+}
+
+/** Result of query `NativeClaimDriveLock`. */
+export interface INativeClaimDriveLockResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeRenewDriveLock`. */
+export interface INativeRenewDriveLockResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeCheckDriveLock`. */
+export interface INativeCheckDriveLockResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeReleaseDriveLock`. */
+export interface INativeReleaseDriveLockResult {
+}
+
+/** Result of query `NativeInvalidateDrivePart`. */
+export interface INativeInvalidateDrivePartResult {
+}
+
+/** Result of query `NativeDriveBreadcrumbShares`. */
+export interface INativeDriveBreadcrumbSharesResult {
+    item_id: IDriveSharesColumns["item_id"];
+}
+
+/** Result of query `NativeListDriveItems`. */
+export interface INativeListDriveItemsResult {
+    id: string | null;
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: number | null;
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+    category: unknown | null;
+    video_match: unknown | null;
+    shared_role: string | null;
+    shared_at: number | null;
+}
+
+/** Result of query `NativeCreateDriveFolder`. */
+export interface INativeCreateDriveFolderResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeListDriveFolders`. */
+export interface INativeListDriveFoldersResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeDeleteDriveRows`. */
+export interface INativeDeleteDriveRowsResult {
+}
+
+/** Result of query `NativePatchDriveItem`. */
+export interface INativePatchDriveItemResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeBulkDriveUpdate`. */
+export interface INativeBulkDriveUpdateResult {
+}
+
+/** Result of query `NativeDriveWriteFence`. */
+export interface INativeDriveWriteFenceResult {
+}
+
+/** Result of query `NativeDriveItem`. */
+export interface INativeDriveItemResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeDriveAncestors`. */
+export interface INativeDriveAncestorsResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeDriveEffectiveShares`. */
+export interface INativeDriveEffectiveSharesResult {
+    role: IDriveSharesColumns["role"];
+}
+
+/** Result of query `NativeDriveOwners`. */
+export interface INativeDriveOwnersResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    avatar_key: IUsersColumns["avatar_key"];
+}
+
+/** Result of query `NativeDriveDtoShares`. */
+export interface INativeDriveDtoSharesResult {
+    item_id: IDriveSharesColumns["item_id"];
+}
+
+/** Result of query `NativeDriveDescendants`. */
+export interface INativeDriveDescendantsResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeDriveUsage`. */
+export interface INativeDriveUsageResult {
+    total: number | null;
+}
+
+/** Result of query `NativeDriveStorageLimit`. */
+export interface INativeDriveStorageLimitResult {
+    drive_storage_limit_bytes: IAppSettingsColumns["drive_storage_limit_bytes"];
+}
+
+/** Result of query `NativeStaleDriveUploads`. */
+export interface INativeStaleDriveUploadsResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: string | null;
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeExpiredDriveTrash`. */
+export interface INativeExpiredDriveTrashResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeExpiredDriveAttachmentTrash`. */
+export interface INativeExpiredDriveAttachmentTrashResult {
+    id: IMessageAttachmentsColumns["id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
+/** Result of query `NativePurgeDriveAttachmentTrash`. */
+export interface INativePurgeDriveAttachmentTrashResult {
+}
+
+/** Result of query `NativeListDriveShares`. */
+export interface INativeListDriveSharesResult {
+    id: string;
+    user_id: IDriveSharesColumns["user_id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    role: string | null;
+}
+
+/** Result of query `NativeDriveShareRecipient`. */
+export interface INativeDriveShareRecipientResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeUpsertDriveShare`. */
+export interface INativeUpsertDriveShareResult {
+}
+
+/** Result of query `NativeRevokeDriveShare`. */
+export interface INativeRevokeDriveShareResult {
+}
+
+/** Result of query `NativeLinkDriveItem`. */
+export interface INativeLinkDriveItemResult {
+}
+
+/** Result of query `NativePublicDriveRoot`. */
+export interface INativePublicDriveRootResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativePublicDriveChildren`. */
+export interface INativePublicDriveChildrenResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeResumeDriveUpload`. */
+export interface INativeResumeDriveUploadResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeResumeDriveParts`. */
+export interface INativeResumeDrivePartsResult {
+    part_number: IDriveUploadPartsColumns["part_number"];
+    etag: IDriveUploadPartsColumns["etag"];
+}
+
+/** Result of query `NativeTouchResumedDrive`. */
+export interface INativeTouchResumedDriveResult {
+}
+
+/** Result of query `NativeStartDriveUpload`. */
+export interface INativeStartDriveUploadResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeRemoveEmptyFailedUpload`. */
+export interface INativeRemoveEmptyFailedUploadResult {
+}
+
+/** Result of query `NativeMissingDrivePart`. */
+export interface INativeMissingDrivePartResult {
+}
+
+/** Result of query `NativeRecordDrivePart`. */
+export interface INativeRecordDrivePartResult {
+}
+
+/** Result of query `NativeTouchDrivePart`. */
+export interface INativeTouchDrivePartResult {
+}
+
+/** Result of query `NativeCompleteDriveParts`. */
+export interface INativeCompleteDrivePartsResult {
+    part_number: IDriveUploadPartsColumns["part_number"];
+    etag: IDriveUploadPartsColumns["etag"];
+}
+
+/** Result of query `NativeFinishDriveUpload`. */
+export interface INativeFinishDriveUploadResult {
+    id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    parent_id: IDriveItemsColumns["parent_id"];
+    kind: IDriveItemsColumns["kind"];
+    name: IDriveItemsColumns["name"];
+    r2_key: IDriveItemsColumns["r2_key"];
+    size: IDriveItemsColumns["size"];
+    content_type: IDriveItemsColumns["content_type"];
+    link_token: IDriveItemsColumns["link_token"];
+    trashed_at: IDriveItemsColumns["trashed_at"];
+    created_at: IDriveItemsColumns["created_at"];
+    updated_at: IDriveItemsColumns["updated_at"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    upload_fingerprint: IDriveItemsColumns["upload_fingerprint"];
+}
+
+/** Result of query `NativeClearCompletedDriveParts`. */
+export interface INativeClearCompletedDrivePartsResult {
+}
+
+/** Result of query `NativeAbortDriveUpload`. */
+export interface INativeAbortDriveUploadResult {
 }
 
 /** Result of query `BackupSettings`. */
@@ -2118,6 +2610,7 @@ export interface Queries {
     OwnScheduledDraft: IOwnScheduledDraftResult;
     CancelScheduledJob: ICancelScheduledJobResult;
     ReturnScheduledToDraft: IReturnScheduledToDraftResult;
+    NativeDriveOwnerAvatar: INativeDriveOwnerAvatarResult;
     NativeAgentAvailability: INativeAgentAvailabilityResult;
     NativeSetupMetadata: INativeSetupMetadataResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
@@ -2239,6 +2732,57 @@ export interface Queries {
     ActivateDomain: IActivateDomainResult;
     EnableSending: IEnableSendingResult;
     UpdateRelayVersion: IUpdateRelayVersionResult;
+    NativeDriveAccessibleMailboxes: INativeDriveAccessibleMailboxesResult;
+    NativeDriveEmailAttachments: INativeDriveEmailAttachmentsResult;
+    NativeDriveAttachmentMutationRows: INativeDriveAttachmentMutationRowsResult;
+    NativeDriveDeleteEmailAttachments: INativeDriveDeleteEmailAttachmentsResult;
+    NativeDriveTrashEmailAttachments: INativeDriveTrashEmailAttachmentsResult;
+    NativeDriveAttachmentContent: INativeDriveAttachmentContentResult;
+    NativeClearDriveRuntimeLeases: INativeClearDriveRuntimeLeasesResult;
+    NativeClaimDriveLock: INativeClaimDriveLockResult;
+    NativeRenewDriveLock: INativeRenewDriveLockResult;
+    NativeCheckDriveLock: INativeCheckDriveLockResult;
+    NativeReleaseDriveLock: INativeReleaseDriveLockResult;
+    NativeInvalidateDrivePart: INativeInvalidateDrivePartResult;
+    NativeDriveBreadcrumbShares: INativeDriveBreadcrumbSharesResult;
+    NativeListDriveItems: INativeListDriveItemsResult;
+    NativeCreateDriveFolder: INativeCreateDriveFolderResult;
+    NativeListDriveFolders: INativeListDriveFoldersResult;
+    NativeDeleteDriveRows: INativeDeleteDriveRowsResult;
+    NativePatchDriveItem: INativePatchDriveItemResult;
+    NativeBulkDriveUpdate: INativeBulkDriveUpdateResult;
+    NativeDriveWriteFence: INativeDriveWriteFenceResult;
+    NativeDriveItem: INativeDriveItemResult;
+    NativeDriveAncestors: INativeDriveAncestorsResult;
+    NativeDriveEffectiveShares: INativeDriveEffectiveSharesResult;
+    NativeDriveOwners: INativeDriveOwnersResult;
+    NativeDriveDtoShares: INativeDriveDtoSharesResult;
+    NativeDriveDescendants: INativeDriveDescendantsResult;
+    NativeDriveUsage: INativeDriveUsageResult;
+    NativeDriveStorageLimit: INativeDriveStorageLimitResult;
+    NativeStaleDriveUploads: INativeStaleDriveUploadsResult;
+    NativeExpiredDriveTrash: INativeExpiredDriveTrashResult;
+    NativeExpiredDriveAttachmentTrash: INativeExpiredDriveAttachmentTrashResult;
+    NativePurgeDriveAttachmentTrash: INativePurgeDriveAttachmentTrashResult;
+    NativeListDriveShares: INativeListDriveSharesResult;
+    NativeDriveShareRecipient: INativeDriveShareRecipientResult;
+    NativeUpsertDriveShare: INativeUpsertDriveShareResult;
+    NativeRevokeDriveShare: INativeRevokeDriveShareResult;
+    NativeLinkDriveItem: INativeLinkDriveItemResult;
+    NativePublicDriveRoot: INativePublicDriveRootResult;
+    NativePublicDriveChildren: INativePublicDriveChildrenResult;
+    NativeResumeDriveUpload: INativeResumeDriveUploadResult;
+    NativeResumeDriveParts: INativeResumeDrivePartsResult;
+    NativeTouchResumedDrive: INativeTouchResumedDriveResult;
+    NativeStartDriveUpload: INativeStartDriveUploadResult;
+    NativeRemoveEmptyFailedUpload: INativeRemoveEmptyFailedUploadResult;
+    NativeMissingDrivePart: INativeMissingDrivePartResult;
+    NativeRecordDrivePart: INativeRecordDrivePartResult;
+    NativeTouchDrivePart: INativeTouchDrivePartResult;
+    NativeCompleteDriveParts: INativeCompleteDrivePartsResult;
+    NativeFinishDriveUpload: INativeFinishDriveUploadResult;
+    NativeClearCompletedDriveParts: INativeClearCompletedDrivePartsResult;
+    NativeAbortDriveUpload: INativeAbortDriveUploadResult;
     BackupSettings: IBackupSettingsResult;
     ExpiredBackups: IExpiredBackupsResult;
     DeleteExpiredBackup: IDeleteExpiredBackupResult;

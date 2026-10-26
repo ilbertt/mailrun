@@ -20,7 +20,7 @@ export function MailLink({
 	if (
 		mailboxId &&
 		url.origin === "https://mailflare.invalid" &&
-		!/^\/(c|book)(\/|$)/.test(url.pathname)
+		!/^\/(c|book|d)(\/|$)/.test(url.pathname)
 	)
 		url.searchParams.set("mailboxId", mailboxId);
 	const target =

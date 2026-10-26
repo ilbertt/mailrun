@@ -1,3 +1,4 @@
+import { open, truncate } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fixture } from "../tests/fixtures";
 import { seconds } from "../src/server/db";
@@ -92,6 +93,170 @@ try {
 		Origin: publicBase,
 		"Content-Type": "application/json",
 	};
+
+	const memorySamples: Record<string, number> = {};
+	const sampleMemory = async (label: string) => {
+		const probe = Bun.spawn(["ps", "-o", "rss=", "-p", String(child.pid)], {
+			stdout: "pipe",
+		});
+		memorySamples[label] = Math.round(
+			Number((await new Response(probe.stdout).text()).trim()) / 1024,
+		);
+	};
+	await sampleMemory("beforeDrive");
+	const driveFolderResponse = await fetch(`${base}/api/drive/items`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({ name: "Standalone Drive" }),
+	});
+	const folderId = z
+		.object({ item: z.object({ id: z.string() }) })
+		.parse(await driveFolderResponse.json()).item.id;
+	const largePart = 64 * 1024 * 1024,
+		largePath = resolve(state.directory, "drive-stream-part");
+	await Bun.write(largePath, "");
+	await truncate(largePath, largePart);
+	const partHandle = await open(largePath, "r+");
+	await partHandle.write(new TextEncoder().encode("last"), 0, 4, largePart - 4);
+	await partHandle.close();
+	const uploadInfo = {
+		name: "Streamed.pdf",
+		size: largePart * 3 + 4,
+		parentId: folderId,
+		contentType: "application/pdf",
+		fingerprint: "smoke-streamed",
+	};
+	const uploadStart = await fetch(`${base}/api/drive/upload`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify(uploadInfo),
+	});
+	const upload = z
+		.object({
+			id: z.string(),
+			partSize: z.literal(64 * 1024 * 1024),
+			uploaded: z.array(z.number()),
+		})
+		.parse(await uploadStart.json());
+	const firstPart = await fetch(
+		`${base}/api/drive/upload/${upload.id}?part=1`,
+		{
+			method: "PUT",
+			headers: {
+				Cookie: sessionCookie,
+				Origin: publicBase,
+				"Content-Length": String(largePart),
+			},
+			body: Bun.file(largePath),
+		},
+	);
+	if (!firstPart.ok)
+		throw new Error(
+			`64 MiB streamed upload failed: ${firstPart.status} ${await firstPart.text()}`,
+		);
+	await sampleMemory("afterPart");
+	const resumedResponse = await fetch(`${base}/api/drive/upload`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify(uploadInfo),
+	});
+	const resumed = z
+		.object({
+			id: z.literal(upload.id),
+			uploaded: z.array(z.number()),
+			resumed: z.literal(true),
+		})
+		.parse(await resumedResponse.json());
+	if (!resumed.uploaded.includes(1))
+		throw new Error("Drive part resume failed");
+	for (const part of [2, 3]) {
+		const response = await fetch(
+			`${base}/api/drive/upload/${upload.id}?part=${part}`,
+			{
+				method: "PUT",
+				headers: {
+					Cookie: sessionCookie,
+					Origin: publicBase,
+					"Content-Length": String(largePart),
+				},
+				body: Bun.file(largePath),
+			},
+		);
+		if (!response.ok)
+			throw new Error(
+				`Sustained Drive upload failed at part ${part}: ${response.status}`,
+			);
+	}
+	await sampleMemory("afterThreeParts");
+	const secondPart = await fetch(
+		`${base}/api/drive/upload/${upload.id}?part=4`,
+		{
+			method: "PUT",
+			headers: {
+				Cookie: sessionCookie,
+				Origin: publicBase,
+				"Content-Length": "4",
+			},
+			body: "tail",
+		},
+	);
+	const completedUpload = await fetch(`${base}/api/drive/upload/${upload.id}`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	if (!secondPart.ok || !completedUpload.ok)
+		throw new Error(`Drive completion failed ${await completedUpload.text()}`);
+	await sampleMemory("afterAssembly");
+	const driveRange = await fetch(
+		`${base}/api/drive/items/${upload.id}/content`,
+		{
+			headers: { Cookie: sessionCookie, Range: `bytes=${largePart * 3 - 4}-` },
+		},
+	);
+	if (driveRange.status !== 206 || (await driveRange.text()) !== "lasttail")
+		throw new Error("Drive Range preview failed");
+	const driveHead = await fetch(
+		`${base}/api/drive/items/${upload.id}/content`,
+		{ method: "HEAD", headers: { Cookie: sessionCookie } },
+	);
+	if (
+		driveHead.status !== 200 ||
+		driveHead.headers.get("Content-Length") !== String(largePart * 3 + 4)
+	)
+		throw new Error("Drive HEAD failed");
+	const linkResponse = await fetch(`${base}/api/drive/items/${folderId}/link`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({ enabled: true }),
+	});
+	const link = z
+		.object({ linkToken: z.string() })
+		.parse(await linkResponse.json()).linkToken;
+	const publicFile = await fetch(
+		`${base}/api/drive/public/${link}?item=${upload.id}&content=1`,
+		{ headers: { Range: "bytes=-4" } },
+	);
+	if (publicFile.status !== 206 || (await publicFile.text()) !== "tail")
+		throw new Error("Public Drive stream failed");
+	const publicDrivePage = await fetch(`${base}/d/${link}`);
+	if (!publicDrivePage.ok) throw new Error("Public Drive page failed");
+	const privateDrive = await fetch(
+		`${base}/api/drive/items/${upload.id}/content`,
+	);
+	if (privateDrive.status !== 401)
+		throw new Error("Drive leaked private content");
+	const drivePage = await fetch(`${base}/drive`, {
+		headers: { Cookie: sessionCookie },
+	});
+	if (!drivePage.ok) throw new Error("Original Drive screen failed");
+	await fetch(`${base}/api/drive/items/${folderId}/link`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({ enabled: false }),
+	});
+	if ((await fetch(`${base}/api/drive/public/${link}`)).status !== 404)
+		throw new Error("Revoked public Drive link remained accessible");
+	await sampleMemory("afterDriveScreens");
 	const savedEvent = await fetch(`${base}/api/calendar/events`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -440,6 +605,11 @@ try {
 				originalRestLogin: "passed",
 				originalMessageApi: "passed",
 				calendarEvents: "passed",
+				drive192MiBStreaming: "passed",
+				driveResume: "passed",
+				driveRangeAndHead: "passed",
+				driveSharingAndRevocation: "passed",
+				originalDriveScreen: "passed",
 				calendarApiKeys: "passed",
 				publicBooking: "passed",
 				bookingConflict: "passed",
@@ -455,6 +625,7 @@ try {
 				bunCronDispatch: "passed",
 				downloadAuthorization: "passed",
 				rssMiB: Math.round(rssKiB / 1024),
+				driveMemoryMiB: memorySamples,
 			},
 			null,
 			2,

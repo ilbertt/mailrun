@@ -1,3 +1,4 @@
+import { clearDriveRuntimeLeases } from "../src/server/drive/files";
 import {
 	closeRealtimeConnections,
 	realtimeWebsocket,
@@ -19,15 +20,25 @@ if (name) {
 } else {
 	// Literal imports are bundled into the executable, including Start's lazy chunks.
 	const { default: handler } = await import("#start-handler");
+	await clearDriveRuntimeLeases();
 	await registerCrons(import.meta.path);
 	const server = Bun.serve<RealtimeSession>({
 		port: Number(process.env.PORT ?? 3000),
 		hostname: process.env.HOST ?? "0.0.0.0",
 		idleTimeout: 60,
-		maxRequestBodySize: 30 * 1024 * 1024,
+		maxRequestBodySize: 65 * 1024 * 1024,
 		routes: getAssetRoutes(),
 		websocket: realtimeWebsocket,
 		async fetch(request, server) {
+			// Drive parts stream directly to disk; other upload endpoints keep the mail limit.
+			if (
+				!(
+					/^\/api\/drive\/upload\/[^/]+$/.test(new URL(request.url).pathname) &&
+					request.method === "PUT"
+				) &&
+				Number(request.headers.get("content-length")) > 30 * 1024 * 1024
+			)
+				return new Response("Request body too large", { status: 413 });
 			if (new URL(request.url).pathname === "/api/realtime") {
 				if (request.headers.get("origin") !== publicOrigin())
 					return new Response("Invalid origin", { status: 403 });

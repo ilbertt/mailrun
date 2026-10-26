@@ -18,6 +18,7 @@ import { Route as MailBookingRouteImport } from './routes/_mail.booking'
 import { Route as MailCalendarRouteImport } from './routes/_mail.calendar'
 import { Route as MailComposeRouteImport } from './routes/_mail.compose'
 import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
+import { Route as MailDriveRouteImport } from './routes/_mail.drive'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
 import { Route as MailScheduledRouteImport } from './routes/_mail.scheduled'
 import { Route as MailSentRouteImport } from './routes/_mail.sent'
@@ -30,6 +31,7 @@ import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiInboundRouteImport } from './routes/api.inbound'
 import { Route as ApiRelayHealthRouteImport } from './routes/api.relay-health'
+import { Route as DTokenRouteImport } from './routes/d.$token'
 import { Route as MailArchivedMessageIdRouteImport } from './routes/_mail.archived.$messageId'
 import { Route as MailDraftsMessageIdRouteImport } from './routes/_mail.drafts.$messageId'
 import { Route as MailFoldersFolderIdRouteImport } from './routes/_mail.folders.$folderId'
@@ -101,6 +103,11 @@ const MailDraftsRoute = MailDraftsRouteImport.update({
   path: '/drafts',
   getParentRoute: () => MailRoute,
 } as any)
+const MailDriveRoute = MailDriveRouteImport.update({
+  id: '/drive',
+  path: '/drive',
+  getParentRoute: () => MailRoute,
+} as any)
 const MailInboxRoute = MailInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -159,6 +166,11 @@ const ApiInboundRoute = ApiInboundRouteImport.update({
 const ApiRelayHealthRoute = ApiRelayHealthRouteImport.update({
   id: '/api/relay-health',
   path: '/api/relay-health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DTokenRoute = DTokenRouteImport.update({
+  id: '/d/$token',
+  path: '/d/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MailArchivedMessageIdRoute = MailArchivedMessageIdRouteImport.update({
@@ -305,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/drafts': typeof MailDraftsRouteWithChildren
+  '/drive': typeof MailDriveRoute
   '/inbox': typeof MailInboxRouteWithChildren
   '/scheduled': typeof MailScheduledRouteWithChildren
   '/sent': typeof MailSentRouteWithChildren
@@ -317,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
+  '/d/$token': typeof DTokenRoute
   '/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/drafts/$messageId': typeof MailDraftsMessageIdRoute
   '/folders/$folderId': typeof MailFoldersFolderIdRouteWithChildren
@@ -353,6 +367,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/drafts': typeof MailDraftsRouteWithChildren
+  '/drive': typeof MailDriveRoute
   '/scheduled': typeof MailScheduledRouteWithChildren
   '/sent': typeof MailSentRouteWithChildren
   '/settings': typeof MailSettingsRouteWithChildren
@@ -364,6 +379,7 @@ export interface FileRoutesByTo {
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
+  '/d/$token': typeof DTokenRoute
   '/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/drafts/$messageId': typeof MailDraftsMessageIdRoute
   '/folders/$folderId': typeof MailFoldersFolderIdRouteWithChildren
@@ -402,6 +418,7 @@ export interface FileRoutesById {
   '/_mail/calendar': typeof MailCalendarRoute
   '/_mail/compose': typeof MailComposeRoute
   '/_mail/drafts': typeof MailDraftsRouteWithChildren
+  '/_mail/drive': typeof MailDriveRoute
   '/_mail/inbox': typeof MailInboxRouteWithChildren
   '/_mail/scheduled': typeof MailScheduledRouteWithChildren
   '/_mail/sent': typeof MailSentRouteWithChildren
@@ -414,6 +431,7 @@ export interface FileRoutesById {
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
+  '/d/$token': typeof DTokenRoute
   '/_mail/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/_mail/drafts/$messageId': typeof MailDraftsMessageIdRoute
   '/_mail/folders/$folderId': typeof MailFoldersFolderIdRouteWithChildren
@@ -452,6 +470,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/compose'
     | '/drafts'
+    | '/drive'
     | '/inbox'
     | '/scheduled'
     | '/sent'
@@ -464,6 +483,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
+    | '/d/$token'
     | '/archived/$messageId'
     | '/drafts/$messageId'
     | '/folders/$folderId'
@@ -500,6 +520,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/compose'
     | '/drafts'
+    | '/drive'
     | '/scheduled'
     | '/sent'
     | '/settings'
@@ -511,6 +532,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
+    | '/d/$token'
     | '/archived/$messageId'
     | '/drafts/$messageId'
     | '/folders/$folderId'
@@ -548,6 +570,7 @@ export interface FileRouteTypes {
     | '/_mail/calendar'
     | '/_mail/compose'
     | '/_mail/drafts'
+    | '/_mail/drive'
     | '/_mail/inbox'
     | '/_mail/scheduled'
     | '/_mail/sent'
@@ -560,6 +583,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/inbound'
     | '/api/relay-health'
+    | '/d/$token'
     | '/_mail/archived/$messageId'
     | '/_mail/drafts/$messageId'
     | '/_mail/folders/$folderId'
@@ -597,6 +621,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   ApiInboundRoute: typeof ApiInboundRoute
   ApiRelayHealthRoute: typeof ApiRelayHealthRoute
+  DTokenRoute: typeof DTokenRoute
   ApiSharedFilesTokenRoute: typeof ApiSharedFilesTokenRoute
   BookUserIdEventIdRoute: typeof BookUserIdEventIdRoute
   CUsernameSlugRoute: typeof CUsernameSlugRoute
@@ -669,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/drafts'
       fullPath: '/drafts'
       preLoaderRoute: typeof MailDraftsRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/drive': {
+      id: '/_mail/drive'
+      path: '/drive'
+      fullPath: '/drive'
+      preLoaderRoute: typeof MailDriveRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/inbox': {
@@ -753,6 +785,13 @@ declare module '@tanstack/react-router' {
       path: '/api/relay-health'
       fullPath: '/api/relay-health'
       preLoaderRoute: typeof ApiRelayHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/d/$token': {
+      id: '/d/$token'
+      path: '/d/$token'
+      fullPath: '/d/$token'
+      preLoaderRoute: typeof DTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_mail/archived/$messageId': {
@@ -1091,6 +1130,7 @@ interface MailRouteChildren {
   MailCalendarRoute: typeof MailCalendarRoute
   MailComposeRoute: typeof MailComposeRoute
   MailDraftsRoute: typeof MailDraftsRouteWithChildren
+  MailDriveRoute: typeof MailDriveRoute
   MailInboxRoute: typeof MailInboxRouteWithChildren
   MailScheduledRoute: typeof MailScheduledRouteWithChildren
   MailSentRoute: typeof MailSentRouteWithChildren
@@ -1108,6 +1148,7 @@ const MailRouteChildren: MailRouteChildren = {
   MailCalendarRoute: MailCalendarRoute,
   MailComposeRoute: MailComposeRoute,
   MailDraftsRoute: MailDraftsRouteWithChildren,
+  MailDriveRoute: MailDriveRoute,
   MailInboxRoute: MailInboxRouteWithChildren,
   MailScheduledRoute: MailScheduledRouteWithChildren,
   MailSentRoute: MailSentRouteWithChildren,
@@ -1130,6 +1171,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   ApiInboundRoute: ApiInboundRoute,
   ApiRelayHealthRoute: ApiRelayHealthRoute,
+  DTokenRoute: DTokenRoute,
   ApiSharedFilesTokenRoute: ApiSharedFilesTokenRoute,
   BookUserIdEventIdRoute: BookUserIdEventIdRoute,
   CUsernameSlugRoute: CUsernameSlugRoute,

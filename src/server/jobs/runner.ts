@@ -1,3 +1,4 @@
+import { runDriveRetention } from "../drive/retention";
 import { runTrashRetention } from "./retention";
 import { z } from "zod";
 import { withDatabase, seconds, id } from "../db";
@@ -34,6 +35,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 				await sql.PruneLoginChallenges`DELETE FROM login_challenges WHERE expires_at<${seconds()}`;
 			});
 		} else {
+			await runDriveRetention();
 			await scheduledBackup();
 		}
 		return { skipped: false };
