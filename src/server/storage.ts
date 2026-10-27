@@ -17,7 +17,7 @@ export class LocalStorage {
 		if (!path.startsWith(root + sep)) throw new Error("Invalid object key");
 		return path;
 	}
-	async put(key: string, bytes: Uint8Array | ArrayBuffer | string) {
+	async put(key: string, bytes: Uint8Array | ArrayBuffer | string | Blob) {
 		const path = this.path(key);
 		await mkdir(dirname(path), { recursive: true, mode: 0o700 });
 		const temporary = `${path}.${crypto.randomUUID()}.tmp`;
@@ -48,7 +48,7 @@ export async function deleteUnreferencedObjects(keys: string[]) {
 	if (!candidates.length) return;
 	const rows = await withDatabase(
 		(sql) =>
-			sql.NativeReferencedObjects`WITH candidates AS(SELECT value AS object_key FROM json_each(${JSON.stringify(candidates)})) SELECT object_key FROM candidates WHERE EXISTS(SELECT 1 FROM messages WHERE raw_r2_key=object_key) OR EXISTS(SELECT 1 FROM message_attachments WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM drive_items WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM backups WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM users WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM mailboxes WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM contacts WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM app_settings WHERE icon_key=object_key)`,
+			sql.NativeReferencedObjects`WITH candidates AS(SELECT value AS object_key FROM json_each(${JSON.stringify(candidates)})) SELECT object_key FROM candidates WHERE EXISTS(SELECT 1 FROM messages WHERE raw_r2_key=object_key) OR EXISTS(SELECT 1 FROM message_attachments WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM drive_items WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM backups WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM mailrun_jmap_uploads WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM users WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM mailboxes WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM contacts WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM app_settings WHERE icon_key=object_key)`,
 	);
 	const referenced = new Set(rows.map((row) => row.object_key));
 	await Promise.all(

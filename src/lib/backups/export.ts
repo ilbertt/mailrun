@@ -50,6 +50,7 @@ export const BACKUP_TABLES: DatabaseBackupTable[] = [
 	"drive_shares",
 	"drive_upload_parts",
 	"mailrun_installation",
+	"mailrun_jmap_uploads",
 ];
 export const INTERNAL_TABLES = [
 	"d1_migrations",

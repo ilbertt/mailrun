@@ -66,3 +66,58 @@ test("malformed restore rolls back without destroying existing messages", async 
 		await state.close();
 	}
 });
+
+test("JMAP upload metadata is backed up once and older full backups restore across migration 0065", async () => {
+	const state = await fixture();
+	const legacyPath = join(state.directory, "pre-jmap.sqlite");
+	const legacy = new Database(legacyPath);
+	try {
+		legacy.exec(
+			"CREATE TABLE d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
+		);
+		for (const [name, file] of getMigrations()) {
+			if (!name.endsWith(".sql") || name.slice(0, 4) >= "0065") continue;
+			legacy.exec(await file.text());
+			legacy.query("INSERT INTO d1_migrations(name) VALUES (?)").run(name);
+		}
+		const emptyPath = join(state.directory, "empty-upload-backup.json");
+		await writeBackup(state.path, emptyPath);
+		restoreBackup(legacy, await Bun.file(emptyPath).json());
+		expect(coveredTables(legacy)).not.toContain("mailrun_jmap_uploads");
+		const oldPath = join(state.directory, "pre-jmap-backup.json");
+		await writeBackup(legacyPath, oldPath);
+		const oldBackup = await Bun.file(oldPath).json();
+		restoreBackup(legacy, oldBackup);
+		state.db.exec(
+			"INSERT INTO mailrun_jmap_uploads VALUES ('upload','owner','jmap-uploads/owner/upload','message/rfc822','draft.eml',123,1)",
+		);
+		const fullPath = join(state.directory, "upload-backup.json");
+		await writeBackup(state.path, fullPath);
+		const full = await Bun.file(fullPath).json();
+		expect(full.tables.mailrun_jmap_uploads).toHaveLength(1);
+		expect(
+			coveredTables(state.db).filter((name) => name === "mailrun_jmap_uploads"),
+		).toHaveLength(1);
+		expect(() => restoreBackup(legacy, full)).toThrow(
+			"Apply migrations before restoring mailrun_jmap_uploads",
+		);
+		expect(legacy.query("SELECT id FROM messages").all()).toHaveLength(1);
+		restoreBackup(state.db, oldBackup);
+		expect(
+			state.db.query("SELECT * FROM mailrun_jmap_uploads").all(),
+		).toHaveLength(0);
+		await migrate(legacyPath);
+		restoreBackup(legacy, full);
+		expect(legacy.query("SELECT id FROM mailrun_jmap_uploads").get()).toEqual({
+			id: "upload",
+		});
+		restoreBackup(legacy, oldBackup);
+		expect(
+			legacy.query("SELECT * FROM mailrun_jmap_uploads").all(),
+		).toHaveLength(0);
+		expect(legacy.query("PRAGMA foreign_key_check").all()).toHaveLength(0);
+	} finally {
+		legacy.close();
+		await state.close();
+	}
+});

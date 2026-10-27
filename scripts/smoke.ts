@@ -453,6 +453,149 @@ try {
 		.parse(await publicMailKeyResponse.json());
 	if (!publicMailKeyResponse.ok)
 		throw new Error("Public mail key creation failed");
+	const jmapKeyResponse = await fetch(`${base}/api/api-keys`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "JMAP mail client",
+			scopes: ["jmap"],
+			mailboxIds: ["mailbox"],
+		}),
+	});
+	const jmapKey = z
+		.object({ key: z.string() })
+		.parse(await jmapKeyResponse.json());
+	const jmapHeaders = {
+		Authorization: `Basic ${btoa("client:" + jmapKey.key)}`,
+	};
+	const discovery = await fetch(`${base}/.well-known/jmap`, {
+		redirect: "manual",
+	});
+	if (
+		discovery.status !== 301 ||
+		discovery.headers.get("location") !== `${publicBase}/jmap/session`
+	)
+		throw new Error("JMAP source discovery URL failed");
+	const jmapSession = await fetch(`${base}/jmap/session`, {
+		headers: jmapHeaders,
+	});
+	if (
+		!jmapSession.ok ||
+		!z
+			.object({
+				username: z.literal("owner@example.com"),
+				apiUrl: z.literal(`${publicBase}/jmap/api`),
+			})
+			.safeParse(await jmapSession.json()).success
+	)
+		throw new Error("JMAP authenticated session contract failed");
+	if (
+		(
+			await fetch(`${base}/jmap/session`, {
+				headers: { Cookie: sessionCookie },
+			})
+		).status !== 401 ||
+		(
+			await fetch(`${base}/jmap/session`, {
+				headers: { Authorization: `Bearer ${publicMailKey.key}` },
+			})
+		).status !== 403
+	)
+		throw new Error("JMAP key scope/session isolation failed");
+	const jmapCall = async (
+		methodCalls: [string, Record<string, unknown>, string][],
+	) => {
+		const response = await fetch(`${base}/jmap/api`, {
+			method: "POST",
+			headers: { ...jmapHeaders, "Content-Type": "application/json" },
+			body: JSON.stringify({
+				using: ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
+				methodCalls,
+			}),
+		});
+		if (!response.ok)
+			throw new Error(`JMAP method request failed: ${response.status}`);
+		return z
+			.object({
+				methodResponses: z.array(
+					z.tuple([z.string(), z.record(z.string(), z.unknown()), z.string()]),
+				),
+			})
+			.parse(await response.json());
+	};
+	const jmapQuery = await jmapCall([
+		["Email/query", { filter: { subject: "searchable" } }, "q"],
+		[
+			"Email/get",
+			{
+				"#ids": { resultOf: "q", name: "Email/query", path: "/ids" },
+				properties: ["id", "subject", "bodyValues"],
+				fetchTextBodyValues: true,
+			},
+			"g",
+		],
+		["Email/changes", { sinceState: "old" }, "c"],
+	]);
+	if (
+		!z
+			.object({ ids: z.array(z.string()) })
+			.parse(jmapQuery.methodResponses[0]?.[1])
+			.ids.includes("message") ||
+		!z
+			.object({ list: z.array(z.object({ id: z.string() })) })
+			.parse(jmapQuery.methodResponses[1]?.[1])
+			.list.some((row) => row.id === "message") ||
+		jmapQuery.methodResponses[2]?.[0] !== "error" ||
+		jmapQuery.methodResponses[2]?.[1].type !== "cannotCalculateChanges"
+	)
+		throw new Error("JMAP query/reference/history contract failed");
+	const jmapMime =
+		"From: hello@example.com\r\nTo: recipient@example.org\r\nSubject: JMAP smoke draft\r\nContent-Type: text/plain\r\n\r\nCompiled JMAP MIME";
+	const jmapUploadResponse = await fetch(`${base}/jmap/upload/owner`, {
+		method: "POST",
+		headers: { ...jmapHeaders, "Content-Type": "message/rfc822" },
+		body: jmapMime,
+	});
+	if (jmapUploadResponse.status !== 201) throw new Error("JMAP upload failed");
+	const jmapUpload = z
+		.object({ blobId: z.string() })
+		.parse(await jmapUploadResponse.json());
+	const jmapImport = await jmapCall([
+		[
+			"Email/import",
+			{
+				emails: {
+					draft: {
+						blobId: jmapUpload.blobId,
+						mailboxIds: { "mailbox~drafts": true },
+					},
+				},
+			},
+			"i",
+		],
+	]);
+	const jmapImported = z
+		.object({
+			created: z.object({
+				draft: z.object({ id: z.string(), blobId: z.string() }),
+			}),
+		})
+		.parse(jmapImport.methodResponses[0]?.[1]).created.draft;
+	const jmapDownload = await fetch(
+		`${base}/jmap/download/owner/${jmapImported.blobId}/draft.eml`,
+		{ headers: jmapHeaders },
+	);
+	if (!jmapDownload.ok || (await jmapDownload.text()) !== jmapMime)
+		throw new Error("JMAP imported MIME download differs");
+	const jmapEvents = await fetch(`${base}/jmap/eventsource?closeafter=state`, {
+		headers: jmapHeaders,
+	});
+	if (
+		!jmapEvents.ok ||
+		!(await jmapEvents.text()).includes('"@type":"StateChange"')
+	)
+		throw new Error("JMAP state event stream failed");
+	await jmapCall([["Email/set", { destroy: [jmapImported.id] }, "d"]]);
 	const publicAdminKeyResponse = await fetch(`${base}/api/admin/api-keys`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -1434,6 +1577,7 @@ try {
 				signedWebhooksAndCronRetries: "passed",
 				emlImportAndMboxExport: "passed",
 				publicApiScopesAndAdministration: "passed",
+				jmapProtocol: "passed",
 				publicScheduledSend: "passed",
 				apiSendPeakMiB: Math.round(apiMemoryPeak),
 				nativeTransferAuthenticationAndAliases: "passed",

@@ -1,3 +1,8 @@
+import { queryEmailIds } from "../src/server/jmap/email-query";
+import type { JmapContext } from "../src/server/jmap/types";
+import { createManagedKey } from "../src/server/auth/key-management";
+import { authenticateApiKey } from "../src/server/auth/api-key";
+import { apiKeyPrincipal } from "../src/server/auth/key-principal";
 import { exportMailbox } from "../src/server/mail-transfer/export";
 import { queryMessages } from "../src/server/mail/message-query";
 import { performance } from "node:perf_hooks";
@@ -19,6 +24,24 @@ try {
 				1_700_000_000 + index,
 			);
 	})();
+	const key = await createManagedKey(owner, "personal", {
+		name: "Benchmark",
+		scopes: ["jmap"],
+		mailboxIds: ["mailbox"],
+	});
+	const auth = await authenticateApiKey(
+		new Request("https://benchmark.example", {
+			headers: { Authorization: `Bearer ${key.key}` },
+		}),
+	);
+	if (!auth) throw new Error("Benchmark key did not authenticate");
+	const jmap: JmapContext = {
+		auth: { ...auth, userId: auth.user.id, email: auth.user.email },
+		actor: apiKeyPrincipal(auth, "jmap"),
+		accountId: owner.id,
+		origin: "https://benchmark.example",
+		createdIds: Object.create(null),
+	};
 	const cases = {
 		inbox: () =>
 			queryMessages(owner, {
@@ -45,6 +68,27 @@ try {
 				offset: 5000,
 			}),
 		conversation: () => getThread(owner, "bench-5000"),
+		jmapInbox: () =>
+			queryEmailIds(jmap, {
+				filter: { inMailbox: "mailbox~inbox" },
+				calculateTotal: true,
+			}),
+		jmapNestedFilter: () =>
+			queryEmailIds(jmap, {
+				filter: {
+					operator: "AND",
+					conditions: [
+						{ inMailbox: "mailbox~inbox" },
+						{
+							operator: "OR",
+							conditions: [{ body: "searchable" }, { subject: "Welcome" }],
+						},
+						{ operator: "NOT", conditions: [{ hasKeyword: "$flagged" }] },
+					],
+				},
+				sort: [{ property: "subject", isAscending: true }],
+				calculateTotal: true,
+			}),
 	};
 	const results: Record<string, { p50Ms: number; p95Ms: number }> = {};
 	for (const [name, run] of Object.entries(cases)) {
@@ -77,7 +121,7 @@ try {
 		messages: 10001,
 		samples: 50,
 		scope:
-			"Local repository/database calls, includes authorization; excludes HTTP, browser rendering and nibrun cold start. Not a comparison with the old app.",
+			"Local repository/database calls, includes mailbox authorization; excludes API-key bcrypt verification, HTTP, browser rendering and nibrun cold start. Not a comparison with the old app.",
 		results,
 		streamedExport,
 	};

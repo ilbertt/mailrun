@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MailRouteImport } from './routes/_mail'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as JmapRouteImport } from './routes/jmap'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SetupRouteImport } from './routes/setup'
+import { Route as DotwellKnownJmapRouteImport } from './routes/[.]well-known.jmap'
 import { Route as MailActivityRouteImport } from './routes/_mail.activity'
 import { Route as MailApiKeysRouteImport } from './routes/_mail.api-keys'
 import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
@@ -45,6 +47,7 @@ import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiInboundRouteImport } from './routes/api.inbound'
 import { Route as ApiRelayHealthRouteImport } from './routes/api.relay-health'
 import { Route as DTokenRouteImport } from './routes/d.$token'
+import { Route as JmapSplatRouteImport } from './routes/jmap.$'
 import { Route as MailAccountsIndexRouteImport } from './routes/_mail.accounts.index'
 import { Route as MailAccountsIdRouteImport } from './routes/_mail.accounts.$id'
 import { Route as MailArchivedMessageIdRouteImport } from './routes/_mail.archived.$messageId'
@@ -99,6 +102,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JmapRoute = JmapRouteImport.update({
+  id: '/jmap',
+  path: '/jmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -112,6 +120,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotwellKnownJmapRoute = DotwellKnownJmapRouteImport.update({
+  id: '/.well-known/jmap',
+  path: '/.well-known/jmap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MailActivityRoute = MailActivityRouteImport.update({
@@ -263,6 +276,11 @@ const DTokenRoute = DTokenRouteImport.update({
   id: '/d/$token',
   path: '/d/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const JmapSplatRoute = JmapSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => JmapRoute,
 } as any)
 const MailAccountsIndexRoute = MailAccountsIndexRouteImport.update({
   id: '/accounts/',
@@ -470,9 +488,11 @@ const ApiMessagesMessageIdAttachmentsAttachmentIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
@@ -503,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
+  '/jmap/$': typeof JmapSplatRoute
   '/accounts/$id': typeof MailAccountsIdRouteWithChildren
   '/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/drafts/$messageId': typeof MailDraftsMessageIdRoute
@@ -546,9 +567,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
@@ -578,6 +601,7 @@ export interface FileRoutesByTo {
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
+  '/jmap/$': typeof JmapSplatRoute
   '/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/drafts/$messageId': typeof MailDraftsMessageIdRoute
   '/folders/$folderId': typeof MailFoldersFolderIdRouteWithChildren
@@ -622,9 +646,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_mail': typeof MailRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/_mail/activity': typeof MailActivityRoute
   '/_mail/api-keys': typeof MailApiKeysRoute
   '/_mail/archived': typeof MailArchivedRouteWithChildren
@@ -655,6 +681,7 @@ export interface FileRoutesById {
   '/api/inbound': typeof ApiInboundRoute
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
+  '/jmap/$': typeof JmapSplatRoute
   '/_mail/accounts/$id': typeof MailAccountsIdRouteWithChildren
   '/_mail/archived/$messageId': typeof MailArchivedMessageIdRoute
   '/_mail/drafts/$messageId': typeof MailDraftsMessageIdRoute
@@ -700,9 +727,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/forgot-password'
+    | '/jmap'
     | '/login'
     | '/reset-password'
     | '/setup'
+    | '/.well-known/jmap'
     | '/activity'
     | '/api-keys'
     | '/archived'
@@ -733,6 +762,7 @@ export interface FileRouteTypes {
     | '/api/inbound'
     | '/api/relay-health'
     | '/d/$token'
+    | '/jmap/$'
     | '/accounts/$id'
     | '/archived/$messageId'
     | '/drafts/$messageId'
@@ -776,9 +806,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/forgot-password'
+    | '/jmap'
     | '/login'
     | '/reset-password'
     | '/setup'
+    | '/.well-known/jmap'
     | '/activity'
     | '/api-keys'
     | '/archived'
@@ -808,6 +840,7 @@ export interface FileRouteTypes {
     | '/api/inbound'
     | '/api/relay-health'
     | '/d/$token'
+    | '/jmap/$'
     | '/archived/$messageId'
     | '/drafts/$messageId'
     | '/folders/$folderId'
@@ -851,9 +884,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_mail'
     | '/forgot-password'
+    | '/jmap'
     | '/login'
     | '/reset-password'
     | '/setup'
+    | '/.well-known/jmap'
     | '/_mail/activity'
     | '/_mail/api-keys'
     | '/_mail/archived'
@@ -884,6 +919,7 @@ export interface FileRouteTypes {
     | '/api/inbound'
     | '/api/relay-health'
     | '/d/$token'
+    | '/jmap/$'
     | '/_mail/accounts/$id'
     | '/_mail/archived/$messageId'
     | '/_mail/drafts/$messageId'
@@ -929,9 +965,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MailRoute: typeof MailRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  JmapRoute: typeof JmapRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetupRoute: typeof SetupRoute
+  DotwellKnownJmapRoute: typeof DotwellKnownJmapRoute
   ApiSplatRoute: typeof ApiSplatRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiInboundRoute: typeof ApiInboundRoute
@@ -969,6 +1007,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jmap': {
+      id: '/jmap'
+      path: '/jmap'
+      fullPath: '/jmap'
+      preLoaderRoute: typeof JmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -988,6 +1033,13 @@ declare module '@tanstack/react-router' {
       path: '/setup'
       fullPath: '/setup'
       preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/jmap': {
+      id: '/.well-known/jmap'
+      path: '/.well-known/jmap'
+      fullPath: '/.well-known/jmap'
+      preLoaderRoute: typeof DotwellKnownJmapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_mail/activity': {
@@ -1199,6 +1251,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/d/$token'
       preLoaderRoute: typeof DTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/jmap/$': {
+      id: '/jmap/$'
+      path: '/$'
+      fullPath: '/jmap/$'
+      preLoaderRoute: typeof JmapSplatRouteImport
+      parentRoute: typeof JmapRoute
     }
     '/_mail/accounts/': {
       id: '/_mail/accounts/'
@@ -1717,13 +1776,25 @@ const MailRouteChildren: MailRouteChildren = {
 
 const MailRouteWithChildren = MailRoute._addFileChildren(MailRouteChildren)
 
+interface JmapRouteChildren {
+  JmapSplatRoute: typeof JmapSplatRoute
+}
+
+const JmapRouteChildren: JmapRouteChildren = {
+  JmapSplatRoute: JmapSplatRoute,
+}
+
+const JmapRouteWithChildren = JmapRoute._addFileChildren(JmapRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MailRoute: MailRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  JmapRoute: JmapRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetupRoute: SetupRoute,
+  DotwellKnownJmapRoute: DotwellKnownJmapRoute,
   ApiSplatRoute: ApiSplatRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiInboundRoute: ApiInboundRoute,

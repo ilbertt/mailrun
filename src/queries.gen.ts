@@ -2013,6 +2013,265 @@ export interface INativeClearCompletedDrivePartsResult {
 export interface INativeAbortDriveUploadResult {
 }
 
+/** Result of query `NativeJmapCurrentGrants`. */
+export interface INativeJmapCurrentGrantsResult {
+    mailbox_scope_enabled: IApiKeysColumns["mailbox_scope_enabled"] | null;
+    kind: IApiKeysColumns["kind"] | null;
+    mailbox_id: IMcpKeyMailboxesColumns["mailbox_id"] | null;
+}
+
+/** Result of query `NativeJmapFolders`. */
+export interface INativeJmapFoldersResult {
+    id: IFoldersColumns["id"];
+    mailbox_id: IFoldersColumns["mailbox_id"];
+    name: IFoldersColumns["name"];
+}
+
+/** Result of query `NativeJmapWriteFence`. */
+export interface INativeJmapWriteFenceResult {
+}
+
+/** Result of query `NativeJmapWriteAccess`. */
+export interface INativeJmapWriteAccessResult {
+    id: string | null;
+}
+
+/** Result of query `NativeJmapUploadFence`. */
+export interface INativeJmapUploadFenceResult {
+}
+
+/** Result of query `NativeJmapCreateUpload`. */
+export interface INativeJmapCreateUploadResult {
+}
+
+/** Result of query `NativeJmapReadUpload`. */
+export interface INativeJmapReadUploadResult {
+    r2_key: IMailrunJmapUploadsColumns["r2_key"];
+    content_type: IMailrunJmapUploadsColumns["content_type"];
+    name: IMailrunJmapUploadsColumns["name"];
+}
+
+/** Result of query `NativeJmapDeleteUpload`. */
+export interface INativeJmapDeleteUploadResult {
+    r2_key: IMailrunJmapUploadsColumns["r2_key"];
+}
+
+/** Result of query `NativeJmapUploadBlob`. */
+export interface INativeJmapUploadBlobResult {
+    id: IMailrunJmapUploadsColumns["id"];
+    user_id: IMailrunJmapUploadsColumns["user_id"];
+    r2_key: IMailrunJmapUploadsColumns["r2_key"];
+    content_type: IMailrunJmapUploadsColumns["content_type"];
+    name: IMailrunJmapUploadsColumns["name"];
+    size: IMailrunJmapUploadsColumns["size"];
+    created_at: IMailrunJmapUploadsColumns["created_at"];
+}
+
+/** Result of query `NativeJmapAttachmentBlob`. */
+export interface INativeJmapAttachmentBlobResult {
+    message_id: IMessageAttachmentsColumns["message_id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+}
+
+/** Result of query `NativeJmapEmailQuery`. */
+export interface INativeJmapEmailQueryResult {
+    id: string;
+    thread: string;
+}
+
+/** Result of query `NativeJmapClaimUpload`. */
+export interface INativeJmapClaimUploadResult {
+    r2_key: IMailrunJmapUploadsColumns["r2_key"];
+}
+
+/** Result of query `NativeJmapImportThread`. */
+export interface INativeJmapImportThreadResult {
+    thread_id: IMessagesColumns["thread_id"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+}
+
+/** Result of query `NativeJmapInsertDraft`. */
+export interface INativeJmapInsertDraftResult {
+}
+
+/** Result of query `NativeJmapDraftAttachment`. */
+export interface INativeJmapDraftAttachmentResult {
+}
+
+/** Result of query `NativeJmapDestroyMessageGuard`. */
+export interface INativeJmapDestroyMessageGuardResult {
+    status: IMessagesColumns["status"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+}
+
+/** Result of query `NativeJmapMessageSending`. */
+export interface INativeJmapMessageSendingResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `NativeJmapCancelMessageJobs`. */
+export interface INativeJmapCancelMessageJobsResult {
+}
+
+/** Result of query `NativeJmapDestroyAttachments`. */
+export interface INativeJmapDestroyAttachmentsResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
+/** Result of query `NativeJmapDeleteEmail`. */
+export interface INativeJmapDeleteEmailResult {
+}
+
+/** Result of query `NativeJmapTrashEmail`. */
+export interface INativeJmapTrashEmailResult {
+}
+
+/** Result of query `NativeJmapMoveFolder`. */
+export interface INativeJmapMoveFolderResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `NativeJmapUpdateSending`. */
+export interface INativeJmapUpdateSendingResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `NativeJmapCancelMovedJobs`. */
+export interface INativeJmapCancelMovedJobsResult {
+}
+
+/** Result of query `NativeJmapUpdateEmail`. */
+export interface INativeJmapUpdateEmailResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeJmapThreads`. */
+export interface INativeJmapThreadsResult {
+    id: IMessagesColumns["id"];
+    thread: string;
+}
+
+/** Result of query `NativeJmapReserveSubmission`. */
+export interface INativeJmapReserveSubmissionResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeJmapQueueSubmissionMessage`. */
+export interface INativeJmapQueueSubmissionMessageResult {
+}
+
+/** Result of query `NativeJmapQueueSubmissionAttachment`. */
+export interface INativeJmapQueueSubmissionAttachmentResult {
+}
+
+/** Result of query `NativeJmapQueueSubmissionJob`. */
+export interface INativeJmapQueueSubmissionJobResult {
+}
+
+/** Result of query `NativeJmapMailboxCounts`. */
+export interface INativeJmapMailboxCountsResult {
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    status: IMessagesColumns["status"];
+    folder_id: IMessagesColumns["folder_id"];
+    total: number;
+    unread: number;
+}
+
+/** Result of query `NativeJmapCreateFolder`. */
+export interface INativeJmapCreateFolderResult {
+}
+
+/** Result of query `NativeJmapRenameFolder`. */
+export interface INativeJmapRenameFolderResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `NativeJmapDestroyFolderGuard`. */
+export interface INativeJmapDestroyFolderGuardResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `NativeJmapFolderSending`. */
+export interface INativeJmapFolderSendingResult {
+    id: string | null;
+}
+
+/** Result of query `NativeJmapCancelFolderJobs`. */
+export interface INativeJmapCancelFolderJobsResult {
+}
+
+/** Result of query `NativeJmapTrashFolder`. */
+export interface INativeJmapTrashFolderResult {
+}
+
+/** Result of query `NativeJmapFolderUsed`. */
+export interface INativeJmapFolderUsedResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeJmapDeleteFolder`. */
+export interface INativeJmapDeleteFolderResult {
+}
+
+/** Result of query `NativeJmapMessages`. */
+export interface INativeJmapMessagesResult {
+    id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    direction: IMessagesColumns["direction"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    subject: IMessagesColumns["subject"];
+    snippet: IMessagesColumns["snippet"];
+    status: IMessagesColumns["status"];
+    thread_id: IMessagesColumns["thread_id"];
+    created_at: IMessagesColumns["created_at"];
+    read: IMessagesColumns["read"];
+    folder_id: IMessagesColumns["folder_id"];
+    snoozed_until: IMessagesColumns["snoozed_until"];
+    starred: IMessagesColumns["starred"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    bcc_addr: IMessagesColumns["bcc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    spam_score: IMessagesColumns["spam_score"];
+    spam_verdict: IMessagesColumns["spam_verdict"];
+    spam_signals: IMessagesColumns["spam_signals"];
+    spam_analyzed_at: IMessagesColumns["spam_analyzed_at"];
+    spam_analysis_error: IMessagesColumns["spam_analysis_error"];
+    trashed_at: IMessagesColumns["trashed_at"];
+    reply_to: IMessagesColumns["reply_to"];
+    draft_revision: IMessagesColumns["draft_revision"];
+    draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
+}
+
+/** Result of query `NativeJmapAttachments`. */
+export interface INativeJmapAttachmentsResult {
+    id: IMessageAttachmentsColumns["id"];
+    message_id: IMessageAttachmentsColumns["message_id"];
+    filename: IMessageAttachmentsColumns["filename"];
+    content_type: IMessageAttachmentsColumns["content_type"];
+    size: IMessageAttachmentsColumns["size"];
+    disposition: IMessageAttachmentsColumns["disposition"];
+    content_id: IMessageAttachmentsColumns["content_id"];
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+    created_at: IMessageAttachmentsColumns["created_at"];
+    trashed_at: IMessageAttachmentsColumns["trashed_at"];
+}
+
+/** Result of query `NativeJmapRevisions`. */
+export interface INativeJmapRevisionsResult {
+    mailbox_id: IJmapMailboxRevisionsColumns["mailbox_id"];
+    revision: IJmapMailboxRevisionsColumns["revision"];
+}
+
 /** Result of query `NativeRetentionOwners`. */
 export interface INativeRetentionOwnersResult {
     id: IUsersColumns["id"];
@@ -3043,8 +3302,26 @@ export interface ICompleteOutboundResult {
 export interface ICompleteSentMessageResult {
 }
 
+/** Result of query `NativeCompleteSubmittedDraft`. */
+export interface INativeCompleteSubmittedDraftResult {
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+}
+
+/** Result of query `NativeSubmittedDraftFiles`. */
+export interface INativeSubmittedDraftFilesResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
+/** Result of query `NativeDeleteSubmittedDraft`. */
+export interface INativeDeleteSubmittedDraftResult {
+}
+
 /** Result of query `FailOutbound`. */
 export interface IFailOutboundResult {
+}
+
+/** Result of query `NativeRestoreSubmittedDraft`. */
+export interface INativeRestoreSubmittedDraftResult {
 }
 
 /** Result of query `FailSentMessage`. */
@@ -3671,6 +3948,48 @@ export interface Queries {
     NativeFinishDriveUpload: INativeFinishDriveUploadResult;
     NativeClearCompletedDriveParts: INativeClearCompletedDrivePartsResult;
     NativeAbortDriveUpload: INativeAbortDriveUploadResult;
+    NativeJmapCurrentGrants: INativeJmapCurrentGrantsResult;
+    NativeJmapFolders: INativeJmapFoldersResult;
+    NativeJmapWriteFence: INativeJmapWriteFenceResult;
+    NativeJmapWriteAccess: INativeJmapWriteAccessResult;
+    NativeJmapUploadFence: INativeJmapUploadFenceResult;
+    NativeJmapCreateUpload: INativeJmapCreateUploadResult;
+    NativeJmapReadUpload: INativeJmapReadUploadResult;
+    NativeJmapDeleteUpload: INativeJmapDeleteUploadResult;
+    NativeJmapUploadBlob: INativeJmapUploadBlobResult;
+    NativeJmapAttachmentBlob: INativeJmapAttachmentBlobResult;
+    NativeJmapEmailQuery: INativeJmapEmailQueryResult;
+    NativeJmapClaimUpload: INativeJmapClaimUploadResult;
+    NativeJmapImportThread: INativeJmapImportThreadResult;
+    NativeJmapInsertDraft: INativeJmapInsertDraftResult;
+    NativeJmapDraftAttachment: INativeJmapDraftAttachmentResult;
+    NativeJmapDestroyMessageGuard: INativeJmapDestroyMessageGuardResult;
+    NativeJmapMessageSending: INativeJmapMessageSendingResult;
+    NativeJmapCancelMessageJobs: INativeJmapCancelMessageJobsResult;
+    NativeJmapDestroyAttachments: INativeJmapDestroyAttachmentsResult;
+    NativeJmapDeleteEmail: INativeJmapDeleteEmailResult;
+    NativeJmapTrashEmail: INativeJmapTrashEmailResult;
+    NativeJmapMoveFolder: INativeJmapMoveFolderResult;
+    NativeJmapUpdateSending: INativeJmapUpdateSendingResult;
+    NativeJmapCancelMovedJobs: INativeJmapCancelMovedJobsResult;
+    NativeJmapUpdateEmail: INativeJmapUpdateEmailResult;
+    NativeJmapThreads: INativeJmapThreadsResult;
+    NativeJmapReserveSubmission: INativeJmapReserveSubmissionResult;
+    NativeJmapQueueSubmissionMessage: INativeJmapQueueSubmissionMessageResult;
+    NativeJmapQueueSubmissionAttachment: INativeJmapQueueSubmissionAttachmentResult;
+    NativeJmapQueueSubmissionJob: INativeJmapQueueSubmissionJobResult;
+    NativeJmapMailboxCounts: INativeJmapMailboxCountsResult;
+    NativeJmapCreateFolder: INativeJmapCreateFolderResult;
+    NativeJmapRenameFolder: INativeJmapRenameFolderResult;
+    NativeJmapDestroyFolderGuard: INativeJmapDestroyFolderGuardResult;
+    NativeJmapFolderSending: INativeJmapFolderSendingResult;
+    NativeJmapCancelFolderJobs: INativeJmapCancelFolderJobsResult;
+    NativeJmapTrashFolder: INativeJmapTrashFolderResult;
+    NativeJmapFolderUsed: INativeJmapFolderUsedResult;
+    NativeJmapDeleteFolder: INativeJmapDeleteFolderResult;
+    NativeJmapMessages: INativeJmapMessagesResult;
+    NativeJmapAttachments: INativeJmapAttachmentsResult;
+    NativeJmapRevisions: INativeJmapRevisionsResult;
     NativeRetentionOwners: INativeRetentionOwnersResult;
     NativeExpiredMail: INativeExpiredMailResult;
     ClaimCronLease: IClaimCronLeaseResult;
@@ -3809,7 +4128,11 @@ export interface Queries {
     NativeRecordAutoReply: INativeRecordAutoReplyResult;
     CompleteOutbound: ICompleteOutboundResult;
     CompleteSentMessage: ICompleteSentMessageResult;
+    NativeCompleteSubmittedDraft: INativeCompleteSubmittedDraftResult;
+    NativeSubmittedDraftFiles: INativeSubmittedDraftFilesResult;
+    NativeDeleteSubmittedDraft: INativeDeleteSubmittedDraftResult;
     FailOutbound: IFailOutboundResult;
+    NativeRestoreSubmittedDraft: INativeRestoreSubmittedDraftResult;
     FailSentMessage: IFailSentMessageResult;
     FeedbackMessage: IFeedbackMessageResult;
     PreviousSpamFeedback: IPreviousSpamFeedbackResult;
@@ -4469,6 +4792,25 @@ export interface IMailrunInstallationTable {
     relationType: (typeof schema)["mailrun_installation"]["_relationType"];
     indexes: keyof (typeof schema)["mailrun_installation"]["_indexes"];
     constraints: keyof (typeof schema)["mailrun_installation"]["_constraints"];
+}
+
+/** Columns of `mailrun_jmap_uploads`. */
+export interface IMailrunJmapUploadsColumns {
+    id: string;
+    user_id: string;
+    r2_key: string;
+    content_type: string;
+    name: string | null;
+    size: number;
+    created_at: number;
+}
+
+/** Schema of `mailrun_jmap_uploads`. */
+export interface IMailrunJmapUploadsTable {
+    columns: IMailrunJmapUploadsColumns;
+    relationType: (typeof schema)["mailrun_jmap_uploads"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_jmap_uploads"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_jmap_uploads"]["_constraints"];
 }
 
 /** Columns of `mailrun_job_leases`. */
@@ -5516,6 +5858,24 @@ export const schema = {
         },
         _constraints: {}
     },
+    mailrun_jmap_uploads: {
+        _relationName: "mailrun_jmap_uploads",
+        _relationType: "table",
+        _columns: {
+            id: { _columnName: "id", _foreignKeys: {} },
+            user_id: { _columnName: "user_id", _foreignKeys: {} },
+            r2_key: { _columnName: "r2_key", _foreignKeys: {} },
+            content_type: { _columnName: "content_type", _foreignKeys: {} },
+            name: { _columnName: "name", _foreignKeys: {} },
+            size: { _columnName: "size", _foreignKeys: {} },
+            created_at: { _columnName: "created_at", _foreignKeys: {} }
+        },
+        _indexes: {
+            mailrun_jmap_uploads_user_idx: { _indexName: "mailrun_jmap_uploads_user_idx" },
+            sqlite_autoindex_mailrun_jmap_uploads_1: { _indexName: "sqlite_autoindex_mailrun_jmap_uploads_1" }
+        },
+        _constraints: {}
+    },
     mailrun_job_leases: {
         _relationName: "mailrun_job_leases",
         _relationType: "table",
@@ -5981,6 +6341,7 @@ export interface Tables {
     mailbox_aliases: IMailboxAliasesTable;
     mailboxes: IMailboxesTable;
     mailrun_installation: IMailrunInstallationTable;
+    mailrun_jmap_uploads: IMailrunJmapUploadsTable;
     mailrun_job_leases: IMailrunJobLeasesTable;
     mcp_key_mailboxes: IMcpKeyMailboxesTable;
     message_attachments: IMessageAttachmentsTable;

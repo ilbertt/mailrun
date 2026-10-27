@@ -1,5 +1,6 @@
 import { enqueueWebhooks } from "../webhooks/repository";
 import { wakeWebhookDispatcher } from "../webhooks/dispatcher";
+import { deleteUnreferencedObjects } from "../storage";
 import { upsertContact } from "./contacts";
 import { buildSnippet } from "../../lib/email/parse";
 import {
@@ -97,9 +98,11 @@ export async function deliverJob(
 	);
 	if (!job) return;
 	let restoreDraft = false;
+	let submittedDraftId: string | undefined;
 	try {
 		const payload = deliveryPayloadSchema.parse(JSON.parse(job.payload));
 		restoreDraft = !!payload.returnToDraft;
+		submittedDraftId = payload.submittedDraftId;
 		const installation = await getInstallation();
 		if (!installation) throw new Error("Cloudflare email is not configured");
 		const [account] = await withDatabase(
@@ -172,7 +175,7 @@ export async function deliverJob(
 			},
 			request,
 		);
-		await withDatabase((sql) =>
+		const submittedObjects = await withDatabase((sql) =>
 			sql.begin(async (sql) => {
 				if (payload.autoReplyMailboxId && payload.autoReplyRecipient)
 					await sql.NativeRecordAutoReply`INSERT INTO auto_reply_deliveries (id,mailbox_id,recipient,sent_at) VALUES (${id("arp")},${payload.autoReplyMailboxId},${payload.autoReplyRecipient},${seconds()}) ON CONFLICT(mailbox_id,recipient) DO UPDATE SET sent_at=excluded.sent_at`;
@@ -184,7 +187,24 @@ export async function deliverJob(
 					to: payload.to.join(", "),
 					cc: payload.cc?.length ? payload.cc.join(", ") : undefined,
 				});
+				if (payload.submittedDraftId) {
+					const [draft] =
+						await sql.NativeCompleteSubmittedDraft`SELECT raw_r2_key FROM messages WHERE id=${payload.submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
+					if (draft) {
+						const files =
+							await sql.NativeSubmittedDraftFiles`SELECT r2_key FROM message_attachments WHERE message_id=${payload.submittedDraftId}`;
+						await sql.NativeDeleteSubmittedDraft`DELETE FROM messages WHERE id=${payload.submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
+						return [
+							...files.map((file) => file.r2_key),
+							...(draft.raw_r2_key ? [draft.raw_r2_key] : []),
+						];
+					}
+				}
+				return [] as string[];
 			}),
+		);
+		await deleteUnreferencedObjects(submittedObjects).catch((error) =>
+			console.warn("Submitted draft file cleanup failed", error),
 		);
 		wakeWebhookDispatcher();
 		for (const recipient of [
@@ -199,6 +219,8 @@ export async function deliverJob(
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {
 				await sql.FailOutbound`UPDATE outbound_jobs SET status='failed',error=${error instanceof Error ? error.message : "Sending failed"},updated_at=${seconds()} WHERE id=${job.id}`;
+				if (submittedDraftId)
+					await sql.NativeRestoreSubmittedDraft`UPDATE messages SET status='draft' WHERE id=${submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
 				await sql.FailSentMessage`UPDATE messages SET status=${restoreDraft ? "draft" : "failed"} WHERE id=${job.message_id}`;
 				if (job.user_id)
 					await enqueueWebhooks(sql, job.user_id, "message.failed", {

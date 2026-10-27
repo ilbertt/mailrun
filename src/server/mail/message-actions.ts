@@ -97,7 +97,7 @@ export async function bulkAction(
 		sql.begin(async (sql) => {
 			for (const message of allowed) {
 				const [sending] =
-					await sql.NativeBulkSendingGuard`SELECT id FROM outbound_jobs WHERE message_id=${message.id} AND status='sending' LIMIT 1`;
+					await sql.NativeBulkSendingGuard`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${message.id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${message.id}) LIMIT 1`;
 				if (sending && data.action !== "read" && data.action !== "unread")
 					throw new Response("A message is being sent. Try again shortly.", {
 						status: 409,
