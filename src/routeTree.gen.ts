@@ -28,6 +28,7 @@ import { Route as MailDomainsRouteImport } from './routes/_mail.domains'
 import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
 import { Route as MailDriveRouteImport } from './routes/_mail.drive'
 import { Route as MailGeneralRouteImport } from './routes/_mail.general'
+import { Route as MailImportExportRouteImport } from './routes/_mail.import-export'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
 import { Route as MailLicensesRouteImport } from './routes/_mail.licenses'
 import { Route as MailRoutingRouteImport } from './routes/_mail.routing'
@@ -58,7 +59,10 @@ import { Route as MailSentMessageIdRouteImport } from './routes/_mail.sent.$mess
 import { Route as MailSettingsAccountRouteImport } from './routes/_mail.settings.account'
 import { Route as MailSettingsApiKeysRouteImport } from './routes/_mail.settings.api-keys'
 import { Route as MailSettingsAppPasswordsRouteImport } from './routes/_mail.settings.app-passwords'
+import { Route as MailSettingsExportRouteImport } from './routes/_mail.settings.export'
 import { Route as MailSettingsForwardingRouteImport } from './routes/_mail.settings.forwarding'
+import { Route as MailSettingsImportRouteImport } from './routes/_mail.settings.import'
+import { Route as MailSettingsImportExportRouteImport } from './routes/_mail.settings.import-export'
 import { Route as MailSettingsInboxRouteImport } from './routes/_mail.settings.inbox'
 import { Route as MailSettingsRulesRouteImport } from './routes/_mail.settings.rules'
 import { Route as MailSettingsSecurityRouteImport } from './routes/_mail.settings.security'
@@ -173,6 +177,11 @@ const MailDriveRoute = MailDriveRouteImport.update({
 const MailGeneralRoute = MailGeneralRouteImport.update({
   id: '/general',
   path: '/general',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailImportExportRoute = MailImportExportRouteImport.update({
+  id: '/import-export',
+  path: '/import-export',
   getParentRoute: () => MailRoute,
 } as any)
 const MailInboxRoute = MailInboxRouteImport.update({
@@ -326,11 +335,27 @@ const MailSettingsAppPasswordsRoute =
     path: '/app-passwords',
     getParentRoute: () => MailSettingsRoute,
   } as any)
+const MailSettingsExportRoute = MailSettingsExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => MailSettingsRoute,
+} as any)
 const MailSettingsForwardingRoute = MailSettingsForwardingRouteImport.update({
   id: '/forwarding',
   path: '/forwarding',
   getParentRoute: () => MailSettingsRoute,
 } as any)
+const MailSettingsImportRoute = MailSettingsImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => MailSettingsRoute,
+} as any)
+const MailSettingsImportExportRoute =
+  MailSettingsImportExportRouteImport.update({
+    id: '/import-export',
+    path: '/import-export',
+    getParentRoute: () => MailSettingsRoute,
+  } as any)
 const MailSettingsInboxRoute = MailSettingsInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -461,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/drafts': typeof MailDraftsRouteWithChildren
   '/drive': typeof MailDriveRoute
   '/general': typeof MailGeneralRoute
+  '/import-export': typeof MailImportExportRoute
   '/inbox': typeof MailInboxRouteWithChildren
   '/licenses': typeof MailLicensesRoute
   '/routing': typeof MailRoutingRoute
@@ -488,7 +514,10 @@ export interface FileRoutesByFullPath {
   '/settings/account': typeof MailSettingsAccountRoute
   '/settings/api-keys': typeof MailSettingsApiKeysRoute
   '/settings/app-passwords': typeof MailSettingsAppPasswordsRoute
+  '/settings/export': typeof MailSettingsExportRoute
   '/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/settings/import': typeof MailSettingsImportRoute
+  '/settings/import-export': typeof MailSettingsImportExportRoute
   '/settings/inbox': typeof MailSettingsInboxRoute
   '/settings/rules': typeof MailSettingsRulesRoute
   '/settings/security': typeof MailSettingsSecurityRoute
@@ -533,6 +562,7 @@ export interface FileRoutesByTo {
   '/drafts': typeof MailDraftsRouteWithChildren
   '/drive': typeof MailDriveRoute
   '/general': typeof MailGeneralRoute
+  '/import-export': typeof MailImportExportRoute
   '/licenses': typeof MailLicensesRoute
   '/routing': typeof MailRoutingRoute
   '/scheduled': typeof MailScheduledRouteWithChildren
@@ -558,7 +588,10 @@ export interface FileRoutesByTo {
   '/settings/account': typeof MailSettingsAccountRoute
   '/settings/api-keys': typeof MailSettingsApiKeysRoute
   '/settings/app-passwords': typeof MailSettingsAppPasswordsRoute
+  '/settings/export': typeof MailSettingsExportRoute
   '/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/settings/import': typeof MailSettingsImportRoute
+  '/settings/import-export': typeof MailSettingsImportExportRoute
   '/settings/inbox': typeof MailSettingsInboxRoute
   '/settings/rules': typeof MailSettingsRulesRoute
   '/settings/security': typeof MailSettingsSecurityRoute
@@ -605,6 +638,7 @@ export interface FileRoutesById {
   '/_mail/drafts': typeof MailDraftsRouteWithChildren
   '/_mail/drive': typeof MailDriveRoute
   '/_mail/general': typeof MailGeneralRoute
+  '/_mail/import-export': typeof MailImportExportRoute
   '/_mail/inbox': typeof MailInboxRouteWithChildren
   '/_mail/licenses': typeof MailLicensesRoute
   '/_mail/routing': typeof MailRoutingRoute
@@ -632,7 +666,10 @@ export interface FileRoutesById {
   '/_mail/settings/account': typeof MailSettingsAccountRoute
   '/_mail/settings/api-keys': typeof MailSettingsApiKeysRoute
   '/_mail/settings/app-passwords': typeof MailSettingsAppPasswordsRoute
+  '/_mail/settings/export': typeof MailSettingsExportRoute
   '/_mail/settings/forwarding': typeof MailSettingsForwardingRoute
+  '/_mail/settings/import': typeof MailSettingsImportRoute
+  '/_mail/settings/import-export': typeof MailSettingsImportExportRoute
   '/_mail/settings/inbox': typeof MailSettingsInboxRoute
   '/_mail/settings/rules': typeof MailSettingsRulesRoute
   '/_mail/settings/security': typeof MailSettingsSecurityRoute
@@ -679,6 +716,7 @@ export interface FileRouteTypes {
     | '/drafts'
     | '/drive'
     | '/general'
+    | '/import-export'
     | '/inbox'
     | '/licenses'
     | '/routing'
@@ -706,7 +744,10 @@ export interface FileRouteTypes {
     | '/settings/account'
     | '/settings/api-keys'
     | '/settings/app-passwords'
+    | '/settings/export'
     | '/settings/forwarding'
+    | '/settings/import'
+    | '/settings/import-export'
     | '/settings/inbox'
     | '/settings/rules'
     | '/settings/security'
@@ -751,6 +792,7 @@ export interface FileRouteTypes {
     | '/drafts'
     | '/drive'
     | '/general'
+    | '/import-export'
     | '/licenses'
     | '/routing'
     | '/scheduled'
@@ -776,7 +818,10 @@ export interface FileRouteTypes {
     | '/settings/account'
     | '/settings/api-keys'
     | '/settings/app-passwords'
+    | '/settings/export'
     | '/settings/forwarding'
+    | '/settings/import'
+    | '/settings/import-export'
     | '/settings/inbox'
     | '/settings/rules'
     | '/settings/security'
@@ -822,6 +867,7 @@ export interface FileRouteTypes {
     | '/_mail/drafts'
     | '/_mail/drive'
     | '/_mail/general'
+    | '/_mail/import-export'
     | '/_mail/inbox'
     | '/_mail/licenses'
     | '/_mail/routing'
@@ -849,7 +895,10 @@ export interface FileRouteTypes {
     | '/_mail/settings/account'
     | '/_mail/settings/api-keys'
     | '/_mail/settings/app-passwords'
+    | '/_mail/settings/export'
     | '/_mail/settings/forwarding'
+    | '/_mail/settings/import'
+    | '/_mail/settings/import-export'
     | '/_mail/settings/inbox'
     | '/_mail/settings/rules'
     | '/_mail/settings/security'
@@ -1030,6 +1079,13 @@ declare module '@tanstack/react-router' {
       path: '/general'
       fullPath: '/general'
       preLoaderRoute: typeof MailGeneralRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/import-export': {
+      id: '/_mail/import-export'
+      path: '/import-export'
+      fullPath: '/import-export'
+      preLoaderRoute: typeof MailImportExportRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/inbox': {
@@ -1242,11 +1298,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailSettingsAppPasswordsRouteImport
       parentRoute: typeof MailSettingsRoute
     }
+    '/_mail/settings/export': {
+      id: '/_mail/settings/export'
+      path: '/export'
+      fullPath: '/settings/export'
+      preLoaderRoute: typeof MailSettingsExportRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
     '/_mail/settings/forwarding': {
       id: '/_mail/settings/forwarding'
       path: '/forwarding'
       fullPath: '/settings/forwarding'
       preLoaderRoute: typeof MailSettingsForwardingRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
+    '/_mail/settings/import': {
+      id: '/_mail/settings/import'
+      path: '/import'
+      fullPath: '/settings/import'
+      preLoaderRoute: typeof MailSettingsImportRouteImport
+      parentRoute: typeof MailSettingsRoute
+    }
+    '/_mail/settings/import-export': {
+      id: '/_mail/settings/import-export'
+      path: '/import-export'
+      fullPath: '/settings/import-export'
+      preLoaderRoute: typeof MailSettingsImportExportRouteImport
       parentRoute: typeof MailSettingsRoute
     }
     '/_mail/settings/inbox': {
@@ -1465,7 +1542,10 @@ interface MailSettingsRouteChildren {
   MailSettingsAccountRoute: typeof MailSettingsAccountRoute
   MailSettingsApiKeysRoute: typeof MailSettingsApiKeysRoute
   MailSettingsAppPasswordsRoute: typeof MailSettingsAppPasswordsRoute
+  MailSettingsExportRoute: typeof MailSettingsExportRoute
   MailSettingsForwardingRoute: typeof MailSettingsForwardingRoute
+  MailSettingsImportRoute: typeof MailSettingsImportRoute
+  MailSettingsImportExportRoute: typeof MailSettingsImportExportRoute
   MailSettingsInboxRoute: typeof MailSettingsInboxRoute
   MailSettingsRulesRoute: typeof MailSettingsRulesRoute
   MailSettingsSecurityRoute: typeof MailSettingsSecurityRoute
@@ -1477,7 +1557,10 @@ const MailSettingsRouteChildren: MailSettingsRouteChildren = {
   MailSettingsAccountRoute: MailSettingsAccountRoute,
   MailSettingsApiKeysRoute: MailSettingsApiKeysRoute,
   MailSettingsAppPasswordsRoute: MailSettingsAppPasswordsRoute,
+  MailSettingsExportRoute: MailSettingsExportRoute,
   MailSettingsForwardingRoute: MailSettingsForwardingRoute,
+  MailSettingsImportRoute: MailSettingsImportRoute,
+  MailSettingsImportExportRoute: MailSettingsImportExportRoute,
   MailSettingsInboxRoute: MailSettingsInboxRoute,
   MailSettingsRulesRoute: MailSettingsRulesRoute,
   MailSettingsSecurityRoute: MailSettingsSecurityRoute,
@@ -1580,6 +1663,7 @@ interface MailRouteChildren {
   MailDraftsRoute: typeof MailDraftsRouteWithChildren
   MailDriveRoute: typeof MailDriveRoute
   MailGeneralRoute: typeof MailGeneralRoute
+  MailImportExportRoute: typeof MailImportExportRoute
   MailInboxRoute: typeof MailInboxRouteWithChildren
   MailLicensesRoute: typeof MailLicensesRoute
   MailRoutingRoute: typeof MailRoutingRoute
@@ -1612,6 +1696,7 @@ const MailRouteChildren: MailRouteChildren = {
   MailDraftsRoute: MailDraftsRouteWithChildren,
   MailDriveRoute: MailDriveRoute,
   MailGeneralRoute: MailGeneralRoute,
+  MailImportExportRoute: MailImportExportRoute,
   MailInboxRoute: MailInboxRouteWithChildren,
   MailLicensesRoute: MailLicensesRoute,
   MailRoutingRoute: MailRoutingRoute,

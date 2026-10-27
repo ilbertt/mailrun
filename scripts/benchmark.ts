@@ -1,3 +1,4 @@
+import { exportMailbox } from "../src/server/mail-transfer/export";
 import { queryMessages } from "../src/server/mail/message-query";
 import { performance } from "node:perf_hooks";
 import { fixture, owner } from "../tests/fixtures";
@@ -60,6 +61,15 @@ try {
 			p95Ms: Number((times[47] ?? 0).toFixed(2)),
 		};
 	}
+	const exportStarted = performance.now();
+	const exported = await exportMailbox(owner, "mailbox");
+	let exportBytes = 0;
+	for await (const chunk of exported.body!) exportBytes += chunk.length;
+	const streamedExport = {
+		samples: 1,
+		elapsedMs: Number((performance.now() - exportStarted).toFixed(2)),
+		bytes: exportBytes,
+	};
 	const report = {
 		measuredAt: new Date().toISOString(),
 		bun: Bun.version,
@@ -69,6 +79,7 @@ try {
 		scope:
 			"Local repository/database calls, includes authorization; excludes HTTP, browser rendering and nibrun cold start. Not a comparison with the old app.",
 		results,
+		streamedExport,
 	};
 	console.log(JSON.stringify(report, null, 2));
 	if (process.env.BENCHMARK_OUTPUT)

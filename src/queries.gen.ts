@@ -2090,6 +2090,82 @@ export interface IInvalidateLicenseResult {
 export interface IActivateLicenseResult {
 }
 
+/** Result of query `NativeExportMessages`. */
+export interface INativeExportMessagesResult {
+    export_rowid: number;
+    id: IMessagesColumns["id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    subject: IMessagesColumns["subject"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    direction: IMessagesColumns["direction"];
+    status: IMessagesColumns["status"];
+    created_at: IMessagesColumns["created_at"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+}
+
+/** Result of query `NativeExportFirstMessage`. */
+export interface INativeExportFirstMessageResult {
+    export_rowid: number;
+    id: IMessagesColumns["id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    subject: IMessagesColumns["subject"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    direction: IMessagesColumns["direction"];
+    status: IMessagesColumns["status"];
+    created_at: IMessagesColumns["created_at"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+}
+
+/** Result of query `NativeImportDuplicate`. */
+export interface INativeImportDuplicateResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeImportWriteFence`. */
+export interface INativeImportWriteFenceResult {
+}
+
+/** Result of query `NativeImportCommitDuplicate`. */
+export interface INativeImportCommitDuplicateResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeImportThread`. */
+export interface INativeImportThreadResult {
+    thread_id: IMessagesColumns["thread_id"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+}
+
+/** Result of query `NativeInsertImportedMessage`. */
+export interface INativeInsertImportedMessageResult {
+}
+
+/** Result of query `NativeInsertImportedAttachment`. */
+export interface INativeInsertImportedAttachmentResult {
+}
+
+/** Result of query `NativeTransferMailbox`. */
+export interface INativeTransferMailboxResult {
+    id: string;
+    user_id: string;
+    local_part: IMailboxesColumns["local_part"];
+}
+
+/** Result of query `NativeImportFolder`. */
+export interface INativeImportFolderResult {
+    id: IFoldersColumns["id"];
+}
+
 /** Result of query `MailboxPermission`. */
 export interface IMailboxPermissionResult {
     id: string;
@@ -3482,6 +3558,16 @@ export interface Queries {
     DeactivateLicense: IDeactivateLicenseResult;
     InvalidateLicense: IInvalidateLicenseResult;
     ActivateLicense: IActivateLicenseResult;
+    NativeExportMessages: INativeExportMessagesResult;
+    NativeExportFirstMessage: INativeExportFirstMessageResult;
+    NativeImportDuplicate: INativeImportDuplicateResult;
+    NativeImportWriteFence: INativeImportWriteFenceResult;
+    NativeImportCommitDuplicate: INativeImportCommitDuplicateResult;
+    NativeImportThread: INativeImportThreadResult;
+    NativeInsertImportedMessage: INativeInsertImportedMessageResult;
+    NativeInsertImportedAttachment: INativeInsertImportedAttachmentResult;
+    NativeTransferMailbox: INativeTransferMailboxResult;
+    NativeImportFolder: INativeImportFolderResult;
     MailboxPermission: IMailboxPermissionResult;
     ManagedDomain: IManagedDomainResult;
     SendingAttachments: ISendingAttachmentsResult;
@@ -5372,6 +5458,7 @@ export const schema = {
             draft_scheduled_at: { _columnName: "draft_scheduled_at", _foreignKeys: {} }
         },
         _indexes: {
+            messages_export_page_idx: { _indexName: "messages_export_page_idx" },
             messages_folder_idx: { _indexName: "messages_folder_idx" },
             messages_inbox_page_idx: { _indexName: "messages_inbox_page_idx" },
             messages_mailbox_idx: { _indexName: "messages_mailbox_idx" },

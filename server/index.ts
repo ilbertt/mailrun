@@ -1,3 +1,8 @@
+import { clearImapStaging } from "../src/server/mail-transfer/imap";
+import {
+	isMailTransferPath,
+	serveMailTransfer,
+} from "../src/server/api/mail-transfer";
 import { startWebhookDispatcher } from "../src/server/webhooks/dispatcher";
 import { clearDomainRuntimeLeases } from "../src/server/domains/repository";
 import {
@@ -27,6 +32,7 @@ if (name) {
 	// Literal imports are bundled into the executable, including Start's lazy chunks.
 	const { default: handler } = await import("#start-handler");
 	await clearDriveRuntimeLeases();
+	await clearImapStaging();
 	await clearDomainRuntimeLeases();
 	await registerCrons(import.meta.path);
 	const stopWebhookDispatcher = startWebhookDispatcher();
@@ -46,7 +52,10 @@ if (name) {
 				) &&
 				Number(request.headers.get("content-length")) > 30 * 1024 * 1024
 			)
-				return new Response("Request body too large", { status: 413 });
+				return Response.json(
+					{ error: "Request body too large" },
+					{ status: 413, headers: { "Cache-Control": "no-store" } },
+				);
 			if (new URL(request.url).pathname === "/api/realtime") {
 				if (request.headers.get("origin") !== publicOrigin())
 					return new Response("Invalid origin", { status: 403 });
@@ -60,6 +69,9 @@ if (name) {
 			}
 			if (isDriveUploadPath(new URL(request.url).pathname))
 				return serveDriveUpload(request);
+			if (isMailTransferPath(new URL(request.url).pathname)) {
+				return serveMailTransfer(request, () => server.timeout(request, 0));
+			}
 			return handler.fetch(request);
 		},
 	});

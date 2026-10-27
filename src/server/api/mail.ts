@@ -31,6 +31,7 @@ import { getUser } from "../auth/service";
 import { z } from "zod";
 import { backupsApi } from "./backups";
 import { webhooksApi } from "./webhooks";
+import { mailTransferApi } from "./mail-transfer";
 import { publicOrigin } from "../config";
 import { requireUser } from "../auth/request";
 import { withDatabase, seconds } from "../db";
@@ -88,6 +89,8 @@ export async function dispatchMailApi(
 	if (backups) return backups;
 	const hooks = await webhooksApi(request, user);
 	if (hooks) return hooks;
+	const transfer = await mailTransferApi(request, user);
+	if (transfer) return transfer;
 	const keys = await keysApi(request, user);
 	if (keys) return keys;
 	const domains = await domainsApi(request, user);

@@ -112,3 +112,18 @@ export function seconds() {
 export function id(prefix = "id") {
 	return `${prefix}_${crypto.randomUUID()}`;
 }
+
+/** A WAL read snapshot can stream exports without holding the request write queue. */
+export async function withReadSnapshot<T>(run: (sql: AppSQL) => Promise<T>) {
+	const path = databasePath();
+	await withDatabase(async () => {}, path);
+	const sql = withTypes<Queries>(
+		new SQL({ adapter: "sqlite", filename: path, readonly: true }),
+	);
+	try {
+		await sql`PRAGMA busy_timeout=5000`;
+		return await sql.begin(run);
+	} finally {
+		await sql.close();
+	}
+}

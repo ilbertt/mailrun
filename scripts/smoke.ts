@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signRelay } from "../src/shared/relay-signature";
 import { createHmac } from "node:crypto";
+import { LocalStorage } from "../src/server/storage";
 
 const state = await fixture();
 const token = crypto.randomUUID();
@@ -20,6 +21,8 @@ state.db
 	)
 	.run(await hash(token), seconds() + 300, seconds());
 const binary = resolve(process.argv[2] ?? "dist/mailrun-local");
+const oldImportStage = "import-staging/previous-session/stale.eml";
+await new LocalStorage().put(oldImportStage, "synthetic abandoned import");
 const publicBase = "https://mailrun-smoke.example";
 const smokeEnvironment: Record<string, string | undefined> = {
 	PATH: process.env.PATH,
@@ -288,6 +291,154 @@ try {
 			);
 	}
 
+	if (await new LocalStorage().file(oldImportStage).exists())
+		throw new Error("Abandoned IMAP staging was not cleared on startup");
+	for (const sample of [
+		{
+			path: "/api/export/messages?mailboxId=mailbox",
+			method: "GET",
+			headers: new Headers(),
+			status: 401,
+		},
+		{
+			path: "/api/import/messages",
+			method: "POST",
+			headers: new Headers({ Origin: publicBase }),
+			status: 401,
+		},
+		{
+			path: "/api/import/messages",
+			method: "POST",
+			headers: new Headers({
+				Cookie: sessionCookie,
+				Origin: "https://untrusted.example",
+			}),
+			status: 403,
+		},
+	]) {
+		const response = await fetch(base + sample.path, {
+			method: sample.method,
+			headers: sample.headers,
+		});
+		if (response.status !== sample.status)
+			throw new Error(
+				`Native mail transfer auth/origin check returned ${response.status}`,
+			);
+	}
+	const oversizedImport = await fetch(`${base}/api/import/messages`, {
+		method: "POST",
+		headers: { Cookie: sessionCookie, Origin: publicBase },
+		body: new Blob([new Uint8Array(31 * 1024 * 1024)]),
+	});
+	if (
+		oversizedImport.status !== 413 ||
+		!z.object({ error: z.string() }).safeParse(await oversizedImport.json())
+			.success
+	)
+		throw new Error("Oversized import did not return the JSON error contract");
+	const importedRaw =
+		"From: Importer <importer@example.org>\r\nTo: hello@example.com\r\nSubject: Standalone import\r\nMessage-ID: <standalone-import@example.org>\r\nDate: Wed, 15 Jan 2025 12:34:56 +0000\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=part\r\n\r\n--part\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nStandalone imported body\r\n--part\r\nContent-Type: text/plain; name=note.txt\r\nContent-Disposition: attachment; filename=note.txt\r\nContent-Transfer-Encoding: base64\r\n\r\naW1wb3J0IGF0dGFjaG1lbnQ=\r\n--part--\r\n";
+	const importForm = () => {
+		const form = new FormData();
+		form.set("mailboxId", "mailbox");
+		form.set("destination", "system:inbox");
+		form.append(
+			"files",
+			new File([importedRaw], "standalone.eml", { type: "message/rfc822" }),
+		);
+		return form;
+	};
+	const importedResponse = await fetch(`${base}/api/import/messages`, {
+		method: "POST",
+		headers: { Cookie: sessionCookie, Origin: publicBase },
+		body: importForm(),
+	});
+	if (
+		!importedResponse.ok ||
+		!z
+			.object({ imported: z.literal(1), skipped: z.literal(0) })
+			.safeParse(await importedResponse.json()).success
+	)
+		throw new Error("Standalone EML import failed");
+	const duplicateImport = await fetch(`${base}/api/import/messages`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${token}` },
+		body: importForm(),
+	});
+	if (
+		!duplicateImport.ok ||
+		!z
+			.object({ imported: z.literal(0), skipped: z.literal(1) })
+			.safeParse(await duplicateImport.json()).success
+	)
+		throw new Error("EML replay was not deduplicated");
+	const importedMessage = state.db
+		.query<{ id: string }, []>(
+			"SELECT id FROM messages WHERE provider_message_id='<standalone-import@example.org>'",
+		)
+		.get();
+	if (!importedMessage) throw new Error("Imported message was not committed");
+	const importedAttachment = state.db
+		.query<{ id: string }, [string]>(
+			"SELECT id FROM message_attachments WHERE message_id=?",
+		)
+		.get(importedMessage.id);
+	if (!importedAttachment)
+		throw new Error("Imported attachment was not committed");
+	const importedDownload = await fetch(
+		`${base}/api/messages/${importedMessage.id}/attachments/${importedAttachment.id}`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	if (
+		!importedDownload.ok ||
+		(await importedDownload.text()) !== "import attachment"
+	)
+		throw new Error("Imported attachment download failed");
+	const exportResponse = await fetch(
+		`${base}/api/export/messages?mailboxId=mailbox`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	const exportedMbox = await exportResponse.text();
+	if (
+		!exportResponse.ok ||
+		!exportResponse.headers.get("content-type")?.includes("application/mbox") ||
+		!exportedMbox.includes("Standalone imported body")
+	)
+		throw new Error("Streamed MBOX export failed");
+	const exportHead = await fetch(
+		`${base}/api/export/messages?mailboxId=mailbox`,
+		{ method: "HEAD", headers: { Cookie: sessionCookie } },
+	);
+	if (
+		!exportHead.ok ||
+		(await exportHead.text()) !== "" ||
+		exportHead.headers.get("content-disposition") !==
+			exportResponse.headers.get("content-disposition")
+	)
+		throw new Error("MBOX HEAD contract failed");
+	const privateImap = await fetch(`${base}/api/import/imap/folders`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			host: "127.0.0.1",
+			port: 993,
+			username: "synthetic",
+			password: "synthetic",
+		}),
+	});
+	if (privateImap.status !== 502)
+		throw new Error("Private IMAP target was not rejected");
+	for (const route of ["/settings/import-export", "/import-export"]) {
+		const response = await fetch(base + route, {
+			headers: { Cookie: sessionCookie },
+			redirect: "manual",
+		});
+		if (
+			![302, 307].includes(response.status) ||
+			!response.headers.get("location")?.includes("/settings/import")
+		)
+			throw new Error(`Import URL alias failed: ${route}`);
+	}
 	const createdKeyResponse = await fetch(`${base}/api/api-keys`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -405,6 +556,8 @@ try {
 		"/api-keys",
 		"/settings/api-keys",
 		"/settings/app-passwords",
+		"/settings/import",
+		"/settings/export",
 		"/backups",
 		"/branding",
 		"/licenses",
@@ -1063,6 +1216,8 @@ try {
 				restoredSecurityAndAdminPages: "passed",
 				localBackupRestoreAndDeletion: "passed",
 				signedWebhooksAndCronRetries: "passed",
+				emlImportAndMboxExport: "passed",
+				nativeTransferAuthenticationAndAliases: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",
