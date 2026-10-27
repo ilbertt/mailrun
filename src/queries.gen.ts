@@ -194,29 +194,6 @@ export interface INativeManagedAccountMailboxesResult {
     hostname: IDomainsColumns["hostname"];
 }
 
-/** Result of query `NativeDomainListActor`. */
-export interface INativeDomainListActorResult {
-    created_by_user_id: IUsersColumns["created_by_user_id"];
-    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
-}
-
-/** Result of query `NativeListDomains`. */
-export interface INativeListDomainsResult {
-    id: IDomainsColumns["id"];
-    user_id: IDomainsColumns["user_id"];
-    hostname: IDomainsColumns["hostname"];
-    zone_id: IDomainsColumns["zone_id"];
-    status: IDomainsColumns["status"];
-    routing_status: IDomainsColumns["routing_status"];
-    sending_subdomain_tag: IDomainsColumns["sending_subdomain_tag"];
-    sending_enabled: IDomainsColumns["sending_enabled"];
-    routing_enabled: IDomainsColumns["routing_enabled"];
-    created_at: IDomainsColumns["created_at"];
-    sending_requested: IDomainsColumns["sending_requested"];
-    sending_provider: IDomainsColumns["sending_provider"];
-    receiving_provider: IDomainsColumns["receiving_provider"];
-}
-
 /** Result of query `NativeBookingHostAvatar`. */
 export interface INativeBookingHostAvatarResult {
     avatar_key: IUsersColumns["avatar_key"];
@@ -1137,6 +1114,20 @@ export interface ISaveInstallationResult {
 export interface ISetInstallationPhaseResult {
 }
 
+/** Result of query `NativeSetupHostnameClaim`. */
+export interface INativeSetupHostnameClaimResult {
+    user_id: IDomainsColumns["user_id"];
+}
+
+/** Result of query `NativeSetupZoneClaim`. */
+export interface INativeSetupZoneClaimResult {
+    user_id: IDomainsColumns["user_id"];
+}
+
+/** Result of query `NativeSetupWriteFence`. */
+export interface INativeSetupWriteFenceResult {
+}
+
 /** Result of query `SetupDomain`. */
 export interface ISetupDomainResult {
     id: IDomainsColumns["id"];
@@ -1151,8 +1142,13 @@ export interface IInsertSetupDomainResult {
 export interface IInsertSetupMailboxResult {
 }
 
+/** Result of query `NativeSetupFinishFence`. */
+export interface INativeSetupFinishFenceResult {
+}
+
 /** Result of query `ActivateDomain`. */
 export interface IActivateDomainResult {
+    id: IDomainsColumns["id"];
 }
 
 /** Result of query `EnableSending`. */
@@ -1161,6 +1157,149 @@ export interface IEnableSendingResult {
 
 /** Result of query `UpdateRelayVersion`. */
 export interface IUpdateRelayVersionResult {
+}
+
+/** Result of query `NativeDomainActor`. */
+export interface INativeDomainActorResult {
+    id: IUsersColumns["id"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    disabled: IUsersColumns["disabled"];
+    can_manage_domains: IUsersColumns["can_manage_domains"];
+    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+}
+
+/** Result of query `NativeDomainById`. */
+export interface INativeDomainByIdResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    zone_id: IDomainsColumns["zone_id"];
+    status: IDomainsColumns["status"];
+    routing_status: IDomainsColumns["routing_status"];
+    sending_subdomain_tag: IDomainsColumns["sending_subdomain_tag"];
+    sending_enabled: IDomainsColumns["sending_enabled"];
+    routing_enabled: IDomainsColumns["routing_enabled"];
+    created_at: IDomainsColumns["created_at"];
+    sending_requested: IDomainsColumns["sending_requested"];
+    sending_provider: IDomainsColumns["sending_provider"];
+    receiving_provider: IDomainsColumns["receiving_provider"];
+}
+
+/** Result of query `NativeDomainWriteFence`. */
+export interface INativeDomainWriteFenceResult {
+}
+
+/** Result of query `NativeDomainClaims`. */
+export interface INativeDomainClaimsResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `NativeClearDomainRuntimeLeases`. */
+export interface INativeClearDomainRuntimeLeasesResult {
+}
+
+/** Result of query `NativeClaimDomainOperation`. */
+export interface INativeClaimDomainOperationResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeRenewDomainOperation`. */
+export interface INativeRenewDomainOperationResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeCheckDomainOperation`. */
+export interface INativeCheckDomainOperationResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeReleaseDomainOperation`. */
+export interface INativeReleaseDomainOperationResult {
+}
+
+/** Result of query `NativeDomainsForUser`. */
+export interface INativeDomainsForUserResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    zone_id: IDomainsColumns["zone_id"];
+    status: IDomainsColumns["status"];
+    routing_status: IDomainsColumns["routing_status"];
+    sending_subdomain_tag: IDomainsColumns["sending_subdomain_tag"];
+    sending_enabled: IDomainsColumns["sending_enabled"];
+    routing_enabled: IDomainsColumns["routing_enabled"];
+    created_at: IDomainsColumns["created_at"];
+    sending_requested: IDomainsColumns["sending_requested"];
+    sending_provider: IDomainsColumns["sending_provider"];
+    receiving_provider: IDomainsColumns["receiving_provider"];
+}
+
+/** Result of query `NativeSaveDomain`. */
+export interface INativeSaveDomainResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    zone_id: IDomainsColumns["zone_id"];
+    status: IDomainsColumns["status"];
+    routing_status: IDomainsColumns["routing_status"];
+    sending_subdomain_tag: IDomainsColumns["sending_subdomain_tag"];
+    sending_enabled: IDomainsColumns["sending_enabled"];
+    routing_enabled: IDomainsColumns["routing_enabled"];
+    created_at: IDomainsColumns["created_at"];
+    sending_requested: IDomainsColumns["sending_requested"];
+    sending_provider: IDomainsColumns["sending_provider"];
+    receiving_provider: IDomainsColumns["receiving_provider"];
+}
+
+/** Result of query `NativeSetDomainReceivingReady`. */
+export interface INativeSetDomainReceivingReadyResult {
+}
+
+/** Result of query `NativeSetDomainSendingReady`. */
+export interface INativeSetDomainSendingReadyResult {
+}
+
+/** Result of query `NativeChooseDomainSending`. */
+export interface INativeChooseDomainSendingResult {
+}
+
+/** Result of query `NativeChooseDomainReceiving`. */
+export interface INativeChooseDomainReceivingResult {
+}
+
+/** Result of query `NativeDomainSendingJob`. */
+export interface INativeDomainSendingJobResult {
+    id: string | null;
+}
+
+/** Result of query `NativeOtherDomainsOnZone`. */
+export interface INativeOtherDomainsOnZoneResult {
+    id: IDomainsColumns["id"];
+}
+
+/** Result of query `NativeCancelDomainJobs`. */
+export interface INativeCancelDomainJobsResult {
+}
+
+/** Result of query `NativeDeleteDomain`. */
+export interface INativeDeleteDomainResult {
+}
+
+/** Result of query `NativeCloudflareOtherReceivingDomains`. */
+export interface INativeCloudflareOtherReceivingDomainsResult {
+    id: IDomainsColumns["id"];
+}
+
+/** Result of query `NativeClearDomainReceiving`. */
+export interface INativeClearDomainReceivingResult {
+}
+
+/** Result of query `NativeClearDomainSending`. */
+export interface INativeClearDomainSendingResult {
 }
 
 /** Result of query `NativeDriveAccessibleMailboxes`. */
@@ -2760,8 +2899,6 @@ export interface Queries {
     NativeRevokeManagedLoginChallenges: INativeRevokeManagedLoginChallengesResult;
     NativeTransferPrimaryAccount: INativeTransferPrimaryAccountResult;
     NativeManagedAccountMailboxes: INativeManagedAccountMailboxesResult;
-    NativeDomainListActor: INativeDomainListActorResult;
-    NativeListDomains: INativeListDomainsResult;
     NativeBookingHostAvatar: INativeBookingHostAvatarResult;
     NativeUserAvatar: INativeUserAvatarResult;
     NativeMailboxAvatar: INativeMailboxAvatarResult;
@@ -2895,12 +3032,38 @@ export interface Queries {
     GetInstallation: IGetInstallationResult;
     SaveInstallation: ISaveInstallationResult;
     SetInstallationPhase: ISetInstallationPhaseResult;
+    NativeSetupHostnameClaim: INativeSetupHostnameClaimResult;
+    NativeSetupZoneClaim: INativeSetupZoneClaimResult;
+    NativeSetupWriteFence: INativeSetupWriteFenceResult;
     SetupDomain: ISetupDomainResult;
     InsertSetupDomain: IInsertSetupDomainResult;
     InsertSetupMailbox: IInsertSetupMailboxResult;
+    NativeSetupFinishFence: INativeSetupFinishFenceResult;
     ActivateDomain: IActivateDomainResult;
     EnableSending: IEnableSendingResult;
     UpdateRelayVersion: IUpdateRelayVersionResult;
+    NativeDomainActor: INativeDomainActorResult;
+    NativeDomainById: INativeDomainByIdResult;
+    NativeDomainWriteFence: INativeDomainWriteFenceResult;
+    NativeDomainClaims: INativeDomainClaimsResult;
+    NativeClearDomainRuntimeLeases: INativeClearDomainRuntimeLeasesResult;
+    NativeClaimDomainOperation: INativeClaimDomainOperationResult;
+    NativeRenewDomainOperation: INativeRenewDomainOperationResult;
+    NativeCheckDomainOperation: INativeCheckDomainOperationResult;
+    NativeReleaseDomainOperation: INativeReleaseDomainOperationResult;
+    NativeDomainsForUser: INativeDomainsForUserResult;
+    NativeSaveDomain: INativeSaveDomainResult;
+    NativeSetDomainReceivingReady: INativeSetDomainReceivingReadyResult;
+    NativeSetDomainSendingReady: INativeSetDomainSendingReadyResult;
+    NativeChooseDomainSending: INativeChooseDomainSendingResult;
+    NativeChooseDomainReceiving: INativeChooseDomainReceivingResult;
+    NativeDomainSendingJob: INativeDomainSendingJobResult;
+    NativeOtherDomainsOnZone: INativeOtherDomainsOnZoneResult;
+    NativeCancelDomainJobs: INativeCancelDomainJobsResult;
+    NativeDeleteDomain: INativeDeleteDomainResult;
+    NativeCloudflareOtherReceivingDomains: INativeCloudflareOtherReceivingDomainsResult;
+    NativeClearDomainReceiving: INativeClearDomainReceivingResult;
+    NativeClearDomainSending: INativeClearDomainSendingResult;
     NativeDriveAccessibleMailboxes: INativeDriveAccessibleMailboxesResult;
     NativeDriveEmailAttachments: INativeDriveEmailAttachmentsResult;
     NativeDriveAttachmentMutationRows: INativeDriveAttachmentMutationRowsResult;

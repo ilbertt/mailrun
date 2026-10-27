@@ -322,3 +322,45 @@ test("scheduled delivery rechecks alias access and restores the draft when revok
 	expect(calls).toBe(0);
 	expect((await getDraft(owner, draft.id)).status).toBe("draft");
 });
+
+test("choosing another sending provider never delivers the message through Cloudflare", async () => {
+	const { saveInstallation } = await import(
+		"../src/server/cloudflare/installation"
+	);
+	await saveInstallation({
+		accountId: "account",
+		zoneId: "zone",
+		hostname: "example.com",
+		workerName: "relay",
+		publicOrigin: "https://fixture.example",
+		apiToken: "synthetic-token",
+		relaySecret: "synthetic-secret",
+		relayVersion: "test",
+	});
+	for (const provider of ["none", "resend", "ses"]) {
+		state.db
+			.query("UPDATE domains SET sending_provider=? WHERE id='domain'")
+			.run(provider);
+		const draft = await saveDraft(owner, {
+			mailboxId: "mailbox",
+			to: "recipient@example.net",
+			cc: "",
+			bcc: "",
+			subject: "Provider choice",
+			text: "Keep the selected provider",
+			html: "",
+		});
+		let called = false;
+		await expect(
+			sendDraft(owner, draft.id, draft.draft_revision, async () => {
+				called = true;
+				return Response.json({
+					success: true,
+					result: { message_id: "unexpected" },
+				});
+			}),
+		).rejects.toThrow("sending is not enabled");
+		expect(called).toBe(false);
+		expect((await getDraft(owner, draft.id)).status).toBe("draft");
+	}
+});

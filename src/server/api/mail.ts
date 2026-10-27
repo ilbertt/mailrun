@@ -1,3 +1,5 @@
+import { domainsApi } from "./domains";
+import { cloudflareAccess } from "../domains/cloudflare";
 import { apiErrorResponse } from "./errors";
 import { accountsApi } from "./accounts";
 import { driveApi } from "./drive";
@@ -7,7 +9,6 @@ import { bookingApi, publicBookingApi } from "./booking";
 import { authenticateApiKey } from "../auth/api-key";
 import { getRequestTimeZone } from "../../lib/time/utils";
 import { licensesApi } from "./licenses";
-import { adminReadApi } from "./admin-read";
 import { pushApi } from "./push";
 import { templatesApi } from "./templates";
 import { avatarsApi } from "./avatars";
@@ -77,6 +78,8 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const domains = await domainsApi(request, user);
+	if (domains) return domains;
 	const accounts = await accountsApi(request, user);
 	if (accounts) return accounts;
 	const drive = await driveApi(request, user);
@@ -106,8 +109,6 @@ export async function dispatchMailApi(
 	if (templates) return templates;
 	const licenses = await licensesApi(request, user);
 	if (licenses) return licenses;
-	const adminRead = await adminReadApi(request, user);
-	if (adminRead) return adminRead;
 	const drafts = await draftsApi(request, user);
 	if (drafts) return drafts;
 	const json = (value: unknown, status = 200) =>
@@ -149,7 +150,7 @@ export async function dispatchMailApi(
 				canForwardEmail: (await licenseEntitlements()).canForwardEmail,
 			},
 			runtime: "node",
-			managesDns: !!process.env.CF_TOKEN,
+			managesDns: !!(await cloudflareAccess()),
 			hasMailboxes: boxes.length > 0,
 			isSetup: !!setup,
 		});

@@ -42,7 +42,7 @@ export async function fixture() {
 			1,
 		);
 	db.query(
-		"INSERT INTO domains (id,user_id,hostname,zone_id,status,sending_enabled,created_at) VALUES ('domain','owner','example.com','zone','active',1,1)",
+		"INSERT INTO domains (id,user_id,hostname,zone_id,status,sending_enabled,sending_provider,created_at) VALUES ('domain','owner','example.com','zone','active',1,'cloudflare',1)",
 	).run();
 	db.query(
 		"INSERT INTO mailboxes (id,user_id,domain_id,local_part,created_at) VALUES ('mailbox','owner','domain','hello',1)",

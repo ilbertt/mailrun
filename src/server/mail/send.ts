@@ -117,7 +117,7 @@ export async function deliverJob(
 		const from = await formattedSender(user, message.mailbox_id, payload.from);
 		const [domain] = await withDatabase(
 			(sql) =>
-				sql.SendingDomain`SELECT id FROM domains WHERE hostname=${getEmailAddress(payload.from).split("@")[1] ?? ""} AND sending_enabled=1 AND status='active'`,
+				sql.SendingDomain`SELECT id FROM domains WHERE hostname=${getEmailAddress(payload.from).split("@")[1] ?? ""} AND sending_enabled=1 AND sending_provider='cloudflare' AND status='active'`,
 		);
 		if (!domain)
 			throw new Error("Cloudflare sending is not enabled for this domain");

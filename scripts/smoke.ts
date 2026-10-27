@@ -20,16 +20,19 @@ state.db
 	.run(await hash(token), seconds() + 300, seconds());
 const binary = resolve(process.argv[2] ?? "dist/mailrun-local");
 const publicBase = "https://mailrun-smoke.example";
+const smokeEnvironment: Record<string, string | undefined> = {
+	PATH: process.env.PATH,
+	HOME: process.env.HOME,
+	TMPDIR: process.env.TMPDIR,
+	DATA_DIR: state.directory,
+	PORT: "0",
+	HOST: "127.0.0.1",
+	APP_URL: publicBase,
+	NODE_ENV: "production",
+};
 const child = Bun.spawn([binary], {
 	cwd: state.directory,
-	env: {
-		...process.env,
-		DATA_DIR: state.directory,
-		PORT: "0",
-		HOST: "127.0.0.1",
-		APP_URL: publicBase,
-		NODE_ENV: "production",
-	},
+	env: smokeEnvironment,
 	stdout: "pipe",
 	stderr: "pipe",
 });
@@ -112,6 +115,21 @@ try {
 		.object({ account: z.object({ id: z.string(), email: z.string() }) })
 		.parse(await createdAccount.json()).account;
 	if (createdAccount.status !== 201) throw new Error("Account creation failed");
+	const domainList = await fetch(`${base}/api/domains`, {
+		headers: { Cookie: sessionCookie },
+	});
+	if (
+		!domainList.ok ||
+		!z
+			.object({
+				domains: z.array(
+					z.object({ id: z.string(), sendingProvider: z.string() }),
+				),
+			})
+			.parse(await domainList.json())
+			.domains.some((domain) => domain.id === "domain")
+	)
+		throw new Error("Original domain list contract failed");
 	const accountDetails = await fetch(`${base}/api/accounts/${managed.id}`, {
 		headers: { Cookie: sessionCookie },
 	});
@@ -166,6 +184,7 @@ try {
 		`/accounts/${managed.id}/mailboxes`,
 		"/mailboxes",
 		"/mailboxes/mailbox",
+		"/domains",
 	]) {
 		const page = await fetch(base + route, {
 			headers: { Cookie: sessionCookie },
@@ -662,7 +681,7 @@ try {
 		);
 	const task = Bun.spawn([binary, "jobs", "maintenance"], {
 		cwd: state.directory,
-		env: { ...process.env, DATA_DIR: state.directory },
+		env: smokeEnvironment,
 		stdout: "pipe",
 		stderr: "pipe",
 	});
@@ -681,7 +700,7 @@ try {
 		],
 		{
 			cwd: state.directory,
-			env: { ...process.env, DATA_DIR: state.directory },
+			env: smokeEnvironment,
 			stdout: "pipe",
 			stderr: "pipe",
 		},
@@ -709,6 +728,7 @@ try {
 				managedAccountCreation: "passed",
 				adminPasswordResetRevocation: "passed",
 				originalAccountScreens: "passed",
+				originalDomainScreenAndList: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",

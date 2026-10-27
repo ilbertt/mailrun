@@ -1,5 +1,12 @@
+import { DomainCloudflare } from "../domains/cloudflare";
+import { domainOperation, checkDomainClaim } from "../domains/repository";
+import {
+	provisionCloudflareDomain,
+	rollbackCloudflareDomain,
+} from "../domains/provision";
+import { signRelay } from "../../shared/relay-signature";
 import { z } from "zod";
-import { cloudflare, type CloudflareFetch } from "./client";
+import { cloudflare, CloudflareApiError, type CloudflareFetch } from "./client";
 import {
 	getInstallation,
 	installationStatus,
@@ -24,6 +31,19 @@ export async function provisionEmail(
 		throw new Error(
 			"Set APP_URL to the application's public HTTPS address before deploying the relay",
 		);
+	const existing = await getInstallation();
+	if (
+		existing &&
+		(existing.hostname !== data.hostname ||
+			existing.account_id !== data.accountId)
+	)
+		throw new Error("This installation is already connected to another domain");
+	const [claimedHostname] = await withDatabase(
+		(sql) =>
+			sql.NativeSetupHostnameClaim`SELECT user_id FROM domains WHERE hostname=${data.hostname}`,
+	);
+	if (claimedHostname && claimedHostname.user_id !== user.id)
+		throw new Error("Domain belongs to another account");
 	const zones = await cloudflare(
 		data.apiToken,
 		`/zones?name=${encodeURIComponent(data.hostname)}`,
@@ -42,13 +62,12 @@ export async function provisionEmail(
 	);
 	if (!zone)
 		throw new Error("Domain not found in the selected Cloudflare account");
-	const existing = await getInstallation();
-	if (
-		existing &&
-		(existing.hostname !== data.hostname ||
-			existing.account_id !== data.accountId)
-	)
-		throw new Error("This installation is already connected to another domain");
+	const [claimedZone] = await withDatabase(
+		(sql) =>
+			sql.NativeSetupZoneClaim`SELECT user_id FROM domains WHERE zone_id=${zone.id} AND user_id<>${user.id} LIMIT 1`,
+	);
+	if (claimedZone)
+		throw new Error("Cloudflare zone belongs to another account");
 	const secret =
 		existing?.relay_secret ?? crypto.randomUUID() + crypto.randomUUID();
 	const worker =
@@ -67,76 +86,73 @@ export async function provisionEmail(
 
 	// The app owns only records for this installation. Provisioning never deletes
 	// MX records or silently replaces an existing domain owned by another user.
-	await withDatabase(async (sql) => {
-		const [domain] =
-			await sql.SetupDomain`SELECT id,user_id FROM domains WHERE hostname=${data.hostname}`;
-		if (domain && domain.user_id !== user.id)
-			throw new Error("Domain belongs to another account");
-		const domainId = domain?.id ?? id("dom");
-		await sql.InsertSetupDomain`
+	await withDatabase((sql) =>
+		sql.begin(async (tx) => {
+			await tx.NativeSetupWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+			await checkDomainClaim(tx, user, data.hostname, zone.id);
+			const [domain] =
+				await tx.SetupDomain`SELECT id,user_id FROM domains WHERE hostname=${data.hostname}`;
+			if (domain && domain.user_id !== user.id)
+				throw new Error("Domain belongs to another account");
+			const domainId = domain?.id ?? id("dom");
+			await tx.InsertSetupDomain`
 			INSERT INTO domains (id,user_id,hostname,zone_id,status,created_at)
 			VALUES (${domainId},${user.id},${data.hostname},${zone.id},'pending',${seconds()})
-			ON CONFLICT(hostname) DO NOTHING`;
-		await sql.InsertSetupMailbox`
+			ON CONFLICT(hostname) DO UPDATE SET zone_id=excluded.zone_id WHERE domains.user_id=excluded.user_id`;
+			await tx.InsertSetupMailbox`
 			INSERT INTO mailboxes (id,user_id,domain_id,local_part,display_name,created_at)
 			VALUES (${id("mb")},${user.id},${domainId},${data.localPart},${user.name},${seconds()})
 			ON CONFLICT(domain_id,local_part) DO NOTHING`;
-	});
+		}),
+	);
 	if (data.activateRouting) {
-		await cloudflare(
-			data.apiToken,
-			`/zones/${zone.id}/email/routing/dns`,
-			z.unknown(),
-			{ method: "POST" },
-			request,
-		);
-		await cloudflare(
-			data.apiToken,
-			`/zones/${zone.id}/email/routing/rules/catch_all`,
-			z.unknown(),
+		const api = new DomainCloudflare(
 			{
-				method: "PUT",
-				body: JSON.stringify({
-					enabled: true,
-					name: `Mailrun ${worker}`,
-					matchers: [{ type: "all" }],
-					actions: [{ type: "worker", value: [worker] }],
-				}),
+				apiToken: data.apiToken,
+				accountId: data.accountId,
+				workerName: worker,
 			},
 			request,
 		);
-		await withDatabase(
-			(sql) =>
-				sql.ActivateDomain`UPDATE domains SET routing_enabled=1,status='active',routing_status='enabled' WHERE hostname=${data.hostname}`,
-		);
-		const sendingSchema = z.object({
-			tag: z.string(),
-			name: z.string(),
-			enabled: z.boolean(),
+		await domainOperation(zone.id, async (assertOwned) => {
+			const provisioned = await provisionCloudflareDomain(api, data.hostname, {
+				enableRouting: true,
+				enableSending: true,
+				replaceMxRecords: data.replaceMxRecords,
+				zone,
+			});
+			try {
+				await withDatabase((sql) =>
+					sql.begin(async (tx) => {
+						await tx.NativeSetupFinishFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+						await assertOwned(tx);
+						const active =
+							await tx.ActivateDomain`UPDATE domains SET routing_enabled=${provisioned.routingEnabled ? 1 : 0},status=${provisioned.routingEnabled || provisioned.sendingEnabled ? "active" : "pending"},routing_status=${provisioned.routingStatus ?? null} WHERE hostname=${data.hostname} AND user_id=${user.id} RETURNING id`;
+						if (!active.length)
+							throw new Error(
+								"Domain changed during setup. Retry before routing mail.",
+							);
+						await tx.EnableSending`UPDATE domains SET sending_provider='cloudflare',sending_enabled=${provisioned.sendingEnabled ? 1 : 0},sending_requested=1,sending_subdomain_tag=${provisioned.sendingSubdomainTag} WHERE hostname=${data.hostname} AND user_id=${user.id}`;
+					}),
+				);
+			} catch (error) {
+				const failures = await rollbackCloudflareDomain(
+					api,
+					provisioned.changes,
+				);
+				if (failures.length)
+					throw new AggregateError(
+						[error, ...failures],
+						"Email setup failed and cleanup could not finish. Check Cloudflare routing before retrying.",
+					);
+				throw error;
+			}
+			await setInstallationPhase(
+				provisioned.routingEnabled ? "ready" : "deployed",
+			);
 		});
-		const sendingDomains = await cloudflare(
-			data.apiToken,
-			`/zones/${zone.id}/email/sending/subdomains`,
-			z.array(sendingSchema),
-			{},
-			request,
-		);
-		const sending =
-			sendingDomains.find((domain) => domain.name === data.hostname) ??
-			(await cloudflare(
-				data.apiToken,
-				`/zones/${zone.id}/email/sending/subdomains`,
-				sendingSchema,
-				{ method: "POST", body: JSON.stringify({ name: data.hostname }) },
-				request,
-			));
-		await withDatabase(
-			(sql) => sql.EnableSending`
-			UPDATE domains SET sending_provider='cloudflare',sending_enabled=${sending.enabled ? 1 : 0},sending_requested=1,sending_subdomain_tag=${sending.tag}
-			WHERE hostname=${data.hostname}`,
-		);
-		await setInstallationPhase("ready");
 	}
+
 	return installationStatus();
 }
 
@@ -153,6 +169,35 @@ export async function refreshRelay(
 		origin = publicOrigin();
 	if (!origin.startsWith("https://"))
 		throw new Error("APP_URL must use HTTPS before deploying the relay");
+	const timestamp = String(Date.now()),
+		probe = await request(`${origin}/api/relay-health`, {
+			method: "POST",
+			headers: {
+				"X-Mailrun-Timestamp": timestamp,
+				"X-Mailrun-Signature": await signRelay(
+					secret,
+					timestamp,
+					"",
+					"",
+					new Uint8Array(),
+				),
+			},
+			signal: AbortSignal.timeout(30000),
+		});
+	const reachable =
+		probe.ok &&
+		z
+			.object({ ok: z.literal(true) })
+			.safeParse(await probe.json().catch(() => null)).success;
+	if (!reachable)
+		throw new Error(
+			"Mailrun could not reach its public address before deploying the relay. Check APP_URL and retry.",
+		);
+	const accountSubdomain = await ensureWorkersSubdomain(
+		installation.account_id,
+		installation.api_token,
+		request,
+	);
 	const form = new FormData();
 	form.set(
 		"metadata",
@@ -184,13 +229,7 @@ export async function refreshRelay(
 		{ method: "POST", body: JSON.stringify({ enabled: true }) },
 		request,
 	);
-	const accountSubdomain = await cloudflare(
-		installation.api_token,
-		`/accounts/${installation.account_id}/workers/subdomain`,
-		z.object({ subdomain: z.string().regex(/^[a-z0-9-]+$/) }),
-		{},
-		request,
-	);
+
 	const health = await request(
 		`https://${worker}.${accountSubdomain.subdomain}.workers.dev/health`,
 		{
@@ -208,4 +247,29 @@ export async function refreshRelay(
 			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
 	);
 	return installationStatus();
+}
+
+async function ensureWorkersSubdomain(
+	accountId: string,
+	token: string,
+	request: CloudflareFetch,
+) {
+	const schema = z.object({ subdomain: z.string().regex(/^[a-z0-9-]+$/) }),
+		path = `/accounts/${accountId}/workers/subdomain`;
+	try {
+		return await cloudflare(token, path, schema, {}, request);
+	} catch (error) {
+		if (!(error instanceof CloudflareApiError) || error.status !== 404)
+			throw error;
+		return cloudflare(
+			token,
+			path,
+			schema,
+			{
+				method: "PUT",
+				body: JSON.stringify({ subdomain: `mailrun-${accountId}` }),
+			},
+			request,
+		);
+	}
 }

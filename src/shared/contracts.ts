@@ -64,6 +64,7 @@ export const setupCloudflareSchema = z.object({
 		.toLowerCase()
 		.regex(/^[a-z0-9][a-z0-9._+-]{0,63}$/),
 	activateRouting: z.boolean().default(false),
+	replaceMxRecords: z.boolean().optional(),
 });
 export const relayDecisionSchema = z.discriminatedUnion("action", [
 	z.object({ action: z.literal("store"), messageId: z.string() }),

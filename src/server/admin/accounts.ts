@@ -73,7 +73,7 @@ export async function listAccounts(user: User) {
 	return withDatabase(async (sql) => {
 		const ctx = await accountsContext(sql, user),
 			rows =
-				await sql.NativeAccountsList`SELECT * FROM users ORDER BY created_at DESC,id`;
+				await sql.NativeAccountsList`SELECT * FROM users ORDER BY created_at DESC,rowid`;
 		return {
 			accounts: rows.map(dto),
 			seats: {

@@ -17,6 +17,7 @@ import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
 import { Route as MailBookingRouteImport } from './routes/_mail.booking'
 import { Route as MailCalendarRouteImport } from './routes/_mail.calendar'
 import { Route as MailComposeRouteImport } from './routes/_mail.compose'
+import { Route as MailDomainsRouteImport } from './routes/_mail.domains'
 import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
 import { Route as MailDriveRouteImport } from './routes/_mail.drive'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
@@ -104,6 +105,11 @@ const MailCalendarRoute = MailCalendarRouteImport.update({
 const MailComposeRoute = MailComposeRouteImport.update({
   id: '/compose',
   path: '/compose',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailDomainsRoute = MailDomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
   getParentRoute: () => MailRoute,
 } as any)
 const MailDraftsRoute = MailDraftsRouteImport.update({
@@ -365,6 +371,7 @@ export interface FileRoutesByFullPath {
   '/booking': typeof MailBookingRoute
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
+  '/domains': typeof MailDomainsRoute
   '/drafts': typeof MailDraftsRouteWithChildren
   '/drive': typeof MailDriveRoute
   '/inbox': typeof MailInboxRouteWithChildren
@@ -423,6 +430,7 @@ export interface FileRoutesByTo {
   '/booking': typeof MailBookingRoute
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
+  '/domains': typeof MailDomainsRoute
   '/drafts': typeof MailDraftsRouteWithChildren
   '/drive': typeof MailDriveRoute
   '/scheduled': typeof MailScheduledRouteWithChildren
@@ -481,6 +489,7 @@ export interface FileRoutesById {
   '/_mail/booking': typeof MailBookingRoute
   '/_mail/calendar': typeof MailCalendarRoute
   '/_mail/compose': typeof MailComposeRoute
+  '/_mail/domains': typeof MailDomainsRoute
   '/_mail/drafts': typeof MailDraftsRouteWithChildren
   '/_mail/drive': typeof MailDriveRoute
   '/_mail/inbox': typeof MailInboxRouteWithChildren
@@ -541,6 +550,7 @@ export interface FileRouteTypes {
     | '/booking'
     | '/calendar'
     | '/compose'
+    | '/domains'
     | '/drafts'
     | '/drive'
     | '/inbox'
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/booking'
     | '/calendar'
     | '/compose'
+    | '/domains'
     | '/drafts'
     | '/drive'
     | '/scheduled'
@@ -656,6 +667,7 @@ export interface FileRouteTypes {
     | '/_mail/booking'
     | '/_mail/calendar'
     | '/_mail/compose'
+    | '/_mail/domains'
     | '/_mail/drafts'
     | '/_mail/drive'
     | '/_mail/inbox'
@@ -782,6 +794,13 @@ declare module '@tanstack/react-router' {
       path: '/compose'
       fullPath: '/compose'
       preLoaderRoute: typeof MailComposeRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/domains': {
+      id: '/_mail/domains'
+      path: '/domains'
+      fullPath: '/domains'
+      preLoaderRoute: typeof MailDomainsRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/drafts': {
@@ -1298,6 +1317,7 @@ interface MailRouteChildren {
   MailBookingRoute: typeof MailBookingRoute
   MailCalendarRoute: typeof MailCalendarRoute
   MailComposeRoute: typeof MailComposeRoute
+  MailDomainsRoute: typeof MailDomainsRoute
   MailDraftsRoute: typeof MailDraftsRouteWithChildren
   MailDriveRoute: typeof MailDriveRoute
   MailInboxRoute: typeof MailInboxRouteWithChildren
@@ -1320,6 +1340,7 @@ const MailRouteChildren: MailRouteChildren = {
   MailBookingRoute: MailBookingRoute,
   MailCalendarRoute: MailCalendarRoute,
   MailComposeRoute: MailComposeRoute,
+  MailDomainsRoute: MailDomainsRoute,
   MailDraftsRoute: MailDraftsRouteWithChildren,
   MailDriveRoute: MailDriveRoute,
   MailInboxRoute: MailInboxRouteWithChildren,

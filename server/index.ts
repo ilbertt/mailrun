@@ -1,3 +1,4 @@
+import { clearDomainRuntimeLeases } from "../src/server/domains/repository";
 import {
 	isDriveUploadPath,
 	serveDriveUpload,
@@ -25,6 +26,7 @@ if (name) {
 	// Literal imports are bundled into the executable, including Start's lazy chunks.
 	const { default: handler } = await import("#start-handler");
 	await clearDriveRuntimeLeases();
+	await clearDomainRuntimeLeases();
 	await registerCrons(import.meta.path);
 	const server = Bun.serve<RealtimeSession>({
 		port: Number(process.env.PORT ?? 3000),
