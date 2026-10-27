@@ -214,6 +214,133 @@ try {
 				`Native upload authentication/origin check returned ${response.status}`,
 			);
 	}
+
+	const createdKeyResponse = await fetch(`${base}/api/api-keys`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "Smoke calendar key",
+			scopes: ["calendar:read"],
+			mailboxIds: [],
+		}),
+	});
+	const createdKey = z
+		.object({ id: z.string(), key: z.string() })
+		.parse(await createdKeyResponse.json());
+	if (
+		!createdKeyResponse.ok ||
+		!(
+			await fetch(`${base}/api/calendar/events`, {
+				headers: { Authorization: `Bearer ${createdKey.key}` },
+			})
+		).ok
+	)
+		throw new Error("Managed calendar key failed");
+	const listedKeys = await fetch(`${base}/api/api-keys`, {
+		headers: { Cookie: sessionCookie },
+	});
+	const listedKeyText = await listedKeys.text();
+	if (!listedKeys.ok || listedKeyText.includes(createdKey.key))
+		throw new Error("Key list exposed secret");
+	const revokedKey = await fetch(`${base}/api/api-keys?id=${createdKey.id}`, {
+		method: "DELETE",
+		headers: calendarHeaders,
+	});
+	if (
+		!revokedKey.ok ||
+		(
+			await fetch(`${base}/api/calendar/events`, {
+				headers: { Authorization: `Bearer ${createdKey.key}` },
+			})
+		).status !== 401
+	)
+		throw new Error("API key revocation failed");
+	const general = await fetch(`${base}/api/admin/general`, {
+		method: "PUT",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			outboundAttachmentMaxMb: 2,
+			driveStorageLimitGb: 1,
+		}),
+	});
+	const generalData = await general.json();
+	if (
+		!general.ok ||
+		!z
+			.object({
+				outboundAttachmentMaxMb: z.literal(2),
+				driveStorageLimitGb: z.literal(1),
+			})
+			.safeParse(generalData).success
+	)
+		throw new Error(
+			`General settings failed: ${general.status} ${JSON.stringify(generalData)}`,
+		);
+	await fetch(`${base}/api/admin/general`, {
+		method: "PUT",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			outboundAttachmentMaxMb: 25,
+			driveStorageLimitGb: null,
+		}),
+	});
+	const activities = await fetch(`${base}/api/activity`, {
+		headers: { Cookie: sessionCookie },
+	});
+	if (
+		!activities.ok ||
+		!z
+			.object({ activities: z.array(z.object({ action: z.string() })) })
+			.parse(await activities.json())
+			.activities.some((row) => row.action === "auth.login")
+	)
+		throw new Error("Authentication activity was not recorded");
+	const resetHeaders = {
+			Origin: publicBase,
+			"Content-Type": "application/json",
+		},
+		unknownReset = await fetch(`${base}/api/auth/password-reset/request`, {
+			method: "POST",
+			headers: resetHeaders,
+			body: JSON.stringify({ email: "unknown@example.net" }),
+		});
+	if (!unknownReset.ok) throw new Error("Public reset request failed");
+	const resetToken = crypto.randomUUID(),
+		resetPassword = crypto.randomUUID();
+	state.db
+		.query(
+			"INSERT INTO password_reset_tokens(id,user_id,token_hash,expires_at,created_at) VALUES('reset-smoke',?,?,?,?)",
+		)
+		.run(managed.id, await hash(resetToken), seconds() + 1800, seconds());
+	const confirmReset = () =>
+		fetch(`${base}/api/auth/password-reset/confirm`, {
+			method: "POST",
+			headers: resetHeaders,
+			body: JSON.stringify({ token: resetToken, password: resetPassword }),
+		});
+	if (!(await confirmReset()).ok || (await confirmReset()).status !== 400)
+		throw new Error("Reset link was not single-use");
+	const recoveredLogin = await fetch(`${base}/api/auth/login`, {
+		method: "POST",
+		headers: resetHeaders,
+		body: JSON.stringify({ email: managed.email, password: resetPassword }),
+	});
+	if (!recoveredLogin.ok) throw new Error("Reset password could not sign in");
+	for (const route of [
+		"/general",
+		"/activity",
+		"/api-keys",
+		"/settings/api-keys",
+		"/settings/app-passwords",
+	])
+		if (!(await fetch(base + route, { headers: { Cookie: sessionCookie } })).ok)
+			throw new Error(`Restored settings route failed: ${route}`);
+	for (const route of [
+		"/forgot-password",
+		"/reset-password?token=synthetic-token",
+	])
+		if (!(await fetch(base + route)).ok)
+			throw new Error(`Public recovery page failed: ${route}`);
 	const memorySamples: Record<string, number> = {};
 	const sampleMemory = async (label: string) => {
 		const probe = Bun.spawn(["ps", "-o", "rss=", "-p", String(child.pid)], {
@@ -729,6 +856,10 @@ try {
 				adminPasswordResetRevocation: "passed",
 				originalAccountScreens: "passed",
 				originalDomainScreenAndList: "passed",
+				managedKeyLifecycle: "passed",
+				generalSettingsAndActivity: "passed",
+				passwordResetSingleUse: "passed",
+				restoredSecurityAndAdminPages: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",

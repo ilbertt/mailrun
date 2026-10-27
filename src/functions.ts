@@ -1,3 +1,4 @@
+import { publicAuthGuard } from "./server/auth/public-guard";
 import { getRequestLocale, loadServerMessages } from "./lib/i18n/server";
 import {
 	navigationCounts,
@@ -5,7 +6,7 @@ import {
 	shortcutSettings,
 } from "./server/mail/navigation";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, deleteCookie } from "@tanstack/react-start/server";
+import { getCookie, getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import * as auth from "./server/auth/service";
 import { requireUser, sessionCookie } from "./server/auth/request";
@@ -55,26 +56,14 @@ export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
 	const user = await auth.getUser(getCookie(auth.SESSION_COOKIE));
 	return { user, needsSetup: !(await auth.hasUsers()) };
 });
-export const loginFn = createServerFn({ method: "POST" })
-	.validator(loginSchema)
-	.handler(async ({ data }) => {
-		const result = await auth.login(data);
-		if (result.mfaRequired) return { mfaRequired: true as const };
-		sessionCookie(result.token);
-		return { mfaRequired: false as const, user: result.user };
-	});
 export const registerFn = createServerFn({ method: "POST" })
-	.validator(registerSchema)
+	.validator(registerSchema.extend({ turnstileToken: z.string().optional() }))
 	.handler(async ({ data }) => {
+		await publicAuthGuard(getRequest(), data.turnstileToken, true);
 		const result = await auth.register(data);
 		sessionCookie(result.token);
 		return { user: result.user };
 	});
-export const logoutFn = createServerFn({ method: "POST" }).handler(async () => {
-	await auth.logout(getCookie(auth.SESSION_COOKIE));
-	deleteCookie(auth.SESSION_COOKIE, { path: "/" });
-	return { ok: true };
-});
 export const mailboxesFn = createServerFn({ method: "GET" }).handler(async () =>
 	listMailboxes(await requireUser()),
 );

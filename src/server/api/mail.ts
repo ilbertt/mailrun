@@ -1,3 +1,5 @@
+import { adminSettingsApi } from "./admin-settings";
+import { keysApi } from "./keys";
 import { domainsApi } from "./domains";
 import { cloudflareAccess } from "../domains/cloudflare";
 import { apiErrorResponse } from "./errors";
@@ -78,6 +80,10 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const adminSettings = await adminSettingsApi(request, user);
+	if (adminSettings) return adminSettings;
+	const keys = await keysApi(request, user);
+	if (keys) return keys;
 	const domains = await domainsApi(request, user);
 	if (domains) return domains;
 	const accounts = await accountsApi(request, user);
@@ -138,12 +144,9 @@ export async function dispatchMailApi(
 				hasAvatar: !!profile.avatar_key,
 				keyboardShortcutsEnabled: !!profile.keyboard_shortcuts_enabled,
 				isPrimaryAdmin: !!profile.is_primary_admin,
-				canManageMailboxes:
-					!!profile.is_primary_admin || !!profile.can_manage_mailboxes,
-				canManageDomains:
-					!!profile.is_primary_admin || !!profile.can_manage_domains,
-				canManageUsers:
-					!!profile.is_primary_admin || !!profile.can_manage_users,
+				canManageMailboxes: !!profile.can_manage_mailboxes,
+				canManageDomains: !!profile.can_manage_domains,
+				canManageUsers: !!profile.can_manage_users,
 				spamProtectionEnabled: !!profile.spam_protection_enabled,
 				showFullRecipientAddresses: !!profile.show_full_recipient_addresses,
 				mfaEnabled: !!profile.totp_enabled,

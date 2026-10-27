@@ -19,7 +19,7 @@ type TurnstileWindow = Window & {
 	};
 };
 
-const TURNSTILE_SITE_KEY = undefined as string | undefined;
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 function loadTurnstileScript(): Promise<void> {
 	const existing = document.querySelector<HTMLScriptElement>(

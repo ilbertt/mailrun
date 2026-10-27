@@ -1,10 +1,14 @@
 import { z } from "zod";
 export async function apiErrorResponse(error: unknown): Promise<Response> {
-	if (error instanceof Response)
+	if (error instanceof Response) {
+		const headers = new Headers(error.headers);
+		headers.delete("content-type");
+		headers.delete("content-length");
 		return Response.json(
 			{ error: await error.text() },
-			{ status: error.status },
+			{ status: error.status, headers },
 		);
+	}
 	if (error instanceof Error && error.message.startsWith("Too many"))
 		return Response.json({ error: error.message }, { status: 429 });
 	if (error instanceof Error && error.message === "Message too large")

@@ -194,6 +194,28 @@ export interface INativeManagedAccountMailboxesResult {
     hostname: IDomainsColumns["hostname"];
 }
 
+/** Result of query `NativeGeneralSettings`. */
+export interface INativeGeneralSettingsResult {
+    outbound_attachment_max_mb: IAppSettingsColumns["outbound_attachment_max_mb"];
+    drive_storage_limit_bytes: IAppSettingsColumns["drive_storage_limit_bytes"];
+}
+
+/** Result of query `NativeSaveGeneralSettings`. */
+export interface INativeSaveGeneralSettingsResult {
+}
+
+/** Result of query `NativeAuthActivityList`. */
+export interface INativeAuthActivityListResult {
+    id: string | null;
+    action: IAuditLogsColumns["action"] | null;
+    metadata: IAuditLogsColumns["metadata"];
+    created_at: number;
+    actor_email: string | null;
+    target_email: string | null;
+    local_part: IMailboxesColumns["local_part"] | null;
+    hostname: IDomainsColumns["hostname"] | null;
+}
+
 /** Result of query `NativeBookingHostAvatar`. */
 export interface INativeBookingHostAvatarResult {
     avatar_key: IUsersColumns["avatar_key"];
@@ -672,6 +694,10 @@ export interface INativeDeleteTemplateResult {
     id: IMessagesColumns["id"];
 }
 
+/** Result of query `NativeRecordAuthActivity`. */
+export interface INativeRecordAuthActivityResult {
+}
+
 /** Result of query `NativeApiKeyCandidates`. */
 export interface INativeApiKeyCandidatesResult {
     id: string;
@@ -685,13 +711,27 @@ export interface INativeApiKeyCandidatesResult {
     is_primary_admin: IUsersColumns["is_primary_admin"];
 }
 
+/** Result of query `NativeVerifyLiveApiKey`. */
+export interface INativeVerifyLiveApiKeyResult {
+    id: string;
+    user_id: IApiKeysColumns["user_id"];
+    kind: IApiKeysColumns["kind"];
+    scopes: IApiKeysColumns["scopes"];
+    mailbox_scope_enabled: IApiKeysColumns["mailbox_scope_enabled"];
+}
+
+/** Result of query `NativeLiveApiKeyUser`. */
+export interface INativeLiveApiKeyUserResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+}
+
 /** Result of query `NativeKeyMailboxScope`. */
 export interface INativeKeyMailboxScopeResult {
     mailbox_id: IMcpKeyMailboxesColumns["mailbox_id"];
-}
-
-/** Result of query `NativeTouchApiKey`. */
-export interface INativeTouchApiKeyResult {
 }
 
 /** Result of query `BrowserAccountUsers`. */
@@ -730,6 +770,92 @@ export interface ISourceMfaRecoveryResult {
 
 /** Result of query `SourceMfaSession`. */
 export interface ISourceMfaSessionResult {
+}
+
+/** Result of query `NativeKeyManagerActor`. */
+export interface INativeKeyManagerActorResult {
+    id: IUsersColumns["id"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+}
+
+/** Result of query `NativeKeyMailboxPermission`. */
+export interface INativeKeyMailboxPermissionResult {
+    id: string | null;
+}
+
+/** Result of query `NativeListManagedKeys`. */
+export interface INativeListManagedKeysResult {
+    id: IApiKeysColumns["id"];
+    name: IApiKeysColumns["name"];
+    prefix: IApiKeysColumns["prefix"];
+    kind: IApiKeysColumns["kind"];
+    scopes: IApiKeysColumns["scopes"];
+    mailbox_scope_enabled: IApiKeysColumns["mailbox_scope_enabled"];
+    created_at: IApiKeysColumns["created_at"];
+    last_used_at: IApiKeysColumns["last_used_at"];
+}
+
+/** Result of query `NativeManagedKeyMailboxes`. */
+export interface INativeManagedKeyMailboxesResult {
+    key_id: IMcpKeyMailboxesColumns["key_id"];
+    mailbox_id: IMcpKeyMailboxesColumns["mailbox_id"];
+}
+
+/** Result of query `NativeCreateManagedKey`. */
+export interface INativeCreateManagedKeyResult {
+}
+
+/** Result of query `NativeGrantManagedKeyMailbox`. */
+export interface INativeGrantManagedKeyMailboxResult {
+}
+
+/** Result of query `NativeOwnedManagedKey`. */
+export interface INativeOwnedManagedKeyResult {
+    id: IApiKeysColumns["id"];
+    kind: IApiKeysColumns["kind"];
+    scopes: IApiKeysColumns["scopes"];
+}
+
+/** Result of query `NativeCancelRevokedKeyApprovals`. */
+export interface INativeCancelRevokedKeyApprovalsResult {
+}
+
+/** Result of query `NativeRevokeManagedKey`. */
+export interface INativeRevokeManagedKeyResult {
+}
+
+/** Result of query `NativeResetAccount`. */
+export interface INativeResetAccountResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    reset_email: IUsersColumns["reset_email"];
+}
+
+/** Result of query `NativeIssuePasswordReset`. */
+export interface INativeIssuePasswordResetResult {
+}
+
+/** Result of query `NativeValidPasswordReset`. */
+export interface INativeValidPasswordResetResult {
+    id: IPasswordResetTokensColumns["id"];
+}
+
+/** Result of query `NativeConsumePasswordReset`. */
+export interface INativeConsumePasswordResetResult {
+    user_id: IPasswordResetTokensColumns["user_id"];
+}
+
+/** Result of query `NativeResetPassword`. */
+export interface INativeResetPasswordResult {
+}
+
+/** Result of query `NativeResetRevokeSessions`. */
+export interface INativeResetRevokeSessionsResult {
+}
+
+/** Result of query `NativeResetRevokeChallenges`. */
+export interface INativeResetRevokeChallengesResult {
 }
 
 /** Result of query `HasUsers`. */
@@ -2851,6 +2977,14 @@ export interface IApplySpamVerdictResult {
 export interface IObserveSpamReputationResult {
 }
 
+/** Result of query `NativeSystemMailSenders`. */
+export interface INativeSystemMailSendersResult {
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    hostname: IDomainsColumns["hostname"];
+    role: IUsersColumns["role"];
+}
+
 /** Result of query `NativePushRecipients`. */
 export interface INativePushRecipientsResult {
     id: string | null;
@@ -2899,6 +3033,9 @@ export interface Queries {
     NativeRevokeManagedLoginChallenges: INativeRevokeManagedLoginChallengesResult;
     NativeTransferPrimaryAccount: INativeTransferPrimaryAccountResult;
     NativeManagedAccountMailboxes: INativeManagedAccountMailboxesResult;
+    NativeGeneralSettings: INativeGeneralSettingsResult;
+    NativeSaveGeneralSettings: INativeSaveGeneralSettingsResult;
+    NativeAuthActivityList: INativeAuthActivityListResult;
     NativeBookingHostAvatar: INativeBookingHostAvatarResult;
     NativeUserAvatar: INativeUserAvatarResult;
     NativeMailboxAvatar: INativeMailboxAvatarResult;
@@ -2979,9 +3116,11 @@ export interface Queries {
     NativeListTemplates: INativeListTemplatesResult;
     NativeCreateTemplate: INativeCreateTemplateResult;
     NativeDeleteTemplate: INativeDeleteTemplateResult;
+    NativeRecordAuthActivity: INativeRecordAuthActivityResult;
     NativeApiKeyCandidates: INativeApiKeyCandidatesResult;
+    NativeVerifyLiveApiKey: INativeVerifyLiveApiKeyResult;
+    NativeLiveApiKeyUser: INativeLiveApiKeyUserResult;
     NativeKeyMailboxScope: INativeKeyMailboxScopeResult;
-    NativeTouchApiKey: INativeTouchApiKeyResult;
     BrowserAccountUsers: IBrowserAccountUsersResult;
     ChallengeAccount: IChallengeAccountResult;
     SourceLoginChallenge: ISourceLoginChallengeResult;
@@ -2989,6 +3128,22 @@ export interface Queries {
     SourceConsumeChallenge: ISourceConsumeChallengeResult;
     SourceMfaRecovery: ISourceMfaRecoveryResult;
     SourceMfaSession: ISourceMfaSessionResult;
+    NativeKeyManagerActor: INativeKeyManagerActorResult;
+    NativeKeyMailboxPermission: INativeKeyMailboxPermissionResult;
+    NativeListManagedKeys: INativeListManagedKeysResult;
+    NativeManagedKeyMailboxes: INativeManagedKeyMailboxesResult;
+    NativeCreateManagedKey: INativeCreateManagedKeyResult;
+    NativeGrantManagedKeyMailbox: INativeGrantManagedKeyMailboxResult;
+    NativeOwnedManagedKey: INativeOwnedManagedKeyResult;
+    NativeCancelRevokedKeyApprovals: INativeCancelRevokedKeyApprovalsResult;
+    NativeRevokeManagedKey: INativeRevokeManagedKeyResult;
+    NativeResetAccount: INativeResetAccountResult;
+    NativeIssuePasswordReset: INativeIssuePasswordResetResult;
+    NativeValidPasswordReset: INativeValidPasswordResetResult;
+    NativeConsumePasswordReset: INativeConsumePasswordResetResult;
+    NativeResetPassword: INativeResetPasswordResult;
+    NativeResetRevokeSessions: INativeResetRevokeSessionsResult;
+    NativeResetRevokeChallenges: INativeResetRevokeChallengesResult;
     HasUsers: IHasUsersResult;
     SessionUser: ISessionUserResult;
     CreateSession: ICreateSessionResult;
@@ -3259,6 +3414,7 @@ export interface Queries {
     SaveSpamFeedback: ISaveSpamFeedbackResult;
     ApplySpamVerdict: IApplySpamVerdictResult;
     ObserveSpamReputation: IObserveSpamReputationResult;
+    NativeSystemMailSenders: INativeSystemMailSendersResult;
     NativePushRecipients: INativePushRecipientsResult;
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;

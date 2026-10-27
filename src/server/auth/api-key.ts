@@ -4,6 +4,7 @@ import { withDatabase, seconds } from "../db";
 import { userSchema, type User } from "../../shared/contracts";
 export type ApiKeyAuthorization = {
 	id: string;
+	kind: "legacy" | "mcp";
 	user: User;
 	scopes: string[];
 	mailboxIds: string[] | null;
@@ -30,19 +31,27 @@ export async function authenticateApiKey(
 	);
 	for (const row of candidates) {
 		if (!(await bcrypt.compare(value, row.key_hash))) continue;
-		const allowed = row.mailbox_scope_enabled
-			? await withDatabase(
-					(sql) =>
-						sql.NativeKeyMailboxScope`SELECT mailbox_id FROM mcp_key_mailboxes WHERE key_id=${row.id}`,
-				)
-			: null;
-		await withDatabase(
-			(sql) =>
-				sql.NativeTouchApiKey`UPDATE api_keys SET last_used_at=${seconds()} WHERE id=${row.id} AND (last_used_at IS NULL OR last_used_at<${seconds() - 60})`,
+		const current = await withDatabase((sql) =>
+			sql.begin(async (tx) => {
+				const [key] =
+					await tx.NativeVerifyLiveApiKey`/* @notNull id */ UPDATE api_keys SET last_used_at=CASE WHEN last_used_at IS NULL OR last_used_at<${seconds() - 60} THEN ${seconds()} ELSE last_used_at END WHERE id=${row.id} AND key_hash=${row.key_hash} AND EXISTS(SELECT 1 FROM users WHERE users.id=api_keys.user_id AND users.disabled=0) RETURNING id,user_id,kind,scopes,mailbox_scope_enabled`;
+				if (!key) return null;
+				const [user] =
+					await tx.NativeLiveApiKeyUser`SELECT id,name,email,role,is_primary_admin FROM users WHERE id=${key.user_id} AND disabled=0`;
+				if (!user) return null;
+				const restricted = key.mailbox_scope_enabled || key.kind === "mcp",
+					allowed = restricted
+						? await tx.NativeKeyMailboxScope`SELECT mailbox_id FROM mcp_key_mailboxes WHERE key_id=${key.id}`
+						: null;
+				return { key, user, allowed };
+			}),
 		);
+		if (!current) return null;
+		const { key, user, allowed } = current;
+
 		let scopes: string[] = [];
 		try {
-			const parsed = z.array(z.string()).safeParse(JSON.parse(row.scopes));
+			const parsed = z.array(z.string()).safeParse(JSON.parse(key.scopes));
 			if (parsed.success) scopes = parsed.data;
 		} catch {}
 		const adminScopes = new Set([
@@ -53,13 +62,14 @@ export async function authenticateApiKey(
 		]);
 		const administrative = scopes.some((scope) => adminScopes.has(scope));
 		return {
-			id: row.id,
+			id: key.id,
+			kind: key.kind === "mcp" ? "mcp" : "legacy",
 			user: userSchema.parse({
-				id: row.user_id,
-				name: row.name,
-				email: row.email,
-				role: row.role,
-				isPrimaryAdmin: !!row.is_primary_admin,
+				id: user.id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+				isPrimaryAdmin: !!user.is_primary_admin,
 			}),
 			scopes: administrative
 				? scopes.filter((scope) => adminScopes.has(scope))

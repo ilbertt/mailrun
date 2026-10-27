@@ -4,6 +4,11 @@ import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 
 export default defineConfig({
+	define: {
+		"process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY": JSON.stringify(
+			process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "",
+		),
+	},
 	resolve: {
 		alias: [
 			{ find: "@", replacement: new URL("./src", import.meta.url).pathname },

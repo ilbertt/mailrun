@@ -70,6 +70,8 @@ SQLite leases exclude overlapping runs. Scheduled work is queried by persisted d
 
 Implemented:
 
+- Original personal/admin API-key, app-password credential, General and Activity screens. Personal and MCP credentials retain mailbox grants; administrative scopes stay separate and require the current primary administrator. Secrets are returned once, only bcrypt hashes persist, revocation cancels pending approvals, and authentication rechecks live key/user state after hash verification. General limits apply to attachment uploads and Drive quota reservations; login/logout activity retains source metadata.
+- Original password-recovery screens and thirty-minute reset links sent through Cloudflare system mail without Sent copies or contacts. Redemption is atomic and single-use and revokes sessions plus pending MFA challenges. Public auth has local IP limits, optional server-validated Turnstile and source-compatible capability flags.
 - Original domain screens with native Cloudflare zone preflight, public-DNS authentication checks, MX-confirmed receiving/sending setup, idempotent DNS repair and scoped cleanup. Original Mailflare per-address Worker rules migrate to the installed relay across all result pages; rollback restores previous rules and MX metadata. Relay setup checks the public app with a signed request before publication, provisions a missing workers.dev namespace and verifies the Worker before changing routing. DNS controls use the credentials saved during setup.
 - Original account list/details/permissions/password/inbox screens and admin mailbox URL aliases. Native creation commits the user, primary inbox, explicit aliases and booking username together; seat limits and primary-admin transfers serialize under SQLite. Delegated admins retain their original limits, resets revoke sessions/challenges, account avatars follow the original management scope, and disabled accounts cannot sign in.
 - Original Drive and public sharing screens with local streamed multipart uploads, three-day resume, atomic quota reservations, inherited view/edit permissions, owner-only sharing/moves/restores, folder breadcrumbs, search/type filters, previews/downloads, Range/HEAD support, trash and 30-day retention. Email attachments keep mailbox permissions and have independent trash/restore/delete actions. Upload leases and staged publication prevent an expired writer from replacing a completed file.
@@ -87,9 +89,9 @@ Implemented:
 
 Still to migrate before production cutover:
 
-- Remaining administration screens and optional Resend/SES provider integrations; password-reset delivery; API keys/app passwords; import/export screens; public API, JMAP and MCP.
+- Remaining administration screens and optional Resend/SES provider integrations; import/export screens; public API, JMAP and MCP. App-password creation and key management are ported; mail-client protocol access remains pending.
 - Agent configuration/chat/tools, approval workflows, automatic draft generation/recovery, webhooks/retries. The original assistant layout is present; its remaining endpoints are not yet ported.
-- Remaining source routes and URL aliases, setup/onboarding screen parity, custom-folder edit operations, Gravatar imports, and a full browser/mobile interaction audit. Calendar, booking, Drive and Cloudflare domain setup were compared against the original on desktop; the current browser viewport override did not take effect, so phone layouts remain unverified. Account lists/details were also compared on desktop and a saved name change was verified after reload. Domain creation and DMARC setup were exercised against a local provider simulator, without live DNS changes.
+- Remaining source routes and URL aliases, setup/onboarding screen parity, Gravatar imports, and a full browser/mobile interaction audit. Calendar, booking, Drive and Cloudflare domain setup were compared against the original on desktop; the current browser viewport override did not take effect, so phone layouts remain unverified. Account lists/details were also compared on desktop and a saved name change was verified after reload. Domain creation and DMARC setup were exercised against a local provider simulator, without live DNS changes. Key and General screens were compared on desktop, including a settings save.
 - Real Cloudflare delivery checks, a full migration/restore rehearsal, original-app end-to-end performance comparison, nibrun restart/durability verification and production cutover.
 
 Full parity remains the acceptance criterion. The preview is an incomplete migration checkpoint; visible source navigation includes features whose native handlers are still being ported. Missing jobs are not represented by no-op implementations.
@@ -105,3 +107,5 @@ Record backups preserve the `mailflare-database-backup` version 1 format. Older 
 ## Source and license
 
 Ported schema/authentication/backup code, UI primitives, recipient editor and email renderer comes from Mailflare commit `71aa49b`; see `NOTICE`. The combined application uses AGPL-3.0-or-later. The original Mailrun repository's public-domain dedication is retained in `LICENSE-MAILRUN`.
+
+Optional Turnstile uses `NEXT_PUBLIC_TURNSTILE_SITE_KEY` at build time and `TURNSTILE_SECRET_KEY` at runtime; leave both unset when it is not configured.

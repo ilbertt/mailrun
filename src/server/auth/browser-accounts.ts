@@ -108,8 +108,8 @@ export async function switchBrowserAccount(userId: string) {
 	setCookie(SESSION_COOKIE, target.token, options());
 	return { ok: true, token: target.token };
 }
-export async function logoutBrowserAccount() {
-	const active = getCookie(SESSION_COOKIE);
+export async function logoutBrowserAccount(token?: string) {
+	const active = token ?? getCookie(SESSION_COOKIE);
 	await logout(active);
 	const remaining = await resolveBrowserAccounts(
 		accountTokens(getCookie(ACCOUNTS_COOKIE)).filter(
