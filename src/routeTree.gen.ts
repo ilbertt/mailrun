@@ -18,7 +18,10 @@ import { Route as SetupRouteImport } from './routes/setup'
 import { Route as MailActivityRouteImport } from './routes/_mail.activity'
 import { Route as MailApiKeysRouteImport } from './routes/_mail.api-keys'
 import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
+import { Route as MailAuditLogsRouteImport } from './routes/_mail.audit-logs'
+import { Route as MailBackupsRouteImport } from './routes/_mail.backups'
 import { Route as MailBookingRouteImport } from './routes/_mail.booking'
+import { Route as MailBrandingRouteImport } from './routes/_mail.branding'
 import { Route as MailCalendarRouteImport } from './routes/_mail.calendar'
 import { Route as MailComposeRouteImport } from './routes/_mail.compose'
 import { Route as MailDomainsRouteImport } from './routes/_mail.domains'
@@ -26,6 +29,8 @@ import { Route as MailDraftsRouteImport } from './routes/_mail.drafts'
 import { Route as MailDriveRouteImport } from './routes/_mail.drive'
 import { Route as MailGeneralRouteImport } from './routes/_mail.general'
 import { Route as MailInboxRouteImport } from './routes/_mail.inbox'
+import { Route as MailLicensesRouteImport } from './routes/_mail.licenses'
+import { Route as MailRoutingRouteImport } from './routes/_mail.routing'
 import { Route as MailScheduledRouteImport } from './routes/_mail.scheduled'
 import { Route as MailSentRouteImport } from './routes/_mail.sent'
 import { Route as MailSettingsRouteImport } from './routes/_mail.settings'
@@ -119,9 +124,24 @@ const MailArchivedRoute = MailArchivedRouteImport.update({
   path: '/archived',
   getParentRoute: () => MailRoute,
 } as any)
+const MailAuditLogsRoute = MailAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailBackupsRoute = MailBackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
+  getParentRoute: () => MailRoute,
+} as any)
 const MailBookingRoute = MailBookingRouteImport.update({
   id: '/booking',
   path: '/booking',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailBrandingRoute = MailBrandingRouteImport.update({
+  id: '/branding',
+  path: '/branding',
   getParentRoute: () => MailRoute,
 } as any)
 const MailCalendarRoute = MailCalendarRouteImport.update({
@@ -157,6 +177,16 @@ const MailGeneralRoute = MailGeneralRouteImport.update({
 const MailInboxRoute = MailInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailLicensesRoute = MailLicensesRouteImport.update({
+  id: '/licenses',
+  path: '/licenses',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailRoutingRoute = MailRoutingRouteImport.update({
+  id: '/routing',
+  path: '/routing',
   getParentRoute: () => MailRoute,
 } as any)
 const MailScheduledRoute = MailScheduledRouteImport.update({
@@ -415,7 +445,10 @@ export interface FileRoutesByFullPath {
   '/activity': typeof MailActivityRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
+  '/audit-logs': typeof MailAuditLogsRoute
+  '/backups': typeof MailBackupsRoute
   '/booking': typeof MailBookingRoute
+  '/branding': typeof MailBrandingRoute
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/domains': typeof MailDomainsRoute
@@ -423,6 +456,8 @@ export interface FileRoutesByFullPath {
   '/drive': typeof MailDriveRoute
   '/general': typeof MailGeneralRoute
   '/inbox': typeof MailInboxRouteWithChildren
+  '/licenses': typeof MailLicensesRoute
+  '/routing': typeof MailRoutingRoute
   '/scheduled': typeof MailScheduledRouteWithChildren
   '/sent': typeof MailSentRouteWithChildren
   '/settings': typeof MailSettingsRouteWithChildren
@@ -481,13 +516,18 @@ export interface FileRoutesByTo {
   '/activity': typeof MailActivityRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
+  '/audit-logs': typeof MailAuditLogsRoute
+  '/backups': typeof MailBackupsRoute
   '/booking': typeof MailBookingRoute
+  '/branding': typeof MailBrandingRoute
   '/calendar': typeof MailCalendarRoute
   '/compose': typeof MailComposeRoute
   '/domains': typeof MailDomainsRoute
   '/drafts': typeof MailDraftsRouteWithChildren
   '/drive': typeof MailDriveRoute
   '/general': typeof MailGeneralRoute
+  '/licenses': typeof MailLicensesRoute
+  '/routing': typeof MailRoutingRoute
   '/scheduled': typeof MailScheduledRouteWithChildren
   '/sent': typeof MailSentRouteWithChildren
   '/settings': typeof MailSettingsRouteWithChildren
@@ -547,7 +587,10 @@ export interface FileRoutesById {
   '/_mail/activity': typeof MailActivityRoute
   '/_mail/api-keys': typeof MailApiKeysRoute
   '/_mail/archived': typeof MailArchivedRouteWithChildren
+  '/_mail/audit-logs': typeof MailAuditLogsRoute
+  '/_mail/backups': typeof MailBackupsRoute
   '/_mail/booking': typeof MailBookingRoute
+  '/_mail/branding': typeof MailBrandingRoute
   '/_mail/calendar': typeof MailCalendarRoute
   '/_mail/compose': typeof MailComposeRoute
   '/_mail/domains': typeof MailDomainsRoute
@@ -555,6 +598,8 @@ export interface FileRoutesById {
   '/_mail/drive': typeof MailDriveRoute
   '/_mail/general': typeof MailGeneralRoute
   '/_mail/inbox': typeof MailInboxRouteWithChildren
+  '/_mail/licenses': typeof MailLicensesRoute
+  '/_mail/routing': typeof MailRoutingRoute
   '/_mail/scheduled': typeof MailScheduledRouteWithChildren
   '/_mail/sent': typeof MailSentRouteWithChildren
   '/_mail/settings': typeof MailSettingsRouteWithChildren
@@ -615,7 +660,10 @@ export interface FileRouteTypes {
     | '/activity'
     | '/api-keys'
     | '/archived'
+    | '/audit-logs'
+    | '/backups'
     | '/booking'
+    | '/branding'
     | '/calendar'
     | '/compose'
     | '/domains'
@@ -623,6 +671,8 @@ export interface FileRouteTypes {
     | '/drive'
     | '/general'
     | '/inbox'
+    | '/licenses'
+    | '/routing'
     | '/scheduled'
     | '/sent'
     | '/settings'
@@ -681,13 +731,18 @@ export interface FileRouteTypes {
     | '/activity'
     | '/api-keys'
     | '/archived'
+    | '/audit-logs'
+    | '/backups'
     | '/booking'
+    | '/branding'
     | '/calendar'
     | '/compose'
     | '/domains'
     | '/drafts'
     | '/drive'
     | '/general'
+    | '/licenses'
+    | '/routing'
     | '/scheduled'
     | '/sent'
     | '/settings'
@@ -746,7 +801,10 @@ export interface FileRouteTypes {
     | '/_mail/activity'
     | '/_mail/api-keys'
     | '/_mail/archived'
+    | '/_mail/audit-logs'
+    | '/_mail/backups'
     | '/_mail/booking'
+    | '/_mail/branding'
     | '/_mail/calendar'
     | '/_mail/compose'
     | '/_mail/domains'
@@ -754,6 +812,8 @@ export interface FileRouteTypes {
     | '/_mail/drive'
     | '/_mail/general'
     | '/_mail/inbox'
+    | '/_mail/licenses'
+    | '/_mail/routing'
     | '/_mail/scheduled'
     | '/_mail/sent'
     | '/_mail/settings'
@@ -890,11 +950,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailArchivedRouteImport
       parentRoute: typeof MailRoute
     }
+    '/_mail/audit-logs': {
+      id: '/_mail/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/audit-logs'
+      preLoaderRoute: typeof MailAuditLogsRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/backups': {
+      id: '/_mail/backups'
+      path: '/backups'
+      fullPath: '/backups'
+      preLoaderRoute: typeof MailBackupsRouteImport
+      parentRoute: typeof MailRoute
+    }
     '/_mail/booking': {
       id: '/_mail/booking'
       path: '/booking'
       fullPath: '/booking'
       preLoaderRoute: typeof MailBookingRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/branding': {
+      id: '/_mail/branding'
+      path: '/branding'
+      fullPath: '/branding'
+      preLoaderRoute: typeof MailBrandingRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/calendar': {
@@ -944,6 +1025,20 @@ declare module '@tanstack/react-router' {
       path: '/inbox'
       fullPath: '/inbox'
       preLoaderRoute: typeof MailInboxRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/licenses': {
+      id: '/_mail/licenses'
+      path: '/licenses'
+      fullPath: '/licenses'
+      preLoaderRoute: typeof MailLicensesRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/routing': {
+      id: '/_mail/routing'
+      path: '/routing'
+      fullPath: '/routing'
+      preLoaderRoute: typeof MailRoutingRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/scheduled': {
@@ -1456,7 +1551,10 @@ interface MailRouteChildren {
   MailActivityRoute: typeof MailActivityRoute
   MailApiKeysRoute: typeof MailApiKeysRoute
   MailArchivedRoute: typeof MailArchivedRouteWithChildren
+  MailAuditLogsRoute: typeof MailAuditLogsRoute
+  MailBackupsRoute: typeof MailBackupsRoute
   MailBookingRoute: typeof MailBookingRoute
+  MailBrandingRoute: typeof MailBrandingRoute
   MailCalendarRoute: typeof MailCalendarRoute
   MailComposeRoute: typeof MailComposeRoute
   MailDomainsRoute: typeof MailDomainsRoute
@@ -1464,6 +1562,8 @@ interface MailRouteChildren {
   MailDriveRoute: typeof MailDriveRoute
   MailGeneralRoute: typeof MailGeneralRoute
   MailInboxRoute: typeof MailInboxRouteWithChildren
+  MailLicensesRoute: typeof MailLicensesRoute
+  MailRoutingRoute: typeof MailRoutingRoute
   MailScheduledRoute: typeof MailScheduledRouteWithChildren
   MailSentRoute: typeof MailSentRouteWithChildren
   MailSettingsRoute: typeof MailSettingsRouteWithChildren
@@ -1482,7 +1582,10 @@ const MailRouteChildren: MailRouteChildren = {
   MailActivityRoute: MailActivityRoute,
   MailApiKeysRoute: MailApiKeysRoute,
   MailArchivedRoute: MailArchivedRouteWithChildren,
+  MailAuditLogsRoute: MailAuditLogsRoute,
+  MailBackupsRoute: MailBackupsRoute,
   MailBookingRoute: MailBookingRoute,
+  MailBrandingRoute: MailBrandingRoute,
   MailCalendarRoute: MailCalendarRoute,
   MailComposeRoute: MailComposeRoute,
   MailDomainsRoute: MailDomainsRoute,
@@ -1490,6 +1593,8 @@ const MailRouteChildren: MailRouteChildren = {
   MailDriveRoute: MailDriveRoute,
   MailGeneralRoute: MailGeneralRoute,
   MailInboxRoute: MailInboxRouteWithChildren,
+  MailLicensesRoute: MailLicensesRoute,
+  MailRoutingRoute: MailRoutingRoute,
   MailScheduledRoute: MailScheduledRouteWithChildren,
   MailSentRoute: MailSentRouteWithChildren,
   MailSettingsRoute: MailSettingsRouteWithChildren,

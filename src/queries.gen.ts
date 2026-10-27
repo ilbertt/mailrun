@@ -903,6 +903,99 @@ export interface IClaimInstallationResult {
 export interface IDeleteSessionResult {
 }
 
+/** Result of query `NativeBackupSettings`. */
+export interface INativeBackupSettingsResult {
+    id: IBackupSettingsColumns["id"];
+    enabled: IBackupSettingsColumns["enabled"];
+    schedule_type: IBackupSettingsColumns["schedule_type"];
+    schedule_value: IBackupSettingsColumns["schedule_value"];
+    retention_enabled: IBackupSettingsColumns["retention_enabled"];
+    retention_days: IBackupSettingsColumns["retention_days"];
+    updated_at: IBackupSettingsColumns["updated_at"];
+    excluded_table_groups: IBackupSettingsColumns["excluded_table_groups"];
+}
+
+/** Result of query `NativeBackupInventory`. */
+export interface INativeBackupInventoryResult {
+    id: IBackupsColumns["id"];
+    status: IBackupsColumns["status"];
+    trigger: IBackupsColumns["trigger"];
+    filename: IBackupsColumns["filename"];
+    r2_key: IBackupsColumns["r2_key"];
+    created_by_user_id: IBackupsColumns["created_by_user_id"];
+    size: IBackupsColumns["size"];
+    error: IBackupsColumns["error"];
+    created_at: IBackupsColumns["created_at"];
+    started_at: IBackupsColumns["started_at"];
+    completed_at: IBackupsColumns["completed_at"];
+}
+
+/** Result of query `NativeUpdateBackupSettings`. */
+export interface INativeUpdateBackupSettingsResult {
+}
+
+/** Result of query `NativeClaimBackupOperation`. */
+export interface INativeClaimBackupOperationResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeInterruptOldBackups`. */
+export interface INativeInterruptOldBackupsResult {
+}
+
+/** Result of query `NativeRenewBackupOperation`. */
+export interface INativeRenewBackupOperationResult {
+}
+
+/** Result of query `NativeReleaseBackupOperation`. */
+export interface INativeReleaseBackupOperationResult {
+}
+
+/** Result of query `NativeBackupRetentionSettings`. */
+export interface INativeBackupRetentionSettingsResult {
+    retention_enabled: IBackupSettingsColumns["retention_enabled"];
+    retention_days: IBackupSettingsColumns["retention_days"];
+}
+
+/** Result of query `NativePurgeBackups`. */
+export interface INativePurgeBackupsResult {
+    r2_key: IBackupsColumns["r2_key"];
+}
+
+/** Result of query `NativeCreateBackup`. */
+export interface INativeCreateBackupResult {
+}
+
+/** Result of query `NativeFinishBackup`. */
+export interface INativeFinishBackupResult {
+}
+
+/** Result of query `NativeFailBackup`. */
+export interface INativeFailBackupResult {
+}
+
+/** Result of query `NativeDailyBackupExists`. */
+export interface INativeDailyBackupExistsResult {
+    id: IBackupsColumns["id"];
+}
+
+/** Result of query `NativeBackupToDelete`. */
+export interface INativeBackupToDeleteResult {
+    status: IBackupsColumns["status"];
+}
+
+/** Result of query `NativeDeleteBackup`. */
+export interface INativeDeleteBackupResult {
+    r2_key: IBackupsColumns["r2_key"];
+}
+
+/** Result of query `NativeBackupDownload`. */
+export interface INativeBackupDownloadResult {
+    filename: IBackupsColumns["filename"];
+    r2_key: IBackupsColumns["r2_key"];
+    status: IBackupsColumns["status"];
+}
+
 /** Result of query `NativeBranding`. */
 export interface INativeBrandingResult {
     app_name: IAppSettingsColumns["app_name"];
@@ -1913,43 +2006,6 @@ export interface INativeClearCompletedDrivePartsResult {
 
 /** Result of query `NativeAbortDriveUpload`. */
 export interface INativeAbortDriveUploadResult {
-}
-
-/** Result of query `BackupSettings`. */
-export interface IBackupSettingsResult {
-    enabled: IBackupSettingsColumns["enabled"];
-    schedule_type: IBackupSettingsColumns["schedule_type"];
-    schedule_value: IBackupSettingsColumns["schedule_value"];
-    retention_enabled: IBackupSettingsColumns["retention_enabled"];
-    retention_days: IBackupSettingsColumns["retention_days"];
-    excluded_table_groups: IBackupSettingsColumns["excluded_table_groups"];
-}
-
-/** Result of query `ExpiredBackups`. */
-export interface IExpiredBackupsResult {
-    id: IBackupsColumns["id"];
-    r2_key: IBackupsColumns["r2_key"];
-}
-
-/** Result of query `DeleteExpiredBackup`. */
-export interface IDeleteExpiredBackupResult {
-}
-
-/** Result of query `ExistingDailyBackup`. */
-export interface IExistingDailyBackupResult {
-    id: IBackupsColumns["id"];
-}
-
-/** Result of query `StartBackup`. */
-export interface IStartBackupResult {
-}
-
-/** Result of query `CompleteBackup`. */
-export interface ICompleteBackupResult {
-}
-
-/** Result of query `FailBackup`. */
-export interface IFailBackupResult {
 }
 
 /** Result of query `NativeRetentionOwners`. */
@@ -3151,6 +3207,22 @@ export interface Queries {
     ConsumeRecoveryCode: IConsumeRecoveryCodeResult;
     ClaimInstallation: IClaimInstallationResult;
     DeleteSession: IDeleteSessionResult;
+    NativeBackupSettings: INativeBackupSettingsResult;
+    NativeBackupInventory: INativeBackupInventoryResult;
+    NativeUpdateBackupSettings: INativeUpdateBackupSettingsResult;
+    NativeClaimBackupOperation: INativeClaimBackupOperationResult;
+    NativeInterruptOldBackups: INativeInterruptOldBackupsResult;
+    NativeRenewBackupOperation: INativeRenewBackupOperationResult;
+    NativeReleaseBackupOperation: INativeReleaseBackupOperationResult;
+    NativeBackupRetentionSettings: INativeBackupRetentionSettingsResult;
+    NativePurgeBackups: INativePurgeBackupsResult;
+    NativeCreateBackup: INativeCreateBackupResult;
+    NativeFinishBackup: INativeFinishBackupResult;
+    NativeFailBackup: INativeFailBackupResult;
+    NativeDailyBackupExists: INativeDailyBackupExistsResult;
+    NativeBackupToDelete: INativeBackupToDeleteResult;
+    NativeDeleteBackup: INativeDeleteBackupResult;
+    NativeBackupDownload: INativeBackupDownloadResult;
     NativeBranding: INativeBrandingResult;
     NativeUpdateBranding: INativeUpdateBrandingResult;
     NativeReadBookingUsername: INativeReadBookingUsernameResult;
@@ -3270,13 +3342,6 @@ export interface Queries {
     NativeFinishDriveUpload: INativeFinishDriveUploadResult;
     NativeClearCompletedDriveParts: INativeClearCompletedDrivePartsResult;
     NativeAbortDriveUpload: INativeAbortDriveUploadResult;
-    BackupSettings: IBackupSettingsResult;
-    ExpiredBackups: IExpiredBackupsResult;
-    DeleteExpiredBackup: IDeleteExpiredBackupResult;
-    ExistingDailyBackup: IExistingDailyBackupResult;
-    StartBackup: IStartBackupResult;
-    CompleteBackup: ICompleteBackupResult;
-    FailBackup: IFailBackupResult;
     NativeRetentionOwners: INativeRetentionOwnersResult;
     NativeExpiredMail: INativeExpiredMailResult;
     ClaimCronLease: IClaimCronLeaseResult;

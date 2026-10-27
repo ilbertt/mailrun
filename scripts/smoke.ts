@@ -332,6 +332,10 @@ try {
 		"/api-keys",
 		"/settings/api-keys",
 		"/settings/app-passwords",
+		"/backups",
+		"/branding",
+		"/licenses",
+		"/routing",
 	])
 		if (!(await fetch(base + route, { headers: { Cookie: sessionCookie } })).ok)
 			throw new Error(`Restored settings route failed: ${route}`);
@@ -806,6 +810,71 @@ try {
 		throw new Error(
 			`Unauthenticated download returned ${deniedDownload.status}`,
 		);
+	const backupResponse = await fetch(`${base}/api/backups`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	const backup = z
+		.object({ backupId: z.string() })
+		.parse(await backupResponse.json());
+	if (!backupResponse.ok) throw new Error("Manual local backup failed");
+	const backupDownload = await fetch(
+		`${base}/api/backups/${backup.backupId}/download`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	const backupFile = await backupDownload.blob();
+	if (!backupDownload.ok || backupFile.size === 0)
+		throw new Error("Local backup download failed");
+	const invalidForm = new FormData();
+	invalidForm.set("backup", new File(['{"format":"wrong"}'], "invalid.json"));
+	const invalidRestore = await fetch(`${base}/api/backups/restore`, {
+		method: "POST",
+		headers: { Cookie: sessionCookie, Origin: publicBase },
+		body: invalidForm,
+	});
+	if (invalidRestore.status !== 400)
+		throw new Error("Invalid restore was not rejected");
+	const restoreForm = new FormData();
+	restoreForm.set(
+		"backup",
+		new File([backupFile], "backup.json", { type: "application/json" }),
+	);
+	const backupRestore = await fetch(`${base}/api/backups/restore`, {
+		method: "POST",
+		headers: { Cookie: sessionCookie, Origin: publicBase },
+		body: restoreForm,
+	});
+	if (
+		!backupRestore.ok ||
+		!(
+			await fetch(`${base}/api/messages?mailboxId=mailbox`, {
+				headers: { Cookie: sessionCookie },
+			})
+		).ok
+	)
+		throw new Error("Local backup restore failed");
+	const backupDelete = await fetch(`${base}/api/backups/${backup.backupId}`, {
+		method: "DELETE",
+		headers: calendarHeaders,
+	});
+	if (
+		!backupDelete.ok ||
+		(
+			await fetch(`${base}/api/backups/${backup.backupId}/download`, {
+				headers: { Cookie: sessionCookie },
+			})
+		).status !== 404
+	)
+		throw new Error("Local backup deletion failed");
+	const auditAlias = await fetch(`${base}/audit-logs`, {
+		headers: { Cookie: sessionCookie },
+		redirect: "manual",
+	});
+	if (
+		![302, 307].includes(auditAlias.status) ||
+		!auditAlias.headers.get("location")?.includes("/activity")
+	)
+		throw new Error("Audit URL alias failed");
 	const task = Bun.spawn([binary, "jobs", "maintenance"], {
 		cwd: state.directory,
 		env: smokeEnvironment,
@@ -860,6 +929,7 @@ try {
 				generalSettingsAndActivity: "passed",
 				passwordResetSingleUse: "passed",
 				restoredSecurityAndAdminPages: "passed",
+				localBackupRestoreAndDeletion: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",

@@ -29,6 +29,7 @@ import { authApi } from "./auth";
 import { getCookie } from "@tanstack/react-start/server";
 import { getUser } from "../auth/service";
 import { z } from "zod";
+import { backupsApi } from "./backups";
 import { publicOrigin } from "../config";
 import { requireUser } from "../auth/request";
 import { withDatabase, seconds } from "../db";
@@ -82,6 +83,8 @@ export async function dispatchMailApi(
 		params = url.searchParams;
 	const adminSettings = await adminSettingsApi(request, user);
 	if (adminSettings) return adminSettings;
+	const backups = await backupsApi(request, user);
+	if (backups) return backups;
 	const keys = await keysApi(request, user);
 	if (keys) return keys;
 	const domains = await domainsApi(request, user);
