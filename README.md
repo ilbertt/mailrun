@@ -72,6 +72,7 @@ SQLite leases exclude overlapping runs. Scheduled work is queried by persisted d
 
 Implemented:
 
+- Public v1 message/read/send, account, mailbox, domain/DNS and local-storage APIs. Bearer keys retain source scopes and creator-limited administrative inventories. Trusted key principals recheck current grants inside writes without granting UI permissions; delegated legacy keys retain their original powers. Mailbox grants filter reads before pagination, private drafts stay private, sends retain the 2 MiB body/40 MiB request contracts and scheduled jobs, and storage health includes write/read/delete. Large JSON spools to private temporary files, decoded attachment buffers are released between writes, and the final Cloudflare wire body is checked against its API limit.
 - Original import/export screens and legacy URL aliases. EML/MBOX/MBX imports retain dates, bodies, raw MIME, attachments, threading, contacts and destination sections/folders, with transactional duplicate checks and atomic file publication. Native IMAP discovers folders and imports batches over TCP/TLS, validates and pins DNS addresses, verifies the original hostname, keeps credentials transient and cleans staging on failure, cancellation or HTTP restart. Batches spool to local files instead of retaining every MIME body in memory. MBOX exports retain the original header/body format and stream a consistent read snapshot without holding the normal database queue; private drafts remain scoped to their author. File uploads retain the source's 25 MiB request and 100-message limits. Oversized and malformed responses release the import form instead of leaving its promise pending.
 - Original webhook management and delivery-history screens, endpoint creation, event subscriptions, enable/disable, one-time signing secrets, rotation, test delivery and manual retry. Inbound/outbound/failure events commit with the mail transaction, then an eager Bun dispatcher sends them outside the request context. Pending work survives restarts; nibrun maintenance runs persisted retry dates with the source backoff and attempt limits. Shared per-delivery leases exclude competing HTTP/cron processes; stale attempts cannot overwrite newer results.
 - Original backup, branding, license and administrative routing screens, plus the audit-log URL alias. Manual backups stream SQLite snapshots to private local files; download, restore, delete, group selection, UTC schedules and retention use the source contracts. Manual operations and cron share a renewable SQLite lease; failed restores roll back atomically, interrupted backups become visible failures and cleanup preserves files still referenced elsewhere.
@@ -94,12 +95,27 @@ Implemented:
 
 Still to migrate before production cutover:
 
-- Remaining administration screens and optional Resend/SES provider integrations; public API, JMAP and MCP. App-password creation and key management are ported; mail-client protocol access remains pending.
+- Remaining administration screens and optional Resend/SES provider integrations; JMAP and MCP. App-password creation and key management are ported; mail-client protocol access remains pending.
 - Agent configuration/chat/tools, approval workflows, automatic draft generation/recovery. The original assistant layout is present; its remaining endpoints are not yet ported.
 - Remaining source routes and URL aliases, setup/onboarding screen parity, Gravatar imports, and a full browser/mobile interaction audit. Calendar, booking, Drive and Cloudflare domain setup were compared against the original on desktop; the complete phone comparison remains unverified. Backup, branding, license and routing screens were also compared on desktop; native manual backup, backup settings save and branding save were verified. A disposable 390×844 iframe harness renders the native inbox, navigation drawer and reader; the reference mobile comparison and touch testing remain open. Account lists/details were also compared on desktop and a saved name change was verified after reload. Domain creation and DMARC setup were exercised against a local provider simulator, without live DNS changes. Key and General screens were compared on desktop, including a settings save. Import/export and IMAP forms were compared on desktop; a local EML was imported, its MBOX downloaded and checked, and an oversized upload was rejected without keeping the form busy. Native IMAP protocol tests use local TCP/TLS fixtures, including certificate/hostname rejection and cancellation; real provider checks and larger MIME memory tests remain open. Early hydration interactions also need audit: an automated source selection immediately after hard navigation was not replayed. Original webhook list/history layouts were compared; endpoint creation, a failed test and successful manual retry were verified against a disposable localhost receiver.
 - Real Cloudflare delivery checks, a full migration/restore rehearsal, original-app end-to-end performance comparison, nibrun restart/durability verification and production cutover.
 
 Full parity remains the acceptance criterion. The preview is an incomplete migration checkpoint; visible source navigation includes features whose native handlers are still being ported. Missing jobs are not represented by no-op implementations.
+
+## Public API
+
+Create mail keys in Settings → API keys and administrative keys in Admin → API keys. The v1 endpoints accept Bearer keys; session cookies and HTTP Basic credentials do not authenticate them. Administrative inventories include the caller and accounts they created, and retain the original license and primary-admin restrictions.
+
+| Endpoint | Scope |
+| --- | --- |
+| `GET /api/v1/messages` | `read` |
+| `POST /api/v1/send` | `send` |
+| `/api/v1/accounts` and `/:id` | `accounts` |
+| `/api/v1/mailboxes` and `/:id` | `mailboxes` |
+| `/api/v1/domains`, `/:id`, `/:id/dns`, `/:id/dns/setup` | `domains` |
+| `GET/POST /api/v1/storage` | `storage` |
+
+Mail reads use the original query, direction and limit fields. Sending supports To/Cc/Bcc, threading, base64 attachments and scheduled delivery. Large request bodies use temporary files under the persistent data directory; they are removed after parsing and abandoned staging is cleared on HTTP startup. The expanded local smoke check exercises a 32 MB JSON request with 24 MB of scheduled attachments. Linux guest memory still needs deployment validation.
 
 ## Data and backups
 

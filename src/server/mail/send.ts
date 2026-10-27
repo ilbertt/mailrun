@@ -151,21 +151,24 @@ export async function deliverJob(
 			html: payload.html,
 			headers,
 		});
+		const wireBody = JSON.stringify({
+			from,
+			to: payload.to,
+			cc: payload.cc,
+			bcc: payload.bcc,
+			subject: payload.subject,
+			headers,
+			...prepared,
+		});
+		if (Buffer.byteLength(wireBody) > 5 * 1024 * 1024)
+			throw new Error("Message exceeds Cloudflare's 5 MiB API limit");
 		const result = await cloudflare(
 			installation.api_token,
 			`/accounts/${installation.account_id}/email/sending/send`,
 			z.object({ message_id: z.string() }),
 			{
 				method: "POST",
-				body: JSON.stringify({
-					from,
-					to: payload.to,
-					cc: payload.cc,
-					bcc: payload.bcc,
-					subject: payload.subject,
-					headers,
-					...prepared,
-				}),
+				body: wireBody,
 			},
 			request,
 		);

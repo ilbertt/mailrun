@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { adminApiAccess } from "../auth/key-principal";
 import type { User } from "../../shared/contracts";
 import { withDatabase, id, seconds, type AppSQL } from "../db";
 const provider = z.enum(["none", "cloudflare", "resend", "ses"]);
@@ -37,6 +38,7 @@ export function domainDto(value: DomainRecord) {
 	};
 }
 export async function domainActor(sql: AppSQL, user: User, mutation = false) {
+	const api = await adminApiAccess(sql, user, "domains");
 	const [actor] =
 		await sql.NativeDomainActor`SELECT id,role,is_primary_admin,disabled,can_manage_domains,can_manage_mailboxes,created_by_user_id FROM users WHERE id=${user.id}`;
 	if (!actor || actor.disabled)
@@ -45,7 +47,7 @@ export async function domainActor(sql: AppSQL, user: User, mutation = false) {
 		mutation &&
 		!(
 			actor.role === "admin" &&
-			(actor.is_primary_admin || actor.can_manage_domains)
+			(actor.is_primary_admin || actor.can_manage_domains || api)
 		)
 	)
 		throw new Response("Forbidden", { status: 403 });

@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { adminApiAccess } from "../auth/key-principal";
 import type { User } from "../../shared/contracts";
 import {
 	createUserAccountSchema,
@@ -16,6 +17,7 @@ export async function adminWrite<T>(run: (sql: AppSQL) => Promise<T>) {
 	);
 }
 export async function accountsContext(sql: AppSQL, user: User) {
+	const api = await adminApiAccess(sql, user, "accounts");
 	const [actor] =
 		await sql.NativeManagedAccountActor`SELECT id,role,is_primary_admin,can_manage_users,disabled FROM users WHERE id=${user.id}`;
 	if (!actor || actor.disabled || actor.role !== "admin")
@@ -32,6 +34,7 @@ export async function accountsContext(sql: AppSQL, user: User) {
 		});
 	return {
 		actor,
+		api,
 		seatLimit: license.plan === "pro" ? license.seat_limit : null,
 	};
 }
@@ -42,6 +45,10 @@ export async function managedAccount(sql: AppSQL, accountId: string) {
 	return account;
 }
 type Account = Awaited<ReturnType<typeof managedAccount>>;
+function assertAccountApiScope(user: User, api: boolean, account: Account) {
+	if (api && account.id !== user.id && account.created_by_user_id !== user.id)
+		throw new Response("Account not found", { status: 404 });
+}
 function dto(account: Account) {
 	return {
 		id: account.id,
@@ -61,10 +68,11 @@ function dto(account: Account) {
 export function canEditAccount(
 	actor: Awaited<ReturnType<typeof accountsContext>>["actor"],
 	account: Account,
+	api = false,
 ) {
 	return (
 		!!actor.is_primary_admin ||
-		(!!actor.can_manage_users &&
+		((!!actor.can_manage_users || api) &&
 			account.role === "user" &&
 			!account.is_primary_admin)
 	);
@@ -73,7 +81,7 @@ export async function listAccounts(user: User) {
 	return withDatabase(async (sql) => {
 		const ctx = await accountsContext(sql, user),
 			rows =
-				await sql.NativeAccountsList`SELECT * FROM users ORDER BY created_at DESC,rowid`;
+				await sql.NativeAccountsList`SELECT * FROM users WHERE ${ctx.api ? 1 : 0}=0 OR id=${user.id} OR created_by_user_id=${user.id} ORDER BY created_at DESC,rowid`;
 		return {
 			accounts: rows.map(dto),
 			seats: {
@@ -85,14 +93,16 @@ export async function listAccounts(user: User) {
 }
 export async function accountDetails(user: User, accountId: string) {
 	return withDatabase(async (sql) => {
-		const { actor } = await accountsContext(sql, user),
+		const context = await accountsContext(sql, user),
+			{ actor, api } = context,
 			account = await managedAccount(sql, accountId);
+		assertAccountApiScope(user, api, account);
 		return {
 			account: {
 				...dto(account),
 				forwardingEmail: account.forwarding_email,
 				canForwardEmail: true,
-				editable: canEditAccount(actor, account),
+				editable: canEditAccount(actor, account, api),
 				canChangeRole: !!actor.is_primary_admin,
 				canTransferPrimary:
 					!!actor.is_primary_admin &&
@@ -115,8 +125,8 @@ async function requireSeat(sql: AppSQL, limit: number | null) {
 export async function createAccount(user: User, value: unknown) {
 	const input = createUserAccountSchema.parse(value);
 	await withDatabase(async (sql) => {
-		const { actor } = await accountsContext(sql, user);
-		if (!actor.is_primary_admin && !actor.can_manage_users)
+		const { actor, api } = await accountsContext(sql, user);
+		if (!actor.is_primary_admin && !actor.can_manage_users && !api)
 			throw new Response("You do not have permission to manage users", {
 				status: 403,
 			});
@@ -124,10 +134,10 @@ export async function createAccount(user: User, value: unknown) {
 	const passwordHash = await bcrypt.hash(input.password, 12),
 		username = input.username.toLowerCase().trim();
 	const account = await adminWrite(async (sql) => {
-		const { actor, seatLimit } = await accountsContext(sql, user);
+		const { actor, seatLimit, api } = await accountsContext(sql, user);
 		if (
 			!actor.is_primary_admin &&
-			(!actor.can_manage_users || input.role === "admin")
+			((!actor.can_manage_users && !api) || input.role === "admin")
 		)
 			throw new Response("Only the primary admin can create admin accounts", {
 				status: 403,
@@ -198,8 +208,10 @@ export async function updateAccount(
 ) {
 	const input = updateManagedAccountSchema.parse(value);
 	await withDatabase(async (sql) => {
-		const { actor } = await accountsContext(sql, user);
-		if (!canEditAccount(actor, await managedAccount(sql, accountId)))
+		const { actor, api } = await accountsContext(sql, user);
+		const account = await managedAccount(sql, accountId);
+		assertAccountApiScope(user, api, account);
+		if (!canEditAccount(actor, account, api))
 			throw new Response("Only the primary admin can manage admin accounts", {
 				status: 403,
 			});
@@ -208,9 +220,10 @@ export async function updateAccount(
 		? await bcrypt.hash(input.password, 12)
 		: null;
 	await adminWrite(async (sql) => {
-		const { actor, seatLimit } = await accountsContext(sql, user),
+		const { actor, seatLimit, api } = await accountsContext(sql, user),
 			account = await managedAccount(sql, accountId);
-		if (!canEditAccount(actor, account))
+		assertAccountApiScope(user, api, account);
+		if (!canEditAccount(actor, account, api))
 			throw new Response("Only the primary admin can manage admin accounts", {
 				status: 403,
 			});

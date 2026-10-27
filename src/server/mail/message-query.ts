@@ -27,7 +27,10 @@ export const messageQuerySchema = z.object({
 			"template",
 		])
 		.optional(),
-	q: z.string().max(500).default(""),
+	q: z
+		.string()
+		.max(32 * 1024)
+		.default(""),
 	title: z.string().max(500).default(""),
 	read: z.enum(["read", "unread", "all"]).optional(),
 	starred: z.enum(["true", "false"]).optional(),
@@ -109,9 +112,13 @@ export async function queryMessages(
 	user: User,
 	input: MessageQueryInput,
 	navigation = false,
+	authorization?: { mailboxIds: string[] | null; includeTemplates?: boolean },
 ) {
 	const data = messageQuerySchema.parse(input);
-	const mailboxes = await listMailboxes(user);
+	const mailboxes = (await listMailboxes(user)).filter(
+		(box) =>
+			!authorization?.mailboxIds || authorization.mailboxIds.includes(box.id),
+	);
 	if (
 		data.mailboxId &&
 		!mailboxes.some((mailbox) => mailbox.id === data.mailboxId)
@@ -152,12 +159,12 @@ export async function queryMessages(
   SELECT m.id,m.mailbox_id,m.thread_id,m.created_at,m.read,
    CASE WHEN ${grouped}=1 AND m.status!='draft' THEN json_array(m.mailbox_id,coalesce(m.thread_id,m.id)) ELSE json_array(m.mailbox_id,m.id) END AS group_key
   FROM messages m
-  WHERE (m.mailbox_id IN (SELECT value FROM json_each(${scope})) OR (${mailboxes.length === 0 && !data.mailboxId ? 1 : 0}=1 AND m.user_id=${user.id}))
+  WHERE (m.mailbox_id IN (SELECT value FROM json_each(${scope})) OR (${mailboxes.length === 0 && !data.mailboxId && !authorization?.mailboxIds ? 1 : 0}=1 AND m.user_id=${user.id}))
   AND (m.status!='draft' OR m.user_id=${user.id})
   AND (${data.direction ?? null} IS NULL OR m.direction=${data.direction ?? null})
   AND (${data.folderId ?? null} IS NULL OR m.folder_id=${data.folderId ?? null})
   AND (${data.status ?? null} IS NULL OR m.status=${data.status ?? null})
-  AND (${data.status === "template" ? 1 : 0}=1 OR m.status!='template')
+  AND (${data.status === "template" || authorization?.includeTemplates ? 1 : 0}=1 OR m.status!='template')
   AND (${data.status === "received" && !data.folderId ? 1 : 0}=0 OR (m.folder_id IS NULL AND (m.snoozed_until IS NULL OR m.snoozed_until<=${seconds()})))
   AND (${data.starred === "true" || parsed.starred ? 1 : 0}=0 OR m.starred=1)
   AND (${data.snoozed === "true" ? 1 : 0}=0 OR (m.status='received' AND m.folder_id IS NULL AND m.snoozed_until>${seconds()}))

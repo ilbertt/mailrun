@@ -825,6 +825,11 @@ export interface INativeCancelRevokedKeyApprovalsResult {
 export interface INativeRevokeManagedKeyResult {
 }
 
+/** Result of query `NativeLiveApiOperation`. */
+export interface INativeLiveApiOperationResult {
+    id: string | null;
+}
+
 /** Result of query `NativeResetAccount`. */
 export interface INativeResetAccountResult {
     id: IUsersColumns["id"];
@@ -3141,6 +3146,128 @@ export interface INativeReferencedObjectsResult {
     object_key: unknown | null;
 }
 
+/** Result of query `NativeV1ManagedMailbox`. */
+export interface INativeV1ManagedMailboxResult {
+    id: string;
+    user_id: IMailboxesColumns["user_id"];
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    created_at: number;
+    type: IMailboxesColumns["type"];
+    disabled: number;
+    avatar_key: string | null;
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    signature: IMailboxesColumns["signature"];
+    auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
+    auto_reply_subject: IMailboxesColumns["auto_reply_subject"];
+    auto_reply_body: IMailboxesColumns["auto_reply_body"];
+}
+
+/** Result of query `NativeV1Mailboxes`. */
+export interface INativeV1MailboxesResult {
+    id: string;
+    user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    hostname: IDomainsColumns["hostname"];
+    display_name: IMailboxesColumns["display_name"];
+    type: IMailboxesColumns["type"];
+    disabled: number;
+    created_at: number;
+}
+
+/** Result of query `NativeV1MailboxLicense`. */
+export interface INativeV1MailboxLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
+}
+
+/** Result of query `NativeV1MailboxChild`. */
+export interface INativeV1MailboxChildResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeV1MailboxDomain`. */
+export interface INativeV1MailboxDomainResult {
+    id: IDomainsColumns["id"];
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `NativeV1MailboxOccupied`. */
+export interface INativeV1MailboxOccupiedResult {
+    id: string | null;
+}
+
+/** Result of query `NativeV1CreateMailbox`. */
+export interface INativeV1CreateMailboxResult {
+}
+
+/** Result of query `NativeV1UpdateMailbox`. */
+export interface INativeV1UpdateMailboxResult {
+}
+
+/** Result of query `NativeV1MailboxSending`. */
+export interface INativeV1MailboxSendingResult {
+    id: string | null;
+}
+
+/** Result of query `NativeV1CancelMailboxJobs`. */
+export interface INativeV1CancelMailboxJobsResult {
+}
+
+/** Result of query `NativeV1DeleteMailbox`. */
+export interface INativeV1DeleteMailboxResult {
+}
+
+/** Result of query `NativeV1MessageBodies`. */
+export interface INativeV1MessageBodiesResult {
+    id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    direction: IMessagesColumns["direction"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    subject: IMessagesColumns["subject"];
+    snippet: IMessagesColumns["snippet"];
+    status: IMessagesColumns["status"];
+    thread_id: IMessagesColumns["thread_id"];
+    created_at: IMessagesColumns["created_at"];
+    read: IMessagesColumns["read"];
+    folder_id: IMessagesColumns["folder_id"];
+    snoozed_until: IMessagesColumns["snoozed_until"];
+    starred: IMessagesColumns["starred"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    bcc_addr: IMessagesColumns["bcc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    spam_score: IMessagesColumns["spam_score"];
+    spam_verdict: IMessagesColumns["spam_verdict"];
+    spam_signals: IMessagesColumns["spam_signals"];
+    spam_analyzed_at: IMessagesColumns["spam_analyzed_at"];
+    spam_analysis_error: IMessagesColumns["spam_analysis_error"];
+    trashed_at: IMessagesColumns["trashed_at"];
+    reply_to: IMessagesColumns["reply_to"];
+    draft_revision: IMessagesColumns["draft_revision"];
+    draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
+}
+
+/** Result of query `NativeV1QueueMessage`. */
+export interface INativeV1QueueMessageResult {
+}
+
+/** Result of query `NativeV1QueueAttachment`. */
+export interface INativeV1QueueAttachmentResult {
+}
+
+/** Result of query `NativeV1QueueSend`. */
+export interface INativeV1QueueSendResult {
+}
+
 /** Result of query `NativeWebhookAttemptRecord`. */
 export interface INativeWebhookAttemptRecordResult {
     id: string | null;
@@ -3394,6 +3521,7 @@ export interface Queries {
     NativeOwnedManagedKey: INativeOwnedManagedKeyResult;
     NativeCancelRevokedKeyApprovals: INativeCancelRevokedKeyApprovalsResult;
     NativeRevokeManagedKey: INativeRevokeManagedKeyResult;
+    NativeLiveApiOperation: INativeLiveApiOperationResult;
     NativeResetAccount: INativeResetAccountResult;
     NativeIssuePasswordReset: INativeIssuePasswordResetResult;
     NativeValidPasswordReset: INativeValidPasswordResetResult;
@@ -3695,6 +3823,21 @@ export interface Queries {
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;
     NativeReferencedObjects: INativeReferencedObjectsResult;
+    NativeV1ManagedMailbox: INativeV1ManagedMailboxResult;
+    NativeV1Mailboxes: INativeV1MailboxesResult;
+    NativeV1MailboxLicense: INativeV1MailboxLicenseResult;
+    NativeV1MailboxChild: INativeV1MailboxChildResult;
+    NativeV1MailboxDomain: INativeV1MailboxDomainResult;
+    NativeV1MailboxOccupied: INativeV1MailboxOccupiedResult;
+    NativeV1CreateMailbox: INativeV1CreateMailboxResult;
+    NativeV1UpdateMailbox: INativeV1UpdateMailboxResult;
+    NativeV1MailboxSending: INativeV1MailboxSendingResult;
+    NativeV1CancelMailboxJobs: INativeV1CancelMailboxJobsResult;
+    NativeV1DeleteMailbox: INativeV1DeleteMailboxResult;
+    NativeV1MessageBodies: INativeV1MessageBodiesResult;
+    NativeV1QueueMessage: INativeV1QueueMessageResult;
+    NativeV1QueueAttachment: INativeV1QueueAttachmentResult;
+    NativeV1QueueSend: INativeV1QueueSendResult;
     NativeWebhookAttemptRecord: INativeWebhookAttemptRecordResult;
     NativeClaimWebhookAttempt: INativeClaimWebhookAttemptResult;
     NativeExhaustWebhookDelivery: INativeExhaustWebhookDeliveryResult;

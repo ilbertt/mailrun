@@ -32,6 +32,7 @@ import { z } from "zod";
 import { backupsApi } from "./backups";
 import { webhooksApi } from "./webhooks";
 import { mailTransferApi } from "./mail-transfer";
+import { isV1Path, serveV1Api } from "./v1";
 import { publicOrigin } from "../config";
 import { requireUser } from "../auth/request";
 import { withDatabase, seconds } from "../db";
@@ -343,6 +344,7 @@ export async function dispatchMailApi(
 }
 export async function serveMailApi(request: Request) {
 	try {
+		if (isV1Path(new URL(request.url).pathname)) return serveV1Api(request);
 		const publicDrive = await publicDriveApi(request);
 		if (publicDrive) return publicDrive;
 		const publicBooking = await publicBookingApi(request);

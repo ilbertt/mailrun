@@ -1,3 +1,4 @@
+import { isV1Path, serveV1Api } from "../src/server/api/v1";
 import { clearImapStaging } from "../src/server/mail-transfer/imap";
 import {
 	isMailTransferPath,
@@ -50,7 +51,10 @@ if (name) {
 					/^\/api\/drive\/upload\/[^/]+$/.test(new URL(request.url).pathname) &&
 					request.method === "PUT"
 				) &&
-				Number(request.headers.get("content-length")) > 30 * 1024 * 1024
+				Number(request.headers.get("content-length")) >
+					(new URL(request.url).pathname === "/api/v1/send" ? 40 : 30) *
+						1024 *
+						1024
 			)
 				return Response.json(
 					{ error: "Request body too large" },
@@ -69,6 +73,13 @@ if (name) {
 			}
 			if (isDriveUploadPath(new URL(request.url).pathname))
 				return serveDriveUpload(request);
+			if (isV1Path(new URL(request.url).pathname)) {
+				const response = await serveV1Api(request);
+				// Release large JSON/request buffers after the HTTP handler has returned.
+				if (Number(request.headers.get("content-length")) > 512 * 1024)
+					setTimeout(() => Bun.gc(true), 0);
+				return response;
+			}
 			if (isMailTransferPath(new URL(request.url).pathname)) {
 				return serveMailTransfer(request, () => server.timeout(request, 0));
 			}

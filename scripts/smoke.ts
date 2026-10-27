@@ -439,6 +439,222 @@ try {
 		)
 			throw new Error(`Import URL alias failed: ${route}`);
 	}
+	const publicMailKeyResponse = await fetch(`${base}/api/api-keys`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "Public mail client",
+			scopes: ["read", "send"],
+			mailboxIds: ["mailbox"],
+		}),
+	});
+	const publicMailKey = z
+		.object({ id: z.string(), key: z.string() })
+		.parse(await publicMailKeyResponse.json());
+	if (!publicMailKeyResponse.ok)
+		throw new Error("Public mail key creation failed");
+	const publicAdminKeyResponse = await fetch(`${base}/api/admin/api-keys`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "Public administration",
+			scopes: ["accounts", "mailboxes", "domains", "storage"],
+		}),
+	});
+	const publicAdminSecret = z
+		.object({ key: z.string() })
+		.parse(await publicAdminKeyResponse.json());
+	const publicAdminKeys = await fetch(`${base}/api/admin/api-keys`, {
+		headers: { Cookie: sessionCookie },
+	});
+	const publicAdminId = z
+		.object({
+			apiKeys: z.array(z.object({ id: z.string(), prefix: z.string() })),
+		})
+		.parse(await publicAdminKeys.json())
+		.apiKeys.find(
+			(row) => row.prefix === publicAdminSecret.key.slice(0, 12),
+		)?.id;
+	if (!publicAdminId)
+		throw new Error("Created administrative key was not listed");
+	const publicAdminKey = { ...publicAdminSecret, id: publicAdminId };
+	if (!publicAdminKeyResponse.ok)
+		throw new Error("Public administrative key creation failed");
+	const publicRead = await fetch(
+		`${base}/api/v1/messages?q=subject:searchable`,
+		{ headers: { Authorization: `Bearer ${publicMailKey.key}` } },
+	);
+	if (
+		!publicRead.ok ||
+		!z
+			.object({
+				messages: z.array(
+					z.object({ id: z.string(), textBody: z.string().nullable() }),
+				),
+			})
+			.parse(await publicRead.json())
+			.messages.some(
+				(row) => row.id === "message" && row.textBody === "Welcome to Mailrun",
+			)
+	)
+		throw new Error("Public source message contract failed");
+	if (
+		(
+			await fetch(`${base}/api/v1/messages`, {
+				headers: { Cookie: sessionCookie },
+			})
+		).status !== 401 ||
+		(
+			await fetch(`${base}/api/v1/accounts`, {
+				headers: { Authorization: `Bearer ${publicMailKey.key}` },
+			})
+		).status !== 401
+	)
+		throw new Error("Public scope/session isolation failed");
+	const publicStorage = await fetch(`${base}/api/v1/storage`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${publicAdminKey.key}`,
+			Origin: "https://external-client.example",
+		},
+	});
+	if (
+		!publicStorage.ok ||
+		!z
+			.object({
+				ok: z.literal(true),
+				storage: z.object({ provider: z.literal("files") }),
+			})
+			.safeParse(await publicStorage.json()).success
+	)
+		throw new Error("Public local storage health failed");
+	const publicAccounts = await fetch(`${base}/api/v1/accounts`, {
+		headers: { Authorization: `Bearer ${publicAdminKey.key}` },
+	});
+	const publicAccountIds = z
+		.object({ accounts: z.array(z.object({ id: z.string() })) })
+		.parse(await publicAccounts.json())
+		.accounts.map((row) => row.id);
+	if (
+		!publicAccounts.ok ||
+		!publicAccountIds.includes(managed.id) ||
+		publicAccountIds.includes("stranger")
+	)
+		throw new Error("Public creator scope failed");
+	const publicMailbox = await fetch(`${base}/api/v1/mailboxes`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${publicAdminKey.key}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			domainId: "domain",
+			ownerUserId: managed.id,
+			localPart: "public-extra",
+		}),
+	});
+	const publicBox = z
+		.object({ id: z.string() })
+		.parse(await publicMailbox.json());
+	if (publicMailbox.status !== 201)
+		throw new Error("Public mailbox creation failed");
+	const publicMailboxUpdate = await fetch(
+		`${base}/api/v1/mailboxes/${publicBox.id}`,
+		{
+			method: "PATCH",
+			headers: {
+				Authorization: `Bearer ${publicAdminKey.key}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ signature: "Public signature" }),
+		},
+	);
+	if (
+		!publicMailboxUpdate.ok ||
+		(
+			await fetch(`${base}/api/v1/mailboxes/${publicBox.id}`, {
+				method: "DELETE",
+				headers: { Authorization: `Bearer ${publicAdminKey.key}` },
+			})
+		).status !== 200
+	)
+		throw new Error("Public mailbox mutation failed");
+	const apiLargeContent = Buffer.alloc(8_000_000).toString("base64");
+	let apiMemoryPeak = 0,
+		apiMemoryRunning = true;
+	const apiMemorySampler = (async () => {
+		while (apiMemoryRunning) {
+			const probe = Bun.spawn(["ps", "-o", "rss=", "-p", String(child.pid)], {
+				stdout: "pipe",
+			});
+			const value = Number((await new Response(probe.stdout).text()).trim());
+			await probe.exited;
+			apiMemoryPeak = Math.max(apiMemoryPeak, value / 1024);
+			await Bun.sleep(10);
+		}
+	})();
+	let publicScheduled: Response;
+	try {
+		publicScheduled = await fetch(`${base}/api/v1/send`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${publicMailKey.key}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				mailboxId: "mailbox",
+				from: "hello@example.com",
+				to: "recipient@example.org",
+				subject: "Public scheduled HTTP",
+				text: "Synthetic queued API body",
+				scheduledAt: "2099-01-01T00:00:00Z",
+				attachments: [0, 1, 2].map((index) => ({
+					filename: `api-bulk-${index}.bin`,
+					contentBase64: apiLargeContent,
+				})),
+			}),
+		});
+	} finally {
+		apiMemoryRunning = false;
+		await apiMemorySampler;
+	}
+	if (
+		!publicScheduled.ok ||
+		!z
+			.object({ messageId: z.string(), scheduled: z.literal(true) })
+			.safeParse(await publicScheduled.json()).success
+	)
+		throw new Error("Public scheduled send failed");
+	const publicDomainList = await fetch(`${base}/api/v1/domains`, {
+		headers: { Authorization: `Bearer ${publicAdminKey.key}` },
+	});
+	if (
+		!publicDomainList.ok ||
+		!z
+			.object({
+				domains: z.array(z.object({ id: z.string() })),
+				dns: z.record(z.string(), z.unknown()),
+			})
+			.parse(await publicDomainList.json())
+			.domains.some((row) => row.id === "domain")
+	)
+		throw new Error("Public domain contract failed");
+	await fetch(`${base}/api/api-keys?id=${publicMailKey.id}`, {
+		method: "DELETE",
+		headers: calendarHeaders,
+	});
+	await fetch(`${base}/api/admin/api-keys?id=${publicAdminKey.id}`, {
+		method: "DELETE",
+		headers: calendarHeaders,
+	});
+	if (
+		(
+			await fetch(`${base}/api/v1/messages`, {
+				headers: { Authorization: `Bearer ${publicMailKey.key}` },
+			})
+		).status !== 401
+	)
+		throw new Error("Public key revocation failed");
 	const createdKeyResponse = await fetch(`${base}/api/api-keys`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -1217,6 +1433,9 @@ try {
 				localBackupRestoreAndDeletion: "passed",
 				signedWebhooksAndCronRetries: "passed",
 				emlImportAndMboxExport: "passed",
+				publicApiScopesAndAdministration: "passed",
+				publicScheduledSend: "passed",
+				apiSendPeakMiB: Math.round(apiMemoryPeak),
 				nativeTransferAuthenticationAndAliases: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
