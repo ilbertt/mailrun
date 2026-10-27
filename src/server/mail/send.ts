@@ -1,3 +1,5 @@
+import { enqueueWebhooks } from "../webhooks/repository";
+import { wakeWebhookDispatcher } from "../webhooks/dispatcher";
 import { upsertContact } from "./contacts";
 import { buildSnippet } from "../../lib/email/parse";
 import {
@@ -173,8 +175,15 @@ export async function deliverJob(
 					await sql.NativeRecordAutoReply`INSERT INTO auto_reply_deliveries (id,mailbox_id,recipient,sent_at) VALUES (${id("arp")},${payload.autoReplyMailboxId},${payload.autoReplyRecipient},${seconds()}) ON CONFLICT(mailbox_id,recipient) DO UPDATE SET sent_at=excluded.sent_at`;
 				await sql.CompleteOutbound`UPDATE outbound_jobs SET status='sent',error=NULL,updated_at=${seconds()} WHERE id=${job.id}`;
 				await sql.CompleteSentMessage`UPDATE messages SET status='sent',from_addr=${from},snippet=${buildSnippet(prepared.text ?? null, prepared.html ?? null)},provider_message_id=${result.message_id},thread_id=coalesce(thread_id,${result.message_id.replace(/^<|>$/g, "")}),text_body=${prepared.text ?? null},html_body=${prepared.html ?? null} WHERE id=${job.message_id}`;
+				await enqueueWebhooks(sql, user.id, "message.outbound", {
+					messageId: job.message_id,
+					providerMessageId: result.message_id,
+					to: payload.to.join(", "),
+					cc: payload.cc?.length ? payload.cc.join(", ") : undefined,
+				});
 			}),
 		);
+		wakeWebhookDispatcher();
 		for (const recipient of [
 			...payload.to,
 			...(payload.cc ?? []),
@@ -188,8 +197,14 @@ export async function deliverJob(
 			sql.begin(async (sql) => {
 				await sql.FailOutbound`UPDATE outbound_jobs SET status='failed',error=${error instanceof Error ? error.message : "Sending failed"},updated_at=${seconds()} WHERE id=${job.id}`;
 				await sql.FailSentMessage`UPDATE messages SET status=${restoreDraft ? "draft" : "failed"} WHERE id=${job.message_id}`;
+				if (job.user_id)
+					await enqueueWebhooks(sql, job.user_id, "message.failed", {
+						messageId: job.message_id,
+						error: error instanceof Error ? error.message : "Sending failed",
+					});
 			}),
 		);
+		wakeWebhookDispatcher();
 		throw error;
 	}
 }

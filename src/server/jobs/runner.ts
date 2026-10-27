@@ -1,3 +1,4 @@
+import { runWebhookJobs } from "../webhooks/delivery";
 import { runDriveRetention } from "../drive/retention";
 import { runTrashRetention } from "./retention";
 import { z } from "zod";
@@ -26,6 +27,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 					console.error(`Scheduled send ${job.id} failed`, error),
 				);
 		} else if (name === "maintenance") {
+			await runWebhookJobs();
 			await runTrashRetention();
 			await withDatabase(async (sql) => {
 				await sql.ExpireApprovals`UPDATE agent_send_approvals SET status='expired' WHERE status='pending' AND expires_at<${seconds()}`;

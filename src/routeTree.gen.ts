@@ -38,6 +38,7 @@ import { Route as MailSnoozedRouteImport } from './routes/_mail.snoozed'
 import { Route as MailSpamRouteImport } from './routes/_mail.spam'
 import { Route as MailStarredRouteImport } from './routes/_mail.starred'
 import { Route as MailTrashRouteImport } from './routes/_mail.trash'
+import { Route as MailWebhooksRouteImport } from './routes/_mail.webhooks'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiInboundRouteImport } from './routes/api.inbound'
@@ -222,6 +223,11 @@ const MailStarredRoute = MailStarredRouteImport.update({
 const MailTrashRoute = MailTrashRouteImport.update({
   id: '/trash',
   path: '/trash',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailWebhooksRoute = MailWebhooksRouteImport.update({
+  id: '/webhooks',
+  path: '/webhooks',
   getParentRoute: () => MailRoute,
 } as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
@@ -465,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/spam': typeof MailSpamRouteWithChildren
   '/starred': typeof MailStarredRouteWithChildren
   '/trash': typeof MailTrashRouteWithChildren
+  '/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
@@ -535,6 +542,7 @@ export interface FileRoutesByTo {
   '/spam': typeof MailSpamRouteWithChildren
   '/starred': typeof MailStarredRouteWithChildren
   '/trash': typeof MailTrashRouteWithChildren
+  '/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
@@ -607,6 +615,7 @@ export interface FileRoutesById {
   '/_mail/spam': typeof MailSpamRouteWithChildren
   '/_mail/starred': typeof MailStarredRouteWithChildren
   '/_mail/trash': typeof MailTrashRouteWithChildren
+  '/_mail/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
   '/api/inbound': typeof ApiInboundRoute
@@ -680,6 +689,7 @@ export interface FileRouteTypes {
     | '/spam'
     | '/starred'
     | '/trash'
+    | '/webhooks'
     | '/api/$'
     | '/api/health'
     | '/api/inbound'
@@ -750,6 +760,7 @@ export interface FileRouteTypes {
     | '/spam'
     | '/starred'
     | '/trash'
+    | '/webhooks'
     | '/api/$'
     | '/api/health'
     | '/api/inbound'
@@ -821,6 +832,7 @@ export interface FileRouteTypes {
     | '/_mail/spam'
     | '/_mail/starred'
     | '/_mail/trash'
+    | '/_mail/webhooks'
     | '/api/$'
     | '/api/health'
     | '/api/inbound'
@@ -1088,6 +1100,13 @@ declare module '@tanstack/react-router' {
       path: '/trash'
       fullPath: '/trash'
       preLoaderRoute: typeof MailTrashRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/webhooks': {
+      id: '/_mail/webhooks'
+      path: '/webhooks'
+      fullPath: '/webhooks'
+      preLoaderRoute: typeof MailWebhooksRouteImport
       parentRoute: typeof MailRoute
     }
     '/api/$': {
@@ -1571,6 +1590,7 @@ interface MailRouteChildren {
   MailSpamRoute: typeof MailSpamRouteWithChildren
   MailStarredRoute: typeof MailStarredRouteWithChildren
   MailTrashRoute: typeof MailTrashRouteWithChildren
+  MailWebhooksRoute: typeof MailWebhooksRoute
   MailAccountsIdRoute: typeof MailAccountsIdRouteWithChildren
   MailFoldersFolderIdRoute: typeof MailFoldersFolderIdRouteWithChildren
   MailMailboxesIdRoute: typeof MailMailboxesIdRoute
@@ -1602,6 +1622,7 @@ const MailRouteChildren: MailRouteChildren = {
   MailSpamRoute: MailSpamRouteWithChildren,
   MailStarredRoute: MailStarredRouteWithChildren,
   MailTrashRoute: MailTrashRouteWithChildren,
+  MailWebhooksRoute: MailWebhooksRoute,
   MailAccountsIdRoute: MailAccountsIdRouteWithChildren,
   MailFoldersFolderIdRoute: MailFoldersFolderIdRouteWithChildren,
   MailMailboxesIdRoute: MailMailboxesIdRoute,

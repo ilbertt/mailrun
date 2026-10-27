@@ -1,3 +1,5 @@
+import { enqueueWebhooks } from "../webhooks/repository";
+import { wakeWebhookDispatcher } from "../webhooks/dispatcher";
 import { notifyNewMessage } from "../realtime";
 import { queueAutoReply } from "./auto-reply";
 import { deliverJob } from "./send";
@@ -290,10 +292,21 @@ export async function storeInbound(
 					mailbox.id,
 					getReputationKeys(message, analysis.fingerprint),
 				);
+			await enqueueWebhooks(sql, mailbox.user_id, "message.inbound", {
+				messageId,
+				from: fromAddr,
+				to,
+				cc: message.ccAddr ?? undefined,
+				subject: message.subject,
+				threadId,
+				spamScore: analysis?.score,
+				spamVerdict: analysis?.verdict,
+			});
 			return true;
 		}),
 	);
 	if (inserted) {
+		wakeWebhookDispatcher();
 		const contact = await upsertContact(mailbox.user_id, fromAddr, "inbound");
 		if (status !== "spam")
 			await notifyNewMessage({

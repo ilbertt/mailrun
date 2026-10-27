@@ -6,6 +6,7 @@ import { hash } from "../src/server/auth/service";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signRelay } from "../src/shared/relay-signature";
+import { createHmac } from "node:crypto";
 
 const state = await fixture();
 const token = crypto.randomUUID();
@@ -30,6 +31,22 @@ const smokeEnvironment: Record<string, string | undefined> = {
 	APP_URL: publicBase,
 	NODE_ENV: "production",
 };
+const webhookRequests: { headers: Headers; body: string }[] = [];
+let webhookStatus = 503;
+const webhookReceiver = Bun.serve({
+	port: 0,
+	hostname: "127.0.0.1",
+	async fetch(request) {
+		webhookRequests.push({
+			headers: request.headers,
+			body: await request.text(),
+		});
+		return new Response(
+			webhookStatus === 204 ? null : "Synthetic endpoint unavailable",
+			{ status: webhookStatus },
+		);
+	},
+});
 const child = Bun.spawn([binary], {
 	cwd: state.directory,
 	env: smokeEnvironment,
@@ -96,6 +113,62 @@ try {
 		Origin: publicBase,
 		"Content-Type": "application/json",
 	};
+
+	const hookResponse = await fetch(`${base}/api/webhooks`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			url: webhookReceiver.url.href,
+			description: "Standalone synthetic endpoint",
+			events: ["message.inbound", "message.outbound", "message.failed"],
+			maxAttempts: 3,
+		}),
+	});
+	const hook = z
+		.object({ id: z.string(), secret: z.string() })
+		.parse(await hookResponse.json());
+	if (!hookResponse.ok) throw new Error("Webhook creation failed");
+	const hookTest = await fetch(`${base}/api/webhooks/${hook.id}/test`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	const testDelivery = z
+		.object({ deliveryId: z.string(), status: z.literal("retrying") })
+		.parse(await hookTest.json());
+	if (!hookTest.ok || webhookRequests.length !== 1)
+		throw new Error("Webhook test did not record failure");
+	webhookStatus = 204;
+	const hookRetry = await fetch(
+		`${base}/api/webhooks/${hook.id}/deliveries/${testDelivery.deliveryId}/retry`,
+		{ method: "POST", headers: calendarHeaders },
+	);
+	if (
+		!hookRetry.ok ||
+		!z
+			.object({ status: z.literal("delivered") })
+			.safeParse(await hookRetry.json()).success
+	)
+		throw new Error("Manual webhook retry failed");
+	const rotatedHook = await fetch(`${base}/api/webhooks/${hook.id}`, {
+		method: "PATCH",
+		headers: calendarHeaders,
+		body: JSON.stringify({ rotateSecret: true }),
+	});
+	const rotatedSecret = z
+		.object({ secret: z.string() })
+		.parse(await rotatedHook.json()).secret;
+	if (!rotatedHook.ok || rotatedSecret === hook.secret)
+		throw new Error("Webhook secret rotation failed");
+	const hookList = await fetch(`${base}/api/webhooks`, {
+		headers: { Cookie: sessionCookie },
+	});
+	const hookListText = await hookList.text();
+	if (
+		!hookList.ok ||
+		hookListText.includes(hook.secret) ||
+		hookListText.includes(rotatedSecret)
+	)
+		throw new Error("Webhook inventory exposed a secret");
 
 	state.db.exec(
 		"INSERT INTO license_settings(id,instance_id,plan,state,updated_at) VALUES('default','http-smoke','team','active',1) ON CONFLICT(id) DO UPDATE SET plan='team',state='active'",
@@ -336,6 +409,7 @@ try {
 		"/branding",
 		"/licenses",
 		"/routing",
+		"/webhooks",
 	])
 		if (!(await fetch(base + route, { headers: { Cookie: sessionCookie } })).ok)
 			throw new Error(`Restored settings route failed: ${route}`);
@@ -775,6 +849,38 @@ try {
 	});
 	if (!delivered.ok) throw new Error("Signed relay delivery failed");
 	await newMail;
+	let eagerDelivery = false;
+	for (let attempt = 0; attempt < 100; attempt++) {
+		const history = await fetch(`${base}/api/webhooks/${hook.id}/deliveries`, {
+			headers: { Cookie: sessionCookie },
+		});
+		const rows = z
+			.object({
+				deliveries: z.array(
+					z.object({ status: z.string(), payload: z.string() }),
+				),
+			})
+			.parse(await history.json()).deliveries;
+		eagerDelivery = rows.some(
+			(row) =>
+				row.status === "delivered" &&
+				row.payload.includes('"subject":"Live notification"'),
+		);
+		if (eagerDelivery) break;
+		await Bun.sleep(10);
+	}
+	const receivedHook = webhookRequests.find((row) =>
+		row.body.includes('"subject":"Live notification"'),
+	);
+	if (
+		!eagerDelivery ||
+		!receivedHook ||
+		receivedHook.headers.get("x-email-platform-signature") !==
+			createHmac("sha256", rotatedSecret)
+				.update(receivedHook.body)
+				.digest("hex")
+	)
+		throw new Error("Eager signed inbound webhook did not arrive");
 	socket.close();
 
 	const health = await fetch(`${base}/api/health`);
@@ -875,6 +981,20 @@ try {
 		!auditAlias.headers.get("location")?.includes("/activity")
 	)
 		throw new Error("Audit URL alias failed");
+	webhookStatus = 503;
+	const cronHookResponse = await fetch(`${base}/api/webhooks/${hook.id}/test`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	const cronHook = z
+		.object({ deliveryId: z.string(), status: z.literal("retrying") })
+		.parse(await cronHookResponse.json());
+	if (!cronHookResponse.ok)
+		throw new Error("Failed webhook could not be queued for cron recovery");
+	state.db
+		.query("UPDATE webhook_deliveries SET next_retry_at=0 WHERE id=?")
+		.run(cronHook.deliveryId);
+	webhookStatus = 204;
 	const task = Bun.spawn([binary, "jobs", "maintenance"], {
 		cwd: state.directory,
 		env: smokeEnvironment,
@@ -886,6 +1006,18 @@ try {
 	if (taskExit !== 0 || !taskOutput.includes('"job":"maintenance"'))
 		throw new Error(
 			`Compiled cron task failed: ${taskOutput} ${await new Response(task.stderr).text()}`,
+		);
+	const cronWebhookState = state.db
+		.query<{ status: string; attempts: number }, [string]>(
+			"SELECT status,attempts FROM webhook_deliveries WHERE id=?",
+		)
+		.get(cronHook.deliveryId);
+	if (
+		cronWebhookState?.status !== "delivered" ||
+		cronWebhookState.attempts !== 2
+	)
+		throw new Error(
+			"Persisted webhook retry did not run through the compiled cron command",
 		);
 	const registeredTask = Bun.spawn(
 		[
@@ -930,6 +1062,7 @@ try {
 				passwordResetSingleUse: "passed",
 				restoredSecurityAndAdminPages: "passed",
 				localBackupRestoreAndDeletion: "passed",
+				signedWebhooksAndCronRetries: "passed",
 				drive192MiBStreaming: "passed",
 				nativeUploadAuthAndCsrf: "passed",
 				driveResume: "passed",
@@ -962,5 +1095,6 @@ try {
 	await child.exited;
 	const error = await new Response(child.stderr).text();
 	if (error.trim()) console.error(error);
+	await webhookReceiver.stop(true);
 	await state.close();
 }

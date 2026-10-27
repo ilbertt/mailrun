@@ -3065,6 +3065,131 @@ export interface INativeReferencedObjectsResult {
     object_key: unknown | null;
 }
 
+/** Result of query `NativeWebhookAttemptRecord`. */
+export interface INativeWebhookAttemptRecordResult {
+    id: string | null;
+    webhook_id: IWebhookDeliveriesColumns["webhook_id"];
+    event_type: IWebhookDeliveriesColumns["event_type"];
+    payload: IWebhookDeliveriesColumns["payload"];
+    status: IWebhookDeliveriesColumns["status"];
+    attempts: IWebhookDeliveriesColumns["attempts"];
+    next_retry_at: IWebhookDeliveriesColumns["next_retry_at"];
+    user_id: IWebhooksColumns["user_id"];
+    url: IWebhooksColumns["url"];
+    secret: IWebhooksColumns["secret"];
+    max_attempts: IWebhooksColumns["max_attempts"];
+}
+
+/** Result of query `NativeClaimWebhookAttempt`. */
+export interface INativeClaimWebhookAttemptResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeExhaustWebhookDelivery`. */
+export interface INativeExhaustWebhookDeliveryResult {
+}
+
+/** Result of query `NativeReleaseUnusedWebhookLease`. */
+export interface INativeReleaseUnusedWebhookLeaseResult {
+}
+
+/** Result of query `NativeStartWebhookAttempt`. */
+export interface INativeStartWebhookAttemptResult {
+    attempts: IWebhookDeliveriesColumns["attempts"];
+}
+
+/** Result of query `NativeFinishWebhookAttempt`. */
+export interface INativeFinishWebhookAttemptResult {
+    id: IWebhookDeliveriesColumns["id"];
+}
+
+/** Result of query `NativeReleaseWebhookAttempt`. */
+export interface INativeReleaseWebhookAttemptResult {
+}
+
+/** Result of query `NativeDueWebhookDeliveries`. */
+export interface INativeDueWebhookDeliveriesResult {
+    id: IWebhookDeliveriesColumns["id"];
+}
+
+/** Result of query `NativeOwnedWebhook`. */
+export interface INativeOwnedWebhookResult {
+    id: IWebhooksColumns["id"];
+    user_id: IWebhooksColumns["user_id"];
+    url: IWebhooksColumns["url"];
+    secret: IWebhooksColumns["secret"];
+    events: IWebhooksColumns["events"];
+    enabled: IWebhooksColumns["enabled"];
+    created_at: IWebhooksColumns["created_at"];
+    description: IWebhooksColumns["description"];
+    max_attempts: IWebhooksColumns["max_attempts"];
+}
+
+/** Result of query `NativeWebhookInventory`. */
+export interface INativeWebhookInventoryResult {
+    id: IWebhooksColumns["id"];
+    user_id: IWebhooksColumns["user_id"];
+    url: IWebhooksColumns["url"];
+    secret: IWebhooksColumns["secret"];
+    events: IWebhooksColumns["events"];
+    enabled: IWebhooksColumns["enabled"];
+    created_at: IWebhooksColumns["created_at"];
+    description: IWebhooksColumns["description"];
+    max_attempts: IWebhooksColumns["max_attempts"];
+}
+
+/** Result of query `NativeWebhookDeliveryStats`. */
+export interface INativeWebhookDeliveryStatsResult {
+    webhook_id: IWebhookDeliveriesColumns["webhook_id"];
+    total: number;
+    delivered: number;
+    failing: number;
+    pending: number;
+    last_attempt: number | null;
+}
+
+/** Result of query `NativeCreateWebhook`. */
+export interface INativeCreateWebhookResult {
+}
+
+/** Result of query `NativeUpdateWebhook`. */
+export interface INativeUpdateWebhookResult {
+}
+
+/** Result of query `NativeDeleteWebhook`. */
+export interface INativeDeleteWebhookResult {
+}
+
+/** Result of query `NativeWebhookDeliveryHistory`. */
+export interface INativeWebhookDeliveryHistoryResult {
+    id: IWebhookDeliveriesColumns["id"];
+    webhook_id: IWebhookDeliveriesColumns["webhook_id"];
+    event_type: IWebhookDeliveriesColumns["event_type"];
+    payload: IWebhookDeliveriesColumns["payload"];
+    status: IWebhookDeliveriesColumns["status"];
+    attempts: IWebhookDeliveriesColumns["attempts"];
+    created_at: IWebhookDeliveriesColumns["created_at"];
+    response_status: IWebhookDeliveriesColumns["response_status"];
+    error: IWebhookDeliveriesColumns["error"];
+    duration_ms: IWebhookDeliveriesColumns["duration_ms"];
+    last_attempt_at: IWebhookDeliveriesColumns["last_attempt_at"];
+    next_retry_at: IWebhookDeliveriesColumns["next_retry_at"];
+}
+
+/** Result of query `NativeMatchingWebhooks`. */
+export interface INativeMatchingWebhooksResult {
+    id: IWebhooksColumns["id"];
+    events: IWebhooksColumns["events"];
+}
+
+/** Result of query `NativeQueueWebhookEvent`. */
+export interface INativeQueueWebhookEventResult {
+}
+
+/** Result of query `NativeQueueWebhookTest`. */
+export interface INativeQueueWebhookTestResult {
+}
+
 export interface Queries {
     SpamTrainingTotals: ISpamTrainingTotalsResult;
     SpamTrainingTokens: ISpamTrainingTokensResult;
@@ -3484,6 +3609,24 @@ export interface Queries {
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;
     NativeReferencedObjects: INativeReferencedObjectsResult;
+    NativeWebhookAttemptRecord: INativeWebhookAttemptRecordResult;
+    NativeClaimWebhookAttempt: INativeClaimWebhookAttemptResult;
+    NativeExhaustWebhookDelivery: INativeExhaustWebhookDeliveryResult;
+    NativeReleaseUnusedWebhookLease: INativeReleaseUnusedWebhookLeaseResult;
+    NativeStartWebhookAttempt: INativeStartWebhookAttemptResult;
+    NativeFinishWebhookAttempt: INativeFinishWebhookAttemptResult;
+    NativeReleaseWebhookAttempt: INativeReleaseWebhookAttemptResult;
+    NativeDueWebhookDeliveries: INativeDueWebhookDeliveriesResult;
+    NativeOwnedWebhook: INativeOwnedWebhookResult;
+    NativeWebhookInventory: INativeWebhookInventoryResult;
+    NativeWebhookDeliveryStats: INativeWebhookDeliveryStatsResult;
+    NativeCreateWebhook: INativeCreateWebhookResult;
+    NativeUpdateWebhook: INativeUpdateWebhookResult;
+    NativeDeleteWebhook: INativeDeleteWebhookResult;
+    NativeWebhookDeliveryHistory: INativeWebhookDeliveryHistoryResult;
+    NativeMatchingWebhooks: INativeMatchingWebhooksResult;
+    NativeQueueWebhookEvent: INativeQueueWebhookEventResult;
+    NativeQueueWebhookTest: INativeQueueWebhookTestResult;
 }
 
 /** Columns of `agent_chat_messages`. */

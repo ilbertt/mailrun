@@ -1,3 +1,4 @@
+import { startWebhookDispatcher } from "../src/server/webhooks/dispatcher";
 import { clearDomainRuntimeLeases } from "../src/server/domains/repository";
 import {
 	isDriveUploadPath,
@@ -28,6 +29,7 @@ if (name) {
 	await clearDriveRuntimeLeases();
 	await clearDomainRuntimeLeases();
 	await registerCrons(import.meta.path);
+	const stopWebhookDispatcher = startWebhookDispatcher();
 	const server = Bun.serve<RealtimeSession>({
 		port: Number(process.env.PORT ?? 3000),
 		hostname: process.env.HOST ?? "0.0.0.0",
@@ -63,6 +65,7 @@ if (name) {
 	});
 	console.log(`Mailrun listening on ${server.url}`);
 	const shutdown = async () => {
+		await stopWebhookDispatcher();
 		closeRealtimeConnections();
 		const timeout = setTimeout(() => {
 			void server.stop(true);
