@@ -49,6 +49,14 @@ export async function hasUsers() {
 			(await sql.HasUsers`SELECT id FROM users LIMIT 1`).length > 0,
 	);
 }
+export async function hasAdminAccount() {
+	return withDatabase(
+		async (sql) =>
+			(
+				await sql.NativeHasAdminAccount`SELECT id FROM users WHERE role='admin' LIMIT 1`
+			).length > 0,
+	);
+}
 export async function getUser(token: string | undefined): Promise<User | null> {
 	if (!token || token.length > 256) return null;
 	const digest = await hash(token);
@@ -114,7 +122,9 @@ export async function login(input: z.infer<typeof loginSchema>) {
 		user: publicUser(row),
 	};
 }
-export async function register(input: z.infer<typeof registerSchema>) {
+export async function claimAdministrator(
+	input: z.infer<typeof registerSchema>,
+) {
 	const data = registerSchema.parse(input);
 	const expected = process.env.SETUP_TOKEN;
 	if (
@@ -129,20 +139,22 @@ export async function register(input: z.infer<typeof registerSchema>) {
 		(sql) => sql.ClaimInstallation`
 		INSERT INTO users (id,email,name,password_hash,role,is_primary_admin,created_at)
 		SELECT ${userId},${data.email},${data.name},${passwordHash},'admin',1,${seconds()}
-		WHERE NOT EXISTS (SELECT 1 FROM users) RETURNING id`,
+		WHERE NOT EXISTS (SELECT 1 FROM users WHERE role='admin') RETURNING id`,
 	);
 	if (!rows.length) throw new Error("An administrator already exists");
-	return {
-		token: await createSession(userId),
-		user: userSchema.parse({
-			id: userId,
-			email: data.email,
-			name: data.name,
-			role: "admin",
-			isPrimaryAdmin: true,
-		}),
-	};
+	return userSchema.parse({
+		id: userId,
+		email: data.email,
+		name: data.name,
+		role: "admin",
+		isPrimaryAdmin: true,
+	});
 }
+export async function register(input: z.infer<typeof registerSchema>) {
+	const user = await claimAdministrator(input);
+	return { token: await createSession(user.id), user };
+}
+
 export async function logout(token: string | undefined) {
 	if (!token) return;
 	const digest = await hash(token);

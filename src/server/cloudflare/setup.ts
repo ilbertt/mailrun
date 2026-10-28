@@ -18,71 +18,15 @@ import { withDatabase, id, seconds } from "../db";
 import { relaySource, relayVersion } from "../../generated/relay";
 import { setupCloudflareSchema, type User } from "../../shared/contracts";
 
+export class RelayDeploymentError extends Error {}
+
 export async function provisionEmail(
 	user: User,
-	input: z.infer<typeof setupCloudflareSchema>,
+	input: z.input<typeof setupCloudflareSchema>,
 	request: CloudflareFetch = fetch,
 ) {
-	if (!user.isPrimaryAdmin)
-		throw new Error("Only the primary administrator can configure email");
 	const data = setupCloudflareSchema.parse(input);
-	const origin = publicOrigin();
-	if (!origin.startsWith("https://"))
-		throw new Error(
-			"Set APP_URL to the application's public HTTPS address before deploying the relay",
-		);
-	const existing = await getInstallation();
-	if (
-		existing &&
-		(existing.hostname !== data.hostname ||
-			existing.account_id !== data.accountId)
-	)
-		throw new Error("This installation is already connected to another domain");
-	const [claimedHostname] = await withDatabase(
-		(sql) =>
-			sql.NativeSetupHostnameClaim`SELECT user_id FROM domains WHERE hostname=${data.hostname}`,
-	);
-	if (claimedHostname && claimedHostname.user_id !== user.id)
-		throw new Error("Domain belongs to another account");
-	const zones = await cloudflare(
-		data.apiToken,
-		`/zones?name=${encodeURIComponent(data.hostname)}`,
-		z.array(
-			z.object({
-				id: z.string(),
-				name: z.string(),
-				account: z.object({ id: z.string() }),
-			}),
-		),
-		{},
-		request,
-	);
-	const zone = zones.find(
-		(zone) => zone.name === data.hostname && zone.account.id === data.accountId,
-	);
-	if (!zone)
-		throw new Error("Domain not found in the selected Cloudflare account");
-	const [claimedZone] = await withDatabase(
-		(sql) =>
-			sql.NativeSetupZoneClaim`SELECT user_id FROM domains WHERE zone_id=${zone.id} AND user_id<>${user.id} LIMIT 1`,
-	);
-	if (claimedZone)
-		throw new Error("Cloudflare zone belongs to another account");
-	const secret =
-		existing?.relay_secret ?? crypto.randomUUID() + crypto.randomUUID();
-	const worker =
-		existing?.worker_name ?? `mailrun-${crypto.randomUUID().slice(0, 12)}`;
-	await saveInstallation({
-		...data,
-		zoneId: zone.id,
-		workerName: worker,
-		publicOrigin: origin,
-		relaySecret: secret,
-		relayVersion: existing?.relay_version ?? "",
-	});
-
-	await refreshRelay(user, request);
-	await setInstallationPhase("deployed");
+	const { zone, worker } = await deployEmailRelay(user, data, request);
 
 	// The app owns only records for this installation. Provisioning never deletes
 	// MX records or silently replaces an existing domain owned by another user.
@@ -117,7 +61,7 @@ export async function provisionEmail(
 		await domainOperation(zone.id, async (assertOwned) => {
 			const provisioned = await provisionCloudflareDomain(api, data.hostname, {
 				enableRouting: true,
-				enableSending: true,
+				enableSending: data.enableSending,
 				replaceMxRecords: data.replaceMxRecords,
 				zone,
 			});
@@ -132,7 +76,7 @@ export async function provisionEmail(
 							throw new Error(
 								"Domain changed during setup. Retry before routing mail.",
 							);
-						await tx.EnableSending`UPDATE domains SET sending_provider='cloudflare',sending_enabled=${provisioned.sendingEnabled ? 1 : 0},sending_requested=1,sending_subdomain_tag=${provisioned.sendingSubdomainTag} WHERE hostname=${data.hostname} AND user_id=${user.id}`;
+						await tx.EnableSending`UPDATE domains SET sending_provider=${data.enableSending ? "cloudflare" : "none"},sending_enabled=${provisioned.sendingEnabled ? 1 : 0},sending_requested=${data.enableSending ? 1 : 0},sending_subdomain_tag=${provisioned.sendingSubdomainTag} WHERE hostname=${data.hostname} AND user_id=${user.id}`;
 					}),
 				);
 			} catch (error) {
@@ -156,6 +100,65 @@ export async function provisionEmail(
 	return installationStatus();
 }
 
+export async function deployEmailRelay(
+	user: User,
+	input: { accountId: string; hostname: string; apiToken: string },
+	request: CloudflareFetch = fetch,
+) {
+	if (!user.isPrimaryAdmin)
+		throw new Error("Only the primary administrator can configure email");
+	const data = setupCloudflareSchema
+		.pick({ accountId: true, hostname: true, apiToken: true })
+		.parse(input);
+	const origin = publicOrigin();
+	if (!origin.startsWith("https://"))
+		throw new RelayDeploymentError(
+			"Set APP_URL to the application's public HTTPS address before deploying the relay",
+		);
+	const existing = await getInstallation();
+	if (
+		existing &&
+		(existing.hostname !== data.hostname ||
+			existing.account_id !== data.accountId)
+	)
+		throw new Error("This installation is already connected to another domain");
+	const [claimedHostname] = await withDatabase(
+		(sql) =>
+			sql.NativeSetupHostnameClaim`SELECT user_id FROM domains WHERE hostname=${data.hostname}`,
+	);
+	if (claimedHostname && claimedHostname.user_id !== user.id)
+		throw new Error("Domain belongs to another account");
+	const zone = await new DomainCloudflare(
+		{ apiToken: data.apiToken, accountId: data.accountId, workerName: null },
+		request,
+	).findZone(data.hostname);
+	if (!zone)
+		throw new Error("Domain not found in the selected Cloudflare account");
+	const [claimedZone] = await withDatabase(
+		(sql) =>
+			sql.NativeSetupZoneClaim`SELECT user_id FROM domains WHERE zone_id=${zone.id} AND user_id<>${user.id} LIMIT 1`,
+	);
+	if (claimedZone)
+		throw new Error("Cloudflare zone belongs to another account");
+	const secret =
+		existing?.relay_secret ?? crypto.randomUUID() + crypto.randomUUID();
+	const worker =
+		existing?.worker_name ?? `mailrun-${crypto.randomUUID().slice(0, 12)}`;
+	await saveInstallation({
+		...data,
+		zoneId: zone.id,
+		workerName: worker,
+		publicOrigin: origin,
+		relaySecret: secret,
+		relayVersion: existing?.relay_version ?? "",
+	});
+
+	await refreshRelay(user, request);
+	await setInstallationPhase("deployed");
+
+	return { zone, worker };
+}
+
 export async function refreshRelay(
 	user: User,
 	request: CloudflareFetch = fetch,
@@ -168,7 +171,9 @@ export async function refreshRelay(
 		secret = installation.relay_secret,
 		origin = publicOrigin();
 	if (!origin.startsWith("https://"))
-		throw new Error("APP_URL must use HTTPS before deploying the relay");
+		throw new RelayDeploymentError(
+			"APP_URL must use HTTPS before deploying the relay",
+		);
 	const timestamp = String(Date.now()),
 		probe = await request(`${origin}/api/relay-health`, {
 			method: "POST",
@@ -190,7 +195,7 @@ export async function refreshRelay(
 			.object({ ok: z.literal(true) })
 			.safeParse(await probe.json().catch(() => null)).success;
 	if (!reachable)
-		throw new Error(
+		throw new RelayDeploymentError(
 			"Mailrun could not reach its public address before deploying the relay. Check APP_URL and retry.",
 		);
 	const accountSubdomain = await ensureWorkersSubdomain(
@@ -238,7 +243,7 @@ export async function refreshRelay(
 		},
 	);
 	if (!health.ok)
-		throw new Error(
+		throw new RelayDeploymentError(
 			"Relay deployed, but could not reach Mailrun. Check APP_URL and retry.",
 		);
 

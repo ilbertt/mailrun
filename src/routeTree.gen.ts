@@ -15,6 +15,8 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as JmapRouteImport } from './routes/jmap'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as DotwellKnownJmapRouteImport } from './routes/[.]well-known.jmap'
@@ -122,6 +124,16 @@ const LoginRoute = LoginRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -533,6 +545,8 @@ export interface FileRoutesByFullPath {
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -619,6 +633,8 @@ export interface FileRoutesByTo {
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -705,6 +721,8 @@ export interface FileRoutesById {
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -793,6 +811,8 @@ export interface FileRouteTypes {
     | '/jmap'
     | '/login'
     | '/mcp'
+    | '/onboarding'
+    | '/register'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -879,6 +899,8 @@ export interface FileRouteTypes {
     | '/jmap'
     | '/login'
     | '/mcp'
+    | '/onboarding'
+    | '/register'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -964,6 +986,8 @@ export interface FileRouteTypes {
     | '/jmap'
     | '/login'
     | '/mcp'
+    | '/onboarding'
+    | '/register'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -1052,6 +1076,8 @@ export interface RootRouteChildren {
   JmapRoute: typeof JmapRouteWithChildren
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  OnboardingRoute: typeof OnboardingRoute
+  RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetupRoute: typeof SetupRoute
   DotwellKnownJmapRoute: typeof DotwellKnownJmapRoute
@@ -1111,6 +1137,20 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1949,6 +1989,8 @@ const rootRouteChildren: RootRouteChildren = {
   JmapRoute: JmapRouteWithChildren,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  OnboardingRoute: OnboardingRoute,
+  RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetupRoute: SetupRoute,
   DotwellKnownJmapRoute: DotwellKnownJmapRoute,

@@ -1,3 +1,4 @@
+import { setupSnapshot } from "./server/setup/service";
 import { publicAuthGuard } from "./server/auth/public-guard";
 import { getRequestLocale, loadServerMessages } from "./lib/i18n/server";
 import {
@@ -54,7 +55,12 @@ import {
 
 export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
 	const user = await auth.getUser(getCookie(auth.SESSION_COOKIE));
-	return { user, needsSetup: !(await auth.hasUsers()) };
+	const status = await setupSnapshot();
+	return {
+		user,
+		needsSetup: !status.hasAdminAccount,
+		needsOnboarding: user?.role === "admin" && !status.hasPrimaryDomain,
+	};
 });
 export const registerFn = createServerFn({ method: "POST" })
 	.validator(registerSchema.extend({ turnstileToken: z.string().optional() }))

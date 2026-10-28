@@ -1,3 +1,5 @@
+import { ensureSetupRelay } from "../setup/service";
+import { addDomainSchema } from "../../lib/validators";
 import { awsDomainApi } from "./aws-domain";
 import { AwsClient } from "../aws/client";
 import { getAwsConfig } from "../aws/settings";
@@ -75,10 +77,16 @@ export async function domainsApi(
 						lookup,
 					),
 				);
-			if (method === "POST")
-				return Response.json(
-					await addDomain(user, await request.json(), client, lookup),
-				);
+			if (method === "POST") {
+				const input = addDomainSchema.parse(await request.json());
+				if (
+					!client &&
+					input.enableRouting !== false &&
+					(!input.receivingProvider || input.receivingProvider === "cloudflare")
+				)
+					await ensureSetupRelay(user, input.hostname, providerSend);
+				return Response.json(await addDomain(user, input, client, lookup));
+			}
 			return null;
 		}
 		const match =

@@ -54,6 +54,8 @@ export const Route = createFileRoute("/_mail")({
 		const session = await context.queryClient.ensureQueryData(sessionQuery());
 		if (session.needsSetup) throw redirect({ to: "/setup" });
 		if (!session.user) throw redirect({ to: "/login" });
+		if (session.needsOnboarding && matches(location.pathname, adminPrefixes))
+			throw redirect({ to: "/setup" });
 		if (
 			matches(location.pathname, adminPrefixes) &&
 			session.user.role !== "admin"

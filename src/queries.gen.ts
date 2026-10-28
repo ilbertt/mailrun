@@ -1646,6 +1646,11 @@ export interface IHasUsersResult {
     id: IUsersColumns["id"];
 }
 
+/** Result of query `NativeHasAdminAccount`. */
+export interface INativeHasAdminAccountResult {
+    id: IUsersColumns["id"];
+}
+
 /** Result of query `SessionUser`. */
 export interface ISessionUserResult {
     id: string;
@@ -2273,16 +2278,6 @@ export interface ISaveInstallationResult {
 export interface ISetInstallationPhaseResult {
 }
 
-/** Result of query `NativeSetupHostnameClaim`. */
-export interface INativeSetupHostnameClaimResult {
-    user_id: IDomainsColumns["user_id"];
-}
-
-/** Result of query `NativeSetupZoneClaim`. */
-export interface INativeSetupZoneClaimResult {
-    user_id: IDomainsColumns["user_id"];
-}
-
 /** Result of query `NativeSetupWriteFence`. */
 export interface INativeSetupWriteFenceResult {
 }
@@ -2312,6 +2307,16 @@ export interface IActivateDomainResult {
 
 /** Result of query `EnableSending`. */
 export interface IEnableSendingResult {
+}
+
+/** Result of query `NativeSetupHostnameClaim`. */
+export interface INativeSetupHostnameClaimResult {
+    user_id: IDomainsColumns["user_id"];
+}
+
+/** Result of query `NativeSetupZoneClaim`. */
+export interface INativeSetupZoneClaimResult {
+    user_id: IDomainsColumns["user_id"];
 }
 
 /** Result of query `UpdateRelayVersion`. */
@@ -4454,6 +4459,30 @@ export interface INativeResendWebhookCredentialsResult {
 export interface INativeSaveResendWebhookResult {
 }
 
+/** Result of query `NativeSetupAdmin`. */
+export interface INativeSetupAdminResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativePrimarySetupDomain`. */
+export interface INativePrimarySetupDomainResult {
+    hostname: IDomainsColumns["hostname"];
+    sending_requested: IDomainsColumns["sending_requested"];
+}
+
+/** Result of query `NativeSetupDatabaseProbe`. */
+export interface INativeSetupDatabaseProbeResult {
+    id: IAppSettingsColumns["id"];
+}
+
+/** Result of query `NativeSetupRecoveryEmail`. */
+export interface INativeSetupRecoveryEmailResult {
+}
+
+/** Result of query `NativeRollbackSetupAccount`. */
+export interface INativeRollbackSetupAccountResult {
+}
+
 /** Result of query `NativeReferencedObjects`. */
 export interface INativeReferencedObjectsResult {
     object_key: unknown | null;
@@ -4952,6 +4981,7 @@ export interface Queries {
     NativeResetRevokeSessions: INativeResetRevokeSessionsResult;
     NativeResetRevokeChallenges: INativeResetRevokeChallengesResult;
     HasUsers: IHasUsersResult;
+    NativeHasAdminAccount: INativeHasAdminAccountResult;
     SessionUser: ISessionUserResult;
     CreateSession: ICreateSessionResult;
     LoginUser: ILoginUserResult;
@@ -5037,8 +5067,6 @@ export interface Queries {
     GetInstallation: IGetInstallationResult;
     SaveInstallation: ISaveInstallationResult;
     SetInstallationPhase: ISetInstallationPhaseResult;
-    NativeSetupHostnameClaim: INativeSetupHostnameClaimResult;
-    NativeSetupZoneClaim: INativeSetupZoneClaimResult;
     NativeSetupWriteFence: INativeSetupWriteFenceResult;
     SetupDomain: ISetupDomainResult;
     InsertSetupDomain: IInsertSetupDomainResult;
@@ -5046,6 +5074,8 @@ export interface Queries {
     NativeSetupFinishFence: INativeSetupFinishFenceResult;
     ActivateDomain: IActivateDomainResult;
     EnableSending: IEnableSendingResult;
+    NativeSetupHostnameClaim: INativeSetupHostnameClaimResult;
+    NativeSetupZoneClaim: INativeSetupZoneClaimResult;
     UpdateRelayVersion: IUpdateRelayVersionResult;
     NativeDomainActor: INativeDomainActorResult;
     NativeDomainById: INativeDomainByIdResult;
@@ -5338,6 +5368,11 @@ export interface Queries {
     NativeSaveResendCredentials: INativeSaveResendCredentialsResult;
     NativeResendWebhookCredentials: INativeResendWebhookCredentialsResult;
     NativeSaveResendWebhook: INativeSaveResendWebhookResult;
+    NativeSetupAdmin: INativeSetupAdminResult;
+    NativePrimarySetupDomain: INativePrimarySetupDomainResult;
+    NativeSetupDatabaseProbe: INativeSetupDatabaseProbeResult;
+    NativeSetupRecoveryEmail: INativeSetupRecoveryEmailResult;
+    NativeRollbackSetupAccount: INativeRollbackSetupAccountResult;
     NativeReferencedObjects: INativeReferencedObjectsResult;
     NativeV1ManagedMailbox: INativeV1ManagedMailboxResult;
     NativeV1Mailboxes: INativeV1MailboxesResult;

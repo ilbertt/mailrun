@@ -23,6 +23,7 @@
 		"smoke:resend": "bun scripts/smoke-resend.ts",
 		"smoke:aws": "bun scripts/smoke-aws.ts",
 		"smoke:avatars": "bun scripts/smoke-avatars.ts",
+		"smoke:setup": "bun scripts/smoke-setup.ts",
 		"check:typescript-version": "bun scripts/check-typescript-version.ts"
 	},
 	"dependencies": {

@@ -1,3 +1,4 @@
+import { isSetupPath, setupApi } from "../src/server/api/setup";
 import { startAvatarDispatcher } from "../src/server/avatars/dispatcher";
 import { withSecurityHeaders } from "../src/server/http/security";
 import {
@@ -89,6 +90,12 @@ if (name) {
 						if (server.upgrade(request, { data: { userId: user.id, token } }))
 							return;
 						return new Response("Expected WebSocket upgrade", { status: 426 });
+					}
+					if (isSetupPath(new URL(request.url).pathname)) {
+						const setup = await setupApi(request, () =>
+							server.timeout(request, 0),
+						);
+						if (setup) return setup;
 					}
 					if (isProviderControlPath(new URL(request.url).pathname))
 						return serveProviderControl(request, () =>

@@ -781,7 +781,6 @@
 	"setup.stepSystem": "系统",
 	"setup.stepDomain": "域名",
 	"setup.stepAccount": "账户",
-	"setup.prepareIntro": "Mailflare 会检查所需的 Cloudflare 配置，并在继续设置之前初始化一个干净的 D1 数据库。",
 	"setup.checking": "正在检查安装",
 	"setup.migrated": "干净数据库已成功迁移",
 	"setup.schemaReady": "数据库结构已就绪",

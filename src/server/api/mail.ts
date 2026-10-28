@@ -1,3 +1,4 @@
+import { setupApi } from "./setup";
 import { awsApi } from "./aws";
 import { adminMaintenanceApi } from "./admin-maintenance";
 import { resendKeyApi } from "./resend-key";
@@ -397,6 +398,8 @@ export async function serveMailApi(request: Request) {
 			!bearerUser
 		)
 			throw new Response("Unauthorized", { status: 401 });
+		const setupResponse = await setupApi(request);
+		if (setupResponse) return setupResponse;
 		const authResponse = await authApi(request);
 		if (authResponse) return authResponse;
 		const user = bearer ? bearerUser : await requireUser();

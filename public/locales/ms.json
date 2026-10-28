@@ -787,7 +787,6 @@
 	"setup.stepSystem": "Sistem",
 	"setup.stepDomain": "Domain",
 	"setup.stepAccount": "Akaun",
-	"setup.prepareIntro": "Mailflare menyemak konfigurasi Cloudflare yang diperlukan dan memulakan pangkalan data D1 yang bersih sebelum persediaan diteruskan.",
 	"setup.checking": "Menyemak pemasangan",
 	"setup.migrated": "Pangkalan data bersih berjaya dimigrasikan",
 	"setup.schemaReady": "Skema pangkalan data sedia",

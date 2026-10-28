@@ -794,7 +794,6 @@
 	"setup.stepSystem": "පද්ධතිය",
 	"setup.stepDomain": "වසම",
 	"setup.stepAccount": "ගිණුම",
-	"setup.prepareIntro": "පිහිටුවීම ඉදිරියට යාමට පෙර, Mailflare එයට අවශ්‍ය Cloudflare වින්‍යාසය පරීක්ෂා කර පිරිසිදු D1 දත්ත සමුදායක් ආරම්භ කරයි.",
 	"setup.checking": "ස්ථාපනය පරීක්ෂා කරමින්",
 	"setup.migrated": "පිරිසිදු දත්ත සමුදාය සාර්ථකව සංක්‍රමණය කරන ලදී",
 	"setup.schemaReady": "දත්ත සමුදා ක්‍රමානුරූපය සූදානම්",

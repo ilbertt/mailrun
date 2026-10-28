@@ -790,7 +790,6 @@
 	"setup.stepSystem": "Sistem",
 	"setup.stepDomain": "Alan adı",
 	"setup.stepAccount": "Hesap",
-	"setup.prepareIntro": "Mailflare, kurulum devam etmeden önce gerekli Cloudflare yapılandırmasını kontrol eder ve temiz bir D1 veritabanı başlatır.",
 	"setup.checking": "Kurulum kontrol ediliyor",
 	"setup.migrated": "Temiz veritabanı başarıyla taşındı",
 	"setup.schemaReady": "Veritabanı şeması hazır",

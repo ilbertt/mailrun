@@ -787,7 +787,6 @@
 	"setup.stepSystem": "Systeem",
 	"setup.stepDomain": "Domein",
 	"setup.stepAccount": "Account",
-	"setup.prepareIntro": "Mailflare controleert de vereiste Cloudflare-configuratie en initialiseert een schone D1-database voordat de installatie verdergaat.",
 	"setup.checking": "Installatie controleren",
 	"setup.migrated": "Schone database succesvol gemigreerd",
 	"setup.schemaReady": "Databaseschema is gereed",

@@ -787,7 +787,6 @@
 	"setup.stepSystem": "સિસ્ટમ",
 	"setup.stepDomain": "ડોમેન",
 	"setup.stepAccount": "એકાઉન્ટ",
-	"setup.prepareIntro": "સેટઅપ આગળ વધે તે પહેલાં Mailflare જરૂરી Cloudflare રૂપરેખાંકન તપાસે છે અને સ્વચ્છ D1 ડેટાબેઝ પ્રારંભ કરે છે.",
 	"setup.checking": "ઇન્સ્ટૉલેશન તપાસી રહ્યા છીએ",
 	"setup.migrated": "સ્વચ્છ ડેટાબેઝ સફળતાપૂર્વક માઇગ્રેટ થયો",
 	"setup.schemaReady": "ડેટાબેઝ સ્કીમા તૈયાર છે",

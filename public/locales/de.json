@@ -787,7 +787,6 @@
 	"setup.stepSystem": "System",
 	"setup.stepDomain": "Domain",
 	"setup.stepAccount": "Konto",
-	"setup.prepareIntro": "Mailflare prüft die erforderliche Cloudflare-Konfiguration und initialisiert eine saubere D1-Datenbank, bevor die Einrichtung fortgesetzt wird.",
 	"setup.checking": "Installation wird geprüft",
 	"setup.migrated": "Saubere Datenbank erfolgreich migriert",
 	"setup.schemaReady": "Das Datenbankschema ist bereit",

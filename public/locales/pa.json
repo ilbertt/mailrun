@@ -787,7 +787,6 @@
 	"setup.stepSystem": "ਸਿਸਟਮ",
 	"setup.stepDomain": "ਡੋਮੇਨ",
 	"setup.stepAccount": "ਖਾਤਾ",
-	"setup.prepareIntro": "ਸੈੱਟਅੱਪ ਅੱਗੇ ਵਧਣ ਤੋਂ ਪਹਿਲਾਂ Mailflare ਲੋੜੀਂਦੀ Cloudflare ਸੰਰਚਨਾ ਦੀ ਜਾਂਚ ਕਰਦਾ ਹੈ ਅਤੇ ਸਾਫ਼ D1 ਡਾਟਾਬੇਸ ਸ਼ੁਰੂ ਕਰਦਾ ਹੈ।",
 	"setup.checking": "ਇੰਸਟਾਲੇਸ਼ਨ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ",
 	"setup.migrated": "ਸਾਫ਼ ਡਾਟਾਬੇਸ ਸਫਲਤਾਪੂਰਵਕ ਮਾਈਗ੍ਰੇਟ ਹੋਇਆ",
 	"setup.schemaReady": "ਡਾਟਾਬੇਸ ਸਕੀਮਾ ਤਿਆਰ ਹੈ",

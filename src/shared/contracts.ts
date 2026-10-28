@@ -14,7 +14,7 @@ export const loginSchema = z.object({
 	code: z.string().max(64).optional(),
 });
 export const registerSchema = loginSchema.omit({ code: true }).extend({
-	password: z.string().min(12).max(256),
+	password: z.string().min(8).max(256),
 	name: z.string().trim().min(1).max(100),
 	setupToken: z.string().min(16).max(256),
 });
@@ -56,14 +56,16 @@ export const setupCloudflareSchema = z.object({
 		.string()
 		.trim()
 		.toLowerCase()
-		.regex(/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/),
+		.transform((value) => value.replace(/\.$/, ""))
+		.pipe(z.hostname().refine((value) => value.includes("."))),
 	apiToken: z.string().min(20).max(500),
 	localPart: z
 		.string()
 		.trim()
 		.toLowerCase()
-		.regex(/^[a-z0-9][a-z0-9._+-]{0,63}$/),
+		.regex(/^[a-z0-9._%+-]{1,64}$/),
 	activateRouting: z.boolean().default(false),
+	enableSending: z.boolean().default(true),
 	replaceMxRecords: z.boolean().optional(),
 });
 export const relayDecisionSchema = z.discriminatedUnion("action", [

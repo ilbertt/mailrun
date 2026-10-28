@@ -787,7 +787,6 @@
 	"setup.stepSystem": "سیستم",
 	"setup.stepDomain": "دامنه",
 	"setup.stepAccount": "حساب",
-	"setup.prepareIntro": "Mailflare پیکربندی لازم Cloudflare را بررسی می‌کند و پیش از ادامه راه‌اندازی، یک پایگاه داده D1 تمیز را مقداردهی اولیه می‌کند.",
 	"setup.checking": "در حال بررسی نصب",
 	"setup.migrated": "پایگاه داده تمیز با موفقیت مهاجرت داده شد",
 	"setup.schemaReady": "طرح‌واره پایگاه داده آماده است",

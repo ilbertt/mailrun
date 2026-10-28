@@ -787,7 +787,6 @@
 	"setup.stepSystem": "Sistema",
 	"setup.stepDomain": "Domínio",
 	"setup.stepAccount": "Conta",
-	"setup.prepareIntro": "O Mailflare verifica a configuração necessária da Cloudflare e inicializa um base de dados D1 limpo antes de continuar a configuração.",
 	"setup.checking": "A verificar a instalação",
 	"setup.migrated": "Base de dados limpo migrado com sucesso",
 	"setup.schemaReady": "O esquema do base de dados está pronto",

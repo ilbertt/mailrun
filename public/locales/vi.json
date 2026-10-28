@@ -781,7 +781,6 @@
 	"setup.stepSystem": "Hệ thống",
 	"setup.stepDomain": "Tên miền",
 	"setup.stepAccount": "Tài khoản",
-	"setup.prepareIntro": "Mailflare kiểm tra cấu hình Cloudflare cần thiết và khởi tạo cơ sở dữ liệu D1 sạch trước khi tiếp tục thiết lập.",
 	"setup.checking": "Đang kiểm tra cài đặt",
 	"setup.migrated": "Đã di chuyển cơ sở dữ liệu sạch thành công",
 	"setup.schemaReady": "Lược đồ cơ sở dữ liệu đã sẵn sàng",

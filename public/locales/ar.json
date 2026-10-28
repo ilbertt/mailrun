@@ -811,7 +811,6 @@
 	"setup.stepSystem": "النظام",
 	"setup.stepDomain": "النطاق",
 	"setup.stepAccount": "الحساب",
-	"setup.prepareIntro": "يتحقق Mailflare من إعدادات Cloudflare المطلوبة ويهيّئ قاعدة بيانات D1 نظيفة قبل متابعة الإعداد.",
 	"setup.checking": "جارٍ فحص التثبيت",
 	"setup.migrated": "تم ترحيل قاعدة البيانات النظيفة بنجاح",
 	"setup.schemaReady": "مخطط قاعدة البيانات جاهز",

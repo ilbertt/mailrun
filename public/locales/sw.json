@@ -787,7 +787,6 @@
 	"setup.stepSystem": "Mfumo",
 	"setup.stepDomain": "Kikoa",
 	"setup.stepAccount": "Akaunti",
-	"setup.prepareIntro": "Mailflare hukagua usanidi unaohitajika wa Cloudflare na kuanzisha hifadhidata safi ya D1 kabla usanidi haujaendelea.",
 	"setup.checking": "Inakagua usakinishaji",
 	"setup.migrated": "Hifadhidata safi imehamishwa kwa mafanikio",
 	"setup.schemaReady": "Muundo wa hifadhidata uko tayari",

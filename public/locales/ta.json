@@ -787,7 +787,6 @@
 	"setup.stepSystem": "கணினி",
 	"setup.stepDomain": "டொமைன்",
 	"setup.stepAccount": "கணக்கு",
-	"setup.prepareIntro": "Mailflare தேவையான Cloudflare உள்ளமைவைச் சரிபார்த்து, அமைப்பு தொடர்வதற்கு முன் ஒரு சுத்தமான D1 தரவுத்தளத்தைத் தொடங்குகிறது.",
 	"setup.checking": "நிறுவல் சரிபார்க்கப்படுகிறது",
 	"setup.migrated": "சுத்தமான தரவுத்தளம் வெற்றிகரமாக மாற்றப்பட்டது",
 	"setup.schemaReady": "தரவுத்தள ஸ்கீமா தயாராக உள்ளது",

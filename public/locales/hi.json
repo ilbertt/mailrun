@@ -787,7 +787,6 @@
 	"setup.stepSystem": "सिस्टम",
 	"setup.stepDomain": "डोमेन",
 	"setup.stepAccount": "खाता",
-	"setup.prepareIntro": "Mailflare आवश्यक Cloudflare कॉन्फ़िगरेशन की जाँच करता है और सेटअप जारी रखने से पहले एक साफ़ D1 डेटाबेस आरंभ करता है।",
 	"setup.checking": "इंस्टॉलेशन की जाँच हो रही है",
 	"setup.migrated": "साफ़ डेटाबेस सफलतापूर्वक माइग्रेट हुआ",
 	"setup.schemaReady": "डेटाबेस स्कीमा तैयार है",

@@ -781,7 +781,6 @@
 	"setup.stepSystem": "システム",
 	"setup.stepDomain": "ドメイン",
 	"setup.stepAccount": "アカウント",
-	"setup.prepareIntro": "Mailflare は、必要な Cloudflare の設定を確認し、セットアップを続ける前にクリーンな D1 データベースを初期化します。",
 	"setup.checking": "インストールを確認中",
 	"setup.migrated": "クリーンなデータベースの移行が完了しました",
 	"setup.schemaReady": "データベーススキーマの準備ができました",
