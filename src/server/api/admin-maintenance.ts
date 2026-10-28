@@ -69,6 +69,7 @@ export async function adminMaintenanceApi(
 				return json(await applyPendingMigrations());
 			}
 		} catch (error) {
+			if (error instanceof Response) throw error;
 			return json(
 				{
 					error:

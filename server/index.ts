@@ -27,6 +27,7 @@ import { migrate } from "../src/server/db";
 import { runJob } from "../src/server/jobs/runner";
 import { registerCrons, cronJobFromArgs } from "../src/server/jobs/cron";
 import { getAssetRoutes } from "../src/server/assets";
+import { serveWithSourceContract } from "../src/server/http/route-contract";
 
 process.umask(0o077);
 await migrate();
@@ -50,54 +51,57 @@ if (name) {
 		routes: getAssetRoutes(),
 		websocket: realtimeWebsocket,
 		async fetch(request, server) {
-			// Drive parts stream directly to disk; other upload endpoints keep the mail limit.
-			if (
-				!(
-					/^\/api\/drive\/upload\/[^/]+$/.test(new URL(request.url).pathname) &&
-					request.method === "PUT"
-				) &&
-				Number(request.headers.get("content-length")) >
-					(new URL(request.url).pathname === "/api/v1/send" ? 40 : 30) *
-						1024 *
-						1024
-			)
-				return Response.json(
-					{ error: "Request body too large" },
-					{ status: 413, headers: { "Cache-Control": "no-store" } },
-				);
-			if (new URL(request.url).pathname === "/api/realtime") {
-				if (request.headers.get("origin") !== publicOrigin())
-					return new Response("Invalid origin", { status: 403 });
-				const token = sessionToken(request),
-					user = await getUser(token);
-				if (!token || !user)
-					return new Response("Unauthorized", { status: 401 });
-				if (server.upgrade(request, { data: { userId: user.id, token } }))
-					return;
-				return new Response("Expected WebSocket upgrade", { status: 426 });
-			}
-			if (new URL(request.url).pathname === "/api/agent/chat")
-				return serveAgentChat(request, () => server.timeout(request, 0));
-			if (new URL(request.url).pathname === "/mcp")
-				return handleMcpRequest(request, () => server.timeout(request, 0));
-			if (isJmapPath(new URL(request.url).pathname)) {
-				return handleJmapRequest(request, undefined, () =>
-					server.timeout(request, 0),
-				);
-			}
-			if (isDriveUploadPath(new URL(request.url).pathname))
-				return serveDriveUpload(request);
-			if (isV1Path(new URL(request.url).pathname)) {
-				const response = await serveV1Api(request);
-				// Release large JSON/request buffers after the HTTP handler has returned.
-				if (Number(request.headers.get("content-length")) > 512 * 1024)
-					setTimeout(() => Bun.gc(true), 0);
-				return response;
-			}
-			if (isMailTransferPath(new URL(request.url).pathname)) {
-				return serveMailTransfer(request, () => server.timeout(request, 0));
-			}
-			return handler.fetch(request);
+			return serveWithSourceContract(request, async (request) => {
+				// Drive parts stream directly to disk; other upload endpoints keep the mail limit.
+				if (
+					!(
+						/^\/api\/drive\/upload\/[^/]+$/.test(
+							new URL(request.url).pathname,
+						) && request.method === "PUT"
+					) &&
+					Number(request.headers.get("content-length")) >
+						(new URL(request.url).pathname === "/api/v1/send" ? 40 : 30) *
+							1024 *
+							1024
+				)
+					return Response.json(
+						{ error: "Request body too large" },
+						{ status: 413, headers: { "Cache-Control": "no-store" } },
+					);
+				if (new URL(request.url).pathname === "/api/realtime") {
+					if (request.headers.get("origin") !== publicOrigin())
+						return new Response("Invalid origin", { status: 403 });
+					const token = sessionToken(request),
+						user = await getUser(token);
+					if (!token || !user)
+						return new Response("Unauthorized", { status: 401 });
+					if (server.upgrade(request, { data: { userId: user.id, token } }))
+						return;
+					return new Response("Expected WebSocket upgrade", { status: 426 });
+				}
+				if (new URL(request.url).pathname === "/api/agent/chat")
+					return serveAgentChat(request, () => server.timeout(request, 0));
+				if (new URL(request.url).pathname === "/mcp")
+					return handleMcpRequest(request, () => server.timeout(request, 0));
+				if (isJmapPath(new URL(request.url).pathname)) {
+					return handleJmapRequest(request, undefined, () =>
+						server.timeout(request, 0),
+					);
+				}
+				if (isDriveUploadPath(new URL(request.url).pathname))
+					return serveDriveUpload(request);
+				if (isV1Path(new URL(request.url).pathname)) {
+					const response = await serveV1Api(request);
+					// Release large JSON/request buffers after the HTTP handler has returned.
+					if (Number(request.headers.get("content-length")) > 512 * 1024)
+						setTimeout(() => Bun.gc(true), 0);
+					return response;
+				}
+				if (isMailTransferPath(new URL(request.url).pathname)) {
+					return serveMailTransfer(request, () => server.timeout(request, 0));
+				}
+				return handler.fetch(request);
+			});
 		},
 	});
 	console.log(`Mailrun listening on ${server.url}`);

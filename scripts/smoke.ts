@@ -8,6 +8,8 @@ import { z } from "zod";
 import { signRelay } from "../src/shared/relay-signature";
 import { createHmac } from "node:crypto";
 import { LocalStorage } from "../src/server/storage";
+import { sourceRouteContracts } from "../src/server/http/route-contract";
+import sourceHttpMethods from "../tests/source-http-methods.json";
 
 const state = await fixture();
 const token = crypto.randomUUID();
@@ -73,6 +75,60 @@ try {
 	const base = log.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
 	if (!base) throw new Error(`Unexpected startup output: ${log}`);
 	reader.releaseLock();
+	// These responses were captured from the real original server, independently
+	// of our method table. Keep authentication absent in both fixtures.
+	for (const sample of sourceHttpMethods.cases) {
+		const response = await fetch(base + sample.path, {
+			method: sample.method,
+			redirect: "manual",
+		});
+		if (
+			response.status !== sample.status ||
+			response.headers.get("Allow") !== sample.allow ||
+			response.headers.get("Location") !== sample.location ||
+			response.headers.get("Refresh") !== sample.refresh ||
+			(await response.arrayBuffer()).byteLength !== sample.bytes
+		)
+			throw new Error(
+				`Original HTTP response differs: ${sample.method} ${sample.path}`,
+			);
+	}
+	// Exercise the compiled boundary, including routes still awaiting a provider
+	// port. Method compatibility does not assert their allowed handlers exist.
+	for (const { path, methods } of sourceRouteContracts) {
+		const sample = path
+			.replace(/\[\[\.\.\.[^\]]+\]\]/g, "session")
+			.replace(/\[[^\]]+\]/g, "fixture");
+		if (!methods.includes("OPTIONS")) {
+			const options = await fetch(base + sample, { method: "OPTIONS" });
+			const allowed = [
+				...methods,
+				"OPTIONS",
+				...(methods.includes("GET") && !methods.includes("HEAD")
+					? ["HEAD"]
+					: []),
+			]
+				.sort()
+				.join(", ");
+			if (
+				options.status !== 204 ||
+				options.headers.get("Allow") !== allowed ||
+				(await options.text())
+			)
+				throw new Error(`Source OPTIONS contract failed for ${path}`);
+		}
+		const unsupported = ["PUT", "DELETE", "PATCH", "POST", "GET"].find(
+			(method) => !methods.includes(method),
+		);
+		if (unsupported) {
+			const result = await fetch(base + sample, {
+				method: unsupported,
+				headers: { Origin: "https://foreign.example" },
+			});
+			if (result.status !== 405 || (await result.text()))
+				throw new Error(`Source ${unsupported} contract failed for ${path}`);
+		}
+	}
 	const csrf = await fetch(`${base}/api/auth/login`, {
 		method: "POST",
 		headers: {
@@ -94,6 +150,28 @@ try {
 	if (!login.ok || !cookie?.toLowerCase().includes("httponly"))
 		throw new Error(`HTTP login failed: ${login.status}`);
 	const sessionCookie = cookie.split(";")[0] ?? "";
+	for (const path of [
+		"/api/auth/me",
+		"/api/messages?mailboxId=mailbox",
+		"/api/admin/migrations",
+		"/api/branding",
+		"/api/branding/icon",
+	]) {
+		const head = await fetch(base + path, {
+			method: "HEAD",
+			headers: { Cookie: sessionCookie },
+		});
+		const get = await fetch(base + path, {
+			headers: { Cookie: sessionCookie },
+		});
+		await get.body?.cancel();
+		if (
+			head.status !== get.status ||
+			head.headers.get("Content-Type") !== get.headers.get("Content-Type") ||
+			(await head.text())
+		)
+			throw new Error(`Source HEAD contract failed for ${path}`);
+	}
 	const mailResponse = await fetch(
 		`${base}/api/messages?mailboxId=mailbox&status=received`,
 		{ headers: { Cookie: sessionCookie } },

@@ -1,5 +1,6 @@
 import handler, { createServerEntry } from "@tanstack/react-start/server-entry";
 import { publicOrigin } from "./server/config";
+import { serveWithSourceContract } from "./server/http/route-contract";
 
 export default createServerEntry({
 	async fetch(request, options) {
@@ -16,7 +17,9 @@ export default createServerEntry({
 				request,
 			);
 		}
-		const response = await handler.fetch(request, options);
+		const response = await serveWithSourceContract(request, (current) =>
+			handler.fetch(current, options),
+		);
 		const headers = new Headers(response.headers);
 		headers.set("Cache-Control", "private, no-store");
 		headers.set("X-Content-Type-Options", "nosniff");
