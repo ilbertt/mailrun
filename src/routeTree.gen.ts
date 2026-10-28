@@ -19,6 +19,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as DotwellKnownJmapRouteImport } from './routes/[.]well-known.jmap'
 import { Route as MailActivityRouteImport } from './routes/_mail.activity'
+import { Route as MailAdminRouteImport } from './routes/_mail.admin'
 import { Route as MailAgentRouteImport } from './routes/_mail.agent'
 import { Route as MailAiUsageRouteImport } from './routes/_mail.ai-usage'
 import { Route as MailApiKeysRouteImport } from './routes/_mail.api-keys'
@@ -139,6 +140,11 @@ const DotwellKnownJmapRoute = DotwellKnownJmapRouteImport.update({
 const MailActivityRoute = MailActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailAdminRoute = MailAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => MailRoute,
 } as any)
 const MailAgentRoute = MailAgentRouteImport.update({
@@ -519,6 +525,7 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
+  '/admin': typeof MailAdminRoute
   '/agent': typeof MailAgentRoute
   '/ai-usage': typeof MailAiUsageRoute
   '/api-keys': typeof MailApiKeysRoute
@@ -602,6 +609,7 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
+  '/admin': typeof MailAdminRoute
   '/agent': typeof MailAgentRoute
   '/ai-usage': typeof MailAiUsageRoute
   '/api-keys': typeof MailApiKeysRoute
@@ -685,6 +693,7 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/_mail/activity': typeof MailActivityRoute
+  '/_mail/admin': typeof MailAdminRoute
   '/_mail/agent': typeof MailAgentRoute
   '/_mail/ai-usage': typeof MailAiUsageRoute
   '/_mail/api-keys': typeof MailApiKeysRoute
@@ -770,6 +779,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/activity'
+    | '/admin'
     | '/agent'
     | '/ai-usage'
     | '/api-keys'
@@ -853,6 +863,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/activity'
+    | '/admin'
     | '/agent'
     | '/ai-usage'
     | '/api-keys'
@@ -935,6 +946,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/_mail/activity'
+    | '/_mail/admin'
     | '/_mail/agent'
     | '/_mail/ai-usage'
     | '/_mail/api-keys'
@@ -1103,6 +1115,13 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof MailActivityRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/admin': {
+      id: '/_mail/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof MailAdminRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/agent': {
@@ -1787,6 +1806,7 @@ const MailFoldersFolderIdRouteWithChildren =
 
 interface MailRouteChildren {
   MailActivityRoute: typeof MailActivityRoute
+  MailAdminRoute: typeof MailAdminRoute
   MailAgentRoute: typeof MailAgentRoute
   MailAiUsageRoute: typeof MailAiUsageRoute
   MailApiKeysRoute: typeof MailApiKeysRoute
@@ -1823,6 +1843,7 @@ interface MailRouteChildren {
 
 const MailRouteChildren: MailRouteChildren = {
   MailActivityRoute: MailActivityRoute,
+  MailAdminRoute: MailAdminRoute,
   MailAgentRoute: MailAgentRoute,
   MailAiUsageRoute: MailAiUsageRoute,
   MailApiKeysRoute: MailApiKeysRoute,

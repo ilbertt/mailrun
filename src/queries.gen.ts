@@ -886,6 +886,21 @@ export interface INativeAgentDiscardProposalResult {
     human_edited_at: IAgentDraftMetadataColumns["human_edited_at"];
 }
 
+/** Result of query `NativeMaintenanceAdmin`. */
+export interface INativeMaintenanceAdminResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeSearchIndexStatus`. */
+export interface INativeSearchIndexStatusResult {
+    indexed: number;
+    messages: number;
+}
+
+/** Result of query `NativeRebuildSearchIndex`. */
+export interface INativeRebuildSearchIndexResult {
+}
+
 /** Result of query `NativeGeneralSettings`. */
 export interface INativeGeneralSettingsResult {
     outbound_attachment_max_mb: IAppSettingsColumns["outbound_attachment_max_mb"];
@@ -4670,6 +4685,9 @@ export interface Queries {
     NativeAgentReadThread: INativeAgentReadThreadResult;
     NativeAgentMarkRead: INativeAgentMarkReadResult;
     NativeAgentDiscardProposal: INativeAgentDiscardProposalResult;
+    NativeMaintenanceAdmin: INativeMaintenanceAdminResult;
+    NativeSearchIndexStatus: INativeSearchIndexStatusResult;
+    NativeRebuildSearchIndex: INativeRebuildSearchIndexResult;
     NativeGeneralSettings: INativeGeneralSettingsResult;
     NativeSaveGeneralSettings: INativeSaveGeneralSettingsResult;
     NativeAuthActivityList: INativeAuthActivityListResult;

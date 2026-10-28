@@ -17,6 +17,7 @@ import AdminLayout from "../app/(admin)/layout";
 import CalendarLayout from "../app/(calendar)/layout";
 import DriveLayout from "../app/(drive)/layout";
 const adminPrefixes = [
+	"/admin",
 	"/routing",
 	"/accounts",
 	"/domains",

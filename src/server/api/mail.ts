@@ -1,3 +1,4 @@
+import { adminMaintenanceApi } from "./admin-maintenance";
 import { aiUsageApi } from "./ai-usage";
 import { agentApi } from "./agent";
 import { agentApprovalsApi } from "./agent-approvals";
@@ -87,6 +88,8 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const maintenance = await adminMaintenanceApi(request, user);
+	if (maintenance) return maintenance;
 	const usage = await aiUsageApi(request, user);
 	if (usage) return usage;
 	const assistant = await agentApi(request, user);

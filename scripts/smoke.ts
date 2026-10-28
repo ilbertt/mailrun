@@ -116,6 +116,45 @@ try {
 		Origin: publicBase,
 		"Content-Type": "application/json",
 	};
+	const updateStatus = await fetch(`${base}/api/admin/update`, {
+		headers: calendarHeaders,
+	});
+	if (
+		!updateStatus.ok ||
+		z
+			.object({
+				configured: z.literal(false),
+				configuration: z.array(z.unknown()),
+			})
+			.parse(await updateStatus.json()).configuration.length
+	)
+		throw new Error("Self-hosted update status failed");
+	const migrationStatus = await fetch(`${base}/api/admin/migrations`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	if (
+		!migrationStatus.ok ||
+		!z.object({ ready: z.boolean() }).parse(await migrationStatus.json()).ready
+	)
+		throw new Error("Compiled migration status/application failed");
+	const missingMigrationOrigin = await fetch(`${base}/api/admin/migrations`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${token}` },
+	});
+	if (missingMigrationOrigin.status !== 403)
+		throw new Error("Migration application accepted a missing origin");
+	const rebuilt = await fetch(`${base}/api/admin/search-index`, {
+		method: "POST",
+		headers: calendarHeaders,
+	});
+	if (
+		!rebuilt.ok ||
+		!z
+			.object({ indexed: z.number(), messages: z.number() })
+			.parse(await rebuilt.json()).messages
+	)
+		throw new Error("Compiled search-index rebuild failed");
 
 	const hookResponse = await fetch(`${base}/api/webhooks`, {
 		method: "POST",
@@ -253,6 +292,7 @@ try {
 	)
 		throw new Error("Administrative password reset did not revoke sessions");
 	for (const route of [
+		"/admin",
 		"/accounts",
 		`/accounts/${managed.id}`,
 		`/accounts/${managed.id}/permissions`,
