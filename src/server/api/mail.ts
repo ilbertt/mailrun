@@ -1,3 +1,5 @@
+import { aiUsageApi } from "./ai-usage";
+import { agentApi } from "./agent";
 import { agentApprovalsApi } from "./agent-approvals";
 import { adminSettingsApi } from "./admin-settings";
 import { keysApi } from "./keys";
@@ -85,6 +87,10 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const usage = await aiUsageApi(request, user);
+	if (usage) return usage;
+	const assistant = await agentApi(request, user);
+	if (assistant) return assistant;
 	const agentApprovals = await agentApprovalsApi(request, user);
 	if (agentApprovals) return agentApprovals;
 	const adminSettings = await adminSettingsApi(request, user);
@@ -132,13 +138,6 @@ export async function dispatchMailApi(
 	if (drafts) return drafts;
 	const json = (value: unknown, status = 200) =>
 		Response.json(value, { status });
-	if (method === "GET" && path === "/api/agent/availability") {
-		const [row] = await withDatabase(
-			(sql) =>
-				sql.NativeAgentAvailability`SELECT agent_enabled FROM app_settings WHERE id='default'`,
-		);
-		return json({ enabled: row ? !!row.agent_enabled : true });
-	}
 	if (method === "GET" && path === "/api/auth/me") {
 		const profile = await currentProfile(user);
 		const [setup] = await withDatabase(
@@ -347,6 +346,10 @@ export async function dispatchMailApi(
 }
 export async function serveMailApi(request: Request) {
 	try {
+		if (new URL(request.url).pathname === "/api/agent/chat") {
+			const { serveAgentChat } = await import("./agent-chat");
+			return serveAgentChat(request);
+		}
 		if (isV1Path(new URL(request.url).pathname)) return serveV1Api(request);
 		const publicDrive = await publicDriveApi(request);
 		if (publicDrive) return publicDrive;

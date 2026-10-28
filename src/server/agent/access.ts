@@ -7,6 +7,7 @@ export async function requireToolAccess(
 	ctx: AgentToolContext,
 	level: "read" | "send" | "manage" = "read",
 ) {
+	if (ctx.signal?.aborted) throw new Error("Request cancelled");
 	await withDatabase(async (sql) => {
 		await assertApiPrincipal(sql, ctx.actor ?? ctx.user, ctx.mailboxId);
 		const [user] =
@@ -22,6 +23,7 @@ export async function withToolUserMutation<T>(
 	return withDatabase((sql) =>
 		sql.begin(async (sql) => {
 			await sql.NativeAgentUserFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+			if (ctx.signal?.aborted) throw new Error("Request cancelled");
 			await assertApiPrincipal(sql, ctx.actor ?? ctx.user);
 			const [user] =
 				await sql.NativeAgentCurrentUser`SELECT id FROM users WHERE id=${ctx.user.id} AND disabled=0`;

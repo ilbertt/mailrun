@@ -19,6 +19,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as DotwellKnownJmapRouteImport } from './routes/[.]well-known.jmap'
 import { Route as MailActivityRouteImport } from './routes/_mail.activity'
+import { Route as MailAgentRouteImport } from './routes/_mail.agent'
+import { Route as MailAiUsageRouteImport } from './routes/_mail.ai-usage'
 import { Route as MailApiKeysRouteImport } from './routes/_mail.api-keys'
 import { Route as MailArchivedRouteImport } from './routes/_mail.archived'
 import { Route as MailAuditLogsRouteImport } from './routes/_mail.audit-logs'
@@ -83,7 +85,7 @@ import { Route as MailAccountsIdIndexRouteImport } from './routes/_mail.accounts
 import { Route as MailAccountsIdMailboxesRouteImport } from './routes/_mail.accounts.$id.mailboxes'
 import { Route as MailAccountsIdPasswordRouteImport } from './routes/_mail.accounts.$id.password'
 import { Route as MailAccountsIdPermissionsRouteImport } from './routes/_mail.accounts.$id.permissions'
-import { Route as MailAgentReviewIdRouteImport } from './routes/_mail.agent.review.$id'
+import { Route as MailAgentReviewIdRouteImport } from './routes/_mail.agent_.review.$id'
 import { Route as MailFoldersFolderIdMessageIdRouteImport } from './routes/_mail.folders.$folderId.$messageId'
 import { Route as MailSettingsMailboxesIndexRouteImport } from './routes/_mail.settings.mailboxes.index'
 import { Route as MailSettingsMailboxesIdRouteImport } from './routes/_mail.settings.mailboxes.$id'
@@ -137,6 +139,16 @@ const DotwellKnownJmapRoute = DotwellKnownJmapRouteImport.update({
 const MailActivityRoute = MailActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailAgentRoute = MailAgentRouteImport.update({
+  id: '/agent',
+  path: '/agent',
+  getParentRoute: () => MailRoute,
+} as any)
+const MailAiUsageRoute = MailAiUsageRouteImport.update({
+  id: '/ai-usage',
+  path: '/ai-usage',
   getParentRoute: () => MailRoute,
 } as any)
 const MailApiKeysRoute = MailApiKeysRouteImport.update({
@@ -463,7 +475,7 @@ const MailAccountsIdPermissionsRoute =
     getParentRoute: () => MailAccountsIdRoute,
   } as any)
 const MailAgentReviewIdRoute = MailAgentReviewIdRouteImport.update({
-  id: '/agent/review/$id',
+  id: '/agent_/review/$id',
   path: '/agent/review/$id',
   getParentRoute: () => MailRoute,
 } as any)
@@ -507,6 +519,8 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
+  '/agent': typeof MailAgentRoute
+  '/ai-usage': typeof MailAiUsageRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
   '/audit-logs': typeof MailAuditLogsRoute
@@ -588,6 +602,8 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/activity': typeof MailActivityRoute
+  '/agent': typeof MailAgentRoute
+  '/ai-usage': typeof MailAiUsageRoute
   '/api-keys': typeof MailApiKeysRoute
   '/archived': typeof MailArchivedRouteWithChildren
   '/audit-logs': typeof MailAuditLogsRoute
@@ -669,6 +685,8 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
   '/_mail/activity': typeof MailActivityRoute
+  '/_mail/agent': typeof MailAgentRoute
+  '/_mail/ai-usage': typeof MailAiUsageRoute
   '/_mail/api-keys': typeof MailApiKeysRoute
   '/_mail/archived': typeof MailArchivedRouteWithChildren
   '/_mail/audit-logs': typeof MailAuditLogsRoute
@@ -732,7 +750,7 @@ export interface FileRoutesById {
   '/_mail/accounts/$id/mailboxes': typeof MailAccountsIdMailboxesRoute
   '/_mail/accounts/$id/password': typeof MailAccountsIdPasswordRoute
   '/_mail/accounts/$id/permissions': typeof MailAccountsIdPermissionsRoute
-  '/_mail/agent/review/$id': typeof MailAgentReviewIdRoute
+  '/_mail/agent_/review/$id': typeof MailAgentReviewIdRoute
   '/_mail/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/_mail/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -752,6 +770,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/activity'
+    | '/agent'
+    | '/ai-usage'
     | '/api-keys'
     | '/archived'
     | '/audit-logs'
@@ -833,6 +853,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/activity'
+    | '/agent'
+    | '/ai-usage'
     | '/api-keys'
     | '/archived'
     | '/audit-logs'
@@ -913,6 +935,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/.well-known/jmap'
     | '/_mail/activity'
+    | '/_mail/agent'
+    | '/_mail/ai-usage'
     | '/_mail/api-keys'
     | '/_mail/archived'
     | '/_mail/audit-logs'
@@ -976,7 +1000,7 @@ export interface FileRouteTypes {
     | '/_mail/accounts/$id/mailboxes'
     | '/_mail/accounts/$id/password'
     | '/_mail/accounts/$id/permissions'
-    | '/_mail/agent/review/$id'
+    | '/_mail/agent_/review/$id'
     | '/_mail/folders/$folderId/$messageId'
     | '/_mail/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -1079,6 +1103,20 @@ declare module '@tanstack/react-router' {
       path: '/activity'
       fullPath: '/activity'
       preLoaderRoute: typeof MailActivityRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/agent': {
+      id: '/_mail/agent'
+      path: '/agent'
+      fullPath: '/agent'
+      preLoaderRoute: typeof MailAgentRouteImport
+      parentRoute: typeof MailRoute
+    }
+    '/_mail/ai-usage': {
+      id: '/_mail/ai-usage'
+      path: '/ai-usage'
+      fullPath: '/ai-usage'
+      preLoaderRoute: typeof MailAiUsageRouteImport
       parentRoute: typeof MailRoute
     }
     '/_mail/api-keys': {
@@ -1529,8 +1567,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailAccountsIdPermissionsRouteImport
       parentRoute: typeof MailAccountsIdRoute
     }
-    '/_mail/agent/review/$id': {
-      id: '/_mail/agent/review/$id'
+    '/_mail/agent_/review/$id': {
+      id: '/_mail/agent_/review/$id'
       path: '/agent/review/$id'
       fullPath: '/agent/review/$id'
       preLoaderRoute: typeof MailAgentReviewIdRouteImport
@@ -1749,6 +1787,8 @@ const MailFoldersFolderIdRouteWithChildren =
 
 interface MailRouteChildren {
   MailActivityRoute: typeof MailActivityRoute
+  MailAgentRoute: typeof MailAgentRoute
+  MailAiUsageRoute: typeof MailAiUsageRoute
   MailApiKeysRoute: typeof MailApiKeysRoute
   MailArchivedRoute: typeof MailArchivedRouteWithChildren
   MailAuditLogsRoute: typeof MailAuditLogsRoute
@@ -1783,6 +1823,8 @@ interface MailRouteChildren {
 
 const MailRouteChildren: MailRouteChildren = {
   MailActivityRoute: MailActivityRoute,
+  MailAgentRoute: MailAgentRoute,
+  MailAiUsageRoute: MailAiUsageRoute,
   MailApiKeysRoute: MailApiKeysRoute,
   MailArchivedRoute: MailArchivedRouteWithChildren,
   MailAuditLogsRoute: MailAuditLogsRoute,

@@ -213,6 +213,27 @@ export interface INativeAgentMutationAccessResult {
     id: string | null;
 }
 
+/** Result of query `NativeAgentActionLookup`. */
+export interface INativeAgentActionLookupResult {
+    content: IAgentChatMessagesColumns["content"];
+    tool_name: IAgentChatMessagesColumns["tool_name"];
+    mailbox_id: IAgentConversationsColumns["mailbox_id"];
+}
+
+/** Result of query `NativeAgentActionClaim`. */
+export interface INativeAgentActionClaimResult {
+    id: string | null;
+}
+
+/** Result of query `NativeAgentApproveRead`. */
+export interface INativeAgentApproveReadResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeAgentActionComplete`. */
+export interface INativeAgentActionCompleteResult {
+}
+
 /** Result of query `NativeAgentApprovalMetadata`. */
 export interface INativeAgentApprovalMetadataResult {
     draft_id: IAgentDraftMetadataColumns["draft_id"];
@@ -318,12 +339,89 @@ export interface INativeAgentQueueApprovedAttachmentResult {
 export interface INativeAgentQueueApprovedJobResult {
 }
 
+/** Result of query `NativeChatMailboxPreferences`. */
+export interface INativeChatMailboxPreferencesResult {
+    model_id: IMailboxAgentSettingsColumns["model_id"];
+    instructions: IMailboxAgentSettingsColumns["instructions"];
+}
+
+/** Result of query `NativeChatCurrentEmail`. */
+export interface INativeChatCurrentEmailResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeAgentConversation`. */
+export interface INativeAgentConversationResult {
+    id: IAgentConversationsColumns["id"];
+    user_id: IAgentConversationsColumns["user_id"];
+    mailbox_id: IAgentConversationsColumns["mailbox_id"];
+    title: IAgentConversationsColumns["title"];
+    created_at: IAgentConversationsColumns["created_at"];
+    updated_at: IAgentConversationsColumns["updated_at"];
+}
+
+/** Result of query `NativeAgentConversationList`. */
+export interface INativeAgentConversationListResult {
+    id: IAgentConversationsColumns["id"];
+    user_id: IAgentConversationsColumns["user_id"];
+    mailbox_id: IAgentConversationsColumns["mailbox_id"];
+    title: IAgentConversationsColumns["title"];
+    created_at: IAgentConversationsColumns["created_at"];
+    updated_at: IAgentConversationsColumns["updated_at"];
+}
+
+/** Result of query `NativeAgentChatHistory`. */
+export interface INativeAgentChatHistoryResult {
+    id: IAgentChatMessagesColumns["id"];
+    conversation_id: IAgentChatMessagesColumns["conversation_id"];
+    role: IAgentChatMessagesColumns["role"];
+    content: IAgentChatMessagesColumns["content"];
+    tool_name: IAgentChatMessagesColumns["tool_name"];
+    created_at: IAgentChatMessagesColumns["created_at"];
+}
+
+/** Result of query `NativeCreateAgentConversation`. */
+export interface INativeCreateAgentConversationResult {
+}
+
+/** Result of query `NativeAgentTurnConversation`. */
+export interface INativeAgentTurnConversationResult {
+    id: IAgentConversationsColumns["id"];
+}
+
+/** Result of query `NativeAgentPromptHistory`. */
+export interface INativeAgentPromptHistoryResult {
+    role: IAgentChatMessagesColumns["role"];
+    content: IAgentChatMessagesColumns["content"];
+}
+
+/** Result of query `NativeAgentUserMessage`. */
+export interface INativeAgentUserMessageResult {
+}
+
+/** Result of query `NativeAgentPersistMessage`. */
+export interface INativeAgentPersistMessageResult {
+    id: string | null;
+}
+
+/** Result of query `NativeAgentFinishTurn`. */
+export interface INativeAgentFinishTurnResult {
+}
+
+/** Result of query `NativeDeleteAgentConversation`. */
+export interface INativeDeleteAgentConversationResult {
+}
+
 /** Result of query `NativeCreateAgentDraft`. */
 export interface INativeCreateAgentDraftResult {
 }
 
 /** Result of query `NativeCreateAgentDraftMetadata`. */
 export interface INativeCreateAgentDraftMetadataResult {
+}
+
+/** Result of query `NativeCompletePublishedAutoDraft`. */
+export interface INativeCompletePublishedAutoDraftResult {
 }
 
 /** Result of query `NativeAgentEditMetadata`. */
@@ -390,6 +488,149 @@ export interface INativeAgentDiscardFilesResult {
 export interface INativeAgentDiscardResult {
 }
 
+/** Result of query `NativeAutoDraftPublishLease`. */
+export interface INativeAutoDraftPublishLeaseResult {
+    id: IAgentJobsColumns["id"];
+}
+
+/** Result of query `NativeAutoDraftPublishGuard`. */
+export interface INativeAutoDraftPublishGuardResult {
+    id: string | null;
+}
+
+/** Result of query `NativeAutoDraftScheduleReviewer`. */
+export interface INativeAutoDraftScheduleReviewerResult {
+    id: string | null;
+}
+
+/** Result of query `NativeScheduleAutoDraft`. */
+export interface INativeScheduleAutoDraftResult {
+}
+
+/** Result of query `NativeScheduledAutoDraft`. */
+export interface INativeScheduledAutoDraftResult {
+    id: IAgentJobsColumns["id"];
+}
+
+/** Result of query `NativeClaimAutoDraft`. */
+export interface INativeClaimAutoDraftResult {
+    id: IAgentJobsColumns["id"];
+    mailbox_id: IAgentJobsColumns["mailbox_id"];
+    source_message_id: IAgentJobsColumns["source_message_id"];
+    reviewer_user_id: IAgentJobsColumns["reviewer_user_id"];
+    status: IAgentJobsColumns["status"];
+    attempts: IAgentJobsColumns["attempts"];
+    next_attempt_at: IAgentJobsColumns["next_attempt_at"];
+    lease_until: IAgentJobsColumns["lease_until"];
+    draft_id: IAgentJobsColumns["draft_id"];
+    reason: IAgentJobsColumns["reason"];
+    created_at: IAgentJobsColumns["created_at"];
+}
+
+/** Result of query `NativeFinishAutoDraft`. */
+export interface INativeFinishAutoDraftResult {
+}
+
+/** Result of query `NativeAutoDraftCurrentSettings`. */
+export interface INativeAutoDraftCurrentSettingsResult {
+    mailbox_id: IMailboxAgentSettingsColumns["mailbox_id"];
+    enabled: IMailboxAgentSettingsColumns["enabled"];
+    auto_draft_enabled: IMailboxAgentSettingsColumns["auto_draft_enabled"];
+    reviewer_user_id: IMailboxAgentSettingsColumns["reviewer_user_id"];
+    instructions: IMailboxAgentSettingsColumns["instructions"];
+    daily_limit: IMailboxAgentSettingsColumns["daily_limit"];
+    updated_at: IMailboxAgentSettingsColumns["updated_at"];
+    model_id: IMailboxAgentSettingsColumns["model_id"];
+    auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
+    owner_user_id: string | null;
+}
+
+/** Result of query `NativeAutoDraftReviewer`. */
+export interface INativeAutoDraftReviewerResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    disabled: IUsersColumns["disabled"];
+    time_zone: IUsersColumns["time_zone"];
+}
+
+/** Result of query `NativeAutoDraftSourceMetadata`. */
+export interface INativeAutoDraftSourceMetadataResult {
+    id: IMessagesColumns["id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    user_id: IMessagesColumns["user_id"];
+    direction: IMessagesColumns["direction"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    reply_to: IMessagesColumns["reply_to"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    status: IMessagesColumns["status"];
+    folder_id: IMessagesColumns["folder_id"];
+    spam_analysis_error: IMessagesColumns["spam_analysis_error"];
+    spam_verdict: IMessagesColumns["spam_verdict"];
+    thread_id: IMessagesColumns["thread_id"];
+    created_at: IMessagesColumns["created_at"];
+}
+
+/** Result of query `NativeAutoDraftDailyCount`. */
+export interface INativeAutoDraftDailyCountResult {
+    count: number;
+}
+
+/** Result of query `NativeAutoDraftExisting`. */
+export interface INativeAutoDraftExistingResult {
+    draft_id: IAgentDraftMetadataColumns["draft_id"];
+    user_id: IMessagesColumns["user_id"];
+}
+
+/** Result of query `NativeAutoDraftNewerMessage`. */
+export interface INativeAutoDraftNewerMessageResult {
+    id: IMessagesColumns["id"];
+}
+
+/** Result of query `NativeAutoDraftContextIds`. */
+export interface INativeAutoDraftContextIdsResult {
+    id: IMessagesColumns["id"];
+    direction: IMessagesColumns["direction"];
+    created_at: IMessagesColumns["created_at"];
+}
+
+/** Result of query `NativeReleaseExpiredAutoDraft`. */
+export interface INativeReleaseExpiredAutoDraftResult {
+}
+
+/** Result of query `NativeRetryAutoDraftFailure`. */
+export interface INativeRetryAutoDraftFailureResult {
+}
+
+/** Result of query `NativeAutoDraftContextBody`. */
+export interface INativeAutoDraftContextBodyResult {
+    text: string | null;
+    html: string | null;
+}
+
+/** Result of query `NativeClaimAgentDispatcher`. */
+export interface INativeClaimAgentDispatcherResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeDueAgentDraftJobs`. */
+export interface INativeDueAgentDraftJobsResult {
+    id: IAgentJobsColumns["id"];
+}
+
+/** Result of query `NativeRenewAgentDispatcher`. */
+export interface INativeRenewAgentDispatcherResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeReleaseAgentDispatcher`. */
+export interface INativeReleaseAgentDispatcherResult {
+}
+
 /** Result of query `NativeAgentMessage`. */
 export interface INativeAgentMessageResult {
     id: IMessagesColumns["id"];
@@ -424,6 +665,106 @@ export interface INativeAgentMessageResult {
     reply_to: IMessagesColumns["reply_to"];
     draft_revision: IMessagesColumns["draft_revision"];
     draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
+}
+
+/** Result of query `NativeAgentMoveCurrent`. */
+export interface INativeAgentMoveCurrentResult {
+    status: IMessagesColumns["status"];
+}
+
+/** Result of query `NativeAgentMoveSending`. */
+export interface INativeAgentMoveSendingResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `NativeAgentMoveMessage`. */
+export interface INativeAgentMoveMessageResult {
+}
+
+/** Result of query `NativeAgentMoveCancelQueued`. */
+export interface INativeAgentMoveCancelQueuedResult {
+}
+
+/** Result of query `NativeAssistantEnabled`. */
+export interface INativeAssistantEnabledResult {
+    agent_enabled: IAppSettingsColumns["agent_enabled"];
+}
+
+/** Result of query `NativeAgentProviderConfig`. */
+export interface INativeAgentProviderConfigResult {
+    agent_provider: IAppSettingsColumns["agent_provider"];
+    agent_preset: IAppSettingsColumns["agent_preset"];
+    agent_base_url: IAppSettingsColumns["agent_base_url"];
+    agent_api_key: IAppSettingsColumns["agent_api_key"];
+    agent_model: IAppSettingsColumns["agent_model"];
+    agent_model_rates: IAppSettingsColumns["agent_model_rates"];
+}
+
+/** Result of query `NativeAgentPrimaryAdmin`. */
+export interface INativeAgentPrimaryAdminResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeSaveAgentProvider`. */
+export interface INativeSaveAgentProviderResult {
+}
+
+/** Result of query `NativeSetAgentEnabled`. */
+export interface INativeSetAgentEnabledResult {
+}
+
+/** Result of query `NativeDisableAgentJobs`. */
+export interface INativeDisableAgentJobsResult {
+}
+
+/** Result of query `NativeDisableAgentApprovals`. */
+export interface INativeDisableAgentApprovalsResult {
+}
+
+/** Result of query `NativeRecordAgentUsage`. */
+export interface INativeRecordAgentUsageResult {
+}
+
+/** Result of query `NativeMailboxAgentSettings`. */
+export interface INativeMailboxAgentSettingsResult {
+    mailbox_id: IMailboxAgentSettingsColumns["mailbox_id"];
+    enabled: IMailboxAgentSettingsColumns["enabled"];
+    auto_draft_enabled: IMailboxAgentSettingsColumns["auto_draft_enabled"];
+    reviewer_user_id: IMailboxAgentSettingsColumns["reviewer_user_id"];
+    instructions: IMailboxAgentSettingsColumns["instructions"];
+    daily_limit: IMailboxAgentSettingsColumns["daily_limit"];
+    updated_at: IMailboxAgentSettingsColumns["updated_at"];
+    model_id: IMailboxAgentSettingsColumns["model_id"];
+}
+
+/** Result of query `NativeAgentReviewers`. */
+export interface INativeAgentReviewersResult {
+    id: string | null;
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+}
+
+/** Result of query `NativeAgentAutoReplySetting`. */
+export interface INativeAgentAutoReplySettingResult {
+    auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
+}
+
+/** Result of query `NativeAgentReviewerGuard`. */
+export interface INativeAgentReviewerGuardResult {
+    id: string | null;
+}
+
+/** Result of query `NativeAgentSettingsAutoReplyGuard`. */
+export interface INativeAgentSettingsAutoReplyGuardResult {
+    auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
+}
+
+/** Result of query `NativeSaveMailboxAgentSettings`. */
+export interface INativeSaveMailboxAgentSettingsResult {
+}
+
+/** Result of query `NativeDisableMailboxAgentJobs`. */
+export interface INativeDisableMailboxAgentJobsResult {
 }
 
 /** Result of query `NativeAgentPageCursor`. */
@@ -539,24 +880,6 @@ export interface INativeAgentMarkReadResult {
     id: IMessagesColumns["id"];
 }
 
-/** Result of query `NativeAgentMoveCurrent`. */
-export interface INativeAgentMoveCurrentResult {
-    status: IMessagesColumns["status"];
-}
-
-/** Result of query `NativeAgentMoveSending`. */
-export interface INativeAgentMoveSendingResult {
-    id: IOutboundJobsColumns["id"];
-}
-
-/** Result of query `NativeAgentMoveMessage`. */
-export interface INativeAgentMoveMessageResult {
-}
-
-/** Result of query `NativeAgentMoveCancelQueued`. */
-export interface INativeAgentMoveCancelQueuedResult {
-}
-
 /** Result of query `NativeAgentDiscardProposal`. */
 export interface INativeAgentDiscardProposalResult {
     revision: IAgentDraftMetadataColumns["revision"];
@@ -588,6 +911,72 @@ export interface INativeAuthActivityListResult {
 /** Result of query `NativeAgentApprovalMailbox`. */
 export interface INativeAgentApprovalMailboxResult {
     mailbox_id: IMessagesColumns["mailbox_id"];
+}
+
+/** Result of query `NativeAgentChatTimeZone`. */
+export interface INativeAgentChatTimeZoneResult {
+    time_zone: IUsersColumns["time_zone"];
+}
+
+/** Result of query `NativeAgentDeleteConversationContext`. */
+export interface INativeAgentDeleteConversationContextResult {
+    mailbox_id: IAgentConversationsColumns["mailbox_id"];
+}
+
+/** Result of query `NativeAgentJobsList`. */
+export interface INativeAgentJobsListResult {
+    id: IAgentJobsColumns["id"];
+    status: IAgentJobsColumns["status"];
+    reason: IAgentJobsColumns["reason"];
+    draft_id: IAgentJobsColumns["draft_id"];
+    source_message_id: IAgentJobsColumns["source_message_id"];
+    created_at: IAgentJobsColumns["created_at"];
+}
+
+/** Result of query `NativeAgentRetryLookup`. */
+export interface INativeAgentRetryLookupResult {
+    mailbox_id: IAgentJobsColumns["mailbox_id"];
+    reviewer_user_id: IAgentJobsColumns["reviewer_user_id"];
+    status: IAgentJobsColumns["status"];
+}
+
+/** Result of query `NativeRetryAgentJob`. */
+export interface INativeRetryAgentJobResult {
+    id: IAgentJobsColumns["id"];
+}
+
+/** Result of query `NativeAiUsageTimeZone`. */
+export interface INativeAiUsageTimeZoneResult {
+    time_zone: IUsersColumns["time_zone"];
+}
+
+/** Result of query `NativeAiUsageTotals`. */
+export interface INativeAiUsageTotalsResult {
+    requests: number;
+    input_tokens: number;
+    output_tokens: number;
+    cost_usd_micros: number;
+    priced_requests: number;
+}
+
+/** Result of query `NativeAiUsageDaily`. */
+export interface INativeAiUsageDailyResult {
+    date: string;
+    requests: number;
+    inputTokens: number;
+    outputTokens: number;
+}
+
+/** Result of query `NativeAiUsagePage`. */
+export interface INativeAiUsagePageResult {
+    id: IAiUsageColumns["id"];
+    created_at: IAiUsageColumns["created_at"];
+    provider: IAiUsageColumns["provider"];
+    model: IAiUsageColumns["model"];
+    source: IAiUsageColumns["source"];
+    input_tokens: IAiUsageColumns["input_tokens"];
+    output_tokens: IAiUsageColumns["output_tokens"];
+    cost_usd_micros: IAiUsageColumns["cost_usd_micros"];
 }
 
 /** Result of query `NativeBookingHostAvatar`. */
@@ -676,11 +1065,6 @@ export interface IReturnScheduledToDraftResult {
 /** Result of query `NativeDriveOwnerAvatar`. */
 export interface INativeDriveOwnerAvatarResult {
     avatar_key: IUsersColumns["avatar_key"];
-}
-
-/** Result of query `NativeAgentAvailability`. */
-export interface INativeAgentAvailabilityResult {
-    agent_enabled: IAppSettingsColumns["agent_enabled"];
 }
 
 /** Result of query `NativeSetupMetadata`. */
@@ -4194,6 +4578,10 @@ export interface Queries {
     NativeAgentUserFence: INativeAgentUserFenceResult;
     NativeAgentCurrentUser: INativeAgentCurrentUserResult;
     NativeAgentMutationAccess: INativeAgentMutationAccessResult;
+    NativeAgentActionLookup: INativeAgentActionLookupResult;
+    NativeAgentActionClaim: INativeAgentActionClaimResult;
+    NativeAgentApproveRead: INativeAgentApproveReadResult;
+    NativeAgentActionComplete: INativeAgentActionCompleteResult;
     NativeAgentApprovalMetadata: INativeAgentApprovalMetadataResult;
     NativeAgentApprovalInProgress: INativeAgentApprovalInProgressResult;
     NativeAgentApprovalSnapshotGuard: INativeAgentApprovalSnapshotGuardResult;
@@ -4208,8 +4596,21 @@ export interface Queries {
     NativeAgentQueueApprovedMessage: INativeAgentQueueApprovedMessageResult;
     NativeAgentQueueApprovedAttachment: INativeAgentQueueApprovedAttachmentResult;
     NativeAgentQueueApprovedJob: INativeAgentQueueApprovedJobResult;
+    NativeChatMailboxPreferences: INativeChatMailboxPreferencesResult;
+    NativeChatCurrentEmail: INativeChatCurrentEmailResult;
+    NativeAgentConversation: INativeAgentConversationResult;
+    NativeAgentConversationList: INativeAgentConversationListResult;
+    NativeAgentChatHistory: INativeAgentChatHistoryResult;
+    NativeCreateAgentConversation: INativeCreateAgentConversationResult;
+    NativeAgentTurnConversation: INativeAgentTurnConversationResult;
+    NativeAgentPromptHistory: INativeAgentPromptHistoryResult;
+    NativeAgentUserMessage: INativeAgentUserMessageResult;
+    NativeAgentPersistMessage: INativeAgentPersistMessageResult;
+    NativeAgentFinishTurn: INativeAgentFinishTurnResult;
+    NativeDeleteAgentConversation: INativeDeleteAgentConversationResult;
     NativeCreateAgentDraft: INativeCreateAgentDraftResult;
     NativeCreateAgentDraftMetadata: INativeCreateAgentDraftMetadataResult;
+    NativeCompletePublishedAutoDraft: INativeCompletePublishedAutoDraftResult;
     NativeAgentEditMetadata: INativeAgentEditMetadataResult;
     NativeAgentAttachmentSource: INativeAgentAttachmentSourceResult;
     NativeAgentEditGuard: INativeAgentEditGuardResult;
@@ -4220,7 +4621,47 @@ export interface Queries {
     NativeAgentDiscardGuard: INativeAgentDiscardGuardResult;
     NativeAgentDiscardFiles: INativeAgentDiscardFilesResult;
     NativeAgentDiscard: INativeAgentDiscardResult;
+    NativeAutoDraftPublishLease: INativeAutoDraftPublishLeaseResult;
+    NativeAutoDraftPublishGuard: INativeAutoDraftPublishGuardResult;
+    NativeAutoDraftScheduleReviewer: INativeAutoDraftScheduleReviewerResult;
+    NativeScheduleAutoDraft: INativeScheduleAutoDraftResult;
+    NativeScheduledAutoDraft: INativeScheduledAutoDraftResult;
+    NativeClaimAutoDraft: INativeClaimAutoDraftResult;
+    NativeFinishAutoDraft: INativeFinishAutoDraftResult;
+    NativeAutoDraftCurrentSettings: INativeAutoDraftCurrentSettingsResult;
+    NativeAutoDraftReviewer: INativeAutoDraftReviewerResult;
+    NativeAutoDraftSourceMetadata: INativeAutoDraftSourceMetadataResult;
+    NativeAutoDraftDailyCount: INativeAutoDraftDailyCountResult;
+    NativeAutoDraftExisting: INativeAutoDraftExistingResult;
+    NativeAutoDraftNewerMessage: INativeAutoDraftNewerMessageResult;
+    NativeAutoDraftContextIds: INativeAutoDraftContextIdsResult;
+    NativeReleaseExpiredAutoDraft: INativeReleaseExpiredAutoDraftResult;
+    NativeRetryAutoDraftFailure: INativeRetryAutoDraftFailureResult;
+    NativeAutoDraftContextBody: INativeAutoDraftContextBodyResult;
+    NativeClaimAgentDispatcher: INativeClaimAgentDispatcherResult;
+    NativeDueAgentDraftJobs: INativeDueAgentDraftJobsResult;
+    NativeRenewAgentDispatcher: INativeRenewAgentDispatcherResult;
+    NativeReleaseAgentDispatcher: INativeReleaseAgentDispatcherResult;
     NativeAgentMessage: INativeAgentMessageResult;
+    NativeAgentMoveCurrent: INativeAgentMoveCurrentResult;
+    NativeAgentMoveSending: INativeAgentMoveSendingResult;
+    NativeAgentMoveMessage: INativeAgentMoveMessageResult;
+    NativeAgentMoveCancelQueued: INativeAgentMoveCancelQueuedResult;
+    NativeAssistantEnabled: INativeAssistantEnabledResult;
+    NativeAgentProviderConfig: INativeAgentProviderConfigResult;
+    NativeAgentPrimaryAdmin: INativeAgentPrimaryAdminResult;
+    NativeSaveAgentProvider: INativeSaveAgentProviderResult;
+    NativeSetAgentEnabled: INativeSetAgentEnabledResult;
+    NativeDisableAgentJobs: INativeDisableAgentJobsResult;
+    NativeDisableAgentApprovals: INativeDisableAgentApprovalsResult;
+    NativeRecordAgentUsage: INativeRecordAgentUsageResult;
+    NativeMailboxAgentSettings: INativeMailboxAgentSettingsResult;
+    NativeAgentReviewers: INativeAgentReviewersResult;
+    NativeAgentAutoReplySetting: INativeAgentAutoReplySettingResult;
+    NativeAgentReviewerGuard: INativeAgentReviewerGuardResult;
+    NativeAgentSettingsAutoReplyGuard: INativeAgentSettingsAutoReplyGuardResult;
+    NativeSaveMailboxAgentSettings: INativeSaveMailboxAgentSettingsResult;
+    NativeDisableMailboxAgentJobs: INativeDisableMailboxAgentJobsResult;
     NativeAgentPageCursor: INativeAgentPageCursorResult;
     NativeAgentMessagePage: INativeAgentMessagePageResult;
     NativeAgentEmailSnapshot: INativeAgentEmailSnapshotResult;
@@ -4228,15 +4669,20 @@ export interface Queries {
     NativeAgentReadDraftRevision: INativeAgentReadDraftRevisionResult;
     NativeAgentReadThread: INativeAgentReadThreadResult;
     NativeAgentMarkRead: INativeAgentMarkReadResult;
-    NativeAgentMoveCurrent: INativeAgentMoveCurrentResult;
-    NativeAgentMoveSending: INativeAgentMoveSendingResult;
-    NativeAgentMoveMessage: INativeAgentMoveMessageResult;
-    NativeAgentMoveCancelQueued: INativeAgentMoveCancelQueuedResult;
     NativeAgentDiscardProposal: INativeAgentDiscardProposalResult;
     NativeGeneralSettings: INativeGeneralSettingsResult;
     NativeSaveGeneralSettings: INativeSaveGeneralSettingsResult;
     NativeAuthActivityList: INativeAuthActivityListResult;
     NativeAgentApprovalMailbox: INativeAgentApprovalMailboxResult;
+    NativeAgentChatTimeZone: INativeAgentChatTimeZoneResult;
+    NativeAgentDeleteConversationContext: INativeAgentDeleteConversationContextResult;
+    NativeAgentJobsList: INativeAgentJobsListResult;
+    NativeAgentRetryLookup: INativeAgentRetryLookupResult;
+    NativeRetryAgentJob: INativeRetryAgentJobResult;
+    NativeAiUsageTimeZone: INativeAiUsageTimeZoneResult;
+    NativeAiUsageTotals: INativeAiUsageTotalsResult;
+    NativeAiUsageDaily: INativeAiUsageDailyResult;
+    NativeAiUsagePage: INativeAiUsagePageResult;
     NativeBookingHostAvatar: INativeBookingHostAvatarResult;
     NativeUserAvatar: INativeUserAvatarResult;
     NativeMailboxAvatar: INativeMailboxAvatarResult;
@@ -4254,7 +4700,6 @@ export interface Queries {
     CancelScheduledJob: ICancelScheduledJobResult;
     ReturnScheduledToDraft: IReturnScheduledToDraftResult;
     NativeDriveOwnerAvatar: INativeDriveOwnerAvatarResult;
-    NativeAgentAvailability: INativeAgentAvailabilityResult;
     NativeSetupMetadata: INativeSetupMetadataResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
     SourceScheduledTime: ISourceScheduledTimeResult;

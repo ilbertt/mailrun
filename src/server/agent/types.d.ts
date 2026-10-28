@@ -30,6 +30,13 @@ export type AgentDraftEditInput = {
 };
 
 export type AgentToolContext = {
+	signal?: AbortSignal;
+	job?: {
+		id: string;
+		attempt: number;
+		leaseUntil: number;
+		sourceMessageId: string;
+	};
 	actor?: ApiPrincipal;
 	user: User;
 	mailboxId: string;

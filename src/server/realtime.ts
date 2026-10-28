@@ -95,3 +95,24 @@ export function closeRealtimeConnections() {
 	for (const socket of sockets()) socket.close(1001, "Server restarting");
 	sockets().clear();
 }
+
+export async function notifyAgentDraft(
+	userId: string,
+	mailboxId: string,
+	draftId: string,
+) {
+	for (const socket of sockets()) {
+		if (socket.data.userId !== userId) continue;
+		try {
+			const user = await getUser(socket.data.token);
+			if (!user) {
+				socket.close(1008, "Session expired");
+				continue;
+			}
+			await mailboxAccess(user, mailboxId);
+			socket.send(JSON.stringify({ type: "agent_draft", mailboxId, draftId }));
+		} catch {
+			/* Sharing or the connection may have changed. */
+		}
+	}
+}

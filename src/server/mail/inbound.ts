@@ -1,3 +1,5 @@
+import { enqueueAutoDraft } from "../agent/jobs";
+import { wakeAgentDispatcher } from "../agent/dispatcher";
 import { enqueueWebhooks } from "../webhooks/repository";
 import { wakeWebhookDispatcher } from "../webhooks/dispatcher";
 import { notifyNewMessage } from "../realtime";
@@ -302,10 +304,22 @@ export async function storeInbound(
 				spamScore: analysis?.score,
 				spamVerdict: analysis?.verdict,
 			});
+			await enqueueAutoDraft(sql, {
+				mailboxId: mailbox.id,
+				sourceMessageId: messageId,
+				ownerUserId: mailbox.user_id,
+				sender: fromAddr,
+				headers,
+				status,
+				folderId,
+				spamVerdict: analysis?.verdict,
+				spamAnalysisError: analysisError,
+			});
 			return true;
 		}),
 	);
 	if (inserted) {
+		wakeAgentDispatcher();
 		wakeWebhookDispatcher();
 		const contact = await upsertContact(mailbox.user_id, fromAddr, "inbound");
 		if (status !== "spam")

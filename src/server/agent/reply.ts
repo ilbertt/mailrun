@@ -1,3 +1,4 @@
+import { readMailHeaderBlock } from "../mail/header-block";
 import PostalMime from "postal-mime";
 import {
 	getEmailAddressList,
@@ -9,7 +10,10 @@ import type { AgentToolContext } from "./types";
 import type { AgentMessage } from "./messages";
 export async function getReplyRecipients(
 	ctx: AgentToolContext,
-	source: AgentMessage,
+	source: Pick<
+		AgentMessage,
+		"reply_to" | "from_addr" | "raw_r2_key" | "to_addr" | "cc_addr"
+	>,
 	replyAll: boolean,
 ) {
 	let recipient =
@@ -18,7 +22,7 @@ export async function getReplyRecipients(
 	if (!source.reply_to && source.raw_r2_key) {
 		const file = new LocalStorage().file(source.raw_r2_key);
 		if (await file.exists()) {
-			const parsed = await PostalMime.parse(await file.arrayBuffer());
+			const parsed = await PostalMime.parse(await readMailHeaderBlock(file));
 			const replyTo = parsed.replyTo
 				?.flatMap((item) =>
 					"address" in item && item.address ? [item.address] : [],

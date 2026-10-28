@@ -8,8 +8,7 @@ import { requireToolAccess, withToolMutation } from "./access";
 import { createAgentDraft, editAgentDraft, discardAgentDraft } from "./drafts";
 import { getReplyRecipients } from "./reply";
 import { requestAgentSend } from "./approvals";
-import { spamFeedback } from "../mail/spam-feedback";
-import { audit } from "../mail/message-actions";
+import { applyAgentMoves } from "./organize";
 import type {
 	AgentToolContext,
 	EmailToolName,
@@ -217,35 +216,9 @@ AND (${parsed.before ? Math.floor(parsed.before.getTime() / 1000) : null} IS NUL
 				destination,
 				emails: rows.map(publicToolMessage),
 			};
-		await withToolMutation(ctx, "manage", async (sql) => {
-			for (const row of rows) {
-				const [current] =
-					await sql.NativeAgentMoveCurrent`SELECT status FROM messages WHERE id=${row.id} AND mailbox_id=${ctx.mailboxId} AND status NOT IN('draft','sent')`;
-				if (!current) throw new Error("Cannot move this message");
-				const [sending] =
-					await sql.NativeAgentMoveSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${row.id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${row.id}) LIMIT 1`;
-				if (sending) throw new Error("A message is being sent");
-				if (
-					destination === "spam" ||
-					(destination === "inbox" && current.status === "spam")
-				)
-					await spamFeedback(
-						sql,
-						ctx.user,
-						row.id,
-						destination === "spam" ? "spam" : "ham",
-					);
-				else {
-					const status = destination === "inbox" ? "received" : destination;
-					await sql.NativeAgentMoveMessage`UPDATE messages SET status=${status},trashed_at=CASE WHEN ${status}='trash' THEN ${seconds()} ELSE NULL END WHERE id=${row.id} AND mailbox_id=${ctx.mailboxId}`;
-					await audit(sql, ctx.user, ctx.mailboxId, row.id, "email.delete", {
-						status,
-					});
-				}
-				if (destination === "trash")
-					await sql.NativeAgentMoveCancelQueued`UPDATE outbound_jobs SET status='cancelled',updated_at=${seconds()} WHERE message_id=${row.id} AND status='queued'`;
-			}
-		});
+		await withToolMutation(ctx, "manage", (sql) =>
+			applyAgentMoves(sql, ctx, ids, destination),
+		);
 		return { emailIds: ids, destination, status: "approved" };
 	}
 	if (name === "discard_draft") {

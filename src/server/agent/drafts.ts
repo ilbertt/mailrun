@@ -1,4 +1,5 @@
-import { withDatabase, id, seconds } from "../db";
+import { assertAutoDraftPublish } from "./job-guard";
+import { withDatabase, id, seconds, type AppSQL } from "../db";
 import {
 	draftLock,
 	formattedSender,
@@ -48,8 +49,11 @@ export async function createAgentDraft(
 			: [],
 		draftId = id("msg");
 	await withToolMutation(ctx, "send", async (sql) => {
+		await assertAutoDraftPublish(sql, ctx);
 		await sql.NativeCreateAgentDraft`INSERT INTO messages(id,user_id,mailbox_id,direction,from_addr,to_addr,cc_addr,subject,text_body,html_body,snippet,status,read,in_reply_to,references_header,thread_id,created_at) VALUES(${draftId},${ctx.user.id},${ctx.mailboxId},'outbound',${from},${input.to},${input.cc || null},${input.subject},${formatted.text},${formatted.html},${buildSnippet(formatted.text, null)},'draft',1,${source?.provider_message_id ?? null},${refs.length ? formatMessageIdHeader(refs) : null},${source?.thread_id ?? null},${seconds()})`;
 		await sql.NativeCreateAgentDraftMetadata`INSERT INTO agent_draft_metadata(draft_id,mailbox_id,origin,source_message_id,revision,created_at) VALUES(${draftId},${ctx.mailboxId},${ctx.origin},${source?.id ?? null},1,${seconds()})`;
+		if (ctx.job)
+			await sql.NativeCompletePublishedAutoDraft`UPDATE agent_jobs SET status='completed',draft_id=${draftId},lease_until=NULL,reason=NULL WHERE id=${ctx.job.id} AND status='running' AND attempts=${ctx.job.attempt} AND lease_until=${ctx.job.leaseUntil}`;
 	});
 	return {
 		draftId,
@@ -236,19 +240,28 @@ export async function discardAgentDraft(
 	return draftLock(draftId, async () => {
 		await requireToolAccess(ctx, "send");
 		const row = await ownToolMessage(ctx, draftId);
-		const keys = await withToolMutation(ctx, "send", async (sql) => {
-			const [draft] =
-				await sql.NativeAgentDiscardGuard`SELECT m.raw_r2_key FROM messages m JOIN agent_draft_metadata a ON a.draft_id=m.id WHERE m.id=${draftId} AND m.mailbox_id=${ctx.mailboxId} AND m.user_id=${ctx.user.id} AND m.status='draft' AND a.revision=${revision} AND a.human_edited_at IS NULL`;
-			if (!draft) throw new Error("Draft changed or cannot be discarded");
-			const files =
-				await sql.NativeAgentDiscardFiles`SELECT r2_key FROM message_attachments WHERE message_id=${draftId}`;
-			await sql.NativeAgentDiscard`DELETE FROM messages WHERE id=${draftId}`;
-			return [
-				...files.map((file) => file.r2_key),
-				...(draft.raw_r2_key ? [draft.raw_r2_key] : []),
-			];
-		});
+		const keys = await withToolMutation(ctx, "send", (sql) =>
+			discardAgentDraftRows(sql, ctx, draftId, revision),
+		);
 		await deleteUnreferencedObjects(keys);
 		return { draftId: row.id, status: "discarded" };
 	});
+}
+
+export async function discardAgentDraftRows(
+	sql: AppSQL,
+	ctx: AgentToolContext,
+	draftId: string,
+	revision: number,
+) {
+	const [draft] =
+		await sql.NativeAgentDiscardGuard`SELECT m.raw_r2_key FROM messages m JOIN agent_draft_metadata a ON a.draft_id=m.id WHERE m.id=${draftId} AND m.mailbox_id=${ctx.mailboxId} AND m.user_id=${ctx.user.id} AND m.status='draft' AND a.revision=${revision} AND a.human_edited_at IS NULL`;
+	if (!draft) throw new Error("Draft changed or cannot be discarded");
+	const files =
+		await sql.NativeAgentDiscardFiles`SELECT r2_key FROM message_attachments WHERE message_id=${draftId}`;
+	await sql.NativeAgentDiscard`DELETE FROM messages WHERE id=${draftId}`;
+	return [
+		...files.map((file) => file.r2_key),
+		...(draft.raw_r2_key ? [draft.raw_r2_key] : []),
+	];
 }

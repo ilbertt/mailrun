@@ -28,6 +28,8 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 				);
 		} else if (name === "maintenance") {
 			await runWebhookJobs();
+			const { recoverAgentDraftJobs } = await import("../agent/jobs");
+			await recoverAgentDraftJobs();
 			await runTrashRetention();
 			await withDatabase(async (sql) => {
 				await sql.ExpireApprovals`UPDATE agent_send_approvals SET status='expired' WHERE status='pending' AND expires_at<${seconds()}`;

@@ -2,6 +2,7 @@ import type { User } from "../../shared/contracts";
 import type { ApiPrincipal } from "../../server/auth/key-principal";
 
 export type CalendarToolContext = {
+	signal?: AbortSignal;
 	actor?: ApiPrincipal;
 	user: User;
 	timeZone?: string;

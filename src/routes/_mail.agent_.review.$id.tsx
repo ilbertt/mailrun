@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Page from "../app/(dashboard)/agent/review/[id]/page";
-export const Route = createFileRoute("/_mail/agent/review/$id")({
+export const Route = createFileRoute("/_mail/agent_/review/$id")({
 	component: ReviewPage,
 });
 

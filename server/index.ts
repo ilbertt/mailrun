@@ -1,3 +1,5 @@
+import { serveAgentChat } from "../src/server/api/agent-chat";
+import { startAgentDispatcher } from "../src/server/agent/dispatcher";
 import { handleMcpRequest } from "../src/server/mcp/handler";
 import { isJmapPath, handleJmapRequest } from "../src/server/jmap/handler";
 import { isV1Path, serveV1Api } from "../src/server/api/v1";
@@ -39,6 +41,7 @@ if (name) {
 	await clearDomainRuntimeLeases();
 	await registerCrons(import.meta.path);
 	const stopWebhookDispatcher = startWebhookDispatcher();
+	const stopAgentDispatcher = startAgentDispatcher();
 	const server = Bun.serve<RealtimeSession>({
 		port: Number(process.env.PORT ?? 3000),
 		hostname: process.env.HOST ?? "0.0.0.0",
@@ -73,6 +76,8 @@ if (name) {
 					return;
 				return new Response("Expected WebSocket upgrade", { status: 426 });
 			}
+			if (new URL(request.url).pathname === "/api/agent/chat")
+				return serveAgentChat(request, () => server.timeout(request, 0));
 			if (new URL(request.url).pathname === "/mcp")
 				return handleMcpRequest(request, () => server.timeout(request, 0));
 			if (isJmapPath(new URL(request.url).pathname)) {
@@ -97,6 +102,7 @@ if (name) {
 	});
 	console.log(`Mailrun listening on ${server.url}`);
 	const shutdown = async () => {
+		await stopAgentDispatcher();
 		await stopWebhookDispatcher();
 		closeRealtimeConnections();
 		const timeout = setTimeout(() => {
