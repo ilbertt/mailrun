@@ -1,3 +1,8 @@
+import { awsDomainApi } from "./aws-domain";
+import { AwsClient } from "../aws/client";
+import { getAwsConfig } from "../aws/settings";
+import { SesClient } from "../aws/ses";
+import { hasSesReceiving } from "../aws/domains";
 import { resendDomainApi } from "./resend-domain";
 import { ResendClient } from "../resend/client";
 import { resendKeyStatus } from "../resend/settings";
@@ -50,6 +55,8 @@ export async function domainsApi(
 			providerSend,
 		);
 		if (resendResponse) return resendResponse;
+		const awsResponse = await awsDomainApi(request, user, client, providerSend);
+		if (awsResponse) return awsResponse;
 		if (path === "/api/domains/check" && method === "POST") {
 			const input = z
 				.object({ hostname: z.string().min(3) })
@@ -151,28 +158,35 @@ export async function domainsApi(
 			if (method === "GET") {
 				const domain = await getDomain(user, domainId);
 				if (operation === "receiving") {
-					const key = await resendKeyStatus();
+					const [key, aws] = await Promise.all([
+						resendKeyStatus(),
+						getAwsConfig(),
+					]);
+					const [resend, ses] = await Promise.all([
+						key.apiKey
+							? resendReceivingPresence(
+									domain,
+									new ResendClient(key.apiKey, providerSend),
+								)
+							: Promise.resolve(null),
+						aws
+							? hasSesReceiving(domain, new AwsClient(aws, providerSend))
+							: Promise.resolve(null),
+					]);
 					return Response.json(
-						{
-							cloudflare: !!domain.routing_enabled,
-							resend: await resendReceivingPresence(
-								domain,
-								key.apiKey
-									? new ResendClient(key.apiKey, providerSend)
-									: undefined,
-							),
-							ses: null,
-						},
+						{ cloudflare: !!domain.routing_enabled, resend, ses },
 						{ headers: { "Cache-Control": "no-store" } },
 					);
 				}
-				const [key, api] = await Promise.all([
+
+				const [key, api, aws] = await Promise.all([
 					resendKeyStatus(),
 					client
 						? Promise.resolve(client)
 						: requireDomainClient().catch(() => null),
+					getAwsConfig(),
 				]);
-				const [cloudflare, resendStatus] = await Promise.all([
+				const [cloudflare, resendStatus, ses] = await Promise.all([
 					api
 						? api
 								.sending(domain.zone_id)
@@ -185,6 +199,11 @@ export async function domainsApi(
 								new ResendClient(key.apiKey, providerSend),
 							)
 						: Promise.resolve(null),
+					aws
+						? new SesClient(new AwsClient(aws, providerSend))
+								.identity(domain.hostname)
+								.catch(() => null)
+						: Promise.resolve(null),
 				]);
 				return Response.json(
 					{
@@ -192,8 +211,8 @@ export async function domainsApi(
 						resend:
 							resendStatus === null ? null : resendStatus !== "not_registered",
 						resendStatus,
-						ses: null,
-						sesVerified: null,
+						ses: ses === null ? null : ses.registered,
+						sesVerified: ses?.verified ?? null,
 					},
 					{ headers: { "Cache-Control": "no-store" } },
 				);

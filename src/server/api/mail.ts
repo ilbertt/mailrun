@@ -1,3 +1,4 @@
+import { awsApi } from "./aws";
 import { adminMaintenanceApi } from "./admin-maintenance";
 import { resendKeyApi } from "./resend-key";
 import { aiUsageApi } from "./ai-usage";
@@ -93,6 +94,8 @@ export async function dispatchMailApi(
 	if (maintenance) return maintenance;
 	const resendKey = await resendKeyApi(request, user);
 	if (resendKey) return resendKey;
+	const aws = await awsApi(request, user);
+	if (aws) return aws;
 	const usage = await aiUsageApi(request, user);
 	if (usage) return usage;
 	const assistant = await agentApi(request, user);

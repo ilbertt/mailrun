@@ -1677,6 +1677,33 @@ export interface IClaimInstallationResult {
 export interface IDeleteSessionResult {
 }
 
+/** Result of query `NativeSesReceipt`. */
+export interface INativeSesReceiptResult {
+    result_json: IMailrunSesReceiptsColumns["result_json"];
+}
+
+/** Result of query `NativeRecordSesReceipt`. */
+export interface INativeRecordSesReceiptResult {
+}
+
+/** Result of query `NativeAwsSettings`. */
+export interface INativeAwsSettingsResult {
+    aws_config: IAppSettingsColumns["aws_config"];
+    ses_receiving: IAppSettingsColumns["ses_receiving"];
+}
+
+/** Result of query `NativeSaveAwsConfig`. */
+export interface INativeSaveAwsConfigResult {
+}
+
+/** Result of query `NativeClearAwsConfig`. */
+export interface INativeClearAwsConfigResult {
+}
+
+/** Result of query `NativeSaveSesReceiving`. */
+export interface INativeSaveSesReceivingResult {
+}
+
 /** Result of query `NativeBackupSettings`. */
 export interface INativeBackupSettingsResult {
     id: IBackupSettingsColumns["id"];
@@ -3859,6 +3886,11 @@ export interface IKeyboardShortcutsResult {
     keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
 }
 
+/** Result of query `NativeProviderInboundDomain`. */
+export interface INativeProviderInboundDomainResult {
+    id: IDomainsColumns["id"];
+}
+
 /** Result of query `NativeOutboundProvider`. */
 export interface INativeOutboundProviderResult {
     sending_provider: IDomainsColumns["sending_provider"];
@@ -4313,11 +4345,6 @@ export interface INativeRealtimeRevisionResult {
     id: string;
     revision: unknown | null;
     permission: unknown | null;
-}
-
-/** Result of query `NativeProviderInboundDomain`. */
-export interface INativeProviderInboundDomainResult {
-    id: IDomainsColumns["id"];
 }
 
 /** Result of query `NativeResendCredentials`. */
@@ -4841,6 +4868,12 @@ export interface Queries {
     ConsumeRecoveryCode: IConsumeRecoveryCodeResult;
     ClaimInstallation: IClaimInstallationResult;
     DeleteSession: IDeleteSessionResult;
+    NativeSesReceipt: INativeSesReceiptResult;
+    NativeRecordSesReceipt: INativeRecordSesReceiptResult;
+    NativeAwsSettings: INativeAwsSettingsResult;
+    NativeSaveAwsConfig: INativeSaveAwsConfigResult;
+    NativeClearAwsConfig: INativeClearAwsConfigResult;
+    NativeSaveSesReceiving: INativeSaveSesReceivingResult;
     NativeBackupSettings: INativeBackupSettingsResult;
     NativeBackupInventory: INativeBackupInventoryResult;
     NativeUpdateBackupSettings: INativeUpdateBackupSettingsResult;
@@ -5135,6 +5168,7 @@ export interface Queries {
     MoveNavigationMessage: IMoveNavigationMessageResult;
     UpdateKeyboardShortcuts: IUpdateKeyboardShortcutsResult;
     KeyboardShortcuts: IKeyboardShortcutsResult;
+    NativeProviderInboundDomain: INativeProviderInboundDomainResult;
     NativeOutboundProvider: INativeOutboundProviderResult;
     ListMailboxes: IListMailboxesResult;
     MailboxSenderDomains: IMailboxSenderDomainsResult;
@@ -5193,7 +5227,6 @@ export interface Queries {
     NativePushRecipients: INativePushRecipientsResult;
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;
-    NativeProviderInboundDomain: INativeProviderInboundDomainResult;
     NativeResendCredentials: INativeResendCredentialsResult;
     NativeSaveResendCredentials: INativeSaveResendCredentialsResult;
     NativeResendWebhookCredentials: INativeResendWebhookCredentialsResult;
@@ -5879,6 +5912,21 @@ export interface IMailrunJobLeasesTable {
     relationType: (typeof schema)["mailrun_job_leases"]["_relationType"];
     indexes: keyof (typeof schema)["mailrun_job_leases"]["_indexes"];
     constraints: keyof (typeof schema)["mailrun_job_leases"]["_constraints"];
+}
+
+/** Columns of `mailrun_ses_receipts`. */
+export interface IMailrunSesReceiptsColumns {
+    id: string;
+    result_json: string;
+    created_at: number;
+}
+
+/** Schema of `mailrun_ses_receipts`. */
+export interface IMailrunSesReceiptsTable {
+    columns: IMailrunSesReceiptsColumns;
+    relationType: (typeof schema)["mailrun_ses_receipts"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_ses_receipts"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_ses_receipts"]["_constraints"];
 }
 
 /** Columns of `mcp_key_mailboxes`. */
@@ -6942,6 +6990,19 @@ export const schema = {
         },
         _constraints: {}
     },
+    mailrun_ses_receipts: {
+        _relationName: "mailrun_ses_receipts",
+        _relationType: "table",
+        _columns: {
+            id: { _columnName: "id", _foreignKeys: {} },
+            result_json: { _columnName: "result_json", _foreignKeys: {} },
+            created_at: { _columnName: "created_at", _foreignKeys: {} }
+        },
+        _indexes: {
+            sqlite_autoindex_mailrun_ses_receipts_1: { _indexName: "sqlite_autoindex_mailrun_ses_receipts_1" }
+        },
+        _constraints: {}
+    },
     mcp_key_mailboxes: {
         _relationName: "mcp_key_mailboxes",
         _relationType: "table",
@@ -7396,6 +7457,7 @@ export interface Tables {
     mailrun_installation: IMailrunInstallationTable;
     mailrun_jmap_uploads: IMailrunJmapUploadsTable;
     mailrun_job_leases: IMailrunJobLeasesTable;
+    mailrun_ses_receipts: IMailrunSesReceiptsTable;
     mcp_key_mailboxes: IMcpKeyMailboxesTable;
     message_attachments: IMessageAttachmentsTable;
     messages: IMessagesTable;

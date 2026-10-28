@@ -61,7 +61,10 @@ test("migration DDL and its ledger entry roll back together and can be retried",
 	const db = await legacyDatabase(path);
 	try {
 		const before = await getMigrationStatus(path);
-		expect(before.pending).toEqual(["0065_jmap_uploads.sql"]);
+		expect(before.pending).toEqual([
+			"0065_jmap_uploads.sql",
+			"0066_ses_receipts.sql",
+		]);
 		db.exec(
 			"CREATE TRIGGER reject_migration BEFORE INSERT ON d1_migrations BEGIN SELECT RAISE(ABORT,'synthetic failure'); END",
 		);
@@ -147,8 +150,9 @@ test("independent processes applying the same migration each observe one committ
 			}),
 		);
 		expect(results.every((r) => r.ready)).toBe(true);
-		expect(results.flatMap((r) => r.applied)).toEqual([
+		expect(results.flatMap((r) => r.applied).sort()).toEqual([
 			"0065_jmap_uploads.sql",
+			"0066_ses_receipts.sql",
 		]);
 	} finally {
 		db.close();

@@ -1,3 +1,8 @@
+import {
+	isProviderControlPath,
+	serveProviderControl,
+} from "../src/server/api/provider-session";
+import { clearSendingStaging } from "../src/server/mail/sending-staging";
 import { serveAgentChat } from "../src/server/api/agent-chat";
 import { startAgentDispatcher } from "../src/server/agent/dispatcher";
 import { handleMcpRequest } from "../src/server/mcp/handler";
@@ -37,6 +42,7 @@ if (name) {
 } else {
 	// Literal imports are bundled into the executable, including Start's lazy chunks.
 	const { default: handler } = await import("#start-handler");
+	await clearSendingStaging();
 	await clearDriveRuntimeLeases();
 	await clearImapStaging();
 	await clearDomainRuntimeLeases();
@@ -79,6 +85,10 @@ if (name) {
 						return;
 					return new Response("Expected WebSocket upgrade", { status: 426 });
 				}
+				if (isProviderControlPath(new URL(request.url).pathname))
+					return serveProviderControl(request, () =>
+						server.timeout(request, 0),
+					);
 				if (new URL(request.url).pathname === "/api/agent/chat")
 					return serveAgentChat(request, () => server.timeout(request, 0));
 				if (new URL(request.url).pathname === "/mcp")

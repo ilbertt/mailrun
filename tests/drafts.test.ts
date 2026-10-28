@@ -364,7 +364,7 @@ test("choosing another sending provider never delivers the message through Cloud
 				? "Sending is not set up"
 				: provider === "resend"
 					? "Resend is selected but no API key"
-					: "Amazon SES sending is not configured",
+					: "AWS is selected but no credentials are configured",
 		);
 		expect(called).toBe(false);
 		expect((await getDraft(owner, draft.id)).status).toBe("draft");

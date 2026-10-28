@@ -18,7 +18,7 @@ export async function prepareAttachments(
 		html?: string;
 		headers: Record<string, string>;
 	},
-	provider: "cloudflare" | "resend" = "cloudflare",
+	provider: "cloudflare" | "resend" | "ses" = "cloudflare",
 ) {
 	const rows = await withDatabase(
 		(sql) =>

@@ -21,6 +21,7 @@
 		"smoke": "bun scripts/smoke.ts",
 		"smoke:agent": "bun scripts/smoke-agent.ts",
 		"smoke:resend": "bun scripts/smoke-resend.ts",
+		"smoke:aws": "bun scripts/smoke-aws.ts",
 		"check:typescript-version": "bun scripts/check-typescript-version.ts"
 	},
 	"dependencies": {

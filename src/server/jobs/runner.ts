@@ -1,3 +1,4 @@
+import { clearSendingStaging } from "../mail/sending-staging";
 import { runWebhookJobs } from "../webhooks/delivery";
 import { runDriveRetention } from "../drive/retention";
 import { runTrashRetention } from "./retention";
@@ -27,6 +28,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 					console.error(`Scheduled send ${job.id} failed`, error),
 				);
 		} else if (name === "maintenance") {
+			await clearSendingStaging();
 			await runWebhookJobs();
 			const { recoverAgentDraftJobs } = await import("../agent/jobs");
 			await recoverAgentDraftJobs();

@@ -389,7 +389,7 @@ export async function removeResendReceiving(
 ) {
 	const current = await resend.findDomain(domain.hostname),
 		dns = await dnsClient(domain, api);
-	if (dns)
+	if (dns && domain.receiving_provider !== "ses")
 		for (const row of await dns.listDns(domain.zone_id, "MX", domain.hostname))
 			if (row.id && isInboundSmtpMx(row.content ?? ""))
 				await dns.deleteDns(domain.zone_id, row.id);

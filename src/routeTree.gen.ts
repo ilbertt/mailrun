@@ -78,6 +78,7 @@ import { Route as MailSpamMessageIdRouteImport } from './routes/_mail.spam.$mess
 import { Route as MailStarredMessageIdRouteImport } from './routes/_mail.starred.$messageId'
 import { Route as MailTrashMessageIdRouteImport } from './routes/_mail.trash.$messageId'
 import { Route as ApiInboundResendRouteImport } from './routes/api.inbound.resend'
+import { Route as ApiInboundSesRouteImport } from './routes/api.inbound.ses'
 import { Route as ApiSharedFilesTokenRouteImport } from './routes/api.shared-files.$token'
 import { Route as BookUserIdIndexRouteImport } from './routes/book.$userId.index'
 import { Route as BookUserIdEventIdRouteImport } from './routes/book.$userId.$eventId'
@@ -440,6 +441,11 @@ const ApiInboundResendRoute = ApiInboundResendRouteImport.update({
   path: '/resend',
   getParentRoute: () => ApiInboundRoute,
 } as any)
+const ApiInboundSesRoute = ApiInboundSesRouteImport.update({
+  id: '/ses',
+  path: '/ses',
+  getParentRoute: () => ApiInboundRoute,
+} as any)
 const ApiSharedFilesTokenRoute = ApiSharedFilesTokenRouteImport.update({
   id: '/api/shared-files/$token',
   path: '/api/shared-files/$token',
@@ -587,6 +593,7 @@ export interface FileRoutesByFullPath {
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/inbound/resend': typeof ApiInboundResendRoute
+  '/api/inbound/ses': typeof ApiInboundSesRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -670,6 +677,7 @@ export interface FileRoutesByTo {
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/inbound/resend': typeof ApiInboundResendRoute
+  '/api/inbound/ses': typeof ApiInboundSesRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -757,6 +765,7 @@ export interface FileRoutesById {
   '/_mail/starred/$messageId': typeof MailStarredMessageIdRoute
   '/_mail/trash/$messageId': typeof MailTrashMessageIdRoute
   '/api/inbound/resend': typeof ApiInboundResendRoute
+  '/api/inbound/ses': typeof ApiInboundSesRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -844,6 +853,7 @@ export interface FileRouteTypes {
     | '/starred/$messageId'
     | '/trash/$messageId'
     | '/api/inbound/resend'
+    | '/api/inbound/ses'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -927,6 +937,7 @@ export interface FileRouteTypes {
     | '/starred/$messageId'
     | '/trash/$messageId'
     | '/api/inbound/resend'
+    | '/api/inbound/ses'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -1013,6 +1024,7 @@ export interface FileRouteTypes {
     | '/_mail/starred/$messageId'
     | '/_mail/trash/$messageId'
     | '/api/inbound/resend'
+    | '/api/inbound/ses'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -1542,6 +1554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInboundResendRouteImport
       parentRoute: typeof ApiInboundRoute
     }
+    '/api/inbound/ses': {
+      id: '/api/inbound/ses'
+      path: '/ses'
+      fullPath: '/api/inbound/ses'
+      preLoaderRoute: typeof ApiInboundSesRouteImport
+      parentRoute: typeof ApiInboundRoute
+    }
     '/api/shared-files/$token': {
       id: '/api/shared-files/$token'
       path: '/api/shared-files/$token'
@@ -1911,10 +1930,12 @@ const JmapRouteWithChildren = JmapRoute._addFileChildren(JmapRouteChildren)
 
 interface ApiInboundRouteChildren {
   ApiInboundResendRoute: typeof ApiInboundResendRoute
+  ApiInboundSesRoute: typeof ApiInboundSesRoute
 }
 
 const ApiInboundRouteChildren: ApiInboundRouteChildren = {
   ApiInboundResendRoute: ApiInboundResendRoute,
+  ApiInboundSesRoute: ApiInboundSesRoute,
 }
 
 const ApiInboundRouteWithChildren = ApiInboundRoute._addFileChildren(

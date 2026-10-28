@@ -1,3 +1,7 @@
+import type { AwsConfig } from "../../lib/aws/aws-types";
+import { requireAwsConfig } from "../aws/settings";
+import { sendSesMail } from "../aws/send";
+import { base64Blob, iteratorStream } from "./attachment-stream";
 import { OutboundProviderError } from "./provider-error";
 import { z } from "zod";
 import { withDatabase } from "../db";
@@ -8,7 +12,8 @@ import { ResendClient } from "../resend/client";
 import { requireResendKey } from "../resend/settings";
 export type OutboundConfig =
 	| { provider: "cloudflare"; apiToken: string; accountId: string }
-	| { provider: "resend"; apiKey: string };
+	| { provider: "resend"; apiKey: string }
+	| { provider: "ses"; config: AwsConfig };
 export type OutboundAttachment = {
 	filename: string;
 	type: string;
@@ -43,7 +48,7 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 	if (provider === "resend")
 		return { provider: "resend", apiKey: await requireResendKey() };
 	if (provider === "ses")
-		throw new OutboundProviderError("Amazon SES sending is not configured");
+		return { provider: "ses", config: await requireAwsConfig() };
 	const installation = await getInstallation();
 	if (!installation)
 		throw new OutboundProviderError("Cloudflare email is not configured");
@@ -56,30 +61,6 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 		apiToken: installation.api_token,
 		accountId: installation.account_id,
 	};
-}
-async function* base64(file: Blob) {
-	const reader = file.stream().getReader();
-	let carry = new Uint8Array(0);
-	try {
-		for (;;) {
-			const chunk = await reader.read();
-			if (chunk.done) break;
-			const bytes = carry.length
-					? Buffer.concat([carry, chunk.value])
-					: Buffer.from(
-							chunk.value.buffer,
-							chunk.value.byteOffset,
-							chunk.value.byteLength,
-						),
-				length = bytes.length - (bytes.length % 3);
-			if (length) yield bytes.subarray(0, length).toString("base64");
-			carry = Uint8Array.from(bytes.subarray(length));
-		}
-		if (carry.length) yield Buffer.from(carry).toString("base64");
-	} finally {
-		await reader.cancel().catch(() => undefined);
-		reader.releaseLock();
-	}
 }
 async function* resendBody(
 	message: OutboundMail,
@@ -110,7 +91,7 @@ async function* resendBody(
 			if (typeof attachment.content === "string")
 				yield encoder.encode(attachment.content);
 			else
-				for await (const chunk of base64(attachment.content))
+				for await (const chunk of base64Blob(attachment.content))
 					yield encoder.encode(chunk);
 			yield encoder.encode('"}');
 		}
@@ -124,6 +105,8 @@ export async function sendThroughProvider(
 	send: CloudflareFetch = fetch,
 	idempotencyKey?: string,
 ) {
+	if (config.provider === "ses")
+		return sendSesMail(config.config, message, send);
 	if (config.provider === "cloudflare") {
 		const body = JSON.stringify(message);
 		if (Buffer.byteLength(body) > 5 * 1024 * 1024)
@@ -144,21 +127,7 @@ export async function sendThroughProvider(
 		: crypto.randomUUID();
 	const messageId = message.headers?.["Message-ID"] ?? `<${nonce}@${domain}>`;
 	const headers = { ...message.headers, "Message-ID": messageId };
-	const iterator = resendBody(message, headers);
-	const body = new ReadableStream<Uint8Array>({
-		async pull(controller) {
-			try {
-				const next = await iterator.next();
-				if (next.done) controller.close();
-				else controller.enqueue(next.value);
-			} catch (error) {
-				controller.error(error);
-			}
-		},
-		async cancel() {
-			await iterator.return();
-		},
-	});
+	const body = iteratorStream(resendBody(message, headers));
 	const controller = new AbortController();
 	const timeout = setTimeout(
 		() => controller.abort(new Error("Resend send timed out")),

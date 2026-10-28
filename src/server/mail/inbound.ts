@@ -104,15 +104,24 @@ export async function storeInbound(
 		phase?: "receive" | "forwarded" | "forward-failed";
 		legacy?: boolean;
 		provider?: boolean;
+		headers?: Record<string, string>;
 		parsed?: Awaited<ReturnType<typeof PostalMime.parse>>;
 	} = {},
 ) {
 	to = to.toLowerCase();
 	const parsed = options.parsed ?? (await PostalMime.parse(raw)),
 		message = parsePostalMime(parsed);
-	const headers = Object.fromEntries(
-		parsed.headers.map((header) => [header.key.toLowerCase(), header.value]),
-	);
+	const headers = {
+		...Object.fromEntries(
+			parsed.headers.map((header) => [header.key.toLowerCase(), header.value]),
+		),
+		...Object.fromEntries(
+			Object.entries(options.headers ?? {}).map(([name, value]) => [
+				name.toLowerCase(),
+				value,
+			]),
+		),
+	};
 	if (message.attachments.length > 10)
 		return {
 			action: "reject" as const,

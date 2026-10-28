@@ -51,6 +51,7 @@ export const BACKUP_TABLES: DatabaseBackupTable[] = [
 	"drive_upload_parts",
 	"mailrun_installation",
 	"mailrun_jmap_uploads",
+	"mailrun_ses_receipts", // Acknowledge retries after their temporary S3 objects were consumed.
 ];
 export const INTERNAL_TABLES = [
 	"d1_migrations",
