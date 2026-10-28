@@ -103,10 +103,12 @@ export async function storeInbound(
 	options: {
 		phase?: "receive" | "forwarded" | "forward-failed";
 		legacy?: boolean;
+		provider?: boolean;
+		parsed?: Awaited<ReturnType<typeof PostalMime.parse>>;
 	} = {},
 ) {
 	to = to.toLowerCase();
-	const parsed = await PostalMime.parse(raw),
+	const parsed = options.parsed ?? (await PostalMime.parse(raw)),
 		message = parsePostalMime(parsed);
 	const headers = Object.fromEntries(
 		parsed.headers.map((header) => [header.key.toLowerCase(), header.value]),
@@ -147,9 +149,19 @@ export async function storeInbound(
 			content: [parsed.text, parsed.html].filter(Boolean).join("\n"),
 		},
 	);
-	if (!decision)
+	if (!decision) {
+		if (options.provider) return { action: "accepted" as const };
 		return { action: "reject" as const, reason: "Unknown recipient" };
+	}
 	if (decision.action === "reject") return decision;
+	// Provider webhooks cannot forward the original SMTP delivery. As in the
+	// source provider intake/queue, accept without a stored message when a
+	// forward has no local copy, or when routing has no destination mailbox.
+	if (
+		options.provider &&
+		((decision.action === "forward" && !decision.keepCopy) || !decision.mailbox)
+	)
+		return { action: "accepted" as const };
 	const mailbox = decision.mailbox;
 	const forwarded = parsed.headers.some(
 		(header) =>
@@ -173,7 +185,8 @@ export async function storeInbound(
 		forwardTo &&
 		forwardTo.toLowerCase() !== to &&
 		(options.phase ?? "receive") === "receive" &&
-		!options.legacy
+		!options.legacy &&
+		!options.provider
 	) {
 		return {
 			action: "forward" as const,

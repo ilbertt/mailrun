@@ -359,7 +359,13 @@ test("choosing another sending provider never delivers the message through Cloud
 					result: { message_id: "unexpected" },
 				});
 			}),
-		).rejects.toThrow("sending is not enabled");
+		).rejects.toThrow(
+			provider === "none"
+				? "Sending is not set up"
+				: provider === "resend"
+					? "Resend is selected but no API key"
+					: "Amazon SES sending is not configured",
+		);
 		expect(called).toBe(false);
 		expect((await getDraft(owner, draft.id)).status).toBe("draft");
 	}

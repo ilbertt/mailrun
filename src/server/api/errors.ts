@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { OutboundProviderError } from "../mail/provider-error";
 export async function apiErrorResponse(error: unknown): Promise<Response> {
+	if (error instanceof OutboundProviderError)
+		return Response.json({ error: error.message }, { status: 500 });
 	if (error instanceof Response) {
 		const headers = new Headers(error.headers);
 		headers.delete("content-type");

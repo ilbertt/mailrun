@@ -228,7 +228,9 @@ export async function uploadAttachments(
 			}[] = [];
 			for (const file of files) {
 				const key = `attachments/${draftId}/${id("file")}`;
-				await storage.put(key, await file.bytes());
+				// Bun.write can consume the multipart File directly. Materializing
+				// bytes here retained another full attachment beside the form body.
+				await storage.put(key, file);
 				uploaded.push(key);
 				entries.push({
 					key,

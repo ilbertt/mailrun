@@ -109,13 +109,49 @@ export async function auditDomainDns(
 	return { mx, spf, dkim, dmarc };
 }
 export async function domainDns(
-	client: DomainCloudflare,
+	client: DomainCloudflare | null,
 	domain: DomainRecord,
 	lookup: DnsLookup = queryDns,
 ) {
-	if (domain.zone_id === "manual")
+	if (domain.zone_id === "manual") {
+		const mailHost =
+			process.env.MAIL_HOSTNAME?.trim() || `mail.${domain.hostname}`;
+		const view = {
+			routing: {
+				records: [] as DnsRecord[],
+				missing: [
+					{
+						type: "MX",
+						name: domain.hostname,
+						content: `10 ${mailHost}`,
+						ttl: 3600,
+					},
+					{
+						type: "TXT",
+						name: domain.hostname,
+						content: `v=spf1 a:${mailHost} ~all`,
+						ttl: 3600,
+					},
+					{
+						type: "TXT",
+						name: `_dmarc.${domain.hostname}`,
+						content: "v=DMARC1; p=none",
+						ttl: 3600,
+					},
+				],
+				status: "manual",
+			},
+			sending: [] as DnsRecord[],
+			sendingEnabled: false,
+		};
+		return {
+			...view,
+			audit: await auditDomainDns(domain.hostname, view, lookup),
+		};
+	}
+	if (!client)
 		throw new Error(
-			"Connect this domain to Cloudflare to manage email routing",
+			"Configure Cloudflare email during setup before managing DNS",
 		);
 	const [routing, settings, identities] = await Promise.all([
 			client.routingDns(domain.zone_id),

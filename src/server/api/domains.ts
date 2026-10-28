@@ -1,3 +1,11 @@
+import { resendDomainApi } from "./resend-domain";
+import { ResendClient } from "../resend/client";
+import { resendKeyStatus } from "../resend/settings";
+import {
+	resendSendingStatus,
+	resendReceivingPresence,
+} from "../resend/domains";
+import type { CloudflareFetch } from "../cloudflare/client";
 import type { DnsLookup } from "../domains/dns";
 import { z } from "zod";
 import type { User } from "../../shared/contracts";
@@ -28,12 +36,20 @@ export async function domainsApi(
 	user: User,
 	client?: DomainCloudflare,
 	lookup?: DnsLookup,
+	providerSend: CloudflareFetch = fetch,
 ): Promise<Response | null> {
 	const url = new URL(request.url),
 		path = url.pathname,
 		method = request.method;
 	if (path !== "/api/domains" && !path.startsWith("/api/domains/")) return null;
 	try {
+		const resendResponse = await resendDomainApi(
+			request,
+			user,
+			client,
+			providerSend,
+		);
+		if (resendResponse) return resendResponse;
 		if (path === "/api/domains/check" && method === "POST") {
 			const input = z
 				.object({ hostname: z.string().min(3) })
@@ -134,24 +150,48 @@ export async function domainsApi(
 			}
 			if (method === "GET") {
 				const domain = await getDomain(user, domainId);
-				if (operation === "receiving")
-					return Response.json({
-						cloudflare: !!domain.routing_enabled,
-						resend: null,
-						ses: null,
-					});
-				const api = client ?? (await requireDomainClient().catch(() => null)),
-					cloudflare = api
-						? await api
+				if (operation === "receiving") {
+					const key = await resendKeyStatus();
+					return Response.json(
+						{
+							cloudflare: !!domain.routing_enabled,
+							resend: await resendReceivingPresence(
+								domain,
+								key.apiKey
+									? new ResendClient(key.apiKey, providerSend)
+									: undefined,
+							),
+							ses: null,
+						},
+						{ headers: { "Cache-Control": "no-store" } },
+					);
+				}
+				const [key, api] = await Promise.all([
+					resendKeyStatus(),
+					client
+						? Promise.resolve(client)
+						: requireDomainClient().catch(() => null),
+				]);
+				const [cloudflare, resendStatus] = await Promise.all([
+					api
+						? api
 								.sending(domain.zone_id)
 								.then((rows) => !!findSendingSubdomain(domain.hostname, rows))
 								.catch(() => false)
-						: false;
+						: Promise.resolve(false),
+					key.apiKey
+						? resendSendingStatus(
+								domain,
+								new ResendClient(key.apiKey, providerSend),
+							)
+						: Promise.resolve(null),
+				]);
 				return Response.json(
 					{
 						cloudflare,
-						resend: null,
-						resendStatus: null,
+						resend:
+							resendStatus === null ? null : resendStatus !== "not_registered",
+						resendStatus,
 						ses: null,
 						sesVerified: null,
 					},

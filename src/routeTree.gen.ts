@@ -77,6 +77,7 @@ import { Route as MailSnoozedMessageIdRouteImport } from './routes/_mail.snoozed
 import { Route as MailSpamMessageIdRouteImport } from './routes/_mail.spam.$messageId'
 import { Route as MailStarredMessageIdRouteImport } from './routes/_mail.starred.$messageId'
 import { Route as MailTrashMessageIdRouteImport } from './routes/_mail.trash.$messageId'
+import { Route as ApiInboundResendRouteImport } from './routes/api.inbound.resend'
 import { Route as ApiSharedFilesTokenRouteImport } from './routes/api.shared-files.$token'
 import { Route as BookUserIdIndexRouteImport } from './routes/book.$userId.index'
 import { Route as BookUserIdEventIdRouteImport } from './routes/book.$userId.$eventId'
@@ -434,6 +435,11 @@ const MailTrashMessageIdRoute = MailTrashMessageIdRouteImport.update({
   path: '/$messageId',
   getParentRoute: () => MailTrashRoute,
 } as any)
+const ApiInboundResendRoute = ApiInboundResendRouteImport.update({
+  id: '/resend',
+  path: '/resend',
+  getParentRoute: () => ApiInboundRoute,
+} as any)
 const ApiSharedFilesTokenRoute = ApiSharedFilesTokenRouteImport.update({
   id: '/api/shared-files/$token',
   path: '/api/shared-files/$token',
@@ -554,7 +560,7 @@ export interface FileRoutesByFullPath {
   '/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
-  '/api/inbound': typeof ApiInboundRoute
+  '/api/inbound': typeof ApiInboundRouteWithChildren
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
   '/jmap/$': typeof JmapSplatRoute
@@ -580,6 +586,7 @@ export interface FileRoutesByFullPath {
   '/spam/$messageId': typeof MailSpamMessageIdRoute
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
+  '/api/inbound/resend': typeof ApiInboundResendRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -637,7 +644,7 @@ export interface FileRoutesByTo {
   '/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
-  '/api/inbound': typeof ApiInboundRoute
+  '/api/inbound': typeof ApiInboundRouteWithChildren
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
   '/jmap/$': typeof JmapSplatRoute
@@ -662,6 +669,7 @@ export interface FileRoutesByTo {
   '/spam/$messageId': typeof MailSpamMessageIdRoute
   '/starred/$messageId': typeof MailStarredMessageIdRoute
   '/trash/$messageId': typeof MailTrashMessageIdRoute
+  '/api/inbound/resend': typeof ApiInboundResendRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -722,7 +730,7 @@ export interface FileRoutesById {
   '/_mail/webhooks': typeof MailWebhooksRoute
   '/api/$': typeof ApiSplatRoute
   '/api/health': typeof ApiHealthRoute
-  '/api/inbound': typeof ApiInboundRoute
+  '/api/inbound': typeof ApiInboundRouteWithChildren
   '/api/relay-health': typeof ApiRelayHealthRoute
   '/d/$token': typeof DTokenRoute
   '/jmap/$': typeof JmapSplatRoute
@@ -748,6 +756,7 @@ export interface FileRoutesById {
   '/_mail/spam/$messageId': typeof MailSpamMessageIdRoute
   '/_mail/starred/$messageId': typeof MailStarredMessageIdRoute
   '/_mail/trash/$messageId': typeof MailTrashMessageIdRoute
+  '/api/inbound/resend': typeof ApiInboundResendRoute
   '/api/shared-files/$token': typeof ApiSharedFilesTokenRoute
   '/book/$userId/$eventId': typeof BookUserIdEventIdRoute
   '/c/$username/$slug': typeof CUsernameSlugRoute
@@ -834,6 +843,7 @@ export interface FileRouteTypes {
     | '/spam/$messageId'
     | '/starred/$messageId'
     | '/trash/$messageId'
+    | '/api/inbound/resend'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -916,6 +926,7 @@ export interface FileRouteTypes {
     | '/spam/$messageId'
     | '/starred/$messageId'
     | '/trash/$messageId'
+    | '/api/inbound/resend'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -1001,6 +1012,7 @@ export interface FileRouteTypes {
     | '/_mail/spam/$messageId'
     | '/_mail/starred/$messageId'
     | '/_mail/trash/$messageId'
+    | '/api/inbound/resend'
     | '/api/shared-files/$token'
     | '/book/$userId/$eventId'
     | '/c/$username/$slug'
@@ -1033,7 +1045,7 @@ export interface RootRouteChildren {
   DotwellKnownJmapRoute: typeof DotwellKnownJmapRoute
   ApiSplatRoute: typeof ApiSplatRoute
   ApiHealthRoute: typeof ApiHealthRoute
-  ApiInboundRoute: typeof ApiInboundRoute
+  ApiInboundRoute: typeof ApiInboundRouteWithChildren
   ApiRelayHealthRoute: typeof ApiRelayHealthRoute
   DTokenRoute: typeof DTokenRoute
   ApiSharedFilesTokenRoute: typeof ApiSharedFilesTokenRoute
@@ -1523,6 +1535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailTrashMessageIdRouteImport
       parentRoute: typeof MailTrashRoute
     }
+    '/api/inbound/resend': {
+      id: '/api/inbound/resend'
+      path: '/resend'
+      fullPath: '/api/inbound/resend'
+      preLoaderRoute: typeof ApiInboundResendRouteImport
+      parentRoute: typeof ApiInboundRoute
+    }
     '/api/shared-files/$token': {
       id: '/api/shared-files/$token'
       path: '/api/shared-files/$token'
@@ -1890,6 +1909,18 @@ const JmapRouteChildren: JmapRouteChildren = {
 
 const JmapRouteWithChildren = JmapRoute._addFileChildren(JmapRouteChildren)
 
+interface ApiInboundRouteChildren {
+  ApiInboundResendRoute: typeof ApiInboundResendRoute
+}
+
+const ApiInboundRouteChildren: ApiInboundRouteChildren = {
+  ApiInboundResendRoute: ApiInboundResendRoute,
+}
+
+const ApiInboundRouteWithChildren = ApiInboundRoute._addFileChildren(
+  ApiInboundRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MailRoute: MailRouteWithChildren,
@@ -1902,7 +1933,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotwellKnownJmapRoute: DotwellKnownJmapRoute,
   ApiSplatRoute: ApiSplatRoute,
   ApiHealthRoute: ApiHealthRoute,
-  ApiInboundRoute: ApiInboundRoute,
+  ApiInboundRoute: ApiInboundRouteWithChildren,
   ApiRelayHealthRoute: ApiRelayHealthRoute,
   DTokenRoute: DTokenRoute,
   ApiSharedFilesTokenRoute: ApiSharedFilesTokenRoute,

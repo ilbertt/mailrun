@@ -67,7 +67,8 @@ export async function listDomains(
 	const domains = rows.map(domainRecord);
 	if (!includeDns) return { domains: domains.map(domainDto) };
 	const api = client ?? (await requireDomainClient().catch(() => null));
-	if (!api) return { domains: domains.map(domainDto), dns: {} };
+	if (!api && !domains.some((domain) => domain.zone_id === "manual"))
+		return { domains: domains.map(domainDto), dns: {} };
 	const results: PromiseSettledResult<{
 		domain: DomainRecord;
 		view: Awaited<ReturnType<typeof domainDns>>;
@@ -75,12 +76,10 @@ export async function listDomains(
 	for (let offset = 0; offset < domains.length; offset += 4)
 		results.push(
 			...(await Promise.allSettled(
-				domains
-					.slice(offset, offset + 4)
-					.map(async (domain) => ({
-						domain,
-						view: await domainDns(api, domain, lookup),
-					})),
+				domains.slice(offset, offset + 4).map(async (domain) => ({
+					domain,
+					view: await domainDns(api, domain, lookup),
+				})),
 			)),
 		);
 
@@ -113,7 +112,8 @@ export async function domainDnsDetails(
 ) {
 	const domain = await getDomain(user, domainId),
 		dns = await domainDns(
-			client ?? (await requireDomainClient()),
+			client ??
+				(domain.zone_id === "manual" ? null : await requireDomainClient()),
 			domain,
 			lookup,
 		);

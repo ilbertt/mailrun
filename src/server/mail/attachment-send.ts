@@ -1,6 +1,7 @@
 import { withDatabase, id, seconds } from "../db";
 import { LocalStorage } from "../storage";
 import { publicOrigin } from "../config";
+import type { OutboundAttachment } from "./provider";
 const escapeHtml = (value: string) =>
 	value.replace(
 		/[&<>"']/g,
@@ -17,18 +18,30 @@ export async function prepareAttachments(
 		html?: string;
 		headers: Record<string, string>;
 	},
+	provider: "cloudflare" | "resend" = "cloudflare",
 ) {
 	const rows = await withDatabase(
 		(sql) =>
 			sql.SendingAttachments`SELECT id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL ORDER BY created_at,id`,
 	);
-	const attachments: Array<{
-		filename: string;
-		type: string;
-		content: string;
-		disposition: string;
-		contentId?: string;
-	}> = [];
+	if (provider !== "cloudflare") {
+		const attachments: OutboundAttachment[] = [];
+		for (const row of rows) {
+			const content = new LocalStorage().file(row.r2_key);
+			if (!(await content.exists()))
+				throw new Error("Attachment file not found");
+			attachments.push({
+				filename: row.filename,
+				type: row.content_type,
+				content,
+				disposition: row.disposition,
+				...(row.content_id ? { contentId: row.content_id } : {}),
+			});
+		}
+		return { attachments, text: message.text, html: message.html };
+	}
+
+	const attachments: OutboundAttachment[] = [];
 	const linked: Array<{ filename: string; size: number; url: string }> = [];
 	let size =
 		Buffer.byteLength(

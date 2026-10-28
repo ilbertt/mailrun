@@ -1,4 +1,5 @@
 import { adminMaintenanceApi } from "./admin-maintenance";
+import { resendKeyApi } from "./resend-key";
 import { aiUsageApi } from "./ai-usage";
 import { agentApi } from "./agent";
 import { agentApprovalsApi } from "./agent-approvals";
@@ -90,6 +91,8 @@ export async function dispatchMailApi(
 		params = url.searchParams;
 	const maintenance = await adminMaintenanceApi(request, user);
 	if (maintenance) return maintenance;
+	const resendKey = await resendKeyApi(request, user);
+	if (resendKey) return resendKey;
 	const usage = await aiUsageApi(request, user);
 	if (usage) return usage;
 	const assistant = await agentApi(request, user);

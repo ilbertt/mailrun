@@ -3859,6 +3859,13 @@ export interface IKeyboardShortcutsResult {
     keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
 }
 
+/** Result of query `NativeOutboundProvider`. */
+export interface INativeOutboundProviderResult {
+    sending_provider: IDomainsColumns["sending_provider"];
+    sending_enabled: IDomainsColumns["sending_enabled"];
+    status: IDomainsColumns["status"];
+}
+
 /** Result of query `ListMailboxes`. */
 export interface IListMailboxesResult {
     id: string;
@@ -4132,11 +4139,6 @@ export interface ISendingMessageResult {
     mailbox_id: IMessagesColumns["mailbox_id"];
 }
 
-/** Result of query `SendingDomain`. */
-export interface ISendingDomainResult {
-    id: IDomainsColumns["id"];
-}
-
 /** Result of query `NativeRecordAutoReply`. */
 export interface INativeRecordAutoReplyResult {
 }
@@ -4311,6 +4313,30 @@ export interface INativeRealtimeRevisionResult {
     id: string;
     revision: unknown | null;
     permission: unknown | null;
+}
+
+/** Result of query `NativeProviderInboundDomain`. */
+export interface INativeProviderInboundDomainResult {
+    id: IDomainsColumns["id"];
+}
+
+/** Result of query `NativeResendCredentials`. */
+export interface INativeResendCredentialsResult {
+    resend_api_key: IAppSettingsColumns["resend_api_key"];
+}
+
+/** Result of query `NativeSaveResendCredentials`. */
+export interface INativeSaveResendCredentialsResult {
+}
+
+/** Result of query `NativeResendWebhookCredentials`. */
+export interface INativeResendWebhookCredentialsResult {
+    resend_webhook_id: IAppSettingsColumns["resend_webhook_id"];
+    resend_webhook_secret: IAppSettingsColumns["resend_webhook_secret"];
+}
+
+/** Result of query `NativeSaveResendWebhook`. */
+export interface INativeSaveResendWebhookResult {
 }
 
 /** Result of query `NativeReferencedObjects`. */
@@ -5109,6 +5135,7 @@ export interface Queries {
     MoveNavigationMessage: IMoveNavigationMessageResult;
     UpdateKeyboardShortcuts: IUpdateKeyboardShortcutsResult;
     KeyboardShortcuts: IKeyboardShortcutsResult;
+    NativeOutboundProvider: INativeOutboundProviderResult;
     ListMailboxes: IListMailboxesResult;
     MailboxSenderDomains: IMailboxSenderDomainsResult;
     MailboxSenderAliases: IMailboxSenderAliasesResult;
@@ -5136,7 +5163,6 @@ export interface Queries {
     ClaimOutbound: IClaimOutboundResult;
     SendingAccount: ISendingAccountResult;
     SendingMessage: ISendingMessageResult;
-    SendingDomain: ISendingDomainResult;
     NativeRecordAutoReply: INativeRecordAutoReplyResult;
     CompleteOutbound: ICompleteOutboundResult;
     CompleteSentMessage: ICompleteSentMessageResult;
@@ -5167,6 +5193,11 @@ export interface Queries {
     NativePushRecipients: INativePushRecipientsResult;
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;
+    NativeProviderInboundDomain: INativeProviderInboundDomainResult;
+    NativeResendCredentials: INativeResendCredentialsResult;
+    NativeSaveResendCredentials: INativeSaveResendCredentialsResult;
+    NativeResendWebhookCredentials: INativeResendWebhookCredentialsResult;
+    NativeSaveResendWebhook: INativeSaveResendWebhookResult;
     NativeReferencedObjects: INativeReferencedObjectsResult;
     NativeV1ManagedMailbox: INativeV1ManagedMailboxResult;
     NativeV1Mailboxes: INativeV1MailboxesResult;
