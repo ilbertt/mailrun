@@ -125,10 +125,15 @@ export async function saveDraft(
 				throw new Error(
 					"This draft changed in another tab. Reopen it before saving.",
 				);
-			const updated = await withDatabase(
-				(sql) => sql.UpdateDraft`
+			const updated = await withDatabase((sql) =>
+				sql.begin(async (sql) => {
+					const updated = await sql.UpdateDraft`
 				UPDATE messages SET mailbox_id=${data.mailboxId},from_addr=${from},to_addr=${data.to},cc_addr=${data.cc || null},bcc_addr=${data.bcc || null},subject=${data.subject},text_body=${data.text},html_body=${data.html},snippet=${data.text.slice(0, 200)},draft_revision=draft_revision+1,draft_scheduled_at=${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null}
-				WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND draft_revision=${data.revision} RETURNING id`,
+				WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND draft_revision=${data.revision} RETURNING id`;
+					if (updated.length)
+						await sql.NativeHumanAgentDraftSave`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()},scheduled_at=${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null} WHERE draft_id=${draftId}`;
+					return updated;
+				}),
 			);
 			if (!updated.length)
 				throw new Error("Draft was changed or sent in another request");
@@ -237,6 +242,7 @@ export async function uploadAttachments(
 					const claimed =
 						await sql.TouchDraftUpload`UPDATE messages SET draft_revision=draft_revision+1 WHERE id=${draftId} AND user_id=${user.id} AND status='draft' RETURNING id`;
 					if (!claimed.length) throw new Error("Draft is no longer editable");
+					await sql.NativeHumanAgentAttachmentAdd`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()} WHERE draft_id=${draftId}`;
 					for (const entry of entries)
 						await sql.UploadDraftAttachment`
 					INSERT INTO message_attachments (id,message_id,filename,content_type,size,r2_key,created_at)
@@ -273,6 +279,7 @@ export async function removeAttachment(
 			sql.begin(async (sql) => {
 				await sql.RemoveDraftAttachment`DELETE FROM message_attachments WHERE id=${attachmentId} AND message_id=${draftId}`;
 				await sql.TouchDraftRemoval`UPDATE messages SET draft_revision=draft_revision+1 WHERE id=${draftId} AND status='draft'`;
+				await sql.NativeHumanAgentAttachmentRemove`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()} WHERE draft_id=${draftId}`;
 			}),
 		);
 		await deleteUnreferencedObjects([attachment.r2_key]);

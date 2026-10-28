@@ -63,6 +63,8 @@ export const deliveryPayloadSchema = z
 		threadId: z.string().nullable().optional(),
 		returnToDraft: z.boolean().optional(),
 		submittedDraftId: z.string().optional(),
+		retainSubmittedDraft: z.boolean().optional(),
+		approvalId: z.string().optional(),
 		autoReplyMailboxId: z.string().optional(),
 		autoReplyRecipient: z.email().optional(),
 	})

@@ -1,3 +1,4 @@
+import { agentApprovalsApi } from "./agent-approvals";
 import { adminSettingsApi } from "./admin-settings";
 import { keysApi } from "./keys";
 import { domainsApi } from "./domains";
@@ -84,6 +85,8 @@ export async function dispatchMailApi(
 		path = url.pathname,
 		method = request.method,
 		params = url.searchParams;
+	const agentApprovals = await agentApprovalsApi(request, user);
+	if (agentApprovals) return agentApprovals;
 	const adminSettings = await adminSettingsApi(request, user);
 	if (adminSettings) return adminSettings;
 	const backups = await backupsApi(request, user);

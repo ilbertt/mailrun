@@ -71,13 +71,14 @@ export async function sendDraft(
 		)
 			throw new Error("Enter a message or attach a file");
 		const due = Math.max(seconds(), draft.draft_scheduled_at ?? seconds());
+		const scheduledAt = due > seconds() ? due : null;
 		const jobId = id("job");
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {
 				const changed =
 					await sql.QueueDraft`UPDATE messages SET status='queued',created_at=${seconds()} WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND draft_revision=${revision} RETURNING id`;
 				if (!changed.length) throw new Error("Draft is no longer editable");
-				await sql.InsertOutboundJob`INSERT INTO outbound_jobs (id,user_id,message_id,status,payload,created_at,updated_at,scheduled_at) VALUES (${jobId},${user.id},${draftId},'queued',${JSON.stringify(payload)},${seconds()},${seconds()},${due})`;
+				await sql.InsertOutboundJob`INSERT INTO outbound_jobs (id,user_id,message_id,status,payload,created_at,updated_at,scheduled_at) VALUES (${jobId},${user.id},${draftId},'queued',${JSON.stringify(payload)},${seconds()},${seconds()},${scheduledAt})`;
 			}),
 		);
 		return { jobId, due };
@@ -99,10 +100,12 @@ export async function deliverJob(
 	if (!job) return;
 	let restoreDraft = false;
 	let submittedDraftId: string | undefined;
+	let approvalId: string | undefined;
 	try {
 		const payload = deliveryPayloadSchema.parse(JSON.parse(job.payload));
 		restoreDraft = !!payload.returnToDraft;
 		submittedDraftId = payload.submittedDraftId;
+		approvalId = payload.approvalId;
 		const installation = await getInstallation();
 		if (!installation) throw new Error("Cloudflare email is not configured");
 		const [account] = await withDatabase(
@@ -187,10 +190,16 @@ export async function deliverJob(
 					to: payload.to.join(", "),
 					cc: payload.cc?.length ? payload.cc.join(", ") : undefined,
 				});
+				if (payload.approvalId)
+					await sql.NativeCompleteAgentApproval`UPDATE agent_send_approvals SET status='sent',message_id=${job.message_id} WHERE id=${payload.approvalId} AND user_id=${job.user_id} AND message_id=${job.message_id} AND status IN('claimed','unknown')`;
 				if (payload.submittedDraftId) {
 					const [draft] =
 						await sql.NativeCompleteSubmittedDraft`SELECT raw_r2_key FROM messages WHERE id=${payload.submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
 					if (draft) {
+						if (payload.retainSubmittedDraft) {
+							await sql.NativeTrashApprovedDraft`UPDATE messages SET status='trash',trashed_at=${seconds()} WHERE id=${payload.submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
+							return [] as string[];
+						}
 						const files =
 							await sql.NativeSubmittedDraftFiles`SELECT r2_key FROM message_attachments WHERE message_id=${payload.submittedDraftId}`;
 						await sql.NativeDeleteSubmittedDraft`DELETE FROM messages WHERE id=${payload.submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
@@ -219,6 +228,8 @@ export async function deliverJob(
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {
 				await sql.FailOutbound`UPDATE outbound_jobs SET status='failed',error=${error instanceof Error ? error.message : "Sending failed"},updated_at=${seconds()} WHERE id=${job.id}`;
+				if (approvalId)
+					await sql.NativeFailAgentApproval`UPDATE agent_send_approvals SET status='unknown' WHERE id=${approvalId} AND user_id=${job.user_id} AND message_id=${job.message_id} AND status='claimed'`;
 				if (submittedDraftId)
 					await sql.NativeRestoreSubmittedDraft`UPDATE messages SET status='draft' WHERE id=${submittedDraftId} AND user_id=${job.user_id} AND status='queued'`;
 				await sql.FailSentMessage`UPDATE messages SET status=${restoreDraft ? "draft" : "failed"} WHERE id=${job.message_id}`;

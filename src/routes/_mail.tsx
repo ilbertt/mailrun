@@ -45,6 +45,7 @@ const primaryPrefixes = [
 	"/ai-usage",
 ];
 const matches = (path: string, prefixes: string[]) =>
+	!path.startsWith("/agent/review/") &&
 	prefixes.some((prefix) => path === prefix || path.startsWith(prefix + "/"));
 export const Route = createFileRoute("/_mail")({
 	validateSearch: z.object({ mailboxId: z.string().optional() }),

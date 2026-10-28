@@ -596,6 +596,237 @@ try {
 	)
 		throw new Error("JMAP state event stream failed");
 	await jmapCall([["Email/set", { destroy: [jmapImported.id] }, "d"]]);
+	const mcpKeyResponse = await fetch(`${base}/api/agent/mcp-keys`, {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({
+			name: "MCP smoke",
+			scopes: [
+				"mcp:read",
+				"mcp:draft",
+				"mcp:request-send",
+				"mcp:calendar-read",
+			],
+			mailboxIds: ["mailbox"],
+		}),
+	});
+	const mcpKey = z
+		.object({ key: z.string() })
+		.parse(await mcpKeyResponse.json());
+	const mcpHeaders = {
+		Authorization: `Bearer ${mcpKey.key}`,
+		Host: new URL(publicBase).host,
+		Accept: "application/json, text/event-stream",
+		Origin: publicBase,
+		"Content-Type": "application/json",
+	};
+	const mcpCall = async (
+		method: string,
+		params: Record<string, unknown>,
+		extra: Record<string, string> = {},
+	) => {
+		const response = await fetch(`${base}/mcp`, {
+			method: "POST",
+			headers: { ...mcpHeaders, ...extra },
+			body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+		});
+		if (!response.ok)
+			throw new Error(`Compiled MCP request failed: ${response.status}`);
+		const text = await response.text(),
+			wire = response.headers.get("content-type")?.includes("text/event-stream")
+				? JSON.parse(
+						text
+							.split("\n")
+							.find((line) => line.startsWith("data: "))!
+							.slice(6),
+					)
+				: JSON.parse(text);
+		return z.object({ result: z.record(z.string(), z.unknown()) }).parse(wire)
+			.result;
+	};
+	const mcpTool = async (name: string, args: Record<string, unknown>) => {
+		const result = await mcpCall("tools/call", { name, arguments: args }),
+			parsed = z
+				.object({
+					content: z.array(z.object({ text: z.string() })),
+					isError: z.boolean().optional(),
+				})
+				.parse(result);
+		if (parsed.isError)
+			throw new Error(`Compiled MCP tool failed: ${parsed.content[0]?.text}`);
+		return JSON.parse(parsed.content[0]!.text) as unknown;
+	};
+	const mcpOptions = await fetch(`${base}/mcp`, {
+		method: "OPTIONS",
+		headers: { Host: new URL(publicBase).host },
+	});
+	const mcpHead = await fetch(`${base}/mcp`, {
+		method: "HEAD",
+		headers: mcpHeaders,
+	});
+	if (
+		mcpOptions.status !== 204 ||
+		!mcpOptions.headers.get("allow")?.includes("HEAD") ||
+		mcpHead.status !== 405 ||
+		(await mcpHead.text()) !== ""
+	)
+		throw new Error("Compiled MCP HEAD/OPTIONS contract failed");
+	const mcpInit = await mcpCall("initialize", {
+		protocolVersion: "2025-06-18",
+		capabilities: {},
+		clientInfo: { name: "fixture", version: "1" },
+	});
+	if (
+		!z
+			.object({ serverInfo: z.object({ name: z.literal("mailflare") }) })
+			.safeParse(mcpInit).success
+	)
+		throw new Error("Compiled MCP initialization failed");
+	const mcpModern = await mcpCall(
+		"server/discover",
+		{
+			_meta: {
+				"io.modelcontextprotocol/protocolVersion": "2026-07-28",
+				"io.modelcontextprotocol/clientCapabilities": {},
+				"io.modelcontextprotocol/clientInfo": {
+					name: "compiled-fixture",
+					version: "1",
+				},
+			},
+		},
+		{ "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "server/discover" },
+	);
+	if (
+		!z
+			.object({ supportedVersions: z.array(z.string()) })
+			.parse(mcpModern)
+			.supportedVersions.includes("2026-07-28")
+	)
+		throw new Error("Compiled modern MCP discovery failed");
+	const mcpBoxes = z
+		.array(z.object({ id: z.string() }))
+		.parse(await mcpTool("list_mailboxes", {}));
+	if (!mcpBoxes.some((row) => row.id === "mailbox"))
+		throw new Error("Compiled MCP mailbox scope failed");
+	const mcpPage = z
+		.object({
+			emails: z.array(
+				z.object({
+					id: z.string(),
+					from: z.string(),
+					to: z.string(),
+					createdAt: z.string(),
+					read: z.boolean(),
+					starred: z.boolean(),
+				}),
+			),
+			nextCursor: z.string().nullable(),
+		})
+		.parse(await mcpTool("list_emails", { mailboxId: "mailbox", limit: 1 }));
+	if (!mcpPage.emails.length)
+		throw new Error("Compiled MCP metadata projection failed");
+	if (mcpPage.nextCursor)
+		await mcpTool("list_emails", {
+			mailboxId: "mailbox",
+			limit: 1,
+			cursor: mcpPage.nextCursor,
+		});
+	const mcpDraft = z
+		.object({ draftId: z.string(), revision: z.number() })
+		.parse(
+			await mcpTool("draft_reply", {
+				mailboxId: "mailbox",
+				emailId: "message",
+				body: "An assistant reply saved for review.",
+			}),
+		);
+	const mcpDraftRead = z
+		.object({ revision: z.number(), text: z.string() })
+		.parse(
+			await mcpTool("get_email", {
+				mailboxId: "mailbox",
+				emailId: mcpDraft.draftId,
+			}),
+		);
+	if (
+		mcpDraftRead.revision !== mcpDraft.revision ||
+		mcpDraftRead.text !== "An assistant reply saved for review."
+	)
+		throw new Error("Compiled MCP body/revision snapshot failed");
+	const mcpApproval = z
+		.object({ approvalId: z.string(), reviewUrl: z.string() })
+		.parse(
+			await mcpTool("request_send", {
+				mailboxId: "mailbox",
+				draftId: mcpDraft.draftId,
+				expectedRevision: mcpDraft.revision,
+			}),
+		);
+	if (!mcpApproval.reviewUrl.startsWith(`${publicBase}/agent/review/`))
+		throw new Error("Compiled MCP review URL failed");
+	const mcpApprovalRead = await fetch(
+		`${base}/api/agent/approvals/${mcpApproval.approvalId}`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	if (
+		!mcpApprovalRead.ok ||
+		!z
+			.object({ status: z.literal("pending"), stale: z.literal(false) })
+			.safeParse(await mcpApprovalRead.json()).success
+	)
+		throw new Error("Compiled human review read failed");
+	if (
+		(
+			await fetch(
+				`${base}/api/agent/approvals/${mcpApproval.approvalId}/confirm`,
+				{
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${mcpKey.key}`,
+						Origin: publicBase,
+					},
+				},
+			)
+		).status !== 401
+	)
+		throw new Error("An MCP key authenticated human confirmation");
+	const reviewPage = await fetch(
+		`${base}/agent/review/${mcpApproval.approvalId}`,
+		{ headers: { Cookie: sessionCookie } },
+	);
+	if (!reviewPage.ok || !(await reviewPage.text()).includes("AI draft review"))
+		throw new Error("Original review page failed");
+	const reviewUserToken = crypto.randomUUID();
+	state.db
+		.query(
+			"INSERT INTO sessions(id,user_id,token_hash,expires_at,created_at) VALUES('review-user','stranger',?,?,?)",
+		)
+		.run(await hash(reviewUserToken), seconds() + 300, seconds());
+	const otherReview = await fetch(
+		`${base}/agent/review/${mcpApproval.approvalId}`,
+		{
+			headers: { Cookie: `ep_session=${reviewUserToken}` },
+			redirect: "manual",
+		},
+	);
+	if (
+		otherReview.status !== 200 ||
+		!(await otherReview.text()).includes("AI draft review")
+	)
+		throw new Error("Non-admin review was redirected into administration");
+	if (
+		(
+			await fetch(`${base}/api/agent/approvals/${mcpApproval.approvalId}`, {
+				headers: { Cookie: `ep_session=${reviewUserToken}` },
+			})
+		).status !== 404
+	)
+		throw new Error("Another user could read a private approval");
+	await mcpTool("discard_draft", {
+		mailboxId: "mailbox",
+		draftId: mcpDraft.draftId,
+		expectedRevision: mcpDraft.revision,
+	});
 	const publicAdminKeyResponse = await fetch(`${base}/api/admin/api-keys`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -1578,6 +1809,7 @@ try {
 				emlImportAndMboxExport: "passed",
 				publicApiScopesAndAdministration: "passed",
 				jmapProtocol: "passed",
+				mcpProtocolAndHumanReview: "passed",
 				publicScheduledSend: "passed",
 				apiSendPeakMiB: Math.round(apiMemoryPeak),
 				nativeTransferAuthenticationAndAliases: "passed",

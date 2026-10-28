@@ -14,6 +14,7 @@ import { Route as MailRouteImport } from './routes/_mail'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as JmapRouteImport } from './routes/jmap'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as DotwellKnownJmapRouteImport } from './routes/[.]well-known.jmap'
@@ -82,6 +83,7 @@ import { Route as MailAccountsIdIndexRouteImport } from './routes/_mail.accounts
 import { Route as MailAccountsIdMailboxesRouteImport } from './routes/_mail.accounts.$id.mailboxes'
 import { Route as MailAccountsIdPasswordRouteImport } from './routes/_mail.accounts.$id.password'
 import { Route as MailAccountsIdPermissionsRouteImport } from './routes/_mail.accounts.$id.permissions'
+import { Route as MailAgentReviewIdRouteImport } from './routes/_mail.agent.review.$id'
 import { Route as MailFoldersFolderIdMessageIdRouteImport } from './routes/_mail.folders.$folderId.$messageId'
 import { Route as MailSettingsMailboxesIndexRouteImport } from './routes/_mail.settings.mailboxes.index'
 import { Route as MailSettingsMailboxesIdRouteImport } from './routes/_mail.settings.mailboxes.$id'
@@ -110,6 +112,11 @@ const JmapRoute = JmapRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -455,6 +462,11 @@ const MailAccountsIdPermissionsRoute =
     path: '/permissions',
     getParentRoute: () => MailAccountsIdRoute,
   } as any)
+const MailAgentReviewIdRoute = MailAgentReviewIdRouteImport.update({
+  id: '/agent/review/$id',
+  path: '/agent/review/$id',
+  getParentRoute: () => MailRoute,
+} as any)
 const MailFoldersFolderIdMessageIdRoute =
   MailFoldersFolderIdMessageIdRouteImport.update({
     id: '/$messageId',
@@ -490,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -557,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/accounts/$id/mailboxes': typeof MailAccountsIdMailboxesRoute
   '/accounts/$id/password': typeof MailAccountsIdPasswordRoute
   '/accounts/$id/permissions': typeof MailAccountsIdPermissionsRoute
+  '/agent/review/$id': typeof MailAgentReviewIdRoute
   '/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -569,6 +583,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -634,6 +649,7 @@ export interface FileRoutesByTo {
   '/accounts/$id/mailboxes': typeof MailAccountsIdMailboxesRoute
   '/accounts/$id/password': typeof MailAccountsIdPasswordRoute
   '/accounts/$id/permissions': typeof MailAccountsIdPermissionsRoute
+  '/agent/review/$id': typeof MailAgentReviewIdRoute
   '/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -648,6 +664,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/jmap': typeof JmapRouteWithChildren
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/.well-known/jmap': typeof DotwellKnownJmapRoute
@@ -715,6 +732,7 @@ export interface FileRoutesById {
   '/_mail/accounts/$id/mailboxes': typeof MailAccountsIdMailboxesRoute
   '/_mail/accounts/$id/password': typeof MailAccountsIdPasswordRoute
   '/_mail/accounts/$id/permissions': typeof MailAccountsIdPermissionsRoute
+  '/_mail/agent/review/$id': typeof MailAgentReviewIdRoute
   '/_mail/folders/$folderId/$messageId': typeof MailFoldersFolderIdMessageIdRoute
   '/_mail/settings/mailboxes/$id': typeof MailSettingsMailboxesIdRoute
   '/api/messages/$messageId/original': typeof ApiMessagesMessageIdOriginalRoute
@@ -729,6 +747,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/jmap'
     | '/login'
+    | '/mcp'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -796,6 +815,7 @@ export interface FileRouteTypes {
     | '/accounts/$id/mailboxes'
     | '/accounts/$id/password'
     | '/accounts/$id/permissions'
+    | '/agent/review/$id'
     | '/folders/$folderId/$messageId'
     | '/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -808,6 +828,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/jmap'
     | '/login'
+    | '/mcp'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -873,6 +894,7 @@ export interface FileRouteTypes {
     | '/accounts/$id/mailboxes'
     | '/accounts/$id/password'
     | '/accounts/$id/permissions'
+    | '/agent/review/$id'
     | '/folders/$folderId/$messageId'
     | '/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -886,6 +908,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/jmap'
     | '/login'
+    | '/mcp'
     | '/reset-password'
     | '/setup'
     | '/.well-known/jmap'
@@ -953,6 +976,7 @@ export interface FileRouteTypes {
     | '/_mail/accounts/$id/mailboxes'
     | '/_mail/accounts/$id/password'
     | '/_mail/accounts/$id/permissions'
+    | '/_mail/agent/review/$id'
     | '/_mail/folders/$folderId/$messageId'
     | '/_mail/settings/mailboxes/$id'
     | '/api/messages/$messageId/original'
@@ -967,6 +991,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   JmapRoute: typeof JmapRouteWithChildren
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetupRoute: typeof SetupRoute
   DotwellKnownJmapRoute: typeof DotwellKnownJmapRoute
@@ -1019,6 +1044,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1497,6 +1529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MailAccountsIdPermissionsRouteImport
       parentRoute: typeof MailAccountsIdRoute
     }
+    '/_mail/agent/review/$id': {
+      id: '/_mail/agent/review/$id'
+      path: '/agent/review/$id'
+      fullPath: '/agent/review/$id'
+      preLoaderRoute: typeof MailAgentReviewIdRouteImport
+      parentRoute: typeof MailRoute
+    }
     '/_mail/folders/$folderId/$messageId': {
       id: '/_mail/folders/$folderId/$messageId'
       path: '/$messageId'
@@ -1739,6 +1778,7 @@ interface MailRouteChildren {
   MailMailboxesIdRoute: typeof MailMailboxesIdRoute
   MailAccountsIndexRoute: typeof MailAccountsIndexRoute
   MailMailboxesIndexRoute: typeof MailMailboxesIndexRoute
+  MailAgentReviewIdRoute: typeof MailAgentReviewIdRoute
 }
 
 const MailRouteChildren: MailRouteChildren = {
@@ -1772,6 +1812,7 @@ const MailRouteChildren: MailRouteChildren = {
   MailMailboxesIdRoute: MailMailboxesIdRoute,
   MailAccountsIndexRoute: MailAccountsIndexRoute,
   MailMailboxesIndexRoute: MailMailboxesIndexRoute,
+  MailAgentReviewIdRoute: MailAgentReviewIdRoute,
 }
 
 const MailRouteWithChildren = MailRoute._addFileChildren(MailRouteChildren)
@@ -1792,6 +1833,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   JmapRoute: JmapRouteWithChildren,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetupRoute: SetupRoute,
   DotwellKnownJmapRoute: DotwellKnownJmapRoute,

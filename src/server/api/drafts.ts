@@ -132,11 +132,6 @@ export async function draftsApi(
 					status: 409,
 				});
 			const saved = await saveDraft(user, { ...data, id: draftId, revision });
-			if (agent)
-				await withDatabase(
-					(sql) =>
-						sql.HumanEditedAgentDraft`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()},scheduled_at=${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null} WHERE draft_id=${draftId}`,
-				);
 			return draftResponse(user, saved.id);
 		}
 		if (method === "DELETE" && !attachments) {

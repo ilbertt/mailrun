@@ -1,3 +1,4 @@
+import { handleMcpRequest } from "../src/server/mcp/handler";
 import { isJmapPath, handleJmapRequest } from "../src/server/jmap/handler";
 import { isV1Path, serveV1Api } from "../src/server/api/v1";
 import { clearImapStaging } from "../src/server/mail-transfer/imap";
@@ -72,6 +73,8 @@ if (name) {
 					return;
 				return new Response("Expected WebSocket upgrade", { status: 426 });
 			}
+			if (new URL(request.url).pathname === "/mcp")
+				return handleMcpRequest(request, () => server.timeout(request, 0));
 			if (isJmapPath(new URL(request.url).pathname)) {
 				return handleJmapRequest(request, undefined, () =>
 					server.timeout(request, 0),
