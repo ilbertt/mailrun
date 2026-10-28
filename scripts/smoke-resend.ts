@@ -155,7 +155,9 @@ try {
 			body: form,
 		});
 		if (!result.ok)
-			throw new Error("Compiled send failed: " + (await result.text()));
+			throw new Error(
+				`Compiled send failed (${result.status}): ` + (await result.text()),
+			);
 		await result.body?.cancel();
 	}
 	let peak = 0;
@@ -194,6 +196,46 @@ try {
 		throw new Error("Streamed Resend attachment differs");
 	if (state.db.query("SELECT id FROM shared_attachment_links").all().length)
 		throw new Error("Resend file was replaced with a link");
+	const failedDraft = z
+		.object({ draft: z.object({ id: z.string(), revision: z.number() }) })
+		.parse(
+			await api("/api/drafts", "POST", {
+				mailboxId: "mailbox",
+				to: "recipient@example.net",
+				subject: "Provider failure recovery",
+				text: "Preserve this draft",
+			}),
+		);
+	provider.provider.sendStatus = 503;
+	try {
+		await sendForm(
+			failedDraft.draft.id,
+			"Provider failure recovery",
+			"recipient@example.net",
+			"Preserve this draft",
+			failedDraft.draft.revision,
+		);
+		throw new Error("Provider failure unexpectedly succeeded");
+	} catch (error) {
+		if (
+			!(error instanceof Error) ||
+			!error.message.includes("(500):") ||
+			!error.message.includes("Resend: Synthetic send failure")
+		)
+			throw error;
+	} finally {
+		provider.provider.sendStatus = 200;
+	}
+	if (
+		!z
+			.object({ status: z.literal("draft") })
+			.safeParse(
+				state.db
+					.query("SELECT status FROM messages WHERE id=?")
+					.get(failedDraft.draft.id),
+			).success
+	)
+		throw new Error("Provider failure did not restore the editable draft");
 	const event = JSON.stringify({
 			type: "email.received",
 			data: { email_id: "received" },
@@ -298,6 +340,7 @@ try {
 				manualProviderSetup: "passed",
 				sharedWebhook: "passed",
 				systemTest: "passed",
+				failureRecovery: "passed",
 				streamedAttachmentBytes: content.length,
 				signedIntake: "passed",
 				duplicateDelivery: "passed",
