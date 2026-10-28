@@ -1,3 +1,4 @@
+import { withSecurityHeaders } from "./server/http/security";
 import handler, { createServerEntry } from "@tanstack/react-start/server-entry";
 import { publicOrigin } from "./server/config";
 import { serveWithSourceContract } from "./server/http/route-contract";
@@ -20,16 +21,9 @@ export default createServerEntry({
 		const response = await serveWithSourceContract(request, (current) =>
 			handler.fetch(current, options),
 		);
-		const headers = new Headers(response.headers);
-		headers.set("Cache-Control", "private, no-store");
-		headers.set("X-Content-Type-Options", "nosniff");
-		headers.set("Referrer-Policy", "same-origin");
-		if (!headers.has("X-Frame-Options")) headers.set("X-Frame-Options", "DENY");
-		if (!headers.has("Content-Security-Policy"))
-			headers.set(
-				"Content-Security-Policy",
-				"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; frame-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
-			);
+		const headers = new Headers(withSecurityHeaders(response).headers);
+		if (!headers.has("Cache-Control"))
+			headers.set("Cache-Control", "private, no-store");
 		headers.set(
 			"Server-Timing",
 			`app;dur=${(performance.now() - started).toFixed(1)}`,

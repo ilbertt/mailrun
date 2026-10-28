@@ -152,6 +152,7 @@ export async function importOneMessage(
 				outcome.userId,
 				address,
 				outcome.placement.direction,
+				mailboxId,
 			).catch((error) =>
 				console.error("Imported contact update failed", error),
 			);

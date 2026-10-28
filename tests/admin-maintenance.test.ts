@@ -64,6 +64,7 @@ test("migration DDL and its ledger entry roll back together and can be retried",
 		expect(before.pending).toEqual([
 			"0065_jmap_uploads.sql",
 			"0066_ses_receipts.sql",
+			"0067_contact_avatars.sql",
 		]);
 		db.exec(
 			"CREATE TRIGGER reject_migration BEFORE INSERT ON d1_migrations BEGIN SELECT RAISE(ABORT,'synthetic failure'); END",
@@ -153,6 +154,7 @@ test("independent processes applying the same migration each observe one committ
 		expect(results.flatMap((r) => r.applied).sort()).toEqual([
 			"0065_jmap_uploads.sql",
 			"0066_ses_receipts.sql",
+			"0067_contact_avatars.sql",
 		]);
 	} finally {
 		db.close();

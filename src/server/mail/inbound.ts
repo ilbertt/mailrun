@@ -28,36 +28,8 @@ import {
 	formatPostalAddressList,
 } from "../../lib/email/address";
 
-export async function readLimitedBody(request: Request, limit: number) {
-	if (Number(request.headers.get("content-length") ?? 0) > limit)
-		throw new Error("Message too large");
-	const chunks: Uint8Array[] = [];
-	let length = 0;
-	const reader = request.body?.getReader();
-	if (reader) {
-		try {
-			while (true) {
-				const chunk = await reader.read();
-				if (chunk.done) break;
-				length += chunk.value.length;
-				if (length > limit) {
-					await reader.cancel();
-					throw new Error("Message too large");
-				}
-				chunks.push(chunk.value);
-			}
-		} finally {
-			reader.releaseLock();
-		}
-	}
-	const bytes = new Uint8Array(length);
-	let position = 0;
-	for (const chunk of chunks) {
-		bytes.set(chunk, position);
-		position += chunk.length;
-	}
-	return bytes;
-}
+export { readLimitedBody } from "../http/body";
+import { readLimitedBody } from "../http/body";
 
 export async function inbound(request: Request): Promise<Response> {
 	const installation = await getInstallation();
@@ -343,7 +315,12 @@ export async function storeInbound(
 	if (inserted) {
 		wakeAgentDispatcher();
 		wakeWebhookDispatcher();
-		const contact = await upsertContact(mailbox.user_id, fromAddr, "inbound");
+		const contact = await upsertContact(
+			mailbox.user_id,
+			fromAddr,
+			"inbound",
+			mailbox.id,
+		);
 		if (status !== "spam")
 			await notifyNewMessage({
 				type: "new_message",

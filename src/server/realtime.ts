@@ -13,10 +13,15 @@ const sockets = () => (globalThis.__mailrunSockets ??= new Set());
 export async function userMailRevision(userId: string) {
 	const rows = await withDatabase(
 		(sql) =>
-			sql.NativeRealtimeRevision`/* @notNull id */ SELECT b.id,COALESCE(r.revision,0) AS revision,CASE WHEN b.user_id=${userId} THEN 'owner' ELSE a.permission END AS permission FROM mailboxes b LEFT JOIN mailbox_access a ON a.mailbox_id=b.id AND a.user_id=${userId} LEFT JOIN jmap_mailbox_revisions r ON r.mailbox_id=b.id WHERE b.disabled=0 AND (b.user_id=${userId} OR (b.type='shared' AND a.user_id=${userId} AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active'))) ORDER BY b.id`,
+			sql.NativeRealtimeRevision`/* @notNull id */ SELECT b.id,COALESCE(r.revision,0) AS revision,COALESCE(av.revision,0) AS avatar_revision,CASE WHEN b.user_id=${userId} THEN 'owner' ELSE a.permission END AS permission FROM mailboxes b LEFT JOIN mailbox_access a ON a.mailbox_id=b.id AND a.user_id=${userId} LEFT JOIN jmap_mailbox_revisions r ON r.mailbox_id=b.id LEFT JOIN mailrun_contact_avatar_revisions av ON av.mailbox_id=b.id WHERE b.disabled=0 AND (b.user_id=${userId} OR (b.type='shared' AND a.user_id=${userId} AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active'))) ORDER BY b.id`,
 	);
 	return JSON.stringify(
-		rows.map((row) => [row.id, row.revision, row.permission]),
+		rows.map((row) => [
+			row.id,
+			row.revision,
+			row.permission,
+			row.avatar_revision,
+		]),
 	);
 }
 const pingSchema = z.object({
@@ -114,5 +119,35 @@ export async function notifyAgentDraft(
 		} catch {
 			/* Sharing or the connection may have changed. */
 		}
+	}
+}
+
+export async function notifyContactAvatar(
+	userId: string,
+	email: string,
+	mailboxIdsJson: string,
+) {
+	const requested = z.array(z.string()).parse(JSON.parse(mailboxIdsJson));
+	const rows = await withDatabase(
+		(sql) =>
+			sql.NativeAvatarNotifyMailboxes`SELECT id FROM mailboxes WHERE user_id=${userId} AND disabled=0 AND id IN(SELECT value FROM json_each(${JSON.stringify(requested)}))`,
+	);
+	const boxIds = rows.map((row) => z.string().parse(row.id));
+	for (const socket of sockets()) {
+		const current = await getUser(socket.data.token);
+		if (!current) {
+			socket.close(1008, "Session expired");
+			continue;
+		}
+		let allowed = current.id === userId;
+		if (!allowed)
+			for (const boxId of boxIds) {
+				try {
+					await mailboxAccess(current, boxId);
+					allowed = true;
+					break;
+				} catch {}
+			}
+		if (allowed) socket.send(JSON.stringify({ type: "contact_avatar", email }));
 	}
 }

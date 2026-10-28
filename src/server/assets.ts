@@ -1,3 +1,4 @@
+import { withSecurityHeaders } from "./http/security";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -56,14 +57,16 @@ export function getClientAsset(path: string) {
 export function getAssetRoutes() {
 	const routes: Record<string, Response> = {};
 	for (const [path, file] of getClientAssets()) {
-		routes[`/${path}`] = new Response(file, {
-			headers: {
-				"Cache-Control": path.startsWith("assets/")
-					? "public, max-age=31536000, immutable"
-					: "no-cache",
-				"X-Content-Type-Options": "nosniff",
-			},
-		});
+		routes[`/${path}`] = withSecurityHeaders(
+			new Response(file, {
+				headers: {
+					"Cache-Control": path.startsWith("assets/")
+						? "public, max-age=31536000, immutable"
+						: "no-cache",
+					"X-Content-Type-Options": "nosniff",
+				},
+			}),
+		);
 	}
 	return routes;
 }

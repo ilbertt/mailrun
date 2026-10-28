@@ -9,7 +9,8 @@ export async function imageResponse(request: Request, key: string) {
 		etag =
 			'"' + new Bun.CryptoHasher("sha256").update(bytes).digest("hex") + '"';
 	const headers = {
-		"Content-Type": "image/webp",
+		"Content-Type":
+			imageContentType(new Uint8Array(bytes)) ?? "application/octet-stream",
 		"X-Content-Type-Options": "nosniff",
 		"Content-Security-Policy": "default-src 'none'; img-src 'self'; sandbox",
 		"Cache-Control": url.searchParams.has("v")
@@ -25,12 +26,33 @@ export async function imageResponse(request: Request, key: string) {
 		},
 	);
 }
-function webp(bytes: Uint8Array) {
-	return (
+export function imageContentType(bytes: Uint8Array) {
+	if (
 		bytes.length >= 12 &&
-		new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
-		new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP"
-	);
+		new TextDecoder().decode(bytes.subarray(0, 4)) === "RIFF" &&
+		new TextDecoder().decode(bytes.subarray(8, 12)) === "WEBP"
+	)
+		return "image/webp";
+	if (
+		bytes.length >= 8 &&
+		[137, 80, 78, 71, 13, 10, 26, 10].every(
+			(value, index) => bytes[index] === value,
+		)
+	)
+		return "image/png";
+	if (
+		bytes.length >= 3 &&
+		bytes[0] === 255 &&
+		bytes[1] === 216 &&
+		bytes[2] === 255
+	)
+		return "image/jpeg";
+	if (
+		bytes.length >= 6 &&
+		/^GIF8[79]a$/.test(new TextDecoder().decode(bytes.subarray(0, 6)))
+	)
+		return "image/gif";
+	return null;
 }
 export async function storeImages(
 	form: FormData,
@@ -56,7 +78,10 @@ export async function storeImages(
 		full.bytes(),
 		preview.bytes(),
 	]);
-	if (!webp(fullBytes) || !webp(previewBytes))
+	if (
+		imageContentType(fullBytes) !== "image/webp" ||
+		imageContentType(previewBytes) !== "image/webp"
+	)
 		throw new Response("A valid WebP image and preview are required", {
 			status: 400,
 		});

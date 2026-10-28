@@ -1,3 +1,4 @@
+import { runAvatarJobs } from "../avatars/jobs";
 import { clearSendingStaging } from "../mail/sending-staging";
 import { runWebhookJobs } from "../webhooks/delivery";
 import { runDriveRetention } from "../drive/retention";
@@ -29,6 +30,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 				);
 		} else if (name === "maintenance") {
 			await clearSendingStaging();
+			await runAvatarJobs();
 			await runWebhookJobs();
 			const { recoverAgentDraftJobs } = await import("../agent/jobs");
 			await recoverAgentDraftJobs();

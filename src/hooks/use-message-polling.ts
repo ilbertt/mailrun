@@ -1,3 +1,4 @@
+import { dispatchContactAvatarChanged } from "../lib/contacts/avatar-client";
 import { useCallback, useEffect, useState } from "react";
 import {
 	AUTH_SESSION_CHANGED_EVENT,
@@ -80,11 +81,28 @@ export function useMessagePolling(): MessageRealtimeState {
 			try {
 				const parsed = JSON.parse(payload) as {
 					type?: string;
+					email?: string;
 					revision?: string;
 					changed?: boolean;
 					draftId?: string;
 					mailboxId?: string;
 				};
+				if (
+					parsed.type === "contact_avatar" &&
+					typeof parsed.email === "string"
+				) {
+					dispatchContactAvatarChanged({
+						email: parsed.email,
+						hasAvatar: true,
+					});
+					dispatchMessagesChanged();
+					if (fromSocket)
+						channel?.postMessage({
+							type: "notification",
+							payload,
+						} satisfies RealtimeChannelMessage);
+					return;
+				}
 				if (parsed.type === "revision" && typeof parsed.revision === "string") {
 					revision = parsed.revision;
 					if (parsed.changed) {

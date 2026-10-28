@@ -1024,6 +1024,15 @@ export interface INativeContactAvatarResult {
 export interface INativeSetContactAvatarResult {
 }
 
+/** Result of query `NativeBlockContactFence`. */
+export interface INativeBlockContactFenceResult {
+}
+
+/** Result of query `NativePriorBlockedContact`. */
+export interface INativePriorBlockedContactResult {
+    id: IContactsColumns["id"];
+}
+
 /** Result of query `NativeBlockContact`. */
 export interface INativeBlockContactResult {
 }
@@ -1675,6 +1684,70 @@ export interface IClaimInstallationResult {
 
 /** Result of query `DeleteSession`. */
 export interface IDeleteSessionResult {
+}
+
+/** Result of query `NativeQueueContactAvatar`. */
+export interface INativeQueueContactAvatarResult {
+}
+
+/** Result of query `NativeAvatarMailboxScope`. */
+export interface INativeAvatarMailboxScopeResult {
+}
+
+/** Result of query `NativeCancelContactAvatar`. */
+export interface INativeCancelContactAvatarResult {
+}
+
+/** Result of query `NativeClaimAvatarDispatch`. */
+export interface INativeClaimAvatarDispatchResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeExhaustAvatarJobs`. */
+export interface INativeExhaustAvatarJobsResult {
+}
+
+/** Result of query `NativeClaimAvatarJob`. */
+export interface INativeClaimAvatarJobResult {
+    contact_id: IMailrunContactAvatarJobsColumns["contact_id"];
+}
+
+/** Result of query `NativeClaimedAvatarContact`. */
+export interface INativeClaimedAvatarContactResult {
+    id: string | null;
+    user_id: IContactsColumns["user_id"];
+    email: string | null;
+    avatar_key: string | null;
+}
+
+/** Result of query `NativeAvatarPublishFence`. */
+export interface INativeAvatarPublishFenceResult {
+}
+
+/** Result of query `NativePublishContactAvatar`. */
+export interface INativePublishContactAvatarResult {
+    id: string | null;
+}
+
+/** Result of query `NativeBumpAvatarMailboxRevision`. */
+export interface INativeBumpAvatarMailboxRevisionResult {
+}
+
+/** Result of query `NativeCompleteAvatarJob`. */
+export interface INativeCompleteAvatarJobResult {
+}
+
+/** Result of query `NativeAvatarNotificationScope`. */
+export interface INativeAvatarNotificationScopeResult {
+    mailbox_ids: IMailrunContactAvatarJobsColumns["mailbox_ids"];
+}
+
+/** Result of query `NativeReleaseAvatarJob`. */
+export interface INativeReleaseAvatarJobResult {
+}
+
+/** Result of query `NativeReleaseAvatarDispatch`. */
+export interface INativeReleaseAvatarDispatchResult {
 }
 
 /** Result of query `NativeSesReceipt`. */
@@ -3371,6 +3444,15 @@ export interface INativeAutoReplyMessageResult {
 export interface INativeAutoReplyJobResult {
 }
 
+/** Result of query `NativeContactWriteFence`. */
+export interface INativeContactWriteFenceResult {
+}
+
+/** Result of query `NativePriorContact`. */
+export interface INativePriorContactResult {
+    id: IContactsColumns["id"];
+}
+
 /** Result of query `NativeUpsertContact`. */
 export interface INativeUpsertContactResult {
     id: IContactsColumns["id"];
@@ -4344,7 +4426,13 @@ export interface INativeDeleteExpiredPushResult {
 export interface INativeRealtimeRevisionResult {
     id: string;
     revision: unknown | null;
+    avatar_revision: unknown | null;
     permission: unknown | null;
+}
+
+/** Result of query `NativeAvatarNotifyMailboxes`. */
+export interface INativeAvatarNotifyMailboxesResult {
+    id: IMailboxesColumns["id"];
 }
 
 /** Result of query `NativeResendCredentials`. */
@@ -4760,6 +4848,8 @@ export interface Queries {
     NativeSetMailboxAvatar: INativeSetMailboxAvatarResult;
     NativeContactAvatar: INativeContactAvatarResult;
     NativeSetContactAvatar: INativeSetContactAvatarResult;
+    NativeBlockContactFence: INativeBlockContactFenceResult;
+    NativePriorBlockedContact: INativePriorBlockedContactResult;
     NativeBlockContact: INativeBlockContactResult;
     NativeBlockContactRule: INativeBlockContactRuleResult;
     NativeSaveManualContact: INativeSaveManualContactResult;
@@ -4868,6 +4958,20 @@ export interface Queries {
     ConsumeRecoveryCode: IConsumeRecoveryCodeResult;
     ClaimInstallation: IClaimInstallationResult;
     DeleteSession: IDeleteSessionResult;
+    NativeQueueContactAvatar: INativeQueueContactAvatarResult;
+    NativeAvatarMailboxScope: INativeAvatarMailboxScopeResult;
+    NativeCancelContactAvatar: INativeCancelContactAvatarResult;
+    NativeClaimAvatarDispatch: INativeClaimAvatarDispatchResult;
+    NativeExhaustAvatarJobs: INativeExhaustAvatarJobsResult;
+    NativeClaimAvatarJob: INativeClaimAvatarJobResult;
+    NativeClaimedAvatarContact: INativeClaimedAvatarContactResult;
+    NativeAvatarPublishFence: INativeAvatarPublishFenceResult;
+    NativePublishContactAvatar: INativePublishContactAvatarResult;
+    NativeBumpAvatarMailboxRevision: INativeBumpAvatarMailboxRevisionResult;
+    NativeCompleteAvatarJob: INativeCompleteAvatarJobResult;
+    NativeAvatarNotificationScope: INativeAvatarNotificationScopeResult;
+    NativeReleaseAvatarJob: INativeReleaseAvatarJobResult;
+    NativeReleaseAvatarDispatch: INativeReleaseAvatarDispatchResult;
     NativeSesReceipt: INativeSesReceiptResult;
     NativeRecordSesReceipt: INativeRecordSesReceiptResult;
     NativeAwsSettings: INativeAwsSettingsResult;
@@ -5095,6 +5199,8 @@ export interface Queries {
     NativePendingAutoReply: INativePendingAutoReplyResult;
     NativeAutoReplyMessage: INativeAutoReplyMessageResult;
     NativeAutoReplyJob: INativeAutoReplyJobResult;
+    NativeContactWriteFence: INativeContactWriteFenceResult;
+    NativePriorContact: INativePriorContactResult;
     NativeUpsertContact: INativeUpsertContactResult;
     NativeMessageContactNames: INativeMessageContactNamesResult;
     NativeIdentityAccount: INativeIdentityAccountResult;
@@ -5227,6 +5333,7 @@ export interface Queries {
     NativePushRecipients: INativePushRecipientsResult;
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;
+    NativeAvatarNotifyMailboxes: INativeAvatarNotifyMailboxesResult;
     NativeResendCredentials: INativeResendCredentialsResult;
     NativeSaveResendCredentials: INativeSaveResendCredentialsResult;
     NativeResendWebhookCredentials: INativeResendWebhookCredentialsResult;
@@ -5855,6 +5962,41 @@ export interface IMailboxesTable {
     relationType: (typeof schema)["mailboxes"]["_relationType"];
     indexes: keyof (typeof schema)["mailboxes"]["_indexes"];
     constraints: keyof (typeof schema)["mailboxes"]["_constraints"];
+}
+
+/** Columns of `mailrun_contact_avatar_jobs`. */
+export interface IMailrunContactAvatarJobsColumns {
+    contact_id: string;
+    mailbox_ids: string;
+    status: string;
+    owner: string | null;
+    lease_until: number | null;
+    attempts: number;
+    published: number;
+    error: string | null;
+    created_at: number;
+}
+
+/** Schema of `mailrun_contact_avatar_jobs`. */
+export interface IMailrunContactAvatarJobsTable {
+    columns: IMailrunContactAvatarJobsColumns;
+    relationType: (typeof schema)["mailrun_contact_avatar_jobs"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_contact_avatar_jobs"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_contact_avatar_jobs"]["_constraints"];
+}
+
+/** Columns of `mailrun_contact_avatar_revisions`. */
+export interface IMailrunContactAvatarRevisionsColumns {
+    mailbox_id: string;
+    revision: number;
+}
+
+/** Schema of `mailrun_contact_avatar_revisions`. */
+export interface IMailrunContactAvatarRevisionsTable {
+    columns: IMailrunContactAvatarRevisionsColumns;
+    relationType: (typeof schema)["mailrun_contact_avatar_revisions"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_contact_avatar_revisions"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_contact_avatar_revisions"]["_constraints"];
 }
 
 /** Columns of `mailrun_installation`. */
@@ -6938,6 +7080,38 @@ export const schema = {
         },
         _constraints: {}
     },
+    mailrun_contact_avatar_jobs: {
+        _relationName: "mailrun_contact_avatar_jobs",
+        _relationType: "table",
+        _columns: {
+            contact_id: { _columnName: "contact_id", _foreignKeys: {} },
+            mailbox_ids: { _columnName: "mailbox_ids", _foreignKeys: {} },
+            status: { _columnName: "status", _foreignKeys: {} },
+            owner: { _columnName: "owner", _foreignKeys: {} },
+            lease_until: { _columnName: "lease_until", _foreignKeys: {} },
+            attempts: { _columnName: "attempts", _foreignKeys: {} },
+            published: { _columnName: "published", _foreignKeys: {} },
+            error: { _columnName: "error", _foreignKeys: {} },
+            created_at: { _columnName: "created_at", _foreignKeys: {} }
+        },
+        _indexes: {
+            mailrun_avatar_job_status: { _indexName: "mailrun_avatar_job_status" },
+            sqlite_autoindex_mailrun_contact_avatar_jobs_1: { _indexName: "sqlite_autoindex_mailrun_contact_avatar_jobs_1" }
+        },
+        _constraints: {}
+    },
+    mailrun_contact_avatar_revisions: {
+        _relationName: "mailrun_contact_avatar_revisions",
+        _relationType: "table",
+        _columns: {
+            mailbox_id: { _columnName: "mailbox_id", _foreignKeys: {} },
+            revision: { _columnName: "revision", _foreignKeys: {} }
+        },
+        _indexes: {
+            sqlite_autoindex_mailrun_contact_avatar_revisions_1: { _indexName: "sqlite_autoindex_mailrun_contact_avatar_revisions_1" }
+        },
+        _constraints: {}
+    },
     mailrun_installation: {
         _relationName: "mailrun_installation",
         _relationType: "table",
@@ -7454,6 +7628,8 @@ export interface Tables {
     mailbox_agent_settings: IMailboxAgentSettingsTable;
     mailbox_aliases: IMailboxAliasesTable;
     mailboxes: IMailboxesTable;
+    mailrun_contact_avatar_jobs: IMailrunContactAvatarJobsTable;
+    mailrun_contact_avatar_revisions: IMailrunContactAvatarRevisionsTable;
     mailrun_installation: IMailrunInstallationTable;
     mailrun_jmap_uploads: IMailrunJmapUploadsTable;
     mailrun_job_leases: IMailrunJobLeasesTable;

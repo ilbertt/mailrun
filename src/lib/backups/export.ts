@@ -11,6 +11,7 @@ export const BACKUP_TABLES: DatabaseBackupTable[] = [
 	"mailboxes",
 	"mailbox_access",
 	"contacts",
+	"mailrun_contact_avatar_jobs",
 	"folders",
 	"api_keys",
 	"messages",
@@ -57,6 +58,7 @@ export const INTERNAL_TABLES = [
 	"d1_migrations",
 	"jmap_mailbox_revisions", // Rebuilt by message triggers.
 	"mailrun_job_leases", // Process leases expire; restoring them would block work.
+	"mailrun_contact_avatar_revisions", // Derived live-refresh ticks; mailbox deletion/restore resets them.
 ];
 const REQUIRED_BACKUP_TABLES: DatabaseBackupTable[] = [
 	"users",

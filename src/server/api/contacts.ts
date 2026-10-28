@@ -1,3 +1,5 @@
+import { enqueueContactAvatar } from "../avatars/jobs";
+import { wakeAvatarDispatcher } from "../avatars/dispatcher";
 import { z } from "zod";
 import { withDatabase, seconds } from "../db";
 import { mailboxAccess } from "../mail/access";
@@ -43,10 +45,21 @@ export async function contactsApi(
 	if (path === "/api/contacts/block" && method === "POST") {
 		await withDatabase((sql) =>
 			sql.begin(async (tx) => {
+				await tx.NativeBlockContactFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+				const [existing] =
+					await tx.NativePriorBlockedContact`SELECT id FROM contacts WHERE user_id=${box.user_id} AND email=${email}`;
 				await tx.NativeBlockContact`INSERT INTO contacts (id,user_id,email,display_name,source,blocked,last_seen_at,created_at) VALUES (${getContactId(box.user_id, email)},${box.user_id},${email},${getContactNameFromAddress(input.address)},'inbound',1,${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET blocked=1`;
+				await enqueueContactAvatar(
+					tx,
+					getContactId(box.user_id, email),
+					box.user_id,
+					box.id,
+					!existing,
+				);
 				await tx.NativeBlockContactRule`INSERT INTO routing_rules (id,user_id,domain_id,scope,pattern,match_field,match_operator,match_value,action,mailbox_id,priority,created_at) VALUES (${"block:" + box.id + ":" + email},${box.user_id},${box.domain_id},'mailbox',${email},'email','exact',${email},'trash',${box.id},100,${seconds()}) ON CONFLICT(id) DO NOTHING`;
 			}),
 		);
+		wakeAvatarDispatcher();
 		return Response.json({ contact: { email, blocked: true } });
 	}
 	if (method === "PATCH") {

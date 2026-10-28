@@ -209,9 +209,12 @@ export async function deliverJob(
 			...(payload.cc ?? []),
 			...(payload.bcc ?? []),
 		])
-			await upsertContact(user.id, recipient, "outbound").catch((error) =>
-				console.error("Sent contact update failed", error),
-			);
+			await upsertContact(
+				user.id,
+				recipient,
+				"outbound",
+				message.mailbox_id,
+			).catch((error) => console.error("Sent contact update failed", error));
 	} catch (error) {
 		await withDatabase((sql) =>
 			sql.begin(async (sql) => {

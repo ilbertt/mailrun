@@ -1,3 +1,4 @@
+import { cancelContactAvatar } from "../avatars/jobs";
 import { imageResponse, storeImages } from "../images";
 import { licenseEntitlements } from "../licenses";
 import { z } from "zod";
@@ -132,9 +133,11 @@ export async function avatarsApi(
 					value,
 				);
 			await upsertContact(box.user_id, email, "manual");
-			await withDatabase(
-				(sql) =>
-					sql.NativeSetContactAvatar`UPDATE contacts SET avatar_key=${value} WHERE user_id=${box.user_id} AND email=${email}`,
+			await withDatabase((sql) =>
+				sql.begin(async (sql) => {
+					await sql.NativeSetContactAvatar`UPDATE contacts SET avatar_key=${value} WHERE user_id=${box.user_id} AND email=${email}`;
+					await cancelContactAvatar(sql, getContactId(box.user_id, email));
+				}),
 			);
 		};
 		if (method === "POST") {

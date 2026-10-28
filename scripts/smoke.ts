@@ -1,3 +1,4 @@
+import { writeAvatarFixturePreload } from "../tests/avatar-provider";
 import { open, truncate } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fixture } from "../tests/fixtures";
@@ -26,7 +27,9 @@ const binary = resolve(process.argv[2] ?? "dist/mailrun-local");
 const oldImportStage = "import-staging/previous-session/stale.eml";
 await new LocalStorage().put(oldImportStage, "synthetic abandoned import");
 const publicBase = "https://mailrun-smoke.example";
+const avatarPreload = await writeAvatarFixturePreload(state.directory);
 const smokeEnvironment: Record<string, string | undefined> = {
+	BUN_OPTIONS: "--preload " + avatarPreload.path,
 	PATH: process.env.PATH,
 	HOME: process.env.HOME,
 	TMPDIR: process.env.TMPDIR,

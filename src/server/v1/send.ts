@@ -104,8 +104,8 @@ export async function v1Send(
 		});
 		committed = true;
 		for (const address of [...to, ...cc, ...bcc])
-			await upsertContact(user.id, address, "outbound").catch((error) =>
-				console.error("API sent contact update failed", error),
+			await upsertContact(user.id, address, "outbound", input.mailboxId).catch(
+				(error) => console.error("API sent contact update failed", error),
 			);
 		if (scheduled) return { messageId, scheduled: true };
 		await deliverJob(jobId, request);
