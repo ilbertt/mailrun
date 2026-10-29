@@ -68,7 +68,7 @@ export async function queueAutoReply(input: {
 				autoReplyMailboxId: input.mailboxId,
 				autoReplyRecipient: recipient,
 			});
-			await tx.NativeAutoReplyMessage`INSERT INTO messages (id,user_id,mailbox_id,direction,from_addr,to_addr,subject,text_body,snippet,status,read,in_reply_to,references_header,thread_id,created_at) VALUES (${messageId},${input.userId},${input.mailboxId},'outbound',${delivered},${recipient},${subject},${text},${buildSnippet(text, null)},'queued',1,${payload.inReplyTo ?? null},${payload.references ?? null},${input.threadId},${seconds()})`;
+			await tx.NativeAutoReplyMessage`INSERT INTO messages (id,user_id,mailbox_id,direction,from_addr,to_addr,subject,text_body,snippet,status,read,in_reply_to,references_header,thread_id,created_at) VALUES (${messageId},${input.userId},${input.mailboxId},'outbound',${delivered},${recipient},${subject},${text},${buildSnippet(text, null)},'queued',1,${payload.inReplyTo ?? null},${input.incomingMessageId},${input.threadId},${seconds()})`;
 			await tx.NativeAutoReplyJob`INSERT INTO outbound_jobs (id,user_id,message_id,status,payload,created_at,updated_at,scheduled_at) VALUES (${jobId},${input.userId},${messageId},'queued',${JSON.stringify(payload)},${seconds()},${seconds()},${seconds()})`;
 			return jobId;
 		}),

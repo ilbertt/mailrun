@@ -59,7 +59,13 @@ export const deliveryPayloadSchema = z
 		text: z.string().optional(),
 		html: z.string().optional(),
 		inReplyTo: header.max(998).nullable().optional(),
-		references: header.max(10000).nullable().optional(),
+		references: z
+			.union([header.max(16 * 1024), z.array(header.max(16 * 1024))])
+			.nullable()
+			.optional(),
+		headers: z
+			.record(z.string().regex(/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/), header)
+			.optional(),
 		threadId: z.string().nullable().optional(),
 		returnToDraft: z.boolean().optional(),
 		submittedDraftId: z.string().optional(),

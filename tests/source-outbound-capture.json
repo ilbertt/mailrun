@@ -1,0 +1,593 @@
+{
+  "provenance": {
+    "source": "71aa49b",
+    "version": "0.5.2",
+    "sendModuleSha256": "380f25f360f45480c681668c66aab057bd3b84c7cb00831a3e3c5863d7c59ff3",
+    "backupModuleSha256": "aff55286a3c6c8b77750751cb9f4ea9c3b1b3649a6235f03d2d6154d3bf136d8"
+  },
+  "backup": {
+    "format": "mailflare-database-backup",
+    "version": 1,
+    "createdAt": "2026-10-29T11:40:40.654Z",
+    "includedTables": [
+      "users",
+      "domains",
+      "mailboxes",
+      "mailbox_access",
+      "contacts",
+      "folders",
+      "api_keys",
+      "messages",
+      "message_attachments",
+      "shared_attachment_links",
+      "outbound_jobs",
+      "routing_rules",
+      "webhooks",
+      "webhook_deliveries",
+      "sessions",
+      "push_subscriptions",
+      "audit_logs",
+      "backup_settings",
+      "backups",
+      "app_settings",
+      "license_settings",
+      "email_templates",
+      "calendar_events",
+      "booking_events",
+      "auto_reply_deliveries",
+      "spam_token_stats",
+      "spam_reputation",
+      "spam_feedback",
+      "mailbox_aliases",
+      "password_reset_tokens",
+      "mfa_recovery_codes",
+      "login_challenges",
+      "mailbox_agent_settings",
+      "agent_conversations",
+      "agent_chat_messages",
+      "agent_jobs",
+      "agent_draft_metadata",
+      "agent_send_approvals",
+      "mcp_key_mailboxes",
+      "ai_usage",
+      "drive_items",
+      "drive_shares",
+      "drive_upload_parts"
+    ],
+    "tables": {
+      "users": [
+        {
+          "id": "owner",
+          "email": "owner@example.com",
+          "password_hash": "test-only",
+          "name": "Owner",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "admin",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 1,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": null
+        }
+      ],
+      "domains": [
+        {
+          "id": "domain",
+          "user_id": "owner",
+          "hostname": "example.com",
+          "zone_id": "zone",
+          "status": "active",
+          "routing_status": null,
+          "sending_subdomain_tag": null,
+          "sending_enabled": 1,
+          "routing_enabled": 0,
+          "created_at": 1,
+          "sending_requested": 0,
+          "sending_provider": "cloudflare",
+          "receiving_provider": "cloudflare"
+        }
+      ],
+      "mailboxes": [
+        {
+          "id": "mailbox",
+          "user_id": "owner",
+          "domain_id": "domain",
+          "local_part": "hello",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        }
+      ],
+      "mailbox_access": [],
+      "contacts": [
+        {
+          "id": "owner:maya@example.net",
+          "user_id": "owner",
+          "email": "maya@example.net",
+          "display_name": "Maya",
+          "source": "outbound",
+          "last_seen_at": 1793274040,
+          "created_at": 1793274040,
+          "blocked": 0,
+          "avatar_key": null
+        },
+        {
+          "id": "owner:copy@example.net",
+          "user_id": "owner",
+          "email": "copy@example.net",
+          "display_name": "Copy",
+          "source": "outbound",
+          "last_seen_at": 1793274040,
+          "created_at": 1793274040,
+          "blocked": 0,
+          "avatar_key": null
+        },
+        {
+          "id": "owner:hidden@example.net",
+          "user_id": "owner",
+          "email": "hidden@example.net",
+          "display_name": null,
+          "source": "outbound",
+          "last_seen_at": 1793274040,
+          "created_at": 1793274040,
+          "blocked": 0,
+          "avatar_key": null
+        }
+      ],
+      "folders": [],
+      "api_keys": [],
+      "messages": [
+        {
+          "id": "msg_NilTXVOa91xaXX02Qhown",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "support@example.com",
+          "to_addr": "Maya <maya@example.net>",
+          "subject": "Source queued references-array",
+          "snippet": "Original queued body references-array",
+          "status": "queued",
+          "thread_id": "source-thread",
+          "created_at": 1793274040,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Original queued body references-array",
+          "html_body": "<p>Original queued <img src=\"cid:source-image\"></p>",
+          "raw_r2_key": null,
+          "cc_addr": "Copy <copy@example.net>",
+          "bcc_addr": "hidden@example.net",
+          "in_reply_to": "parent@example.org",
+          "references_header": "root@example.org parent@example.org parent@example.org",
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "msg_aw1H6AH0YKGJVSoOfceg-",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "support@example.com",
+          "to_addr": "Maya <maya@example.net>",
+          "subject": "Source queued references-string",
+          "snippet": "Original queued body references-string",
+          "status": "queued",
+          "thread_id": "source-thread",
+          "created_at": 1793274040,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Original queued body references-string",
+          "html_body": "<p>Original queued <img src=\"cid:source-image\"></p>",
+          "raw_r2_key": null,
+          "cc_addr": "Copy <copy@example.net>",
+          "bcc_addr": "hidden@example.net",
+          "in_reply_to": "parent@example.org",
+          "references_header": "root@example.org parent@example.org",
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "msg_BFhJ6UxLWUuZ0T0TIGct-",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "support@example.com",
+          "to_addr": "Maya <maya@example.net>",
+          "subject": "Source queued long-references",
+          "snippet": "Original queued body long-references",
+          "status": "queued",
+          "thread_id": "source-thread",
+          "created_at": 1793274040,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Original queued body long-references",
+          "html_body": "<p>Original queued <img src=\"cid:source-image\"></p>",
+          "raw_r2_key": null,
+          "cc_addr": "Copy <copy@example.net>",
+          "bcc_addr": "hidden@example.net",
+          "in_reply_to": "parent@example.org",
+          "references_header": "00-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 01-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 02-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 04-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 05-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 06-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 07-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 08-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 09-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 10-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 11-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 12-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 13-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 14-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 15-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 16-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 17-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 18-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 19-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 20-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 21-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 22-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 23-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 24-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 25-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 26-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 27-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 28-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 29-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 30-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 31-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 32-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 33-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 34-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 35-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 36-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 37-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 38-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 39-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 40-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 41-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 42-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 43-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 44-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 45-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 46-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 47-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 48-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 49-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 50-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 51-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 52-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 53-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 54-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 55-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 56-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 57-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 58-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 59-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 60-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 61-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 62-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 63-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org 64-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org",
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        }
+      ],
+      "message_attachments": [
+        {
+          "id": "att_i2rQuXVFPtYm4OrXjqqNB",
+          "message_id": "msg_NilTXVOa91xaXX02Qhown",
+          "filename": "source-references-array.txt",
+          "content_type": "text/plain",
+          "size": 53,
+          "disposition": "inline",
+          "content_id": "source-image",
+          "r2_key": "attachments/msg_NilTXVOa91xaXX02Qhown/att_i2rQuXVFPtYm4OrXjqqNB/source-references-array.txt",
+          "created_at": 1793274040,
+          "trashed_at": null
+        },
+        {
+          "id": "att_Eo669OcuIJG7h43lPwxs9",
+          "message_id": "msg_aw1H6AH0YKGJVSoOfceg-",
+          "filename": "source-references-string.txt",
+          "content_type": "text/plain",
+          "size": 54,
+          "disposition": "inline",
+          "content_id": "source-image",
+          "r2_key": "attachments/msg_aw1H6AH0YKGJVSoOfceg-/att_Eo669OcuIJG7h43lPwxs9/source-references-string.txt",
+          "created_at": 1793274040,
+          "trashed_at": null
+        },
+        {
+          "id": "att_l6ukvtFds-qy5zgB1d0xl",
+          "message_id": "msg_BFhJ6UxLWUuZ0T0TIGct-",
+          "filename": "source-long-references.txt",
+          "content_type": "text/plain",
+          "size": 52,
+          "disposition": "inline",
+          "content_id": "source-image",
+          "r2_key": "attachments/msg_BFhJ6UxLWUuZ0T0TIGct-/att_l6ukvtFds-qy5zgB1d0xl/source-long-references.txt",
+          "created_at": 1793274040,
+          "trashed_at": null
+        }
+      ],
+      "shared_attachment_links": [],
+      "outbound_jobs": [
+        {
+          "id": "job_4uMpWSBeIgRIG31Gc3TLn",
+          "user_id": "owner",
+          "message_id": "msg_NilTXVOa91xaXX02Qhown",
+          "status": "queued",
+          "payload": "{\"userId\":\"owner\",\"mailboxId\":\"mailbox\",\"from\":\"support@example.com\",\"to\":[\"Maya <maya@example.net>\"],\"cc\":[\"Copy <copy@example.net>\"],\"bcc\":[\"hidden@example.net\"],\"subject\":\"Source queued references-array\",\"text\":\"Original queued body references-array\",\"html\":\"<p>Original queued <img src=\\\"cid:source-image\\\"></p>\",\"inReplyTo\":\"<parent@example.org>\",\"references\":[\"<root@example.org>\",\" <parent@example.org> \",\"<parent@example.org>\"],\"threadId\":\"source-thread\",\"headers\":{\"X-Migration-Proof\":\"source-array\"},\"attachments\":[{\"filename\":\"source-references-array.txt\",\"type\":\"text/plain\",\"disposition\":\"inline\",\"contentId\":\"source-image\",\"storageId\":\"att_i2rQuXVFPtYm4OrXjqqNB\"}],\"scheduledAt\":\"2100-01-01T12:00:00.000Z\",\"publicOrigin\":\"https://source.example.com\"}",
+          "error": null,
+          "created_at": 1793274040,
+          "updated_at": 1793274040,
+          "scheduled_at": 4102488000
+        },
+        {
+          "id": "job_fjsBXBTDRvdV39gHj-_2a",
+          "user_id": "owner",
+          "message_id": "msg_aw1H6AH0YKGJVSoOfceg-",
+          "status": "queued",
+          "payload": "{\"userId\":\"owner\",\"mailboxId\":\"mailbox\",\"from\":\"support@example.com\",\"to\":[\"Maya <maya@example.net>\"],\"cc\":[\"Copy <copy@example.net>\"],\"bcc\":[\"hidden@example.net\"],\"subject\":\"Source queued references-string\",\"text\":\"Original queued body references-string\",\"html\":\"<p>Original queued <img src=\\\"cid:source-image\\\"></p>\",\"inReplyTo\":\"<parent@example.org>\",\"references\":\"<root@example.org>, <parent@example.org>\",\"threadId\":\"source-thread\",\"headers\":{\"Auto-Submitted\":\"auto-replied\",\"X-Auto-Response-Suppress\":\"All\"},\"attachments\":[{\"filename\":\"source-references-string.txt\",\"type\":\"text/plain\",\"disposition\":\"inline\",\"contentId\":\"source-image\",\"storageId\":\"att_Eo669OcuIJG7h43lPwxs9\"}],\"scheduledAt\":\"2100-01-01T12:00:00.000Z\",\"publicOrigin\":\"https://source.example.com\"}",
+          "error": null,
+          "created_at": 1793274040,
+          "updated_at": 1793274040,
+          "scheduled_at": 4102488000
+        },
+        {
+          "id": "job_3Ei9l_cd74FjEkI3nETT_",
+          "user_id": "owner",
+          "message_id": "msg_BFhJ6UxLWUuZ0T0TIGct-",
+          "status": "queued",
+          "payload": "{\"userId\":\"owner\",\"mailboxId\":\"mailbox\",\"from\":\"support@example.com\",\"to\":[\"Maya <maya@example.net>\"],\"cc\":[\"Copy <copy@example.net>\"],\"bcc\":[\"hidden@example.net\"],\"subject\":\"Source queued long-references\",\"text\":\"Original queued body long-references\",\"html\":\"<p>Original queued <img src=\\\"cid:source-image\\\"></p>\",\"inReplyTo\":\"<parent@example.org>\",\"references\":[\"<00-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<01-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<02-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<04-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<05-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<06-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<07-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<08-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<09-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<10-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<11-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<12-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<13-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<14-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<15-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<16-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<17-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<18-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<19-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<20-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<21-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<22-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<23-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<24-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<25-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<26-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<27-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<28-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<29-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<30-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<31-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<32-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<33-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<34-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<35-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<36-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<37-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<38-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<39-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<40-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<41-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<42-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<43-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<44-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<45-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<46-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<47-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<48-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<49-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<50-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<51-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<52-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<53-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<54-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<55-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<56-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<57-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<58-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<59-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<60-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<61-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<62-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<63-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\",\"<64-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>\"],\"threadId\":\"source-thread\",\"headers\":{\"X-Migration-Proof\":\"source-long-chain\"},\"attachments\":[{\"filename\":\"source-long-references.txt\",\"type\":\"text/plain\",\"disposition\":\"inline\",\"contentId\":\"source-image\",\"storageId\":\"att_l6ukvtFds-qy5zgB1d0xl\"}],\"scheduledAt\":\"2100-01-01T12:00:00.000Z\",\"publicOrigin\":\"https://source.example.com\"}",
+          "error": null,
+          "created_at": 1793274040,
+          "updated_at": 1793274040,
+          "scheduled_at": 4102488000
+        }
+      ],
+      "routing_rules": [],
+      "webhooks": [],
+      "webhook_deliveries": [],
+      "sessions": [],
+      "push_subscriptions": [],
+      "audit_logs": [],
+      "backup_settings": [
+        {
+          "id": "default",
+          "enabled": 0,
+          "schedule_type": "daily",
+          "schedule_value": null,
+          "retention_enabled": 0,
+          "retention_days": 30,
+          "updated_at": 1793274040,
+          "excluded_table_groups": "[]"
+        }
+      ],
+      "backups": [],
+      "app_settings": [
+        {
+          "id": "default",
+          "app_name": "Mailflare",
+          "icon_key": null,
+          "updated_at": 1793274040,
+          "agent_provider": null,
+          "agent_preset": null,
+          "agent_base_url": null,
+          "agent_api_key": null,
+          "agent_model": null,
+          "agent_enabled": 1,
+          "agent_model_rates": null,
+          "outbound_attachment_max_mb": 25,
+          "resend_api_key": null,
+          "aws_config": null,
+          "ses_receiving": null,
+          "resend_webhook_id": null,
+          "resend_webhook_secret": null,
+          "drive_storage_limit_bytes": null
+        }
+      ],
+      "license_settings": [],
+      "email_templates": [],
+      "calendar_events": [],
+      "booking_events": [],
+      "auto_reply_deliveries": [],
+      "spam_token_stats": [],
+      "spam_reputation": [],
+      "spam_feedback": [],
+      "mailbox_aliases": [
+        {
+          "id": "source-alias",
+          "mailbox_id": "mailbox",
+          "domain_id": "domain",
+          "local_part": "support",
+          "created_at": 1
+        }
+      ],
+      "password_reset_tokens": [],
+      "mfa_recovery_codes": [],
+      "login_challenges": [],
+      "mailbox_agent_settings": [],
+      "agent_conversations": [],
+      "agent_chat_messages": [],
+      "agent_jobs": [],
+      "agent_draft_metadata": [],
+      "agent_send_approvals": [],
+      "mcp_key_mailboxes": [],
+      "ai_usage": [],
+      "drive_items": [],
+      "drive_shares": [],
+      "drive_upload_parts": []
+    }
+  },
+  "queue": [
+    {
+      "kind": "email.scheduled",
+      "jobId": "job_4uMpWSBeIgRIG31Gc3TLn",
+      "messageId": "msg_NilTXVOa91xaXX02Qhown",
+      "scheduledAt": "2100-01-01T12:00:00.000Z"
+    },
+    {
+      "kind": "email.scheduled",
+      "jobId": "job_fjsBXBTDRvdV39gHj-_2a",
+      "messageId": "msg_aw1H6AH0YKGJVSoOfceg-",
+      "scheduledAt": "2100-01-01T12:00:00.000Z"
+    },
+    {
+      "kind": "email.scheduled",
+      "jobId": "job_3Ei9l_cd74FjEkI3nETT_",
+      "messageId": "msg_BFhJ6UxLWUuZ0T0TIGct-",
+      "scheduledAt": "2100-01-01T12:00:00.000Z"
+    }
+  ],
+  "objects": [
+    {
+      "key": "attachments/msg_BFhJ6UxLWUuZ0T0TIGct-/att_l6ukvtFds-qy5zgB1d0xl/source-long-references.txt",
+      "base64": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgbG9uZy1yZWZlcmVuY2VzIGNhZsOpCg==",
+      "sha256": "348f2cee1e9935a929dbb72a1d4bbd0d0a264b45200f57811d428b385a28764d",
+      "metadata": {
+        "httpMetadata": {
+          "contentType": "text/plain"
+        },
+        "customMetadata": {
+          "filename": "source-long-references.txt",
+          "messageId": "msg_BFhJ6UxLWUuZ0T0TIGct-"
+        },
+        "size": 52,
+        "uploaded": "2026-10-29T11:40:40.653Z",
+        "etag": "1a18776514d-34"
+      }
+    },
+    {
+      "key": "attachments/msg_NilTXVOa91xaXX02Qhown/att_i2rQuXVFPtYm4OrXjqqNB/source-references-array.txt",
+      "base64": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgcmVmZXJlbmNlcy1hcnJheSBjYWbDqQo=",
+      "sha256": "ba7d35c4ebca1e84b5db04f6e95a03ee7f08b1b88c4335d04373868e84f085fb",
+      "metadata": {
+        "httpMetadata": {
+          "contentType": "text/plain"
+        },
+        "customMetadata": {
+          "filename": "source-references-array.txt",
+          "messageId": "msg_NilTXVOa91xaXX02Qhown"
+        },
+        "size": 53,
+        "uploaded": "2026-10-29T11:40:40.647Z",
+        "etag": "1a187765147-35"
+      }
+    },
+    {
+      "key": "attachments/msg_aw1H6AH0YKGJVSoOfceg-/att_Eo669OcuIJG7h43lPwxs9/source-references-string.txt",
+      "base64": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgcmVmZXJlbmNlcy1zdHJpbmcgY2Fmw6kK",
+      "sha256": "a516239cd5aa02da574ad8a76a5677b7d3b41adc2c8e0c496233f1bebb178a16",
+      "metadata": {
+        "httpMetadata": {
+          "contentType": "text/plain"
+        },
+        "customMetadata": {
+          "filename": "source-references-string.txt",
+          "messageId": "msg_aw1H6AH0YKGJVSoOfceg-"
+        },
+        "size": 54,
+        "uploaded": "2026-10-29T11:40:40.650Z",
+        "etag": "1a18776514a-36"
+      }
+    }
+  ],
+  "expected": {
+    "deliveries": [
+      {
+        "from": "support@example.com",
+        "to": [
+          "Maya <maya@example.net>"
+        ],
+        "cc": [
+          "Copy <copy@example.net>"
+        ],
+        "bcc": [
+          "hidden@example.net"
+        ],
+        "subject": "Source queued references-array",
+        "headers": {
+          "X-Migration-Proof": "source-array",
+          "In-Reply-To": "<parent@example.org>",
+          "References": "<root@example.org> <parent@example.org> <parent@example.org>"
+        },
+        "html": "<p>Original queued <img src=\"cid:source-image\"></p>",
+        "text": "Original queued body references-array",
+        "attachments": [
+          {
+            "filename": "source-references-array.txt",
+            "type": "text/plain",
+            "content": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgcmVmZXJlbmNlcy1hcnJheSBjYWbDqQo=",
+            "disposition": "inline",
+            "contentId": "source-image"
+          }
+        ]
+      },
+      {
+        "from": "support@example.com",
+        "to": [
+          "Maya <maya@example.net>"
+        ],
+        "cc": [
+          "Copy <copy@example.net>"
+        ],
+        "bcc": [
+          "hidden@example.net"
+        ],
+        "subject": "Source queued references-string",
+        "headers": {
+          "Auto-Submitted": "auto-replied",
+          "X-Auto-Response-Suppress": "All",
+          "In-Reply-To": "<parent@example.org>",
+          "References": "<root@example.org> <parent@example.org>"
+        },
+        "html": "<p>Original queued <img src=\"cid:source-image\"></p>",
+        "text": "Original queued body references-string",
+        "attachments": [
+          {
+            "filename": "source-references-string.txt",
+            "type": "text/plain",
+            "content": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgcmVmZXJlbmNlcy1zdHJpbmcgY2Fmw6kK",
+            "disposition": "inline",
+            "contentId": "source-image"
+          }
+        ]
+      },
+      {
+        "from": "support@example.com",
+        "to": [
+          "Maya <maya@example.net>"
+        ],
+        "cc": [
+          "Copy <copy@example.net>"
+        ],
+        "bcc": [
+          "hidden@example.net"
+        ],
+        "subject": "Source queued long-references",
+        "headers": {
+          "X-Migration-Proof": "source-long-chain",
+          "In-Reply-To": "<parent@example.org>",
+          "References": "<00-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <01-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <02-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <04-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <05-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <06-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <07-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <08-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <09-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <10-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <11-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <12-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <13-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <14-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <15-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <16-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <17-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <18-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <19-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <20-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <21-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <22-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <23-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <24-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <25-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <26-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <27-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <28-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <29-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <30-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <31-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <32-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <33-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <34-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <35-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <36-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <37-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <38-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <39-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <40-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <41-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <42-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <43-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <44-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <45-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <46-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <47-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <48-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <49-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <50-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <51-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <52-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <53-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <54-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <55-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <56-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <57-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <58-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <59-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <60-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <61-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <62-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <63-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org> <64-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.org>"
+        },
+        "html": "<p>Original queued <img src=\"cid:source-image\"></p>",
+        "text": "Original queued body long-references",
+        "attachments": [
+          {
+            "filename": "source-long-references.txt",
+            "type": "text/plain",
+            "content": "T3JpZ2luYWwgc2NoZWR1bGVkIGF0dGFjaG1lbnQgbG9uZy1yZWZlcmVuY2VzIGNhZsOpCg==",
+            "disposition": "inline",
+            "contentId": "source-image"
+          }
+        ]
+      }
+    ],
+    "audits": [
+      {
+        "actor_user_id": "owner",
+        "mailbox_id": "mailbox",
+        "message_id": "msg_NilTXVOa91xaXX02Qhown",
+        "action": "email.send",
+        "metadata": "{\"to\":\"Maya <maya@example.net>\",\"cc\":\"Copy <copy@example.net>\",\"subject\":\"Source queued references-array\"}"
+      },
+      {
+        "actor_user_id": "owner",
+        "mailbox_id": "mailbox",
+        "message_id": "msg_aw1H6AH0YKGJVSoOfceg-",
+        "action": "email.send",
+        "metadata": "{\"to\":\"Maya <maya@example.net>\",\"cc\":\"Copy <copy@example.net>\",\"subject\":\"Source queued references-string\"}"
+      },
+      {
+        "actor_user_id": "owner",
+        "mailbox_id": "mailbox",
+        "message_id": "msg_BFhJ6UxLWUuZ0T0TIGct-",
+        "action": "email.send",
+        "metadata": "{\"to\":\"Maya <maya@example.net>\",\"cc\":\"Copy <copy@example.net>\",\"subject\":\"Source queued long-references\"}"
+      }
+    ]
+  }
+}

@@ -3,11 +3,8 @@ import { wakeWebhookDispatcher } from "../webhooks/dispatcher";
 import { deleteUnreferencedObjects } from "../storage";
 import { upsertContact } from "./contacts";
 import { buildSnippet } from "../../lib/email/parse";
-import {
-	parseMessageIdList,
-	formatMessageIdHeader,
-	normalizeMessageId,
-} from "../../lib/email/threading";
+import { deliveryHeaders } from "./delivery-headers";
+import { audit } from "./message-actions";
 import { z } from "zod";
 import { sendSchema, userSchema, type User } from "../../shared/contracts";
 import { withDatabase, id, seconds } from "../db";
@@ -62,6 +59,7 @@ export async function sendDraft(
 			threadId: draft.thread_id,
 			returnToDraft: true,
 		});
+		deliveryHeaders(payload);
 		if (
 			!payload.text?.trim() &&
 			!payload.html?.trim() &&
@@ -120,28 +118,7 @@ export async function deliverJob(
 		});
 		const from = await formattedSender(user, message.mailbox_id, payload.from);
 		const provider = await outboundConfig(payload.from);
-		// Cloudflare owns Message-ID; only threading headers are supplied.
-		const headers: Record<string, string> = {};
-		if (payload.autoReplyMailboxId && payload.autoReplyRecipient) {
-			headers["Auto-Submitted"] = "auto-replied";
-			headers["X-Auto-Response-Suppress"] = "All";
-		}
-		const parent = normalizeMessageId(payload.inReplyTo);
-		if (parent) {
-			const value = formatMessageIdHeader([parent]);
-			if (Buffer.byteLength(value) <= 2048) headers["In-Reply-To"] = value;
-		}
-		const references = parseMessageIdList(payload.references);
-		while (
-			references.length > 1 &&
-			Buffer.byteLength(formatMessageIdHeader(references)) > 2048
-		)
-			references.splice(1, 1);
-		if (
-			references.length &&
-			Buffer.byteLength(formatMessageIdHeader(references)) <= 2048
-		)
-			headers.References = formatMessageIdHeader(references);
+		const headers = deliveryHeaders(payload);
 		const prepared = await prepareAttachments(
 			job.message_id ?? "",
 			{
@@ -172,6 +149,18 @@ export async function deliverJob(
 					await sql.NativeRecordAutoReply`INSERT INTO auto_reply_deliveries (id,mailbox_id,recipient,sent_at) VALUES (${id("arp")},${payload.autoReplyMailboxId},${payload.autoReplyRecipient},${seconds()}) ON CONFLICT(mailbox_id,recipient) DO UPDATE SET sent_at=excluded.sent_at`;
 				await sql.CompleteOutbound`UPDATE outbound_jobs SET status='sent',error=NULL,updated_at=${seconds()} WHERE id=${job.id}`;
 				await sql.CompleteSentMessage`UPDATE messages SET status='sent',from_addr=${from},snippet=${buildSnippet(prepared.text ?? null, prepared.html ?? null)},provider_message_id=${result.messageId},thread_id=coalesce(thread_id,${result.messageId.replace(/^<|>$/g, "")}),text_body=${prepared.text ?? null},html_body=${prepared.html ?? null} WHERE id=${job.message_id}`;
+				await audit(
+					sql,
+					user,
+					message.mailbox_id,
+					job.message_id,
+					"email.send",
+					{
+						to: payload.to.join(", "),
+						cc: payload.cc?.length ? payload.cc.join(", ") : undefined,
+						subject: payload.subject,
+					},
+				);
 				await enqueueWebhooks(sql, user.id, "message.outbound", {
 					messageId: job.message_id,
 					providerMessageId: result.messageId,

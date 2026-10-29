@@ -26,6 +26,7 @@
 		"smoke:setup": "bun scripts/smoke-setup.ts",
 		"smoke:setup-crash": "bun scripts/smoke-setup-crash.ts",
 		"smoke:imported-relay": "bun scripts/smoke-imported-relay.ts",
+		"smoke:source-outbound": "bun scripts/smoke-source-outbound.ts",
 		"smoke:durability": "bun scripts/smoke-durability.ts",
 		"check:typescript-version": "bun scripts/check-typescript-version.ts"
 	},
