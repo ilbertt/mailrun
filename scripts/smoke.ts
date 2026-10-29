@@ -143,8 +143,10 @@ try {
 		throw new Error("Original public homepage was not rendered");
 	for (const [path, title] of [
 		["/login", "Sign in"],
+		["/login?add=1", "Sign in"],
 		["/forgot-password", "Reset your password"],
 		["/reset-password?token=synthetic", "Choose a new password"],
+		["/reset-password?token=1", "Choose a new password"],
 	] as const) {
 		const response = await fetch(base + path);
 		const html = await response.text();
@@ -177,6 +179,17 @@ try {
 	if (!login.ok || !cookie?.toLowerCase().includes("httponly"))
 		throw new Error(`HTTP login failed: ${login.status}`);
 	const sessionCookie = cookie.split(";")[0] ?? "";
+	const addAccount = await fetch(base + "/login?add=1", {
+		headers: { Cookie: sessionCookie },
+		redirect: "manual",
+	});
+	if (
+		addAccount.status !== 200 ||
+		!(await addAccount.text()).includes("Add another account")
+	)
+		throw new Error(
+			"The source add-account flag failed for a signed-in account",
+		);
 	for (const path of [
 		"/api/auth/me",
 		"/api/messages?mailboxId=mailbox",

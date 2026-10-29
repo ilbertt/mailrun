@@ -65,6 +65,7 @@ export function LanguageProvider({
 				document.documentElement.lang = nextLocale;
 				document.documentElement.dir = getDirection(nextLocale);
 				setActive({ locale: nextLocale, messages });
+				window.dispatchEvent(new Event("mailflare:locale-changed"));
 			})
 			.catch(() => undefined);
 	}, []);

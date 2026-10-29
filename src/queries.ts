@@ -5,8 +5,16 @@ import {
 	messagesFn,
 	threadFn,
 	mailSettingsFn,
+	localeFn,
 } from "./functions";
 import type { ListInput } from "./shared/contracts";
+import { documentCacheOptions } from "./query-client";
+
+export const documentQuery = () =>
+	queryOptions({
+		...documentCacheOptions,
+		queryFn: () => localeFn(),
+	});
 
 export const sessionQuery = () =>
 	queryOptions({

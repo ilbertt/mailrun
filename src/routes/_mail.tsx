@@ -8,6 +8,7 @@ import {
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { MailSessionProvider } from "../components/mail-session-provider";
 import { MailClientSync } from "../components/mail-client-sync";
+import { LoadingTransition } from "../components/loading-transition";
 import { sessionQuery, mailboxesQuery } from "../queries";
 import DashboardLayout from "../app/(dashboard)/layout";
 import SettingsLayout from "../app/(settings)/layout";
@@ -87,10 +88,12 @@ function MailLayout() {
 					: DashboardLayout;
 	return (
 		<MailSessionProvider key={user.id} user={user} mailboxes={mailboxes}>
-			<MailClientSync />
-			<Layout>
-				<Outlet />
-			</Layout>
+			<LoadingTransition ready>
+				<MailClientSync />
+				<Layout>
+					<Outlet />
+				</Layout>
+			</LoadingTransition>
 		</MailSessionProvider>
 	);
 }

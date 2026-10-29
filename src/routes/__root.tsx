@@ -1,7 +1,7 @@
 import { MailNotifications } from "../components/mail-notifications";
 import { BrandingProvider } from "../components/branding-provider";
 import { AuthClientSync } from "../components/auth-client-sync";
-import { localeFn } from "../functions";
+import { documentQuery } from "../queries";
 import { getDirection } from "../lib/i18n/utils";
 import { sidebarBootstrapScript } from "../components/sidebar-state-utils";
 import { themeBootstrapScript } from "../components/theme-utils";
@@ -18,7 +18,9 @@ import styles from "../styles.css?url";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 	{
-		beforeLoad: async () => ({ document: await localeFn() }),
+		beforeLoad: async ({ context }) => ({
+			document: await context.queryClient.ensureQueryData(documentQuery()),
+		}),
 		loader: ({ context }) => context.document,
 		head: ({ loaderData, matches }) => ({
 			meta: [

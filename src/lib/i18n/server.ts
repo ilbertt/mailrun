@@ -2,6 +2,7 @@ import { getCookie } from "@tanstack/react-start/server";
 import { getClientAsset } from "../../server/assets";
 import {
 	LOCALE_COOKIE,
+	DEFAULT_LOCALE,
 	createTranslator,
 	loadMessages,
 	resolveLocale,
@@ -17,6 +18,7 @@ export async function getRequestLocale() {
 export async function loadServerMessages(
 	locale: Locale,
 ): Promise<Partial<Messages> | undefined> {
+	if (locale === DEFAULT_LOCALE) return undefined;
 	try {
 		return await loadMessages(locale, async (path) => {
 			const file = getClientAsset(path.slice(1));

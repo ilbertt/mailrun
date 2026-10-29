@@ -18,6 +18,8 @@
 		"build:local": "BUILD_TARGET=host bun run build",
 		"start": "bun server/index.ts",
 		"benchmark": "bun scripts/benchmark.ts",
+		"benchmark:navigation": "bun scripts/benchmark-navigation.ts",
+		"benchmark:navigation:report": "bun scripts/report-navigation-benchmark.ts",
 		"smoke": "bun scripts/smoke.ts",
 		"smoke:agent": "bun scripts/smoke-agent.ts",
 		"smoke:resend": "bun scripts/smoke-resend.ts",
