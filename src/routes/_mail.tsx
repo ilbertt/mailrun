@@ -3,7 +3,7 @@ import {
 	createFileRoute,
 	Outlet,
 	redirect,
-	useLocation,
+	useChildMatches,
 } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { MailSessionProvider } from "../components/mail-session-provider";
@@ -73,7 +73,9 @@ export const Route = createFileRoute("/_mail")({
 function MailLayout() {
 	const { user } = Route.useRouteContext();
 	const mailboxes = useSuspenseQuery(mailboxesQuery(user.id)).data;
-	const { pathname } = useLocation();
+	const pathname = useChildMatches({
+		select: (matches) => matches.at(-1)?.pathname ?? "/inbox",
+	});
 	const Layout = matches(pathname, adminPrefixes)
 		? AdminLayout
 		: pathname.startsWith("/settings")
