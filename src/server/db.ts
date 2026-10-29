@@ -5,6 +5,8 @@ import { SQL } from "bun";
 import { withTypes, type TypedSQL } from "@ilbertt/bun-sqlgen";
 import { join } from "node:path";
 import { dataDirectory } from "./config";
+import { syncDirectory } from "./filesystem";
+import { dirname } from "node:path";
 import { getMigrations } from "./assets";
 import type { Queries } from "../queries.gen";
 
@@ -81,11 +83,33 @@ export async function getMigrationStatus(
 ): Promise<MigrationStatus> {
 	const migrations = await bundledMigrations();
 	if (!existsSync(path)) return migrationStatus([], migrations);
-	const db = new Database(path, { readonly: true });
+	const inspect = (readonly: boolean) => {
+		const db = new Database(
+			path,
+			readonly ? { readonly: true } : { readwrite: true, create: false },
+		);
+		try {
+			db.exec("PRAGMA query_only=ON");
+			return appliedMigrationNames(db);
+		} finally {
+			db.close();
+		}
+	};
 	try {
-		return migrationStatus(appliedMigrationNames(db), migrations);
-	} finally {
-		db.close();
+		return migrationStatus(inspect(true), migrations);
+	} catch (error) {
+		if (
+			!(
+				error instanceof Error &&
+				"code" in error &&
+				error.code === "SQLITE_CANTOPEN"
+			)
+		)
+			throw error;
+		// Bun's SQLite cannot open some closed WAL snapshots read-only until
+		// journal sidecars exist. Permit that internal bookkeeping, keep SQL
+		// query-only, and never create an absent database or application tables.
+		return migrationStatus(inspect(false), migrations);
 	}
 }
 async function runMigrations(path: string, rejectUnknown: boolean) {
@@ -94,7 +118,9 @@ async function runMigrations(path: string, rejectUnknown: boolean) {
 		const db = new Database(path, { create: true }),
 			applied: string[] = [];
 		try {
-			db.exec("PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;");
+			db.exec(
+				"PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;",
+			);
 			// Switching an existing rollback journal to WAL can fail immediately
 			// while another process holds a schema read lock, despite busy_timeout.
 			const deadline = Date.now() + 5000;
@@ -143,6 +169,7 @@ async function runMigrations(path: string, rejectUnknown: boolean) {
 					.immediate();
 				if (changed) applied.push(migration.name);
 			}
+			await syncDirectory(dirname(path));
 			initialized.add(path);
 			return {
 				...migrationStatus(appliedMigrationNames(db), migrations),
@@ -182,6 +209,9 @@ export async function withDatabase<T>(
 		try {
 			await sql`PRAGMA foreign_keys=ON`;
 			await sql`PRAGMA busy_timeout=5000`;
+			// Bun defaults WAL connections to NORMAL; acknowledged mail/jobs must
+			// retain their committed metadata across an operating-system restart.
+			await sql`PRAGMA synchronous=FULL`;
 			return await run(sql);
 		} finally {
 			await sql.close();

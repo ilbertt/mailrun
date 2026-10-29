@@ -1,6 +1,6 @@
 import { dirname } from "node:path";
 import { z } from "zod";
-import { rename, mkdir, open } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { cleanupStaleDriveUploads } from "./retention";
 import type { User } from "../../shared/contracts";
 import {
@@ -174,10 +174,7 @@ export async function uploadPart(
 		const provisionalKey = partKey(item, partNumber, crypto.randomUUID()),
 			result = await writeStream(provisionalKey, request.body, expected),
 			key = partKey(item, partNumber, result.etag);
-		await rename(
-			new LocalStorage().path(provisionalKey),
-			new LocalStorage().path(key),
-		);
+		await new LocalStorage().publish(provisionalKey, key);
 		try {
 			await driveWrite(async (sql) => {
 				await assertOwned(sql);
@@ -233,15 +230,7 @@ export async function finishUpload(user: User, itemId: string) {
 				throw new Response("Upload not found", { status: 404 });
 			// Publish under the same SQLite write lock that checks the lease and metadata.
 			// An expired finalizer must never overwrite another writer's completed file.
-			await rename(storage.path(staged), storage.path(key));
-			if (process.platform === "linux") {
-				const directory = await open(dirname(storage.path(key)), "r");
-				try {
-					await directory.sync();
-				} finally {
-					await directory.close();
-				}
-			}
+			await storage.publish(staged, key);
 			const [row] =
 				await sql.NativeFinishDriveUpload`UPDATE drive_items SET upload_id=NULL,upload_part_size=NULL,upload_fingerprint=NULL,updated_at=${seconds()} WHERE id=${item.id} AND upload_id=${item.uploadId} RETURNING *`;
 			if (!row) throw new Response("Upload not found", { status: 404 });

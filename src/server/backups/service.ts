@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { mkdir, rename, unlink } from "node:fs/promises";
+import { mkdir, unlink } from "node:fs/promises";
 import { dirname } from "node:path";
 import { z } from "zod";
 import type { User } from "../../shared/contracts";
@@ -176,7 +176,7 @@ async function createAndRun(
 			temporary,
 			parseExcludedBackupTableGroups(settings.excluded_table_groups),
 		);
-		await rename(temporary, path);
+		await storage.publish(key + ".tmp", key);
 		await withDatabase(
 			(sql) =>
 				sql.NativeFinishBackup`UPDATE backups SET status='completed',size=${Bun.file(path).size},completed_at=${seconds()},error=NULL WHERE id=${backupId}`,

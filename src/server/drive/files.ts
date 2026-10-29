@@ -1,4 +1,4 @@
-import { mkdir, open, rename, unlink, rm } from "node:fs/promises";
+import { mkdir, open, unlink, rm } from "node:fs/promises";
 import { dirname } from "node:path";
 import { LocalStorage } from "../storage";
 import { withDatabase, id, seconds, type AppSQL } from "../db";
@@ -8,10 +8,13 @@ export const uploadTreeKey = (itemId: string) =>
 export const partKey = (item: NativeDriveRow, number: number, etag: string) =>
 	`${uploadTreeKey(item.id)}/${encodeURIComponent(item.uploadId ?? "")}/${number}-${encodeURIComponent(etag)}`;
 export async function removeUploadFiles(itemId: string) {
-	await rm(new LocalStorage().path(uploadTreeKey(itemId)), {
+	const storage = new LocalStorage(),
+		key = uploadTreeKey(itemId);
+	await rm(storage.path(key), {
 		recursive: true,
 		force: true,
 	});
+	await storage.syncParents([key], true);
 }
 export async function clearDriveRuntimeLeases() {
 	await withDatabase(
@@ -85,7 +88,8 @@ export async function writeStream(
 ) {
 	const storage = new LocalStorage(),
 		path = storage.path(key),
-		temporary = storage.path(`${stagingKey ?? key}.${crypto.randomUUID()}.tmp`);
+		temporaryKey = `${stagingKey ?? key}.${crypto.randomUUID()}.tmp`,
+		temporary = storage.path(temporaryKey);
 	await mkdir(dirname(path), { recursive: true, mode: 0o700 });
 	await mkdir(dirname(temporary), { recursive: true, mode: 0o700 });
 	const file = await open(temporary, "wx", 0o600),
@@ -111,17 +115,7 @@ export async function writeStream(
 		}
 		if (size !== expected)
 			throw new Response("Invalid part size", { status: 400 });
-		await file.sync();
-		await file.close();
-		await rename(temporary, path);
-		if (process.platform === "linux") {
-			const folder = await open(dirname(path), "r");
-			try {
-				await folder.sync();
-			} finally {
-				await folder.close();
-			}
-		}
+		await storage.publish(temporaryKey, key, file);
 		return { size, etag: hash.digest("hex") };
 	} catch (error) {
 		await reader.cancel().catch(() => {});

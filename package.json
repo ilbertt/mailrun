@@ -24,6 +24,7 @@
 		"smoke:aws": "bun scripts/smoke-aws.ts",
 		"smoke:avatars": "bun scripts/smoke-avatars.ts",
 		"smoke:setup": "bun scripts/smoke-setup.ts",
+		"smoke:durability": "bun scripts/smoke-durability.ts",
 		"check:typescript-version": "bun scripts/check-typescript-version.ts"
 	},
 	"dependencies": {

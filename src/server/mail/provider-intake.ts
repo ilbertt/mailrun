@@ -1,4 +1,4 @@
-import PostalMime from "postal-mime";
+import { parseMail } from "./parse";
 import { getEmailAddress } from "../../lib/email/address";
 import { parsePostalMime } from "../../lib/email/parse";
 import { withDatabase } from "../db";
@@ -16,7 +16,7 @@ export async function intakeProviderMail(input: {
 			delivered: 0,
 			dropped: "Message exceeds the 25 MiB receiving limit",
 		};
-	const parsed = await PostalMime.parse(input.raw),
+	const parsed = await parseMail(input.raw),
 		message = parsePostalMime(parsed);
 	let dropped: string | null = null;
 	if (message.attachments.length > 10)

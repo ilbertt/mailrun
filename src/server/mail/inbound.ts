@@ -15,11 +15,12 @@ import { observeReputation } from "./spam-feedback";
 import { upsertContact } from "./contacts";
 import { licenseEntitlements } from "../licenses";
 import { getEmailAddress } from "../../lib/email/address";
-import PostalMime from "postal-mime";
+import type PostalMime from "postal-mime";
 import { withDatabase, id, seconds } from "../db";
 import { LocalStorage } from "../storage";
 import { getInstallation } from "../cloudflare/installation";
-import { verifyRelay } from "../../shared/relay-signature";
+import { verifyInboundSignature } from "./relay-auth";
+import { parseMail } from "./parse";
 import { relayDecisionSchema } from "../../shared/contracts";
 import { resolveRouting, inboxDestination } from "./routing";
 import { z } from "zod";
@@ -43,6 +44,7 @@ export async function inbound(request: Request): Promise<Response> {
 			return new Response(error.message, { status: 413 });
 		throw error;
 	}
+	if (raw.byteLength > 512 * 1024) Bun.gc(true);
 	const from = request.headers.get("x-mailrun-from") ?? "";
 	const to = request.headers.get("x-mailrun-to") ?? "";
 	const phase = z
@@ -52,7 +54,7 @@ export async function inbound(request: Request): Promise<Response> {
 		return new Response("Invalid relay phase", { status: 400 });
 	const signatureFrom =
 		phase.data === "receive" ? from : `${phase.data}\n${from}`;
-	const valid = await verifyRelay(
+	const valid = verifyInboundSignature(
 		installation.relay_secret,
 		request.headers.get("x-mailrun-timestamp") ?? "",
 		signatureFrom,
@@ -68,6 +70,36 @@ export async function inbound(request: Request): Promise<Response> {
 	return Response.json(relayDecisionSchema.parse(result));
 }
 
+/** Keep large signed MIME bodies outside Start's rendering request context. */
+export async function serveInbound(request: Request) {
+	const started = performance.now();
+	let response: Response;
+	try {
+		response = await inbound(request);
+	} catch (error) {
+		console.error("Email intake failed", {
+			code:
+				error instanceof Error && "code" in error
+					? String(error.code)
+					: "unavailable",
+		});
+		response = new Response("Email storage temporarily unavailable", {
+			status: 503,
+		});
+	}
+	const headers = new Headers(response.headers);
+	headers.set("Cache-Control", "private, no-store");
+	headers.set(
+		"Server-Timing",
+		`app;dur=${(performance.now() - started).toFixed(1)}`,
+	);
+	return new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers,
+	});
+}
+
 export async function storeInbound(
 	from: string,
 	to: string,
@@ -81,7 +113,7 @@ export async function storeInbound(
 	} = {},
 ) {
 	to = to.toLowerCase();
-	const parsed = options.parsed ?? (await PostalMime.parse(raw)),
+	const parsed = options.parsed ?? (await parseMail(raw)),
 		message = parsePostalMime(parsed);
 	const headers = {
 		...Object.fromEntries(

@@ -1,6 +1,7 @@
-import { mkdir, rename, unlink } from "node:fs/promises";
+import { mkdir, open, rename, unlink, type FileHandle } from "node:fs/promises";
 import { dirname, join, resolve, sep } from "node:path";
 import { dataDirectory } from "./config";
+import { syncDirectory } from "./filesystem";
 
 export class LocalStorage {
 	constructor(readonly root = join(dataDirectory(), "blobs")) {}
@@ -20,12 +21,61 @@ export class LocalStorage {
 	async put(key: string, bytes: Uint8Array | ArrayBuffer | string | Blob) {
 		const path = this.path(key);
 		await mkdir(dirname(path), { recursive: true, mode: 0o700 });
-		const temporary = `${path}.${crypto.randomUUID()}.tmp`;
+		const temporaryKey = `${key}.${crypto.randomUUID()}.tmp`,
+			temporary = this.path(temporaryKey),
+			file = await open(temporary, "wx", 0o600);
 		try {
-			await Bun.write(temporary, bytes, { mode: 0o600 });
-			await rename(temporary, path);
+			// Keep the writing descriptor open through fsync so a delayed writeback
+			// error cannot disappear between closing it and opening a fresh one.
+			const written = await Bun.write(Bun.file(file.fd), bytes),
+				expected =
+					typeof bytes === "string"
+						? Buffer.byteLength(bytes)
+						: bytes instanceof Blob
+							? bytes.size
+							: bytes.byteLength;
+			if (written !== expected) throw new Error("Incomplete object write");
+			await this.publish(temporaryKey, key, file);
 		} finally {
-			await unlink(temporary).catch(() => {});
+			try {
+				await file.close();
+			} finally {
+				await unlink(temporary).catch(() => {});
+			}
+		}
+	}
+	async syncFile(file: FileHandle) {
+		await file.sync();
+	}
+	async syncParents(keys: string[], missingOK = false) {
+		const boundary = dirname(resolve(this.root)),
+			directories = new Set<string>();
+		for (const key of keys) {
+			let directory = dirname(this.path(key));
+			while (directory !== boundary) {
+				directories.add(directory);
+				directory = dirname(directory);
+			}
+			directories.add(boundary);
+		}
+		// Also persist newly created parent directories. Do not cache this across
+		// writes: another HTTP/cron process may have removed and recreated a tree.
+		for (const directory of [...directories].sort(
+			(a, b) => b.length - a.length,
+		))
+			await syncDirectory(directory, missingOK);
+	}
+	async publish(stagedKey: string, key: string, writer?: FileHandle) {
+		const staged = this.path(stagedKey),
+			destination = this.path(key);
+		await mkdir(dirname(destination), { recursive: true, mode: 0o700 });
+		const file = writer ?? (await open(staged, "r"));
+		try {
+			await this.syncFile(file);
+			await rename(staged, destination);
+			await this.syncParents([stagedKey, key]);
+		} finally {
+			if (!writer) await file.close();
 		}
 	}
 	file(key: string) {
@@ -38,6 +88,7 @@ export class LocalStorage {
 			)
 				throw error;
 		});
+		await this.syncParents([key], true);
 	}
 }
 

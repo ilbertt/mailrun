@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { writeFile, chmod } from "node:fs/promises";
+import { open, type FileHandle } from "node:fs/promises";
 import { z } from "zod";
 import { BACKUP_TABLE_GROUPS } from "./table-groups";
 import type { DatabaseBackupTable } from "./types";
@@ -140,10 +140,17 @@ export async function writeBackup(
 	destination: string,
 	excludedGroups: string[] = [],
 ) {
-	await writeFile(destination, "", { mode: 0o600 });
-	await chmod(destination, 0o600);
 	const db = new Database(databasePath);
-	const writer = Bun.file(destination).writer({ highWaterMark: 1024 * 1024 });
+	let target: FileHandle | undefined;
+	try {
+		target = await open(destination, "w", 0o600);
+		await target.chmod(0o600);
+	} catch (error) {
+		db.close();
+		if (target) await target.close();
+		throw error;
+	}
+	const writer = Bun.file(target.fd).writer({ highWaterMark: 1024 * 1024 });
 	let ended = false;
 	try {
 		db.exec("BEGIN");
@@ -182,6 +189,7 @@ export async function writeBackup(
 		writer.write("}}");
 		await writer.end();
 		ended = true;
+		await target.sync();
 		db.exec("COMMIT");
 	} finally {
 		if (!ended) {
@@ -190,6 +198,7 @@ export async function writeBackup(
 			} catch {}
 		}
 		db.close();
+		await target.close();
 	}
 }
 
@@ -230,7 +239,7 @@ export function restoreBackup(db: Database, input: unknown) {
 					message[column] = body[column] ?? null;
 			}
 	}
-	db.exec("PRAGMA foreign_keys=ON");
+	db.exec("PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON");
 	db.transaction(() => {
 		db.exec("PRAGMA defer_foreign_keys=ON");
 		for (const table of [...tables].reverse())

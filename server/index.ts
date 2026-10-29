@@ -1,4 +1,5 @@
 import { isSetupPath, setupApi } from "../src/server/api/setup";
+import { serveInbound } from "../src/server/mail/inbound";
 import { startAvatarDispatcher } from "../src/server/avatars/dispatcher";
 import { withSecurityHeaders } from "../src/server/http/security";
 import {
@@ -91,6 +92,11 @@ if (name) {
 							return;
 						return new Response("Expected WebSocket upgrade", { status: 426 });
 					}
+					if (
+						new URL(request.url).pathname === "/api/inbound" &&
+						request.method === "POST"
+					)
+						return serveInbound(request);
 					if (isSetupPath(new URL(request.url).pathname)) {
 						const setup = await setupApi(request, () =>
 							server.timeout(request, 0),

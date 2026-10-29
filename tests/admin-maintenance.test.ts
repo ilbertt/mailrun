@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
 import { Database } from "bun:sqlite";
 import { existsSync } from "node:fs";
+import { copyFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fixture, owner, stranger } from "./fixtures";
 import { getMigrations } from "../src/server/assets";
@@ -17,6 +18,33 @@ const request = (path: string, method = "GET", origin?: string) =>
 		method,
 		headers: origin ? { Origin: origin } : {},
 	});
+test("migration inspection reads a copied WAL database without sidecars and leaves application records unchanged", async () => {
+	const state = await fixture(),
+		path = join(state.directory, "copied-wal.sqlite");
+	try {
+		state.db.exec("PRAGMA wal_checkpoint(TRUNCATE)");
+		await copyFile(state.path, path);
+		const before = await Bun.file(path).bytes();
+		expect(existsSync(path + "-wal")).toBe(false);
+		expect(existsSync(path + "-shm")).toBe(false);
+		expect(await getMigrationStatus(path)).toEqual({
+			ready: true,
+			pending: [],
+			unknown: [],
+		});
+		expect(await Bun.file(path).bytes()).toEqual(before);
+		const db = new Database(path, { readonly: true });
+		try {
+			expect(db.query("SELECT count(*) AS count FROM users").get()).toEqual({
+				count: 2,
+			});
+		} finally {
+			db.close();
+		}
+	} finally {
+		await state.close();
+	}
+});
 async function legacyDatabase(path: string) {
 	const db = new Database(path);
 	db.exec(
