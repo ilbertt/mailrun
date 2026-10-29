@@ -121,3 +121,77 @@ test("JMAP upload metadata is backed up once and older full backups restore acro
 		await state.close();
 	}
 });
+
+test("domain relay columns retain old full backups and backfill only a verified native primary domain", async () => {
+	const state = await fixture(),
+		legacyPath = join(state.directory, "before-relay-binding.sqlite"),
+		legacy = new Database(legacyPath);
+	try {
+		legacy.exec(
+			"CREATE TABLE d1_migrations(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT UNIQUE,applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
+		);
+		for (const [name, file] of getMigrations())
+			if (name.endsWith(".sql") && name.slice(0, 4) < "0068") {
+				legacy.exec(await file.text());
+				legacy.query("INSERT INTO d1_migrations(name) VALUES(?)").run(name);
+			}
+		const seed = join(state.directory, "binding-seed.json");
+		await writeBackup(state.path, seed);
+		restoreBackup(legacy, await Bun.file(seed).json());
+		legacy.exec(
+			"UPDATE domains SET routing_enabled=1; INSERT INTO domains(id,user_id,hostname,zone_id,status,routing_enabled,created_at) VALUES('other-host','owner','sub.example.com','zone','active',1,1); INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES('primary','account','zone','example.com','native-primary','https://fixture.example','fixture-token','fixture-secret','fixture-version','ready',1)",
+		);
+		const oldPath = join(state.directory, "old-binding-backup.json");
+		await writeBackup(legacyPath, oldPath);
+		const old = await Bun.file(oldPath).json();
+		restoreBackup(legacy, old);
+		await migrate(legacyPath);
+		expect(
+			legacy
+				.query(
+					"SELECT id,mailrun_relay_worker_name,mailrun_relay_zone_id FROM domains ORDER BY id",
+				)
+				.all(),
+		).toEqual([
+			{
+				id: "domain",
+				mailrun_relay_worker_name: "native-primary",
+				mailrun_relay_zone_id: "zone",
+			},
+			{
+				id: "other-host",
+				mailrun_relay_worker_name: null,
+				mailrun_relay_zone_id: null,
+			},
+		]);
+		const currentPath = join(state.directory, "current-binding-backup.json");
+		await writeBackup(legacyPath, currentPath);
+		const current = await Bun.file(currentPath).json();
+		restoreBackup(state.db, current);
+		expect(
+			state.db
+				.query(
+					"SELECT mailrun_relay_worker_name FROM domains WHERE id='domain'",
+				)
+				.get(),
+		).toEqual({ mailrun_relay_worker_name: "native-primary" });
+		restoreBackup(legacy, old);
+		expect(
+			legacy.query("SELECT mailrun_relay_worker_name FROM domains").all(),
+		).toEqual([
+			{ mailrun_relay_worker_name: null },
+			{ mailrun_relay_worker_name: null },
+		]);
+		restoreBackup(legacy, current);
+		expect(
+			coveredTables(legacy).filter((name) => name === "domains"),
+		).toHaveLength(1);
+		expect(legacy.query("SELECT id FROM messages").all()).toEqual([
+			{ id: "message" },
+		]);
+		expect(legacy.query("PRAGMA foreign_key_check").all()).toEqual([]);
+	} finally {
+		legacy.close();
+		await state.close();
+	}
+});

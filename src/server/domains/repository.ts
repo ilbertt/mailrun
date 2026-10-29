@@ -17,6 +17,8 @@ const row = z.object({
 	sending_provider: provider,
 	receiving_provider: provider,
 	created_at: z.number(),
+	mailrun_relay_worker_name: z.string().nullable(),
+	mailrun_relay_zone_id: z.string().nullable(),
 });
 export type DomainRecord = z.infer<typeof row>;
 export const domainRecord = (value: unknown) => row.parse(value);
@@ -36,6 +38,24 @@ export function domainDto(value: DomainRecord) {
 		receivingProvider: value.receiving_provider,
 		createdAt: new Date(value.created_at * 1000).toISOString(),
 	};
+}
+export async function bindDomainRelay(
+	sql: AppSQL,
+	domainId: string,
+	zoneId: string,
+	workerName: string | null,
+) {
+	if (!workerName)
+		throw new Response("Complete email relay setup before enabling receiving", {
+			status: 503,
+		});
+	const [row] =
+		await sql.NativeBindDomainRelay`UPDATE domains SET mailrun_relay_worker_name=${workerName},mailrun_relay_zone_id=${zoneId} WHERE id=${domainId} AND zone_id=${zoneId} RETURNING *`;
+	if (!row)
+		throw new Response("Domain changed during setup. Try again.", {
+			status: 409,
+		});
+	return domainRecord(row);
 }
 export async function domainActor(sql: AppSQL, user: User, mutation = false) {
 	const api = await adminApiAccess(sql, user, "domains");

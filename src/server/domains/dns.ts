@@ -118,6 +118,7 @@ export async function domainDns(
 			process.env.MAIL_HOSTNAME?.trim() || `mail.${domain.hostname}`;
 		const view = {
 			routing: {
+				relayReady: true,
 				records: [] as DnsRecord[],
 				missing: [
 					{
@@ -163,7 +164,14 @@ export async function domainDns(
 			? await client.sendingDns(domain.zone_id, identity.tag).catch(() => [])
 			: [];
 	const view = {
-		routing: { ...routing, status: settings.status },
+		routing: {
+			...routing,
+			status: settings.status,
+			relayReady:
+				!!client.access.workerName &&
+				domain.mailrun_relay_worker_name === client.access.workerName &&
+				domain.mailrun_relay_zone_id === domain.zone_id,
+		},
 		sending,
 		sendingEnabled: identity?.enabled ?? false,
 		dkimSelector: identity?.dkim_selector,
@@ -183,6 +191,7 @@ export function summarizeDomainDns(
 	return {
 		routing: {
 			configured:
+				view.routing.relayReady &&
 				view.routing.missing.length === 0 &&
 				(view.routing.records.length > 0 || !!domain.routing_enabled),
 			missing: [

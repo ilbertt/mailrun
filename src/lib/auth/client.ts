@@ -95,7 +95,15 @@ export async function authFetch(
 	});
 
 	const returnedId = response.headers.get("X-Mailflare-Draft-Id"),
-		revision = response.headers.get("ETag");
+		applicationRevision = response.headers.get("X-Mailflare-Draft-Revision"),
+		// A compression proxy may weaken the representation ETag. Keep the
+		// application's optimistic-lock version independent of that transformation.
+		revision =
+			applicationRevision !== null &&
+			/^\d+$/.test(applicationRevision) &&
+			Number.isSafeInteger(Number(applicationRevision))
+				? `"${applicationRevision}"`
+				: response.headers.get("ETag");
 	if (returnedId && revision && session === getClientSessionToken())
 		draftRevisions.set(returnedId, revision);
 	if (

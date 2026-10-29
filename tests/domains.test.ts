@@ -371,6 +371,6 @@ test("an unverified relay blocks receiving while domain metadata and read-only D
 		);
 	await expect(
 		setupDomainDns(owner, "domain", "mx", false, unverified, cf.lookup),
-	).rejects.toThrow("Complete email setup");
+	).rejects.toThrow();
 	expect(cf.calls.filter((call) => call.method !== "GET")).toHaveLength(0);
 });

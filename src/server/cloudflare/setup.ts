@@ -1,6 +1,11 @@
 import { cloudflareCredentials } from "./credentials";
 import { DomainCloudflare } from "../domains/cloudflare";
-import { domainOperation, checkDomainClaim } from "../domains/repository";
+import {
+	domainOperation,
+	checkDomainClaim,
+	bindDomainRelay,
+	domainActor,
+} from "../domains/repository";
 import {
 	provisionCloudflareDomain,
 	rollbackCloudflareDomain,
@@ -15,7 +20,7 @@ import {
 	setInstallationPhase,
 } from "./installation";
 import { publicOrigin } from "../config";
-import { withDatabase, id, seconds } from "../db";
+import { withDatabase, id, seconds, type AppSQL } from "../db";
 import { relaySource, relayVersion } from "../../generated/relay";
 import { setupCloudflareSchema, type User } from "../../shared/contracts";
 
@@ -78,6 +83,8 @@ export async function provisionEmail(
 								"Domain changed during setup. Retry before routing mail.",
 							);
 						await tx.EnableSending`UPDATE domains SET sending_provider=${data.enableSending ? "cloudflare" : "none"},sending_enabled=${provisioned.sendingEnabled ? 1 : 0},sending_requested=${data.enableSending ? 1 : 0},sending_subdomain_tag=${provisioned.sendingSubdomainTag} WHERE hostname=${data.hostname} AND user_id=${user.id}`;
+						if (provisioned.routingEnabled)
+							await bindDomainRelay(tx, active[0]!.id, zone.id, worker);
 					}),
 				);
 			} catch (error) {
@@ -101,13 +108,34 @@ export async function provisionEmail(
 	return installationStatus();
 }
 
+type RelayFence = (sql: AppSQL) => Promise<void>;
+async function authorizeRelayWrite(user: User, assertOwned: RelayFence) {
+	await withDatabase(async (sql) => {
+		await assertOwned(sql);
+		const actor = await domainActor(sql, user, true);
+		if (!actor.is_primary_admin)
+			throw new Response(
+				"Only the primary administrator can configure the email relay",
+				{ status: 403 },
+			);
+	});
+}
 export async function deployEmailRelay(
 	user: User,
 	input: { accountId: string; hostname: string; apiToken: string },
 	request: CloudflareFetch = fetch,
 ) {
-	if (!user.isPrimaryAdmin)
-		throw new Error("Only the primary administrator can configure email");
+	return domainOperation("email-relay", (assertOwned) =>
+		deployRelayOwned(user, input, request, assertOwned),
+	);
+}
+async function deployRelayOwned(
+	user: User,
+	input: { accountId: string; hostname: string; apiToken: string },
+	request: CloudflareFetch,
+	assertOwned: RelayFence,
+) {
+	await authorizeRelayWrite(user, assertOwned);
 	const data = setupCloudflareSchema
 		.pick({ accountId: true, hostname: true, apiToken: true })
 		.parse(input);
@@ -117,12 +145,10 @@ export async function deployEmailRelay(
 			"Set APP_URL to the application's public HTTPS address before deploying the relay",
 		);
 	const existing = await getInstallation();
-	if (
-		existing &&
-		(existing.hostname !== data.hostname ||
-			existing.account_id !== data.accountId)
-	)
-		throw new Error("This installation is already connected to another domain");
+	if (existing && existing.account_id !== data.accountId)
+		throw new Error(
+			"This installation is already connected to another Cloudflare account",
+		);
 	const [claimedHostname] = await withDatabase(
 		(sql) =>
 			sql.NativeSetupHostnameClaim`SELECT user_id FROM domains WHERE hostname=${data.hostname}`,
@@ -145,6 +171,7 @@ export async function deployEmailRelay(
 		existing?.relay_secret ?? crypto.randomUUID() + crypto.randomUUID();
 	const worker =
 		existing?.worker_name ?? `mailrun-${crypto.randomUUID().slice(0, 12)}`;
+	await authorizeRelayWrite(user, assertOwned);
 	await saveInstallation({
 		...data,
 		zoneId: zone.id,
@@ -154,7 +181,8 @@ export async function deployEmailRelay(
 		relayVersion: existing?.relay_version ?? "",
 	});
 
-	await refreshRelay(user, request);
+	await refreshRelayOwned(user, request, assertOwned);
+	await authorizeRelayWrite(user, assertOwned);
 	await setInstallationPhase("deployed");
 
 	return { zone, worker };
@@ -164,8 +192,16 @@ export async function refreshRelay(
 	user: User,
 	request: CloudflareFetch = fetch,
 ) {
-	if (!user.isPrimaryAdmin)
-		throw new Error("Only the primary administrator can update the relay");
+	return domainOperation("email-relay", (assertOwned) =>
+		refreshRelayOwned(user, request, assertOwned),
+	);
+}
+async function refreshRelayOwned(
+	user: User,
+	request: CloudflareFetch,
+	assertOwned: RelayFence,
+) {
+	await authorizeRelayWrite(user, assertOwned);
 	const installation = await getInstallation();
 	if (!installation) throw new Error("Email is not configured");
 	const { apiToken } = cloudflareCredentials(installation);
@@ -204,10 +240,12 @@ export async function refreshRelay(
 		throw new RelayDeploymentError(
 			"Mailrun could not reach its public address before deploying the relay. Check APP_URL and retry.",
 		);
+	await authorizeRelayWrite(user, assertOwned);
 	const accountSubdomain = await ensureWorkersSubdomain(
 		installation.account_id,
 		apiToken,
 		request,
+		() => authorizeRelayWrite(user, assertOwned),
 	);
 	const form = new FormData();
 	form.set(
@@ -226,6 +264,7 @@ export async function refreshRelay(
 		new Blob([relaySource], { type: "application/javascript+module" }),
 		"relay.js",
 	);
+	await authorizeRelayWrite(user, assertOwned);
 	await cloudflare(
 		apiToken,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}`,
@@ -233,6 +272,7 @@ export async function refreshRelay(
 		{ method: "PUT", body: form },
 		request,
 	);
+	await authorizeRelayWrite(user, assertOwned);
 	await cloudflare(
 		apiToken,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}/subdomain`,
@@ -247,6 +287,7 @@ export async function refreshRelay(
 		request,
 	);
 
+	await authorizeRelayWrite(user, assertOwned);
 	await withDatabase(
 		(sql) =>
 			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},api_token=${apiToken},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
@@ -292,6 +333,7 @@ async function ensureWorkersSubdomain(
 	accountId: string,
 	token: string,
 	request: CloudflareFetch,
+	authorizeWrite: () => Promise<void>,
 ) {
 	const schema = z.object({ subdomain: z.string().regex(/^[a-z0-9-]+$/) }),
 		path = `/accounts/${accountId}/workers/subdomain`;
@@ -300,6 +342,7 @@ async function ensureWorkersSubdomain(
 	} catch (error) {
 		if (!(error instanceof CloudflareApiError) || error.status !== 404)
 			throw error;
+		await authorizeWrite();
 		return cloudflare(
 			token,
 			path,

@@ -1657,7 +1657,12 @@ try {
 	const savedDraft = z
 		.object({ draft: z.object({ id: z.string() }) })
 		.parse(await saved.json()).draft;
-	if (!saved.ok || !saved.headers.get("etag"))
+	if (
+		!saved.ok ||
+		!saved.headers.get("etag") ||
+		saved.headers.get("X-Mailflare-Draft-Revision") !== "0" ||
+		!saved.headers.get("Cache-Control")?.includes("no-transform")
+	)
 		throw new Error("Draft creation or revision headers failed");
 	const updated = await fetch(`${base}/api/drafts/${savedDraft.id}`, {
 		method: "PATCH",

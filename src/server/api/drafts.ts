@@ -75,7 +75,9 @@ export async function draftResponse(
 		{
 			headers: {
 				ETag: `"${draft.revision}"`,
+				"X-Mailflare-Draft-Revision": String(draft.revision),
 				"X-Mailflare-Draft-Id": draft.id,
+				"Cache-Control": "private, no-store, no-transform",
 			},
 		},
 	);

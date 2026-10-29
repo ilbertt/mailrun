@@ -2323,6 +2323,25 @@ export interface INativeSetupZoneClaimResult {
 export interface IUpdateRelayVersionResult {
 }
 
+/** Result of query `NativeBindDomainRelay`. */
+export interface INativeBindDomainRelayResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    zone_id: IDomainsColumns["zone_id"];
+    status: IDomainsColumns["status"];
+    routing_status: IDomainsColumns["routing_status"];
+    sending_subdomain_tag: IDomainsColumns["sending_subdomain_tag"];
+    sending_enabled: IDomainsColumns["sending_enabled"];
+    routing_enabled: IDomainsColumns["routing_enabled"];
+    created_at: IDomainsColumns["created_at"];
+    sending_requested: IDomainsColumns["sending_requested"];
+    sending_provider: IDomainsColumns["sending_provider"];
+    receiving_provider: IDomainsColumns["receiving_provider"];
+    mailrun_relay_worker_name: IDomainsColumns["mailrun_relay_worker_name"];
+    mailrun_relay_zone_id: IDomainsColumns["mailrun_relay_zone_id"];
+}
+
 /** Result of query `NativeDomainActor`. */
 export interface INativeDomainActorResult {
     id: IUsersColumns["id"];
@@ -2349,6 +2368,8 @@ export interface INativeDomainByIdResult {
     sending_requested: IDomainsColumns["sending_requested"];
     sending_provider: IDomainsColumns["sending_provider"];
     receiving_provider: IDomainsColumns["receiving_provider"];
+    mailrun_relay_worker_name: IDomainsColumns["mailrun_relay_worker_name"];
+    mailrun_relay_zone_id: IDomainsColumns["mailrun_relay_zone_id"];
 }
 
 /** Result of query `NativeDomainWriteFence`. */
@@ -2400,6 +2421,8 @@ export interface INativeDomainsForUserResult {
     sending_requested: IDomainsColumns["sending_requested"];
     sending_provider: IDomainsColumns["sending_provider"];
     receiving_provider: IDomainsColumns["receiving_provider"];
+    mailrun_relay_worker_name: IDomainsColumns["mailrun_relay_worker_name"];
+    mailrun_relay_zone_id: IDomainsColumns["mailrun_relay_zone_id"];
 }
 
 /** Result of query `NativeSaveDomain`. */
@@ -2417,6 +2440,8 @@ export interface INativeSaveDomainResult {
     sending_requested: IDomainsColumns["sending_requested"];
     sending_provider: IDomainsColumns["sending_provider"];
     receiving_provider: IDomainsColumns["receiving_provider"];
+    mailrun_relay_worker_name: IDomainsColumns["mailrun_relay_worker_name"];
+    mailrun_relay_zone_id: IDomainsColumns["mailrun_relay_zone_id"];
 }
 
 /** Result of query `NativeSetDomainReceivingReady`. */
@@ -5077,6 +5102,7 @@ export interface Queries {
     NativeSetupHostnameClaim: INativeSetupHostnameClaimResult;
     NativeSetupZoneClaim: INativeSetupZoneClaimResult;
     UpdateRelayVersion: IUpdateRelayVersionResult;
+    NativeBindDomainRelay: INativeBindDomainRelayResult;
     NativeDomainActor: INativeDomainActorResult;
     NativeDomainById: INativeDomainByIdResult;
     NativeDomainWriteFence: INativeDomainWriteFenceResult;
@@ -5758,6 +5784,8 @@ export interface IDomainsColumns {
     sending_requested: number;
     sending_provider: string;
     receiving_provider: string;
+    mailrun_relay_worker_name: string | null;
+    mailrun_relay_zone_id: string | null;
 }
 
 /** Schema of `domains`. */
@@ -6882,7 +6910,9 @@ export const schema = {
             created_at: { _columnName: "created_at", _foreignKeys: {} },
             sending_requested: { _columnName: "sending_requested", _foreignKeys: {} },
             sending_provider: { _columnName: "sending_provider", _foreignKeys: {} },
-            receiving_provider: { _columnName: "receiving_provider", _foreignKeys: {} }
+            receiving_provider: { _columnName: "receiving_provider", _foreignKeys: {} },
+            mailrun_relay_worker_name: { _columnName: "mailrun_relay_worker_name", _foreignKeys: {} },
+            mailrun_relay_zone_id: { _columnName: "mailrun_relay_zone_id", _foreignKeys: {} }
         },
         _indexes: {
             domains_hostname_idx: { _indexName: "domains_hostname_idx" },

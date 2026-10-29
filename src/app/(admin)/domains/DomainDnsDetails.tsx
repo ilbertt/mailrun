@@ -42,13 +42,15 @@ export default function DomainDnsDetails({
 			: t("domains.sendingNotSet");
 	const routingOk =
 		domain.routingEnabled &&
+		dns.routing.relayReady !== false &&
 		dns.routing.missing.length === 0 &&
 		(dns.routing.records.length > 0 || domain.routingEnabled);
 	const routingLabel = routingOk
 		? t("domains.routingConfigured")
 		: dns.routing.missing.length > 0
 			? t("domains.recordsMissing", { count: dns.routing.missing.length })
-			: dns.routing.records.length > 0 && !domain.routingEnabled
+			: dns.routing.records.length > 0 &&
+					(!domain.routingEnabled || dns.routing.relayReady === false)
 				? t("domains.needsSetup")
 				: t("domains.noRoutingRecords");
 

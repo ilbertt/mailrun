@@ -53,6 +53,7 @@ export type DnsStatusSummary = {
 
 export type DomainDnsView = {
 	routing: {
+		relayReady?: boolean;
 		records: DnsRecord[];
 		missing: DnsRecord[];
 		status?: string;

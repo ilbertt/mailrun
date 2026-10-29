@@ -1,3 +1,5 @@
+import { ensureSetupRelay } from "../setup/service";
+import { getInstallation } from "../cloudflare/installation";
 import type { User } from "../../shared/contracts";
 import { addDomainSchema } from "../../lib/validators";
 import { withDatabase, id, seconds, type AppSQL } from "../db";
@@ -17,6 +19,7 @@ import {
 	domainWrite,
 	checkDomainClaim,
 	domainRecord,
+	bindDomainRelay,
 	domainDto,
 	type DomainRecord,
 } from "./repository";
@@ -174,7 +177,14 @@ export async function addDomain(
 					await sql.NativeSaveDomain`INSERT INTO domains(id,user_id,hostname,zone_id,status,routing_status,sending_subdomain_tag,sending_enabled,routing_enabled,sending_requested,sending_provider,receiving_provider,created_at) VALUES(${claimed?.id ?? id("dom")},${user.id},${hostname},${preflight.zone.id},${provisioned.routingEnabled || provisioned.sendingEnabled || receivingProvider !== "cloudflare" ? "active" : "pending"},${provisioned.routingStatus ?? null},${provisioned.sendingSubdomainTag},${provisioned.sendingEnabled ? 1 : 0},${provisioned.routingEnabled ? 1 : 0},${provisioned.sendingRequested ? 1 : 0},${sendingProvider},${receivingProvider},${seconds()}) ON CONFLICT(hostname) DO UPDATE SET zone_id=excluded.zone_id,status=excluded.status,routing_status=excluded.routing_status,sending_subdomain_tag=excluded.sending_subdomain_tag,sending_enabled=excluded.sending_enabled,routing_enabled=excluded.routing_enabled,sending_requested=excluded.sending_requested,sending_provider=excluded.sending_provider,receiving_provider=excluded.receiving_provider WHERE domains.user_id=excluded.user_id RETURNING *`;
 				if (!row)
 					throw new Response("Domain is already registered", { status: 409 });
-				return domainRecord(row);
+				return provisioned.routingEnabled
+					? bindDomainRelay(
+							sql,
+							row.id,
+							preflight.zone.id,
+							api.access.workerName,
+						)
+					: domainRecord(row);
 			});
 		} catch (error) {
 			const failures = await rollbackCloudflareDomain(api, provisioned.changes);
@@ -219,7 +229,7 @@ export async function setupDomainDns(
 		});
 	const api = client ?? (await requireDomainClient());
 	return domainOperation(domain.zone_id, async (assertOwned) => {
-		await setupDnsInOperation(
+		const preparedApi = await setupDnsInOperation(
 			user,
 			domain,
 			record,
@@ -227,7 +237,7 @@ export async function setupDomainDns(
 			api,
 			assertOwned,
 		);
-		return domainDnsDetails(user, domainId, api, lookup);
+		return domainDnsDetails(user, domainId, preparedApi, lookup);
 	});
 }
 async function setupDnsInOperation(
@@ -243,6 +253,26 @@ async function setupDnsInOperation(
 		await ownedDomain(sql, user, domain.id, true);
 	});
 	if (record === "mx" || record === "spf") {
+		if (!api.access.workerName) {
+			const foreign = await api.foreignMx(domain.zone_id, domain.hostname);
+			if (foreign.length && !replaceMx)
+				throw new MxConflictError(
+					foreign.map((row) => ({
+						content: row.content ?? "",
+						priority: row.priority ?? 0,
+					})),
+				);
+			await ensureSetupRelay(user, domain.hostname, api.fetch, api.access);
+			const installation = await getInstallation();
+			if (!installation || installation.phase === "saved")
+				throw new Response("Email relay setup did not complete. Try again.", {
+					status: 503,
+				});
+			api = new DomainCloudflare(
+				{ ...api.access, workerName: installation.worker_name },
+				api.fetch,
+			);
+		}
 		const zone = await api.zone(domain.zone_id),
 			provisioned = await provisionCloudflareDomain(api, domain.hostname, {
 				enableRouting: true,
@@ -255,6 +285,13 @@ async function setupDnsInOperation(
 				await assertOwned(sql);
 				await ownedDomain(sql, user, domain.id, true);
 				await sql.NativeSetDomainReceivingReady`UPDATE domains SET routing_enabled=${provisioned.routingEnabled ? 1 : 0},routing_status=COALESCE(${provisioned.routingStatus ?? null},routing_status),status=CASE WHEN ${provisioned.routingEnabled ? 1 : 0}=1 THEN 'active' ELSE status END WHERE id=${domain.id}`;
+				if (provisioned.routingEnabled)
+					await bindDomainRelay(
+						sql,
+						domain.id,
+						domain.zone_id,
+						api.access.workerName,
+					);
 			});
 		} catch (error) {
 			const failures = await rollbackCloudflareDomain(api, provisioned.changes);
@@ -307,6 +344,7 @@ async function setupDnsInOperation(
 				ttl: 3600,
 			});
 	}
+	return api;
 }
 export async function chooseDomainProvider(
 	user: User,

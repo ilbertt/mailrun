@@ -1,3 +1,4 @@
+import { RelayDeploymentError } from "../cloudflare/setup";
 import { ensureSetupRelay } from "../setup/service";
 import { addDomainSchema } from "../../lib/validators";
 import { awsDomainApi } from "./aws-domain";
@@ -237,6 +238,8 @@ export async function domainsApi(
 				},
 				{ status: 409 },
 			);
+		if (error instanceof RelayDeploymentError)
+			return Response.json({ error: error.message }, { status: 502 });
 		if (error instanceof CloudflareApiError) {
 			if (error.errors.some((item) => item.code === 2008))
 				return Response.json(

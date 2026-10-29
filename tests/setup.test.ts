@@ -77,9 +77,9 @@ test("setup deploys the relay before routing and retry reuses its name and secre
 		activateRouting: true,
 	};
 	try {
-		await expect(provisionEmail(stranger, input, request)).rejects.toThrow(
-			"administrator",
-		);
+		await expect(
+			provisionEmail(stranger, input, request),
+		).rejects.toMatchObject({ status: 403 });
 		expect(calls).toEqual([]);
 		await expect(provisionEmail(owner, input, request)).rejects.toThrow(
 			"could not reach",

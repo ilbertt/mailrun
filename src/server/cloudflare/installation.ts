@@ -23,7 +23,7 @@ export async function saveInstallation(input: {
 		(sql) => sql.SaveInstallation`
 		INSERT INTO mailrun_installation (id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at)
 		VALUES ('primary',${input.accountId},${input.zoneId},${input.hostname},${input.workerName},${input.publicOrigin},${input.apiToken},${input.relaySecret},${input.relayVersion},'saved',${seconds()})
-		ON CONFLICT(id) DO UPDATE SET api_token=excluded.api_token,public_origin=excluded.public_origin,relay_version=excluded.relay_version,updated_at=excluded.updated_at`,
+		ON CONFLICT(id) DO UPDATE SET hostname=CASE WHEN mailrun_installation.phase='saved' THEN excluded.hostname ELSE mailrun_installation.hostname END,zone_id=CASE WHEN mailrun_installation.phase='saved' THEN excluded.zone_id ELSE mailrun_installation.zone_id END,api_token=excluded.api_token,public_origin=excluded.public_origin,relay_version=excluded.relay_version,updated_at=excluded.updated_at`,
 	);
 }
 export async function setInstallationPhase(

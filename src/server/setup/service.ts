@@ -9,6 +9,7 @@ import {
 	DomainCloudflare,
 	normalizeHostname,
 	MxConflictError,
+	type CloudflareAccess,
 } from "../domains/cloudflare";
 import { domainOperation, domainActor } from "../domains/repository";
 import { provisionEmail, deployEmailRelay } from "../cloudflare/setup";
@@ -130,11 +131,17 @@ export async function ensureSetupRelay(
 	user: User,
 	hostname: string,
 	send: CloudflareFetch = fetch,
+	providedAccess?: CloudflareAccess,
 ) {
-	await withDatabase((sql) => domainActor(sql, user, true));
-	const access = await cloudflareAccess();
-	if (access?.workerName) return;
-	if (!user.isPrimaryAdmin)
+	const actor = await withDatabase((sql) => domainActor(sql, user, true));
+	const currentAccess = await cloudflareAccess();
+	const access = providedAccess ?? currentAccess;
+	if (
+		access?.workerName ||
+		(currentAccess?.workerName && currentAccess.accountId === access?.accountId)
+	)
+		return;
+	if (!actor.is_primary_admin)
 		throw new Response(
 			"Only the primary administrator can configure the email relay",
 			{ status: 403 },

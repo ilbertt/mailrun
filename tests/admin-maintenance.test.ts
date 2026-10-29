@@ -93,6 +93,7 @@ test("migration DDL and its ledger entry roll back together and can be retried",
 			"0065_jmap_uploads.sql",
 			"0066_ses_receipts.sql",
 			"0067_contact_avatars.sql",
+			"0068_domain_relay_binding.sql",
 		]);
 		db.exec(
 			"CREATE TRIGGER reject_migration BEFORE INSERT ON d1_migrations BEGIN SELECT RAISE(ABORT,'synthetic failure'); END",
@@ -183,6 +184,7 @@ test("independent processes applying the same migration each observe one committ
 			"0065_jmap_uploads.sql",
 			"0066_ses_receipts.sql",
 			"0067_contact_avatars.sql",
+			"0068_domain_relay_binding.sql",
 		]);
 	} finally {
 		db.close();

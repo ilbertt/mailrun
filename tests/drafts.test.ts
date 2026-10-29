@@ -17,6 +17,7 @@ import { sendDraft, deliverJob } from "../src/server/mail/send";
 import { sharedFile } from "../src/server/mail/attachment-send";
 import { LocalStorage } from "../src/server/storage";
 import { z } from "zod";
+import { draftResponse, expectedDraftRevision } from "../src/server/api/drafts";
 let state: Awaited<ReturnType<typeof fixture>>;
 beforeEach(async () => {
 	state = await fixture();
@@ -33,6 +34,32 @@ const input = {
 	html: "<p>Hello</p>",
 	text: "Hello",
 };
+test("draft responses expose a proxy-independent revision without accepting weak or stale preconditions", async () => {
+	const draft = await saveDraft(owner, input);
+	const response = await draftResponse(owner, draft.id);
+	expect(response.headers.get("X-Mailflare-Draft-Revision")).toBe("0");
+	expect(response.headers.get("Cache-Control")).toBe(
+		"private, no-store, no-transform",
+	);
+	for (const [etag, status] of [
+		['W/"0"', 412],
+		['"1"', 409],
+	] as const) {
+		try {
+			expectedDraftRevision(
+				new Request("https://fixture.example/api/send", {
+					headers: { "If-Match": etag },
+				}),
+				0,
+			);
+			throw new Error("Invalid revision accepted");
+		} catch (error) {
+			expect(error).toBeInstanceOf(Response);
+			if (!(error instanceof Response)) throw error;
+			expect(error.status).toBe(status);
+		}
+	}
+});
 test("drafts survive save/reopen; stale revisions and shared readers cannot overwrite or inspect them", async () => {
 	const draft = await saveDraft(owner, input);
 	const saved = await saveDraft(owner, {
