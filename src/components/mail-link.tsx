@@ -1,6 +1,5 @@
-import { useContext, type ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { MailContext } from "./mail-context";
 export function MailLink({
 	href,
 	onClick,
@@ -15,22 +14,10 @@ export function MailLink({
 	scroll?: boolean;
 }) {
 	const router = useRouter();
-	const mailboxId = useContext(MailContext)?.mailboxId;
-	const url = new URL(href, "https://mailflare.invalid");
-	if (
-		mailboxId &&
-		url.origin === "https://mailflare.invalid" &&
-		!/^\/(c|book|d)(\/|$)/.test(url.pathname)
-	)
-		url.searchParams.set("mailboxId", mailboxId);
-	const target =
-		url.origin === "https://mailflare.invalid"
-			? url.pathname + url.search + url.hash
-			: href;
 	return (
 		<a
 			{...props}
-			href={target}
+			href={href}
 			onClick={(event) => {
 				onClick?.(event);
 				if (
@@ -40,12 +27,14 @@ export function MailLink({
 					event.ctrlKey ||
 					event.altKey ||
 					event.shiftKey ||
-					props.target === "_blank" ||
-					url.origin !== "https://mailflare.invalid"
+					(props.target != null && props.target !== "_self") ||
+					props.download != null ||
+					!href.startsWith("/") ||
+					href.startsWith("//")
 				)
 					return;
 				event.preventDefault();
-				void router.navigate({ href: target, replace, resetScroll: scroll });
+				void router.navigate({ href, replace, resetScroll: scroll });
 			}}
 		/>
 	);

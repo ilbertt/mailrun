@@ -1,3 +1,5 @@
+import { branding } from "./server/branding";
+import { DEFAULT_BRANDING } from "./components/branding-provider-utils";
 import { setupSnapshot } from "./server/setup/service";
 import { publicAuthGuard } from "./server/auth/public-guard";
 import { getRequestLocale, loadServerMessages } from "./lib/i18n/server";
@@ -204,5 +206,9 @@ export const updateShortcutSettingsFn = createServerFn({ method: "POST" })
 
 export const localeFn = createServerFn({ method: "GET" }).handler(async () => {
 	const locale = await getRequestLocale();
-	return { locale, messages: await loadServerMessages(locale) };
+	const [messages, initialBranding] = await Promise.all([
+		loadServerMessages(locale),
+		branding().catch(() => DEFAULT_BRANDING),
+	]);
+	return { locale, messages, branding: initialBranding };
 });

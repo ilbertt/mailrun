@@ -4,11 +4,9 @@ import {
 	Outlet,
 	redirect,
 	useLocation,
-	useSearch,
 } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { MailContext } from "../components/mail-context";
+import { MailSessionProvider } from "../components/mail-session-provider";
 import { MailClientSync } from "../components/mail-client-sync";
 import { sessionQuery, mailboxesQuery } from "../queries";
 import DashboardLayout from "../app/(dashboard)/layout";
@@ -75,26 +73,7 @@ export const Route = createFileRoute("/_mail")({
 function MailLayout() {
 	const { user } = Route.useRouteContext();
 	const mailboxes = useSuspenseQuery(mailboxesQuery(user.id)).data;
-	const search = useSearch({ strict: false });
 	const { pathname } = useLocation();
-	const [selected, setSelected] = useState("");
-	const requested = search.mailboxId || selected;
-	const mailboxId = mailboxes.some((mailbox) => mailbox.id === requested)
-		? requested
-		: (mailboxes[0]?.id ?? "");
-	useEffect(() => {
-		try {
-			const stored = localStorage.getItem("selected-mailbox-id");
-			if (mailboxes.some((item) => item.id === stored))
-				setSelected(stored ?? "");
-		} catch {}
-	}, [mailboxes]);
-	const select = (value: string) => {
-		setSelected(value);
-		try {
-			localStorage.setItem("selected-mailbox-id", value);
-		} catch {}
-	};
 	const Layout = matches(pathname, adminPrefixes)
 		? AdminLayout
 		: pathname.startsWith("/settings")
@@ -105,14 +84,11 @@ function MailLayout() {
 					? DriveLayout
 					: DashboardLayout;
 	return (
-		<MailContext.Provider
-			key={user.id}
-			value={{ user, mailboxes, mailboxId, setMailboxId: select }}
-		>
+		<MailSessionProvider key={user.id} user={user} mailboxes={mailboxes}>
 			<MailClientSync />
 			<Layout>
 				<Outlet />
 			</Layout>
-		</MailContext.Provider>
+		</MailSessionProvider>
 	);
 }

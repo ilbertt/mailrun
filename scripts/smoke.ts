@@ -132,6 +132,30 @@ try {
 				throw new Error(`Source ${unsupported} contract failed for ${path}`);
 		}
 	}
+	const publicHome = await fetch(base + "/", { redirect: "manual" });
+	const publicHomeHtml = await publicHome.text();
+	if (
+		publicHome.status !== 200 ||
+		!publicHomeHtml.includes("Mailboxes that feel like your inbox.") ||
+		!publicHomeHtml.includes('href="/login"') ||
+		!publicHomeHtml.includes('href="/setup"')
+	)
+		throw new Error("Original public homepage was not rendered");
+	for (const [path, title] of [
+		["/login", "Sign in"],
+		["/forgot-password", "Reset your password"],
+		["/reset-password?token=synthetic", "Choose a new password"],
+	] as const) {
+		const response = await fetch(base + path);
+		const html = await response.text();
+		if (
+			!response.ok ||
+			[...html.matchAll(/<title>([^<]*)<\/title>/g)]
+				.map((match) => match[1])
+				.join() !== `${title} - Mailflare`
+		)
+			throw new Error(`Original auth title missing from SSR: ${path}`);
+	}
 	const csrf = await fetch(`${base}/api/auth/login`, {
 		method: "POST",
 		headers: {
@@ -296,6 +320,70 @@ try {
 	state.db.exec(
 		"INSERT INTO license_settings(id,instance_id,plan,state,updated_at) VALUES('default','http-smoke','team','active',1) ON CONFLICT(id) DO UPDATE SET plan='team',state='active'",
 	);
+	const brandedName = "Parcelroom";
+	const brandingForm = new FormData();
+	brandingForm.set("appName", brandedName);
+	const savedBranding = await fetch(base + "/api/branding", {
+		method: "PUT",
+		headers: { Cookie: sessionCookie, Origin: publicBase },
+		body: brandingForm,
+	});
+	if (!savedBranding.ok) throw new Error("Could not save entitled branding");
+	for (const [path, title, text] of [
+		["/", brandedName, "Mailboxes that feel like your inbox."],
+		["/login", `Sign in - ${brandedName}`, "Open your mailbox"],
+		[
+			"/forgot-password",
+			`Reset your password - ${brandedName}`,
+			"Reset your password",
+		],
+		[
+			"/reset-password?token=synthetic",
+			`Choose a new password - ${brandedName}`,
+			"Choose a new password",
+		],
+	] as const) {
+		const response = await fetch(base + path);
+		const html = await response.text();
+		if (
+			!response.ok ||
+			[...html.matchAll(/<title>([^<]*)<\/title>/g)]
+				.map((match) => match[1])
+				.join() !== title ||
+			!html.includes(text)
+		)
+			throw new Error(`Initial branded document differs: ${path}`);
+		for (const expected of [
+			`name="apple-mobile-web-app-title" content="${brandedName}"`,
+			'name="description" content="Multi-tenant email on Cloudflare"',
+			'name="mobile-web-app-capable" content="yes"',
+			'name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"',
+		])
+			if (!html.includes(expected))
+				throw new Error(`Document metadata missing: ${path}: ${expected}`);
+	}
+	const italianLogin = await fetch(base + "/login", {
+		headers: { Cookie: "mailflare-locale=it" },
+	});
+	const italianHtml = await italianLogin.text();
+	if (
+		!italianLogin.ok ||
+		!italianHtml.includes(`<title>Accedi - ${brandedName}</title>`) ||
+		!italianHtml.includes('lang="it"')
+	)
+		throw new Error("Localized auth metadata missing from the first render");
+	const restoredBranding = new FormData();
+	restoredBranding.set("appName", "Mailflare");
+	if (
+		!(
+			await fetch(base + "/api/branding", {
+				method: "PUT",
+				headers: { Cookie: sessionCookie, Origin: publicBase },
+				body: restoredBranding,
+			})
+		).ok
+	)
+		throw new Error("Could not restore fixture branding");
 	const accountPassword = crypto.randomUUID(),
 		createdAccount = await fetch(`${base}/api/accounts`, {
 			method: "POST",

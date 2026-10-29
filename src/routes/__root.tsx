@@ -18,18 +18,42 @@ import styles from "../styles.css?url";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 	{
-		loader: () => localeFn(),
-		head: () => ({
+		beforeLoad: async () => ({ document: await localeFn() }),
+		loader: ({ context }) => context.document,
+		head: ({ loaderData, matches }) => ({
 			meta: [
 				{ charSet: "utf-8" },
 				{ name: "viewport", content: "width=device-width, initial-scale=1" },
-				{ title: "Mailflare" },
-				{ name: "robots", content: "noindex,nofollow" },
+				{ title: loaderData?.branding.appName ?? "Mailflare" },
+				{ name: "description", content: "Multi-tenant email on Cloudflare" },
+				{ name: "mobile-web-app-capable", content: "yes" },
+				{
+					name: "apple-mobile-web-app-title",
+					content: loaderData?.branding.appName ?? "Mailflare",
+				},
+				{ name: "apple-mobile-web-app-status-bar-style", content: "default" },
+				{
+					name: "robots",
+					content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+				},
+				{
+					name: "googlebot",
+					content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+				},
 			],
 			links: [
 				{ rel: "stylesheet", href: styles },
+				...(matches.at(-1)?.pathname === "/"
+					? [
+							{
+								rel: "icon",
+								href: loaderData?.branding.hasCustomIcon
+									? "/api/branding/icon"
+									: "/icon-96.png",
+							},
+						]
+					: [{ rel: "apple-touch-icon", href: "/icon-192.png" }]),
 				{ rel: "icon", href: "/api/branding/icon" },
-				{ rel: "apple-touch-icon", href: "/icon-192.png" },
 				{ rel: "manifest", href: "/manifest.webmanifest" },
 			],
 		}),
@@ -51,7 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 );
 function Root() {
 	const { queryClient } = Route.useRouteContext();
-	const { locale, messages } = Route.useLoaderData();
+	const { locale, messages, branding } = Route.useLoaderData();
 	return (
 		<html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
 			<head>
@@ -63,7 +87,7 @@ function Root() {
 				<QueryClientProvider client={queryClient}>
 					<AuthClientSync />
 					<LanguageProvider initialLocale={locale} initialMessages={messages}>
-						<BrandingProvider>
+						<BrandingProvider initialBranding={branding}>
 							<ThemeSync />
 							<Outlet />
 							<MailNotifications />
