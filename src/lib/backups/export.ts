@@ -228,6 +228,25 @@ export function restoreBackup(db: Database, input: unknown) {
 		if (!tables.includes(table) && document.tables[table]?.length)
 			throw new Error(`Apply migrations before restoring ${table}`);
 	}
+	// Older databases can ignore newly nullable token fields, but must not drop
+	// the only usable credential from a Global API Key installation backup.
+	if (
+		document.tables.mailrun_installation?.some(
+			(row) => row.api_key || row.api_email,
+		)
+	) {
+		const columns = nameRows.parse(
+			db.query('PRAGMA table_info("mailrun_installation")').all(),
+		);
+		if (
+			!["api_key", "api_email"].every((name) =>
+				columns.some((column) => column.name === name),
+			)
+		)
+			throw new Error(
+				"Apply migrations before restoring Cloudflare Global API Key credentials",
+			);
+	}
 	const legacy = new Map(
 		(document.tables.message_bodies ?? []).map((row) => [row.message_id, row]),
 	);

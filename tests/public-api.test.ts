@@ -53,7 +53,7 @@ async function install() {
 		hostname: "example.com",
 		workerName: "fixture",
 		publicOrigin: "https://mail.example.com",
-		apiToken: "synthetic",
+		auth: { kind: "token" as const, token: "synthetic" },
 		relaySecret: "secret",
 		relayVersion: "fixture",
 	});

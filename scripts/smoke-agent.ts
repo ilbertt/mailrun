@@ -17,7 +17,7 @@ state.db
 	)
 	.run(await hash(token), seconds() + 600, seconds());
 state.db.exec(
-	"UPDATE users SET spam_protection_enabled=0 WHERE id='owner'; INSERT INTO mailrun_installation VALUES('primary','account','zone','example.com','relay','https://mailrun-agent-smoke.example','synthetic-token','synthetic-relay-secret','fixture','ready',1)",
+	"UPDATE users SET spam_protection_enabled=0 WHERE id='owner'; INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES('primary','account','zone','example.com','relay','https://mailrun-agent-smoke.example','synthetic-token','synthetic-relay-secret','fixture','ready',1)",
 );
 const binary = resolve(process.argv[2] ?? "dist/mailrun-local"),
 	env = {

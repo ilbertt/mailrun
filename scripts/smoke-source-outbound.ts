@@ -18,6 +18,12 @@ import {
 
 const state = await fixture(),
 	provider = await startFixtureSetupProvider(state.directory);
+if (process.argv.includes("--global-key"))
+	provider.cf.access.auth = {
+		kind: "global-key",
+		key: "queued-global-key",
+		email: "owner@example.com",
+	};
 const legacyDirectory = join(state.directory, "original-schema");
 await mkdir(legacyDirectory);
 const sourceDb = new Database(join(legacyDirectory, "mailflare.sqlite"));
@@ -61,7 +67,12 @@ const env = {
 	TMPDIR: process.env.TMPDIR,
 	DATA_DIR: legacyDirectory,
 	APP_URL: provider.publicOrigin,
-	CF_TOKEN: provider.cf.access.apiToken,
+	...(provider.cf.access.auth.kind === "token"
+		? { CF_TOKEN: provider.cf.access.auth.token }
+		: {
+				CF_API_KEY: provider.cf.access.auth.key,
+				CF_EMAIL: provider.cf.access.auth.email,
+			}),
 	CF_ACCOUNT_ID: provider.cf.access.accountId ?? undefined,
 	NODE_EXTRA_CA_CERTS: provider.cert,
 	BUN_OPTIONS: "--preload " + preload.path,
@@ -100,12 +111,13 @@ try {
 		.query("SELECT id,payload FROM outbound_jobs ORDER BY id")
 		.all();
 	await cron();
-	assert.ok(
+	assert.deepEqual(
 		sourceDb
 			.query(
-				"SELECT name FROM d1_migrations WHERE name='0068_domain_relay_binding.sql'",
+				"SELECT name FROM d1_migrations WHERE name IN ('0068_domain_relay_binding.sql','0069_cloudflare_global_key.sql') ORDER BY name",
 			)
-			.get(),
+			.all(),
+		[{ name: "0068_domain_relay_binding.sql" }, { name: "0069_cloudflare_global_key.sql" }],
 		"Compiled startup did not upgrade the source schema",
 	);
 	assert.equal(deliveries.length, 0, "An imported future job sent early");

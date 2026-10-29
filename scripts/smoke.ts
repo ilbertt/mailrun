@@ -1739,7 +1739,7 @@ try {
 		throw new Error("Attachment authorization failed");
 	// Exercise the compiled Bun websocket and the Start handler in the same process.
 	state.db.exec(
-		"INSERT INTO mailrun_installation VALUES ('primary','account','zone','example.com','relay','https://mailrun-smoke.example','synthetic-token','synthetic-secret','v1','ready',1)",
+		"INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES ('primary','account','zone','example.com','relay','https://mailrun-smoke.example','synthetic-token','synthetic-secret','v1','ready',1)",
 	);
 	// DOM globals hide Bun's documented headers overload in this shared TS project.
 	const NativeWebSocket = WebSocket as typeof WebSocket & {

@@ -1,4 +1,5 @@
 import { cloudflareCredentials } from "../cloudflare/credentials";
+import type { CloudflareAuth } from "../../shared/cloudflare-auth";
 import { z } from "zod";
 import { canonicalTxt } from "./dns-records";
 import { getInstallation } from "../cloudflare/installation";
@@ -68,16 +69,16 @@ export const routingRuleSchema = z.object({
 export type RoutingRule = z.infer<typeof routingRuleSchema>;
 export type CatchAll = z.infer<typeof catchAllSchema>;
 export type CloudflareAccess = {
-	apiToken: string;
+	auth: CloudflareAuth;
 	accountId: string | null;
 	workerName: string | null;
 };
 export async function cloudflareAccess(): Promise<CloudflareAccess | null> {
 	const installation = await getInstallation(),
-		{ apiToken, accountId } = cloudflareCredentials(installation);
-	return apiToken
+		{ auth, accountId } = cloudflareCredentials(installation);
+	return auth
 		? {
-				apiToken,
+				auth,
 				accountId,
 				workerName:
 					installation && installation.phase !== "saved"
@@ -136,7 +137,7 @@ export class DomainCloudflare {
 		readonly fetch: CloudflareFetch = globalThis.fetch,
 	) {}
 	call<T>(path: string, schema: z.ZodType<T>, init: RequestInit = {}) {
-		return cloudflare(this.access.apiToken, path, schema, init, this.fetch);
+		return cloudflare(this.access.auth, path, schema, init, this.fetch);
 	}
 	async findZone(hostname: string) {
 		for (const name of zoneCandidates(normalizeHostname(hostname))) {

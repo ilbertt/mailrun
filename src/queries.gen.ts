@@ -2268,6 +2268,8 @@ export interface IGetInstallationResult {
     relay_version: IMailrunInstallationColumns["relay_version"];
     phase: IMailrunInstallationColumns["phase"];
     updated_at: IMailrunInstallationColumns["updated_at"];
+    api_key: IMailrunInstallationColumns["api_key"];
+    api_email: IMailrunInstallationColumns["api_email"];
 }
 
 /** Result of query `SaveInstallation`. */
@@ -6075,6 +6077,8 @@ export interface IMailrunInstallationColumns {
     relay_version: string;
     phase: string;
     updated_at: number;
+    api_key: string | null;
+    api_email: string | null;
 }
 
 /** Schema of `mailrun_installation`. */
@@ -7191,7 +7195,9 @@ export const schema = {
             relay_secret: { _columnName: "relay_secret", _foreignKeys: {} },
             relay_version: { _columnName: "relay_version", _foreignKeys: {} },
             phase: { _columnName: "phase", _foreignKeys: {} },
-            updated_at: { _columnName: "updated_at", _foreignKeys: {} }
+            updated_at: { _columnName: "updated_at", _foreignKeys: {} },
+            api_key: { _columnName: "api_key", _foreignKeys: {} },
+            api_email: { _columnName: "api_email", _foreignKeys: {} }
         },
         _indexes: {
             sqlite_autoindex_mailrun_installation_1: { _indexName: "sqlite_autoindex_mailrun_installation_1" }

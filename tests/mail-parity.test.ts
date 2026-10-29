@@ -99,7 +99,7 @@ test("the original local spam classifier honors blocked contacts and the account
 });
 test("auto replies suppress loops, share one pending job, and throttle only after a successful send", async () => {
 	state.db.exec(
-		"UPDATE mailboxes SET auto_reply_enabled=1,auto_reply_body='Back tomorrow' WHERE id='mailbox';INSERT INTO mailrun_installation VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
+		"UPDATE mailboxes SET auto_reply_enabled=1,auto_reply_body='Back tomorrow' WHERE id='mailbox';INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
 	);
 	const input = {
 		mailboxId: "mailbox",

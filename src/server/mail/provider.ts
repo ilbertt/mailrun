@@ -1,4 +1,5 @@
 import { cloudflareCredentials } from "../cloudflare/credentials";
+import type { CloudflareAuth } from "../../shared/cloudflare-auth";
 import type { AwsConfig } from "../../lib/aws/aws-types";
 import { requireAwsConfig } from "../aws/settings";
 import { sendSesMail } from "../aws/send";
@@ -12,7 +13,7 @@ import { cloudflare, type CloudflareFetch } from "../cloudflare/client";
 import { ResendClient } from "../resend/client";
 import { requireResendKey } from "../resend/settings";
 export type OutboundConfig =
-	| { provider: "cloudflare"; apiToken: string; accountId: string }
+	| { provider: "cloudflare"; auth: CloudflareAuth; accountId: string }
 	| { provider: "resend"; apiKey: string }
 	| { provider: "ses"; config: AwsConfig };
 export type OutboundAttachment = {
@@ -50,10 +51,8 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 		return { provider: "resend", apiKey: await requireResendKey() };
 	if (provider === "ses")
 		return { provider: "ses", config: await requireAwsConfig() };
-	const { apiToken, accountId } = cloudflareCredentials(
-		await getInstallation(),
-	);
-	if (!apiToken || !accountId)
+	const { auth, accountId } = cloudflareCredentials(await getInstallation());
+	if (!auth || !accountId)
 		throw new OutboundProviderError("Cloudflare email is not configured");
 	if (!row.sending_enabled || row.status !== "active")
 		throw new OutboundProviderError(
@@ -61,7 +60,7 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 		);
 	return {
 		provider: "cloudflare",
-		apiToken,
+		auth,
 		accountId,
 	};
 }
@@ -115,7 +114,7 @@ export async function sendThroughProvider(
 		if (Buffer.byteLength(body) > 5 * 1024 * 1024)
 			throw new Error("Message exceeds Cloudflare's 5 MiB API limit");
 		const result = await cloudflare(
-			config.apiToken,
+			config.auth,
 			`/accounts/${config.accountId}/email/sending/send`,
 			z.object({ message_id: z.string() }),
 			{ method: "POST", body },

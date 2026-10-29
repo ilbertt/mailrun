@@ -360,7 +360,8 @@ test("the domain REST contract returns DNS summaries, validation errors and cons
 		dns: { domain: { auth: { dkim: "ok" } } },
 	});
 	const privateData = JSON.stringify(await (await call("/domain/dns")).json());
-	expect(privateData).not.toContain(cf.access.apiToken);
+	for (const secret of Object.values(cf.access.auth))
+		if (secret !== cf.access.auth.kind) expect(privateData).not.toContain(secret);
 });
 
 test("an unverified relay blocks receiving while domain metadata and read-only DNS management stay available", async () => {

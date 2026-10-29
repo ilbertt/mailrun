@@ -96,7 +96,12 @@ export const setupStatusFn = createServerFn({ method: "GET" }).handler(
 );
 export const setupCloudflareFn = createServerFn({ method: "POST" })
 	.validator(setupCloudflareSchema)
-	.handler(async ({ data }) => provisionEmail(await requireUser(), data));
+	.handler(async ({ data }) =>
+		provisionEmail(await requireUser(), {
+			...data,
+			auth: { kind: "token", token: data.apiToken },
+		}),
+	);
 export const refreshRelayFn = createServerFn({ method: "POST" }).handler(
 	async () => refreshRelay(await requireUser()),
 );

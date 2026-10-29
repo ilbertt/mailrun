@@ -148,7 +148,7 @@ test("attachment limits fail before any metadata is added", async () => {
 });
 function install() {
 	state.db.exec(
-		"INSERT INTO mailrun_installation VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
+		"INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
 	);
 }
 const sentSchema = z.object({
@@ -360,7 +360,7 @@ test("choosing another sending provider never delivers the message through Cloud
 		hostname: "example.com",
 		workerName: "relay",
 		publicOrigin: "https://fixture.example",
-		apiToken: "synthetic-token",
+		auth: { kind: "token" as const, token: "synthetic-token" },
 		relaySecret: "synthetic-secret",
 		relayVersion: "test",
 	});

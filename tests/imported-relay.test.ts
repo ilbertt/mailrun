@@ -44,7 +44,7 @@ function provider(
 	const cf = cloudflareFixture();
 	cf.access.workerName = null;
 	cf.access.accountId = "a".repeat(32);
-	cf.access.apiToken = "test-cloudflare-token";
+	cf.access.auth = { kind: "token", token: "test-cloudflare-token" };
 	cf.zones[0]!.account.id = cf.access.accountId;
 	cf.routing.set("zone", true);
 	cf.catchAlls.set("zone", {
@@ -266,7 +266,7 @@ test("deploy and refresh operations share a fenced installation lease", async ()
 		{
 			hostname: "example.com",
 			accountId: "a".repeat(32),
-			apiToken: "test-cloudflare-token",
+			auth: { kind: "token" as const, token: "test-cloudflare-token" },
 		},
 		p.send,
 	);
@@ -293,7 +293,7 @@ test("a failed first relay publication can be retried from a different owned dom
 	const input = {
 		hostname: "example.com",
 		accountId: "a".repeat(32),
-		apiToken: "test-cloudflare-token",
+		auth: { kind: "token" as const, token: "test-cloudflare-token" },
 	};
 	await expect(deployEmailRelay(owner, input, p.send)).rejects.toThrow(
 		"temporary publication failure",
@@ -365,7 +365,7 @@ test("namespace creation rechecks primary permissions after discovering a missin
 			{
 				hostname: "example.com",
 				accountId: "a".repeat(32),
-				apiToken: "test-cloudflare-token",
+				auth: { kind: "token" as const, token: "test-cloudflare-token" },
 			},
 			send,
 		),

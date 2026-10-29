@@ -11,6 +11,13 @@ const state = await fixture(),
 	preload = await writeSetupFixturePreload(state.directory, provider.url),
 	binary = resolve(process.argv[2] ?? "dist/mailrun-local"),
 	setupToken = crypto.randomUUID();
+const globalKey = process.argv.includes("--global-key");
+if (globalKey)
+	provider.cf.access.auth = {
+		kind: "global-key",
+		key: "setup-global-key",
+		email: "owner@example.com",
+	};
 state.db.exec("DELETE FROM users");
 const env = {
 	PATH: process.env.PATH,
@@ -22,6 +29,8 @@ const env = {
 	APP_URL: provider.publicOrigin,
 	SETUP_TOKEN: setupToken,
 	CF_TOKEN: "test-cloudflare-token",
+	CF_API_KEY: globalKey ? "setup-global-key" : undefined,
+	CF_EMAIL: globalKey ? "owner@example.com" : undefined,
 	CF_ACCOUNT_ID: "a".repeat(32),
 	NODE_EXTRA_CA_CERTS: provider.cert,
 	BUN_OPTIONS: "--preload " + preload.path,
@@ -255,8 +264,29 @@ try {
 		);
 	await mailboxAgain.body?.cancel();
 
+	if (globalKey) {
+		// Reboot using only the persisted pair, then test a deployment switch back
+		// to the source token scheme without changing account/Worker identity.
+		delete env.CF_API_KEY;
+		delete env.CF_EMAIL;
+		env.CF_TOKEN = "";
+		await stop();
+		await start();
+		const fallback = await fetch(base + "/api/domains/check", {
+			method: "POST",
+			headers: {
+				Origin: provider.publicOrigin,
+				Cookie: "ep_session=" + session.data.token,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ hostname: "example.com" }),
+		});
+		if (!fallback.ok)
+			throw new Error("Saved Global API Key fallback failed after restart");
+		await fallback.body?.cancel();
+	}
 	env.CF_TOKEN = "rotated-cloudflare-token";
-	provider.cf.access.apiToken = env.CF_TOKEN;
+	provider.cf.access.auth = { kind: "token", token: env.CF_TOKEN };
 	await stop();
 	await start();
 	const rotatedDomainCheck = await fetch(base + "/api/domains/check", {
@@ -290,6 +320,7 @@ try {
 				restartAndLogin: "passed",
 				authenticatedOnboarding: "passed",
 				deploymentTokenRotation: "passed",
+				globalKeySetupAndSavedFallback: globalKey ? "passed" : "not requested",
 				workerUploads: provider.uploads,
 				externalRequests: 0,
 			},

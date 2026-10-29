@@ -28,7 +28,13 @@ import {
 	sendThroughProvider,
 } from "../src/server/mail/provider";
 let state: Awaited<ReturnType<typeof fixture>>;
-const keys = ["CF_TOKEN", "CF_ACCOUNT_ID", "CF_EMAIL_WORKER_NAME"] as const;
+const keys = [
+	"CF_TOKEN",
+	"CF_API_KEY",
+	"CF_EMAIL",
+	"CF_ACCOUNT_ID",
+	"CF_EMAIL_WORKER_NAME",
+] as const;
 let environment: Record<string, string | undefined>;
 beforeEach(async () => {
 	state = await fixture();
@@ -43,7 +49,7 @@ afterEach(async () => {
 	await state.close();
 });
 const access: CloudflareAccess = {
-	apiToken: "synthetic-token",
+	auth: { kind: "token" as const, token: "synthetic-token" },
 	accountId: "account",
 	workerName: "mailrun-relay",
 };
@@ -187,14 +193,14 @@ test("setup-saved credentials enable original DNS management without environment
 		hostname: "example.com",
 		workerName: "saved-relay",
 		publicOrigin: "https://fixture.example",
-		apiToken: "saved-token",
+		auth: { kind: "token" as const, token: "saved-token" },
 		relaySecret: "synthetic-secret",
 		relayVersion: "test",
 	});
 	expect((await cloudflareAccess())?.workerName).toBeNull();
 	await setInstallationPhase("deployed");
 	expect(await cloudflareAccess()).toEqual({
-		apiToken: "saved-token",
+		auth: { kind: "token" as const, token: "saved-token" },
 		accountId: "account",
 		workerName: "saved-relay",
 	});
@@ -209,7 +215,7 @@ test("environment credentials remain usable before setup", async () => {
 	process.env.CF_ACCOUNT_ID = "account";
 	process.env.CF_EMAIL_WORKER_NAME = "relay";
 	expect(await cloudflareAccess()).toEqual({
-		apiToken: "environment-token",
+		auth: { kind: "token" as const, token: "environment-token" },
 		accountId: "account",
 		workerName: null,
 	});
@@ -221,7 +227,7 @@ test("a deployment token rotation applies to DNS and sending while the saved acc
 		hostname: "example.com",
 		workerName: "saved-relay",
 		publicOrigin: "https://fixture.example",
-		apiToken: "old-token",
+		auth: { kind: "token" as const, token: "old-token" },
 		relaySecret: "synthetic-secret",
 		relayVersion: "test",
 	});
@@ -229,13 +235,13 @@ test("a deployment token rotation applies to DNS and sending while the saved acc
 	process.env.CF_TOKEN = " rotated-token ";
 	process.env.CF_ACCOUNT_ID = "another-account";
 	expect(await cloudflareAccess()).toEqual({
-		apiToken: "rotated-token",
+		auth: { kind: "token" as const, token: "rotated-token" },
 		accountId: "account",
 		workerName: "saved-relay",
 	});
 	expect(await outboundConfig("hello@example.com")).toEqual({
 		provider: "cloudflare",
-		apiToken: "rotated-token",
+		auth: { kind: "token" as const, token: "rotated-token" },
 		accountId: "account",
 	});
 	const config = await outboundConfig("hello@example.com");
@@ -258,16 +264,71 @@ test("a deployment token rotation applies to DNS and sending while the saved acc
 		},
 	);
 	delete process.env.CF_TOKEN;
-	expect((await cloudflareAccess())?.apiToken).toBe("old-token");
+	expect((await cloudflareAccess())?.auth).toEqual({
+		kind: "token",
+		token: "old-token",
+	});
 });
 test("an imported ready Cloudflare sender can use its deployment credentials before installing a native relay", async () => {
 	process.env.CF_TOKEN = " environment-token ";
 	process.env.CF_ACCOUNT_ID = "account";
 	expect(await outboundConfig("hello@example.com")).toEqual({
 		provider: "cloudflare",
-		apiToken: "environment-token",
+		auth: { kind: "token" as const, token: "environment-token" },
 		accountId: "account",
 	});
+});
+test("original Global API Key credentials authorize imported-domain DNS and sending without a native relay", async () => {
+	Object.assign(process.env, {
+		CF_TOKEN: "unused-token",
+		CF_API_KEY: " global-fixture-key ",
+		CF_EMAIL: " owner@example.com ",
+		CF_ACCOUNT_ID: "account",
+	});
+	const access = await cloudflareAccess();
+	expect(access).toEqual({
+		auth: {
+			kind: "global-key",
+			key: "global-fixture-key",
+			email: "owner@example.com",
+		},
+		accountId: "account",
+		workerName: null,
+	});
+	if (!access) throw new Error("Expected configured global key");
+	const calls: string[] = [];
+	const request: CloudflareFetch = async (input, init) => {
+		const url = new URL(String(input)),
+			headers = new Headers(init?.headers);
+		expect(headers.get("Authorization")).toBeNull();
+		expect(headers.get("X-Auth-Key")).toBe("global-fixture-key");
+		expect(headers.get("X-Auth-Email")).toBe("owner@example.com");
+		calls.push(url.pathname);
+		return success(
+			url.pathname.endsWith("/email/sending/send")
+				? { message_id: "global-delivery-fixture" }
+				: [{ id: "zone", name: "example.com", account: { id: "account" } }],
+		);
+	};
+	expect(
+		(await new DomainCloudflare(access, request).findZone("example.com"))?.id,
+	).toBe("zone");
+	expect(
+		await sendThroughProvider(
+			await outboundConfig("hello@example.com"),
+			{
+				from: "hello@example.com",
+				to: ["hello@example.com"],
+				subject: "Synthetic global-key send",
+				text: "Fixture only",
+			},
+			request,
+		),
+	).toEqual({ messageId: "global-delivery-fixture" });
+	expect(calls).toEqual([
+		"/client/v4/zones",
+		"/client/v4/accounts/account/email/sending/send",
+	]);
 });
 test("zone lookup walks subdomains, filters the configured account and normalizes hostnames", async () => {
 	const paths: string[] = [];

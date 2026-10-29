@@ -7,6 +7,114 @@ import {
 } from "../src/server/cloudflare/installation";
 import { verifyRelay } from "../src/shared/relay-signature";
 import type { CloudflareFetch } from "../src/server/cloudflare/client";
+import { cloudflareCredentials } from "../src/server/cloudflare/credentials";
+
+test("relay refresh switches saved auth schemes only after health succeeds and never sends provider credentials to health endpoints", async () => {
+	const state = await fixture();
+	const keys = [
+		"APP_URL",
+		"CF_TOKEN",
+		"CF_API_KEY",
+		"CF_EMAIL",
+		"CF_ACCOUNT_ID",
+	] as const;
+	const previous = keys.map((key) => [key, process.env[key]] as const);
+	Object.assign(process.env, {
+		APP_URL: "https://global.fixture.example",
+		CF_TOKEN: "ignored-token",
+		CF_API_KEY: "rotated-key",
+		CF_EMAIL: "owner@example.com",
+		CF_ACCOUNT_ID: "other-account",
+	});
+	let healthy = false;
+	try {
+		await saveInstallation({
+			accountId: "account",
+			zoneId: "zone",
+			hostname: "example.com",
+			workerName: "stable-relay",
+			publicOrigin: process.env.APP_URL!,
+			auth: { kind: "token", token: "saved-token" },
+			relaySecret: "relay-secret",
+			relayVersion: "old",
+		});
+		const send: CloudflareFetch = async (input, init) => {
+			const url = new URL(String(input)),
+				headers = new Headers(init?.headers);
+			if (url.origin === process.env.APP_URL) {
+				expect(headers.get("Authorization")).toBeNull();
+				expect(headers.get("X-Auth-Key")).toBeNull();
+				expect(headers.get("X-Auth-Email")).toBeNull();
+				return Response.json({ ok: true });
+			}
+			if (url.hostname.endsWith("workers.dev")) {
+				expect(headers.get("Authorization")).toBe("Bearer relay-secret");
+				expect(headers.get("X-Auth-Key")).toBeNull();
+				expect(headers.get("X-Auth-Email")).toBeNull();
+				return Response.json({ ok: healthy }, { status: healthy ? 200 : 401 });
+			}
+			expect(url.pathname.startsWith("/client/v4/accounts/account/")).toBe(
+				true,
+			);
+			if (process.env.CF_API_KEY) {
+				expect(headers.get("Authorization")).toBeNull();
+				expect(headers.get("X-Auth-Key")).toBe("rotated-key");
+				expect(headers.get("X-Auth-Email")).toBe("owner@example.com");
+			} else {
+				expect(headers.get("Authorization")).toBe("Bearer replacement-token");
+				expect(headers.get("X-Auth-Key")).toBeNull();
+				expect(headers.get("X-Auth-Email")).toBeNull();
+			}
+			return Response.json({
+				success: true,
+				result: url.pathname.endsWith("/workers/subdomain")
+					? { subdomain: "fixture" }
+					: {},
+			});
+		};
+		await expect(refreshRelay(owner, send)).rejects.toThrow("could not reach");
+		expect(await getInstallation()).toMatchObject({
+			api_token: "saved-token",
+			api_key: null,
+			api_email: null,
+			relay_version: "old",
+		});
+		healthy = true;
+		await refreshRelay(owner, send);
+		expect(await getInstallation()).toMatchObject({
+			api_token: "",
+			api_key: "rotated-key",
+			api_email: "owner@example.com",
+			account_id: "account",
+			worker_name: "stable-relay",
+			relay_secret: "relay-secret",
+		});
+		delete process.env.CF_API_KEY;
+		delete process.env.CF_EMAIL;
+		delete process.env.CF_TOKEN;
+		expect(cloudflareCredentials(await getInstallation()).auth).toEqual({
+			kind: "global-key",
+			key: "rotated-key",
+			email: "owner@example.com",
+		});
+		process.env.CF_TOKEN = "replacement-token";
+		await refreshRelay(owner, send);
+		expect(await getInstallation()).toMatchObject({
+			api_token: "replacement-token",
+			api_key: null,
+			api_email: null,
+			account_id: "account",
+			worker_name: "stable-relay",
+			relay_secret: "relay-secret",
+		});
+	} finally {
+		for (const [key, value] of previous) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
+		await state.close();
+	}
+});
 
 test("setup deploys the relay before routing and retry reuses its name and secret", async () => {
 	const state = await fixture();
@@ -72,7 +180,7 @@ test("setup deploys the relay before routing and retry reuses its name and secre
 	const input = {
 		accountId: "a".repeat(32),
 		hostname: "example.com",
-		apiToken: "test-cloudflare-token",
+		auth: { kind: "token" as const, token: "test-cloudflare-token" },
 		localPart: "hello",
 		activateRouting: true,
 	};
@@ -183,7 +291,7 @@ test("setup creates a missing workers.dev subdomain and migrates existing Mailfl
 					{
 						accountId,
 						hostname: "example.com",
-						apiToken: "test-cloudflare-token",
+						auth: { kind: "token" as const, token: "test-cloudflare-token" },
 						localPart: "hello",
 						activateRouting: true,
 					},
@@ -237,7 +345,7 @@ test("relay refresh uses the redeployed token and saves it only after verified c
 		hostname: "example.com",
 		workerName: "stable-relay",
 		publicOrigin: "https://rotation.fixture.example",
-		apiToken: "saved-token",
+		auth: { kind: "token" as const, token: "saved-token" },
 		relaySecret: "stable-secret",
 		relayVersion: "old",
 	});

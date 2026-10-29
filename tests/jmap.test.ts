@@ -440,7 +440,7 @@ test("Identity/get and EmailSubmission/set send a draft once and append the impl
 		hostname: "example.com",
 		workerName: "fixture",
 		publicOrigin: "https://mail.example.com",
-		apiToken: "synthetic",
+		auth: { kind: "token" as const, token: "synthetic" },
 		relaySecret: "secret",
 		relayVersion: "fixture",
 	});
@@ -504,7 +504,7 @@ test("submission failure retains the original draft and reports a per-object fai
 		hostname: "example.com",
 		workerName: "fixture",
 		publicOrigin: "https://mail.example.com",
-		apiToken: "synthetic",
+		auth: { kind: "token" as const, token: "synthetic" },
 		relaySecret: "secret",
 		relayVersion: "fixture",
 	});
@@ -713,7 +713,7 @@ test("submission reservation blocks competing JMAP and UI mutations while a prov
 		hostname: "example.com",
 		workerName: "fixture",
 		publicOrigin: "https://mail.example.com",
-		apiToken: "synthetic",
+		auth: { kind: "token" as const, token: "synthetic" },
 		relaySecret: "secret",
 		relayVersion: "fixture",
 	});

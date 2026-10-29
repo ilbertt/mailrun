@@ -146,7 +146,7 @@ test("system recovery mail uses Cloudflare without creating Sent copies or conta
 		hostname: "example.com",
 		workerName: "relay",
 		publicOrigin: "https://fixture.example",
-		apiToken: "fixture-token",
+		auth: { kind: "token" as const, token: "fixture-token" },
 		relaySecret: "fixture-secret",
 		relayVersion: "test",
 	});

@@ -20,7 +20,7 @@ const zoneSchema = z.object({
 });
 export function cloudflareFixture() {
 	const access: CloudflareAccess = {
-			apiToken: "fixture-token",
+			auth: { kind: "token" as const, token: "fixture-token" },
 			accountId: "account",
 			workerName: "mailrun-relay",
 		},

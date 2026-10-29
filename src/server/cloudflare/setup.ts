@@ -1,4 +1,11 @@
-import { cloudflareCredentials } from "./credentials";
+import {
+	cloudflareCredentials,
+	cloudflareCredentialColumns,
+} from "./credentials";
+import {
+	cloudflareAuthSchema,
+	type CloudflareAuth,
+} from "../../shared/cloudflare-auth";
 import { DomainCloudflare } from "../domains/cloudflare";
 import {
 	domainOperation,
@@ -26,12 +33,21 @@ import { setupCloudflareSchema, type User } from "../../shared/contracts";
 
 export class RelayDeploymentError extends Error {}
 
+const emailSetupSchema = setupCloudflareSchema.omit({ apiToken: true }).extend({
+	auth: cloudflareAuthSchema,
+});
+const relaySetupSchema = emailSetupSchema.pick({
+	accountId: true,
+	hostname: true,
+	auth: true,
+});
+
 export async function provisionEmail(
 	user: User,
-	input: z.input<typeof setupCloudflareSchema>,
+	input: z.input<typeof emailSetupSchema>,
 	request: CloudflareFetch = fetch,
 ) {
-	const data = setupCloudflareSchema.parse(input);
+	const data = emailSetupSchema.parse(input);
 	const { zone, worker } = await deployEmailRelay(user, data, request);
 
 	// The app owns only records for this installation. Provisioning never deletes
@@ -58,7 +74,7 @@ export async function provisionEmail(
 	if (data.activateRouting) {
 		const api = new DomainCloudflare(
 			{
-				apiToken: data.apiToken,
+				auth: data.auth,
 				accountId: data.accountId,
 				workerName: worker,
 			},
@@ -122,7 +138,7 @@ async function authorizeRelayWrite(user: User, assertOwned: RelayFence) {
 }
 export async function deployEmailRelay(
 	user: User,
-	input: { accountId: string; hostname: string; apiToken: string },
+	input: z.input<typeof relaySetupSchema>,
 	request: CloudflareFetch = fetch,
 ) {
 	return domainOperation("email-relay", (assertOwned) =>
@@ -131,14 +147,12 @@ export async function deployEmailRelay(
 }
 async function deployRelayOwned(
 	user: User,
-	input: { accountId: string; hostname: string; apiToken: string },
+	input: z.input<typeof relaySetupSchema>,
 	request: CloudflareFetch,
 	assertOwned: RelayFence,
 ) {
 	await authorizeRelayWrite(user, assertOwned);
-	const data = setupCloudflareSchema
-		.pick({ accountId: true, hostname: true, apiToken: true })
-		.parse(input);
+	const data = relaySetupSchema.parse(input);
 	const origin = publicOrigin();
 	if (!origin.startsWith("https://"))
 		throw new RelayDeploymentError(
@@ -156,7 +170,7 @@ async function deployRelayOwned(
 	if (claimedHostname && claimedHostname.user_id !== user.id)
 		throw new Error("Domain belongs to another account");
 	const zone = await new DomainCloudflare(
-		{ apiToken: data.apiToken, accountId: data.accountId, workerName: null },
+		{ auth: data.auth, accountId: data.accountId, workerName: null },
 		request,
 	).findZone(data.hostname);
 	if (!zone)
@@ -204,10 +218,10 @@ async function refreshRelayOwned(
 	await authorizeRelayWrite(user, assertOwned);
 	const installation = await getInstallation();
 	if (!installation) throw new Error("Email is not configured");
-	const { apiToken } = cloudflareCredentials(installation);
-	if (!apiToken)
+	const { auth } = cloudflareCredentials(installation);
+	if (!auth)
 		throw new RelayDeploymentError(
-			"Set CF_TOKEN before deploying the email relay",
+			"Set CF_TOKEN or CF_API_KEY with CF_EMAIL before deploying the email relay",
 		);
 	const worker = installation.worker_name,
 		secret = installation.relay_secret,
@@ -243,7 +257,7 @@ async function refreshRelayOwned(
 	await authorizeRelayWrite(user, assertOwned);
 	const accountSubdomain = await ensureWorkersSubdomain(
 		installation.account_id,
-		apiToken,
+		auth,
 		request,
 		() => authorizeRelayWrite(user, assertOwned),
 	);
@@ -266,7 +280,7 @@ async function refreshRelayOwned(
 	);
 	await authorizeRelayWrite(user, assertOwned);
 	await cloudflare(
-		apiToken,
+		auth,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}`,
 		z.unknown(),
 		{ method: "PUT", body: form },
@@ -274,7 +288,7 @@ async function refreshRelayOwned(
 	);
 	await authorizeRelayWrite(user, assertOwned);
 	await cloudflare(
-		apiToken,
+		auth,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}/subdomain`,
 		z.unknown(),
 		{ method: "POST", body: JSON.stringify({ enabled: true }) },
@@ -288,9 +302,10 @@ async function refreshRelayOwned(
 	);
 
 	await authorizeRelayWrite(user, assertOwned);
+	const credentials = cloudflareCredentialColumns(auth);
 	await withDatabase(
 		(sql) =>
-			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},api_token=${apiToken},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
+			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},api_token=${credentials.apiToken},api_key=${credentials.apiKey},api_email=${credentials.apiEmail},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
 	);
 	return installationStatus();
 }
@@ -331,20 +346,20 @@ export async function waitForRelayHealth(
 
 async function ensureWorkersSubdomain(
 	accountId: string,
-	token: string,
+	auth: CloudflareAuth,
 	request: CloudflareFetch,
 	authorizeWrite: () => Promise<void>,
 ) {
 	const schema = z.object({ subdomain: z.string().regex(/^[a-z0-9-]+$/) }),
 		path = `/accounts/${accountId}/workers/subdomain`;
 	try {
-		return await cloudflare(token, path, schema, {}, request);
+		return await cloudflare(auth, path, schema, {}, request);
 	} catch (error) {
 		if (!(error instanceof CloudflareApiError) || error.status !== 404)
 			throw error;
 		await authorizeWrite();
 		return cloudflare(
-			token,
+			auth,
 			path,
 			schema,
 			{

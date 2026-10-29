@@ -22,6 +22,8 @@ beforeEach(async () => {
 	const keys = [
 		"APP_URL",
 		"CF_TOKEN",
+		"CF_API_KEY",
+		"CF_EMAIL",
 		"CF_ACCOUNT_ID",
 		"SETUP_TOKEN",
 		"TURNSTILE_SECRET_KEY",
@@ -40,6 +42,8 @@ beforeEach(async () => {
 		SETUP_TOKEN: setupToken,
 	});
 	delete process.env.TURNSTILE_SECRET_KEY;
+	delete process.env.CF_API_KEY;
+	delete process.env.CF_EMAIL;
 	globalThis.__mailrunPublicAuthAttempts?.clear();
 });
 afterEach(async () => {
@@ -49,7 +53,7 @@ afterEach(async () => {
 function provider() {
 	const cf = cloudflareFixture();
 	cf.access.accountId = "a".repeat(32);
-	cf.access.apiToken = "test-cloudflare-token";
+	cf.access.auth = { kind: "token", token: "test-cloudflare-token" };
 	cf.zones[0]!.account.id = cf.access.accountId;
 	let healthy = true,
 		uploads = 0;
@@ -120,6 +124,38 @@ const input = () => ({
 	resetEmail: "Recovery@example.org",
 	setupToken,
 	enableSending: false,
+});
+test("source Global API Key deployment completes first-account setup and keeps credentials out of public status", async () => {
+	process.env.CF_API_KEY = " global-setup-key ";
+	process.env.CF_EMAIL = " owner@example.com ";
+	const p = provider();
+	let apiCalls = 0;
+	const send: CloudflareFetch = async (input, init) => {
+		if (new URL(String(input)).origin === "https://api.cloudflare.com") {
+			apiCalls++;
+			const headers = new Headers(init?.headers);
+			expect(headers.get("Authorization")).toBeNull();
+			expect(headers.get("X-Auth-Key")).toBe("global-setup-key");
+			expect(headers.get("X-Auth-Email")).toBe("owner@example.com");
+		}
+		return p.send(input, init);
+	};
+	const configured = await setupApi(request("/api/setup/prepare", {}));
+	expect(configured?.status).toBe(200);
+	expect(
+		await registerWorkspace({ ...input(), enableSending: true }, send),
+	).toEqual({ ok: true, redirect: "/login" });
+	expect(apiCalls).toBeGreaterThan(10);
+	expect(await getInstallation()).toMatchObject({
+		api_token: "",
+		api_key: "global-setup-key",
+		api_email: "owner@example.com",
+		phase: "ready",
+	});
+	const status = JSON.stringify(await setupSnapshot());
+	expect(status).not.toContain("global-setup-key");
+	expect(status).not.toContain("owner@example.com");
+	expect(status).not.toContain(process.env.CF_TOKEN!);
 });
 function request(
 	path: string,

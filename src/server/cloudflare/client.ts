@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+	cloudflareAuthHeaders,
+	type CloudflareAuth,
+} from "../../shared/cloudflare-auth";
 
 const envelope = z.object({
 	success: z.boolean(),
@@ -23,14 +27,13 @@ export type CloudflareFetch = (
 	init?: RequestInit,
 ) => Promise<Response>;
 export async function cloudflare<T>(
-	token: string,
+	auth: CloudflareAuth,
 	path: string,
 	schema: z.ZodType<T>,
 	init: RequestInit = {},
 	request: CloudflareFetch = fetch,
 ): Promise<T> {
-	const headers = new Headers(init.headers);
-	headers.set("Authorization", `Bearer ${token}`);
+	const headers = cloudflareAuthHeaders(auth, init.headers);
 	if (init.body && !(init.body instanceof FormData))
 		headers.set("Content-Type", "application/json");
 	const response = await request(

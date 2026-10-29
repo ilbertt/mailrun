@@ -480,7 +480,7 @@ test("outbound success and failure queue the source events without message bodie
 		hostname: "example.com",
 		workerName: "fixture",
 		publicOrigin: "https://mail.example.com",
-		apiToken: "synthetic-only",
+		auth: { kind: "token" as const, token: "synthetic-only" },
 		relaySecret: "secret",
 		relayVersion: "fixture",
 	});

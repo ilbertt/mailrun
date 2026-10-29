@@ -10,6 +10,94 @@ import {
 } from "../src/lib/backups/export";
 import { getMigrations } from "../src/server/assets";
 import { migrate } from "../src/server/db";
+import {
+	saveInstallation,
+	getInstallation,
+} from "../src/server/cloudflare/installation";
+
+test("token and Global API Key record backups preserve credentials across migration 0069", async () => {
+	const state = await fixture();
+	const legacyPath = join(state.directory, "pre-global-key.sqlite"),
+		legacy = new Database(legacyPath);
+	try {
+		legacy.exec(
+			"CREATE TABLE d1_migrations(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT UNIQUE,applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
+		);
+		for (const [name, file] of getMigrations())
+			if (name.endsWith(".sql") && name.slice(0, 4) < "0069") {
+				legacy.exec(await file.text());
+				legacy.query("INSERT INTO d1_migrations(name) VALUES(?)").run(name);
+			}
+		const seed = join(state.directory, "global-key-seed.json");
+		await writeBackup(state.path, seed);
+		restoreBackup(legacy, await Bun.file(seed).json());
+		legacy.exec(
+			"INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES('primary','account','zone','example.com','relay','https://fixture.example','old-token','fixture-secret','fixture-version','ready',1)",
+		);
+		const oldPath = join(state.directory, "old-token-backup.json");
+		await writeBackup(legacyPath, oldPath);
+		const old: unknown = await Bun.file(oldPath).json();
+		restoreBackup(legacy, old);
+		expect(
+			legacy.query("SELECT api_token FROM mailrun_installation").get(),
+		).toEqual({ api_token: "old-token" });
+		await saveInstallation({
+			accountId: "account",
+			zoneId: "zone",
+			hostname: "example.com",
+			workerName: "relay",
+			publicOrigin: "https://fixture.example",
+			auth: {
+				kind: "global-key",
+				key: "saved-key",
+				email: "owner@example.com",
+			},
+			relaySecret: "fixture-secret",
+			relayVersion: "fixture-version",
+		});
+		const currentPath = join(state.directory, "global-key-backup.json");
+		await writeBackup(state.path, currentPath);
+		const current: unknown = await Bun.file(currentPath).json();
+		expect(() => restoreBackup(legacy, current)).toThrow(
+			"Apply migrations before restoring Cloudflare Global API Key credentials",
+		);
+		expect(
+			legacy.query("SELECT api_token FROM mailrun_installation").get(),
+		).toEqual({ api_token: "old-token" });
+		await migrate(legacyPath);
+		restoreBackup(legacy, current);
+		expect(
+			legacy
+				.query("SELECT api_token,api_key,api_email FROM mailrun_installation")
+				.get(),
+		).toEqual({
+			api_token: "",
+			api_key: "saved-key",
+			api_email: "owner@example.com",
+		});
+		restoreBackup(state.db, current);
+		expect(await getInstallation()).toMatchObject({
+			api_token: "",
+			api_key: "saved-key",
+			api_email: "owner@example.com",
+		});
+		restoreBackup(state.db, old);
+		expect(await getInstallation()).toMatchObject({
+			api_token: "old-token",
+			api_key: null,
+			api_email: null,
+		});
+		expect(
+			coveredTables(state.db).filter(
+				(table) => table === "mailrun_installation",
+			),
+		).toHaveLength(1);
+		expect(state.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
+	} finally {
+		legacy.close();
+		await state.close();
+	}
+});
 
 test("new tables are covered once; leases are excluded; old full backups restore before and after migration", async () => {
 	const state = await fixture();

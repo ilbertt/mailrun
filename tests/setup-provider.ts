@@ -42,7 +42,7 @@ export async function startFixtureSetupProvider(
 	const cf = cloudflareFixture(),
 		calls: string[] = [];
 	cf.access.accountId = "a".repeat(32);
-	cf.access.apiToken = "test-cloudflare-token";
+	cf.access.auth = { kind: "token", token: "test-cloudflare-token" };
 	cf.zones[0]!.account.id = cf.access.accountId;
 	let appBase = "",
 		healthy = true,
@@ -97,10 +97,16 @@ export async function startFixtureSetupProvider(
 						},
 					});
 				}
-				if (
-					url.origin !== "https://api.cloudflare.com" ||
-					headers.get("Authorization") !== "Bearer " + cf.access.apiToken
-				)
+				const auth = cf.access.auth;
+				const authenticated =
+					auth.kind === "global-key"
+						? headers.get("Authorization") === null &&
+							headers.get("X-Auth-Key") === auth.key &&
+							headers.get("X-Auth-Email") === auth.email
+						: headers.get("Authorization") === "Bearer " + auth.token &&
+							headers.get("X-Auth-Key") === null &&
+							headers.get("X-Auth-Email") === null;
+				if (url.origin !== "https://api.cloudflare.com" || !authenticated)
 					throw new Error("Unexpected setup provider request");
 				if (url.pathname.endsWith("/workers/subdomain"))
 					return Response.json({

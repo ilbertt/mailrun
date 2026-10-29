@@ -25,7 +25,7 @@ beforeEach(async () => {
 		hostname: "example.com",
 		workerName: "relay",
 		publicOrigin: "https://fixture.example",
-		apiToken: "fixture-token",
+		auth: { kind: "token" as const, token: "fixture-token" },
 		relaySecret: "fixture-secret",
 		relayVersion: "fixture-version",
 	});

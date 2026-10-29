@@ -94,6 +94,7 @@ test("migration DDL and its ledger entry roll back together and can be retried",
 			"0066_ses_receipts.sql",
 			"0067_contact_avatars.sql",
 			"0068_domain_relay_binding.sql",
+			"0069_cloudflare_global_key.sql",
 		]);
 		db.exec(
 			"CREATE TRIGGER reject_migration BEFORE INSERT ON d1_migrations BEGIN SELECT RAISE(ABORT,'synthetic failure'); END",
@@ -185,6 +186,7 @@ test("independent processes applying the same migration each observe one committ
 			"0066_ses_receipts.sql",
 			"0067_contact_avatars.sql",
 			"0068_domain_relay_binding.sql",
+			"0069_cloudflare_global_key.sql",
 		]);
 	} finally {
 		db.close();

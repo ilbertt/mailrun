@@ -193,7 +193,7 @@ test("moving one occurrence to the past creates a standalone event without losin
 });
 test("invitation attachments and deliveries commit with the event and use the existing Cloudflare sender", async () => {
 	state.db.exec(
-		"INSERT INTO mailrun_installation VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
+		"INSERT INTO mailrun_installation(id,account_id,zone_id,hostname,worker_name,public_origin,api_token,relay_secret,relay_version,phase,updated_at) VALUES ('primary','account','zone','example.com','relay','https://mail.example.com','token','secret','v1','ready',1)",
 	);
 	const saved = await createCalendarEvent(
 		owner,

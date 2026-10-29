@@ -89,9 +89,9 @@ export async function setupChecks() {
 		},
 		{
 			key: "Cloudflare API credentials",
-			configured: !!access?.apiToken && !!access.accountId,
+			configured: !!access?.auth && !!access.accountId,
 			message:
-				"Set CF_TOKEN and CF_ACCOUNT_ID for automatic email relay deployment.",
+				"Set CF_ACCOUNT_ID and either CF_TOKEN or CF_API_KEY with CF_EMAIL for automatic email relay deployment.",
 		},
 		{
 			key: "Public address",
@@ -111,9 +111,9 @@ export async function setupDomainPreflight(
 ) {
 	const hostname = normalizeHostname(value),
 		access = await cloudflareAccess();
-	if (!access?.apiToken || !access.accountId)
+	if (!access?.auth || !access.accountId)
 		throw new Response(
-			"Set CF_TOKEN and CF_ACCOUNT_ID before connecting email",
+			"Set CF_ACCOUNT_ID and either CF_TOKEN or CF_API_KEY with CF_EMAIL before connecting email",
 			{ status: 503 },
 		);
 	const api = new DomainCloudflare(access, send),
@@ -148,12 +148,12 @@ export async function ensureSetupRelay(
 		);
 	if (!access?.accountId)
 		throw new Response(
-			"Set CF_TOKEN and CF_ACCOUNT_ID before connecting email",
+			"Set CF_ACCOUNT_ID and either CF_TOKEN or CF_API_KEY with CF_EMAIL before connecting email",
 			{ status: 503 },
 		);
 	await deployEmailRelay(
 		user,
-		{ hostname, accountId: access.accountId, apiToken: access.apiToken },
+		{ hostname, accountId: access.accountId, auth: access.auth },
 		send,
 	);
 }
@@ -201,7 +201,7 @@ export async function registerWorkspace(
 				user,
 				{
 					accountId: access.accountId,
-					apiToken: access.apiToken,
+					auth: access.auth,
 					hostname: domain.hostname,
 					localPart: data.username,
 					activateRouting: true,
