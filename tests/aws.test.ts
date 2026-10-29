@@ -794,9 +794,13 @@ test("two in-flight SNS callbacks converge on the committed receipt when the fir
 		),
 	);
 	let count = 0,
+		firstEntered = () => {},
 		secondEntered = () => {},
 		releaseSecond = () => {};
-	const entered = new Promise<void>((resolve) => {
+	const firstStarted = new Promise<void>((resolve) => {
+			firstEntered = resolve;
+		}),
+		entered = new Promise<void>((resolve) => {
 			secondEntered = resolve;
 		}),
 		gate = new Promise<void>((resolve) => {
@@ -808,17 +812,25 @@ test("two in-flight SNS callbacks converge on the committed receipt when the fir
 			new URL(request.url).pathname !== "/inbound/race"
 		)
 			return;
-		if (++count === 1) await entered;
-		else {
+		if (++count === 1) {
+			firstEntered();
+			await entered;
+		} else {
 			secondEntered();
 			await gate;
 		}
 	};
 	const first = sesInbound(
-			await envelope(notification("inbound/race")),
-			aws.send,
-		),
-		second = sesInbound(await envelope(notification("inbound/race")), aws.send);
+		await envelope(notification("inbound/race")),
+		aws.send,
+	);
+	// Let this named callback acquire the first GET before starting its rival.
+	// Otherwise asynchronous signing can reverse them and deadlock the test gate.
+	await firstStarted;
+	const second = sesInbound(
+		await envelope(notification("inbound/race")),
+		aws.send,
+	);
 	try {
 		expect((await first).status).toBe(200);
 	} finally {
