@@ -1,3 +1,4 @@
+import { cloudflareCredentials } from "../cloudflare/credentials";
 import type { AwsConfig } from "../../lib/aws/aws-types";
 import { requireAwsConfig } from "../aws/settings";
 import { sendSesMail } from "../aws/send";
@@ -49,8 +50,10 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 		return { provider: "resend", apiKey: await requireResendKey() };
 	if (provider === "ses")
 		return { provider: "ses", config: await requireAwsConfig() };
-	const installation = await getInstallation();
-	if (!installation)
+	const { apiToken, accountId } = cloudflareCredentials(
+		await getInstallation(),
+	);
+	if (!apiToken || !accountId)
 		throw new OutboundProviderError("Cloudflare email is not configured");
 	if (!row.sending_enabled || row.status !== "active")
 		throw new OutboundProviderError(
@@ -58,8 +61,8 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 		);
 	return {
 		provider: "cloudflare",
-		apiToken: installation.api_token,
-		accountId: installation.account_id,
+		apiToken,
+		accountId,
 	};
 }
 async function* resendBody(

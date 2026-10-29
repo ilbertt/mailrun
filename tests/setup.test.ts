@@ -1,7 +1,10 @@
 import { test, expect } from "bun:test";
 import { fixture, owner, stranger } from "./fixtures";
 import { provisionEmail, refreshRelay } from "../src/server/cloudflare/setup";
-import { getInstallation } from "../src/server/cloudflare/installation";
+import {
+	getInstallation,
+	saveInstallation,
+} from "../src/server/cloudflare/installation";
 import { verifyRelay } from "../src/shared/relay-signature";
 import type { CloudflareFetch } from "../src/server/cloudflare/client";
 
@@ -212,6 +215,68 @@ test("setup creates a missing workers.dev subdomain and migrates existing Mailfl
 	} finally {
 		if (oldOrigin === undefined) delete process.env.APP_URL;
 		else process.env.APP_URL = oldOrigin;
+		await state.close();
+	}
+});
+
+test("relay refresh uses the redeployed token and saves it only after verified connectivity", async () => {
+	const state = await fixture();
+	const previous = {
+		APP_URL: process.env.APP_URL,
+		CF_TOKEN: process.env.CF_TOKEN,
+		CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
+	};
+	Object.assign(process.env, {
+		APP_URL: "https://rotation.fixture.example",
+		CF_TOKEN: " rotated-token ",
+		CF_ACCOUNT_ID: "unrelated-account",
+	});
+	await saveInstallation({
+		accountId: "account",
+		zoneId: "zone",
+		hostname: "example.com",
+		workerName: "stable-relay",
+		publicOrigin: "https://rotation.fixture.example",
+		apiToken: "saved-token",
+		relaySecret: "stable-secret",
+		relayVersion: "old",
+	});
+	let healthy = false;
+	const request: CloudflareFetch = async (input, init) => {
+		const url = new URL(String(input));
+		if (url.origin === process.env.APP_URL)
+			return Response.json({ ok: healthy }, { status: healthy ? 200 : 503 });
+		if (url.hostname.endsWith(".workers.dev"))
+			return Response.json({ ok: true });
+		expect(url.pathname.startsWith("/client/v4/accounts/account/")).toBe(true);
+		expect(new Headers(init?.headers).get("Authorization")).toBe(
+			"Bearer rotated-token",
+		);
+		return Response.json({
+			success: true,
+			result: url.pathname.endsWith("/workers/subdomain")
+				? { subdomain: "fixture" }
+				: {},
+		});
+	};
+	try {
+		await expect(refreshRelay(owner, request)).rejects.toThrow(
+			"could not reach",
+		);
+		expect((await getInstallation())?.api_token).toBe("saved-token");
+		healthy = true;
+		await refreshRelay(owner, request);
+		expect(await getInstallation()).toMatchObject({
+			api_token: "rotated-token",
+			account_id: "account",
+			worker_name: "stable-relay",
+			relay_secret: "stable-secret",
+		});
+	} finally {
+		for (const [key, value] of Object.entries(previous)) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
 		await state.close();
 	}
 });

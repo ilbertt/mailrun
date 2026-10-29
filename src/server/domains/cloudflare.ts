@@ -1,3 +1,4 @@
+import { cloudflareCredentials } from "../cloudflare/credentials";
 import { z } from "zod";
 import { getInstallation } from "../cloudflare/installation";
 import { cloudflare, type CloudflareFetch } from "../cloudflare/client";
@@ -72,12 +73,11 @@ export type CloudflareAccess = {
 };
 export async function cloudflareAccess(): Promise<CloudflareAccess | null> {
 	const installation = await getInstallation(),
-		apiToken = installation?.api_token || process.env.CF_TOKEN?.trim();
+		{ apiToken, accountId } = cloudflareCredentials(installation);
 	return apiToken
 		? {
 				apiToken,
-				accountId:
-					installation?.account_id || process.env.CF_ACCOUNT_ID?.trim() || null,
+				accountId,
 				workerName:
 					installation && installation.phase !== "saved"
 						? installation.worker_name

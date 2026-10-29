@@ -41,13 +41,16 @@ export default function DomainDnsDetails({
 				: t("domains.sendingNotConfigured")
 			: t("domains.sendingNotSet");
 	const routingOk =
+		domain.routingEnabled &&
 		dns.routing.missing.length === 0 &&
 		(dns.routing.records.length > 0 || domain.routingEnabled);
 	const routingLabel = routingOk
 		? t("domains.routingConfigured")
 		: dns.routing.missing.length > 0
 			? t("domains.recordsMissing", { count: dns.routing.missing.length })
-			: t("domains.noRoutingRecords");
+			: dns.routing.records.length > 0 && !domain.routingEnabled
+				? t("domains.needsSetup")
+				: t("domains.noRoutingRecords");
 
 	const auditRow = (record: DnsAuthRecord) => {
 		if (!audit) return null;

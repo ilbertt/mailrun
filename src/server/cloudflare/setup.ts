@@ -1,3 +1,4 @@
+import { cloudflareCredentials } from "./credentials";
 import { DomainCloudflare } from "../domains/cloudflare";
 import { domainOperation, checkDomainClaim } from "../domains/repository";
 import {
@@ -167,6 +168,11 @@ export async function refreshRelay(
 		throw new Error("Only the primary administrator can update the relay");
 	const installation = await getInstallation();
 	if (!installation) throw new Error("Email is not configured");
+	const { apiToken } = cloudflareCredentials(installation);
+	if (!apiToken)
+		throw new RelayDeploymentError(
+			"Set CF_TOKEN before deploying the email relay",
+		);
 	const worker = installation.worker_name,
 		secret = installation.relay_secret,
 		origin = publicOrigin();
@@ -200,7 +206,7 @@ export async function refreshRelay(
 		);
 	const accountSubdomain = await ensureWorkersSubdomain(
 		installation.account_id,
-		installation.api_token,
+		apiToken,
 		request,
 	);
 	const form = new FormData();
@@ -221,14 +227,14 @@ export async function refreshRelay(
 		"relay.js",
 	);
 	await cloudflare(
-		installation.api_token,
+		apiToken,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}`,
 		z.unknown(),
 		{ method: "PUT", body: form },
 		request,
 	);
 	await cloudflare(
-		installation.api_token,
+		apiToken,
 		`/accounts/${installation.account_id}/workers/scripts/${worker}/subdomain`,
 		z.unknown(),
 		{ method: "POST", body: JSON.stringify({ enabled: true }) },
@@ -243,7 +249,7 @@ export async function refreshRelay(
 
 	await withDatabase(
 		(sql) =>
-			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
+			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},api_token=${apiToken},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
 	);
 	return installationStatus();
 }

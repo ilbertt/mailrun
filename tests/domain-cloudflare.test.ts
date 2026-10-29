@@ -22,6 +22,10 @@ import {
 	setInstallationPhase,
 } from "../src/server/cloudflare/installation";
 import { dispatchMailApi } from "../src/server/api/mail";
+import {
+	outboundConfig,
+	sendThroughProvider,
+} from "../src/server/mail/provider";
 let state: Awaited<ReturnType<typeof fixture>>;
 const keys = ["CF_TOKEN", "CF_ACCOUNT_ID", "CF_EMAIL_WORKER_NAME"] as const;
 let environment: Record<string, string | undefined>;
@@ -199,7 +203,7 @@ test("setup-saved credentials enable original DNS management without environment
 		).json(),
 	).toMatchObject({ managesDns: true });
 });
-test("environment credentials remain usable before setup and saved credentials take precedence", async () => {
+test("environment credentials remain usable before setup", async () => {
 	process.env.CF_TOKEN = " environment-token ";
 	process.env.CF_ACCOUNT_ID = "account";
 	process.env.CF_EMAIL_WORKER_NAME = "relay";
@@ -207,6 +211,61 @@ test("environment credentials remain usable before setup and saved credentials t
 		apiToken: "environment-token",
 		accountId: "account",
 		workerName: null,
+	});
+});
+test("a deployment token rotation applies to DNS and sending while the saved account and Worker remain bound", async () => {
+	await saveInstallation({
+		accountId: "account",
+		zoneId: "zone",
+		hostname: "example.com",
+		workerName: "saved-relay",
+		publicOrigin: "https://fixture.example",
+		apiToken: "old-token",
+		relaySecret: "synthetic-secret",
+		relayVersion: "test",
+	});
+	await setInstallationPhase("ready");
+	process.env.CF_TOKEN = " rotated-token ";
+	process.env.CF_ACCOUNT_ID = "another-account";
+	expect(await cloudflareAccess()).toEqual({
+		apiToken: "rotated-token",
+		accountId: "account",
+		workerName: "saved-relay",
+	});
+	expect(await outboundConfig("hello@example.com")).toEqual({
+		provider: "cloudflare",
+		apiToken: "rotated-token",
+		accountId: "account",
+	});
+	const config = await outboundConfig("hello@example.com");
+	await sendThroughProvider(
+		config,
+		{
+			from: "hello@example.com",
+			to: ["recipient@example.net"],
+			subject: "Rotation fixture",
+			text: "Synthetic only",
+		},
+		async (input, init) => {
+			expect(String(input)).toBe(
+				"https://api.cloudflare.com/client/v4/accounts/account/email/sending/send",
+			);
+			expect(new Headers(init?.headers).get("Authorization")).toBe(
+				"Bearer rotated-token",
+			);
+			return success({ message_id: "rotation-fixture" });
+		},
+	);
+	delete process.env.CF_TOKEN;
+	expect((await cloudflareAccess())?.apiToken).toBe("old-token");
+});
+test("an imported ready Cloudflare sender can use its deployment credentials before installing a native relay", async () => {
+	process.env.CF_TOKEN = " environment-token ";
+	process.env.CF_ACCOUNT_ID = "account";
+	expect(await outboundConfig("hello@example.com")).toEqual({
+		provider: "cloudflare",
+		apiToken: "environment-token",
+		accountId: "account",
 	});
 });
 test("zone lookup walks subdomains, filters the configured account and normalizes hostnames", async () => {

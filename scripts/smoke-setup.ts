@@ -255,6 +255,26 @@ try {
 		);
 	await mailboxAgain.body?.cancel();
 
+	env.CF_TOKEN = "rotated-cloudflare-token";
+	provider.cf.access.apiToken = env.CF_TOKEN;
+	await stop();
+	await start();
+	const rotatedDomainCheck = await fetch(base + "/api/domains/check", {
+		method: "POST",
+		headers: {
+			Origin: provider.publicOrigin,
+			Cookie: "ep_session=" + session.data.token,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ hostname: "example.com" }),
+	});
+	if (!rotatedDomainCheck.ok)
+		throw new Error(
+			"Redeployed Cloudflare token did not replace the saved token: " +
+				(await rotatedDomainCheck.text()),
+		);
+	await rotatedDomainCheck.body?.cancel();
+
 	console.log(
 		JSON.stringify(
 			{
@@ -269,6 +289,7 @@ try {
 				receiveOnly: "passed",
 				restartAndLogin: "passed",
 				authenticatedOnboarding: "passed",
+				deploymentTokenRotation: "passed",
 				workerUploads: provider.uploads,
 				externalRequests: 0,
 			},
