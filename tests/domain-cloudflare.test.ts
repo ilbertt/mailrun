@@ -17,6 +17,7 @@ import {
 	type CloudflareFetch,
 } from "../src/server/cloudflare/client";
 import { provisionCloudflareDomain } from "../src/server/domains/provision";
+import { canonicalTxt } from "../src/server/domains/dns-records";
 import {
 	saveInstallation,
 	setInstallationPhase,
@@ -347,6 +348,70 @@ test("DNS views support current record arrays and the source legacy missing-reco
 		records: [required[0]],
 		missing: [required[1]],
 	});
+});
+test("routing DNS joins quoted DKIM chunks while detecting real TXT and MX differences", async () => {
+	const key = "AbCdEf0123+/".repeat(35),
+		content = `v=DKIM1; k=rsa; p=${key}`,
+		required: DnsRecord[] = [
+			{
+				type: "TXT",
+				name: "cf2024-1._domainkey.example.com",
+				content: `"${content}"`,
+			},
+			{
+				type: "TXT",
+				name: "example.com",
+				content: '"v=spf1 include:_spf.mx.cloudflare.net ~all"',
+			},
+			{
+				type: "MX",
+				name: "example.com",
+				content: "route1.mx.cloudflare.net.",
+				priority: 10,
+			},
+		];
+	let actualKey = `"${content.slice(0, 255)}" "${content.slice(255)}"`,
+		priority = 10;
+	const client = new DomainCloudflare(access, async (input) => {
+		const url = new URL(String(input));
+		if (url.pathname.endsWith("/email/routing/dns")) return success(required);
+		if (url.pathname === "/client/v4/zones/zone")
+			return success({ id: "zone", name: "example.com" });
+		const name = url.searchParams.get("name");
+		return success(
+			name?.startsWith("cf2024-1.")
+				? [{ ...required[0], content: actualKey }]
+				: url.searchParams.get("type") === "MX"
+					? [{ ...required[2], content: "ROUTE1.MX.CLOUDFLARE.NET", priority }]
+					: [
+							{
+								...required[1],
+								content: "v=spf1 include:_spf.mx.cloudflare.net ~all",
+							},
+						],
+		);
+	});
+	expect((await client.routingDns("zone")).missing).toEqual([]);
+	actualKey = `"${content.toLowerCase()}"`;
+	expect((await client.routingDns("zone")).missing).toEqual([required[0]!]);
+	actualKey = `"${content}."`;
+	priority = 20;
+	expect((await client.routingDns("zone")).missing).toEqual([
+		required[0]!,
+		required[2]!,
+	]);
+});
+test("TXT presentation normalization preserves escaped bytes, spaces and malformed input", () => {
+	expect(canonicalTxt('"v=DKIM1; p=AbC" "dEf"')).toBe(
+		canonicalTxt("v=DKIM1; p=AbCdEf"),
+	);
+	expect(canonicalTxt('"caf\\195\\169"')).toBe(canonicalTxt("café"));
+	expect(canonicalTxt('"a\\\"b\\\\c"')).toBe(canonicalTxt('a"b\\c'));
+	expect(canonicalTxt('"a " " b"')).toBe(canonicalTxt("a  b"));
+	expect(canonicalTxt('"AbC"')).not.toBe(canonicalTxt('"abc"'));
+	expect(canonicalTxt('"AbC."')).not.toBe(canonicalTxt('"AbC"'));
+	expect(canonicalTxt('"unclosed')).not.toBe(canonicalTxt("unclosed"));
+	expect(canonicalTxt('"\\999"')).not.toBe(canonicalTxt("999"));
 });
 test("sending reuses exact or wildcard identities without duplicating provider configuration", async () => {
 	const wildcard = { tag: "wild", name: "*.example.com", enabled: true },

@@ -1,5 +1,6 @@
 import { cloudflareCredentials } from "../cloudflare/credentials";
 import { z } from "zod";
+import { canonicalTxt } from "./dns-records";
 import { getInstallation } from "../cloudflare/installation";
 import { cloudflare, type CloudflareFetch } from "../cloudflare/client";
 export const dnsRecordSchema = z.object({
@@ -407,8 +408,11 @@ export class DomainCloudflare {
 						.get(JSON.stringify([record.type, record.name]))
 						?.some(
 							(candidate) =>
-								canonicalDns(candidate.content ?? "") ===
-									canonicalDns(record.content ?? "") &&
+								(record.type?.toUpperCase() === "TXT"
+									? canonicalTxt(candidate.content ?? "") ===
+										canonicalTxt(record.content ?? "")
+									: canonicalDns(candidate.content ?? "") ===
+										canonicalDns(record.content ?? "")) &&
 								(record.priority === undefined ||
 									candidate.priority === record.priority),
 						),
