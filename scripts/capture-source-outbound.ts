@@ -1,17 +1,20 @@
 // Generate synthetic migration evidence using the unmodified Mailflare baseline.
-// node scripts/capture-source-outbound.mjs /path/to/mailflare-71aa49b /tmp/capture.json
+// bun scripts/capture-source-outbound.ts /path/to/mailflare-71aa49b /tmp/capture.json
 // Requires that reference checkout's installed Node dependencies; never sends mail.
 import { mkdtemp, writeFile, readFile, rm, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { z } from "zod";
+import { capturedMailSchema } from "../tests/source-outbound-fixture";
 
 if (!process.argv[2] || !process.argv[3])
 	throw new Error("Expected reference checkout and output JSON path");
 const source = resolve(process.argv[2]);
 const destination = resolve(process.argv[3]);
-const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const digest = (bytes: Uint8Array) =>
+	createHash("sha256").update(bytes).digest("hex");
 const provenance = {
 	source: "71aa49b",
 	version: "0.5.2",
@@ -32,7 +35,32 @@ if (
 		"Reference sender/exporter differs from the pinned Mailflare baseline",
 	);
 const require = createRequire(join(source, "package.json"));
-const { build } = require("esbuild");
+type ReferenceBuildOptions = {
+	entryPoints: string[];
+	outfile: string;
+	bundle: true;
+	platform: "node";
+	format: "esm";
+	target: "node22";
+	tsconfig: string;
+	external: string[];
+	alias: Record<string, string>;
+	banner: { js: string };
+	define: Record<string, string>;
+	logLevel: "warning";
+};
+const { build } = z
+	.object({
+		build: z.custom<(options: ReferenceBuildOptions) => Promise<unknown>>(
+			(value) => typeof value === "function",
+		),
+	})
+	.parse(require("esbuild"));
+const node = Bun.which("node");
+if (!node)
+	throw new Error(
+		"The original better-sqlite3 runtime needs Node for reference capture",
+	);
 const directory = await mkdtemp(join(source, ".mailrun-outbound-capture-"));
 try {
 	const helper = `
@@ -107,20 +135,41 @@ db.db.close();
 		define: { "process.env.MAILFLARE_RUNTIME": '"node"' },
 		logLevel: "warning",
 	});
-	execFileSync(process.execPath, [bundle, directory, source], {
+	execFileSync(node, [bundle, directory, source], {
 		stdio: "inherit",
 		timeout: 30000,
 	});
-	const backup = JSON.parse(
+	const backup: unknown = JSON.parse(
 		await readFile(join(directory, "backup.json"), "utf8"),
 	);
-	const results = JSON.parse(
-		await readFile(join(directory, "result.json"), "utf8"),
-	);
-	const expected = JSON.parse(
-		await readFile(join(directory, "expected.json"), "utf8"),
-	);
-	const objects = [];
+	const results = z
+		.object({
+			queue: z.array(
+				z.object({
+					kind: z.literal("email.scheduled"),
+					jobId: z.string(),
+					messageId: z.string(),
+					scheduledAt: z.string(),
+				}),
+			),
+		})
+		.parse(JSON.parse(await readFile(join(directory, "result.json"), "utf8")));
+	const expected = z
+		.object({
+			deliveries: z.array(capturedMailSchema),
+			audits: z.array(
+				z.record(z.string(), z.union([z.string(), z.number(), z.null()])),
+			),
+		})
+		.parse(
+			JSON.parse(await readFile(join(directory, "expected.json"), "utf8")),
+		);
+	const objects: {
+		key: string;
+		base64: string;
+		sha256: string;
+		metadata: unknown;
+	}[] = [];
 	const bucket = join(directory, "blobs");
 	for (const name of await readdir(bucket, { recursive: true })) {
 		if (name.endsWith(".meta.json")) continue;
