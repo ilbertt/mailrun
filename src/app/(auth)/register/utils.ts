@@ -52,7 +52,20 @@ async function post<T extends z.ZodType>(
 			},
 			body: body === undefined ? undefined : JSON.stringify(body),
 		});
-		return { ok: response.ok, data: schema.parse(await response.json()) };
+		const payload: unknown = await response.json().catch(() => null);
+		const parsed = schema.safeParse(payload);
+		if (parsed.success) return { ok: response.ok, data: parsed.data };
+		const failure = z.object({ error: z.string().min(1) }).safeParse(payload);
+		return {
+			ok: false,
+			data: schema.parse({
+				error: failure.success
+					? failure.data.error
+					: response.ok
+						? "Setup returned an unexpected response. Please try again."
+						: `Setup request failed (HTTP ${response.status}). Please try again.`,
+			}),
+		};
 	} catch {
 		return {
 			ok: false,

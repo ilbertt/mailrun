@@ -235,23 +235,51 @@ export async function refreshRelay(
 		request,
 	);
 
-	const health = await request(
+	await waitForRelayHealth(
 		`https://${worker}.${accountSubdomain.subdomain}.workers.dev/health`,
-		{
-			headers: { Authorization: `Bearer ${secret}` },
-			signal: AbortSignal.timeout(30_000),
-		},
+		secret,
+		request,
 	);
-	if (!health.ok)
-		throw new RelayDeploymentError(
-			"Relay deployed, but could not reach Mailrun. Check APP_URL and retry.",
-		);
 
 	await withDatabase(
 		(sql) =>
 			sql.UpdateRelayVersion`UPDATE mailrun_installation SET relay_version=${relayVersion},public_origin=${origin},updated_at=${seconds()} WHERE id='primary'`,
 	);
 	return installationStatus();
+}
+
+export async function waitForRelayHealth(
+	url: string,
+	secret: string,
+	request: CloudflareFetch = fetch,
+) {
+	const deadline = Date.now() + 30_000;
+	let status: number | null = null;
+	for (let attempt = 0; attempt < 6 && Date.now() < deadline; attempt++) {
+		if (attempt)
+			await Bun.sleep(
+				Math.min(100 * 2 ** (attempt - 1), deadline - Date.now()),
+			);
+		const remaining = deadline - Date.now();
+		if (remaining <= 0) break;
+		try {
+			const response = await request(url, {
+				headers: { Authorization: `Bearer ${secret}` },
+				signal: AbortSignal.timeout(Math.min(5_000, remaining)),
+			});
+			status = response.status;
+			if (response.ok) {
+				const body: unknown = await response.json().catch(() => null);
+				if (z.object({ ok: z.literal(true) }).safeParse(body).success) return;
+			} else await response.body?.cancel();
+			if (status === 401 || status === 403) break;
+		} catch {
+			status = null;
+		}
+	}
+	throw new RelayDeploymentError(
+		`Relay deployed, but could not reach Mailrun${status == null ? "" : ` (HTTP ${status})`}. Check APP_URL and retry.`,
+	);
 }
 
 async function ensureWorkersSubdomain(

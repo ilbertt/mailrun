@@ -128,7 +128,7 @@ test("setup deploys the relay before routing and retry reuses its name and secre
 		else process.env.APP_URL = oldOrigin;
 		await state.close();
 	}
-});
+}, 15_000);
 
 test("setup creates a missing workers.dev subdomain and migrates existing Mailflare addresses only after health checks", async () => {
 	const { cloudflareFixture } = await import("./cloudflare-fixture");

@@ -115,8 +115,19 @@ async function dispatchSetupApi(
 		if (
 			error instanceof CloudflareApiError ||
 			error instanceof RelayDeploymentError
-		)
+		) {
+			console.warn(
+				"Email setup provider check failed",
+				error instanceof CloudflareApiError
+					? {
+							kind: "cloudflare",
+							status: error.status,
+							codes: error.errors.map((row) => row.code),
+						}
+					: { kind: "relay", message: error.message },
+			);
 			return Response.json({ error: error.message }, { status: 502 });
+		}
 		return apiErrorResponse(error);
 	}
 }
