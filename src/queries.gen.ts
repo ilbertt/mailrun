@@ -4442,6 +4442,42 @@ export interface INativeMcpApprovalKeyResult {
     mailbox_id: IAgentSendApprovalsColumns["mailbox_id"];
 }
 
+/** Result of query `NativeSourceUploadOwner`. */
+export interface INativeSourceUploadOwnerResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeSourceUploadMetadata`. */
+export interface INativeSourceUploadMetadataResult {
+}
+
+/** Result of query `NativeSourceDriveUploads`. */
+export interface INativeSourceDriveUploadsResult {
+    id: IDriveItemsColumns["id"];
+    upload_id: IDriveItemsColumns["upload_id"];
+    upload_part_size: IDriveItemsColumns["upload_part_size"];
+    size: IDriveItemsColumns["size"];
+}
+
+/** Result of query `NativeSourceDriveParts`. */
+export interface INativeSourceDrivePartsResult {
+    part_number: IDriveUploadPartsColumns["part_number"];
+    etag: IDriveUploadPartsColumns["etag"];
+}
+
+/** Result of query `NativeSourceDrivePartHash`. */
+export interface INativeSourceDrivePartHashResult {
+}
+
+/** Result of query `NativeSourceDriveUploadId`. */
+export interface INativeSourceDriveUploadIdResult {
+}
+
+/** Result of query `NativeSourceObjectReferences`. */
+export interface INativeSourceObjectReferencesResult {
+    object_key: string | null;
+}
+
 /** Result of query `NativePushRecipients`. */
 export interface INativePushRecipientsResult {
     id: string | null;
@@ -5388,6 +5424,13 @@ export interface Queries {
     NativeMcpCancelScheduledJob: INativeMcpCancelScheduledJobResult;
     NativeMcpCancelScheduledMessage: INativeMcpCancelScheduledMessageResult;
     NativeMcpApprovalKey: INativeMcpApprovalKeyResult;
+    NativeSourceUploadOwner: INativeSourceUploadOwnerResult;
+    NativeSourceUploadMetadata: INativeSourceUploadMetadataResult;
+    NativeSourceDriveUploads: INativeSourceDriveUploadsResult;
+    NativeSourceDriveParts: INativeSourceDrivePartsResult;
+    NativeSourceDrivePartHash: INativeSourceDrivePartHashResult;
+    NativeSourceDriveUploadId: INativeSourceDriveUploadIdResult;
+    NativeSourceObjectReferences: INativeSourceObjectReferencesResult;
     NativePushRecipients: INativePushRecipientsResult;
     NativeDeleteExpiredPush: INativeDeleteExpiredPushResult;
     NativeRealtimeRevision: INativeRealtimeRevisionResult;

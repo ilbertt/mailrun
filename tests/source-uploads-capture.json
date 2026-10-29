@@ -1,0 +1,355 @@
+{
+  "provenance": {
+    "source": "71aa49b",
+    "version": "0.5.2",
+    "blobsModuleSha256": "e5edc4f987aa990e0219a6d79488b772a32be461ef7574a271631192b33d2269",
+    "bucketModuleSha256": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2",
+    "backupModuleSha256": "aff55286a3c6c8b77750751cb9f4ea9c3b1b3649a6235f03d2d6154d3bf136d8"
+  },
+  "backup": {
+    "format": "mailflare-database-backup",
+    "version": 1,
+    "createdAt": "2026-10-29T16:01:04.886Z",
+    "includedTables": [
+      "users",
+      "domains",
+      "mailboxes",
+      "mailbox_access",
+      "contacts",
+      "folders",
+      "api_keys",
+      "messages",
+      "message_attachments",
+      "shared_attachment_links",
+      "outbound_jobs",
+      "routing_rules",
+      "webhooks",
+      "webhook_deliveries",
+      "sessions",
+      "push_subscriptions",
+      "audit_logs",
+      "backup_settings",
+      "backups",
+      "app_settings",
+      "license_settings",
+      "email_templates",
+      "calendar_events",
+      "booking_events",
+      "auto_reply_deliveries",
+      "spam_token_stats",
+      "spam_reputation",
+      "spam_feedback",
+      "mailbox_aliases",
+      "password_reset_tokens",
+      "mfa_recovery_codes",
+      "login_challenges",
+      "mailbox_agent_settings",
+      "agent_conversations",
+      "agent_chat_messages",
+      "agent_jobs",
+      "agent_draft_metadata",
+      "agent_send_approvals",
+      "mcp_key_mailboxes",
+      "ai_usage",
+      "drive_items",
+      "drive_shares",
+      "drive_upload_parts"
+    ],
+    "tables": {
+      "users": [
+        {
+          "id": "owner",
+          "email": "owner@example.com",
+          "password_hash": "$2b$04$xo7KOgYtCoyFBu1TVvy2b.edoOf5SV7FY00Kos/2GL9SyPTbLtJaa",
+          "name": "Owner",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "admin",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 1,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": null
+        },
+        {
+          "id": "stranger",
+          "email": "stranger@example.com",
+          "password_hash": "$2b$04$xo7KOgYtCoyFBu1TVvy2b.edoOf5SV7FY00Kos/2GL9SyPTbLtJaa",
+          "name": "Stranger",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "user",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 0,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": null
+        }
+      ],
+      "domains": [
+        {
+          "id": "domain",
+          "user_id": "owner",
+          "hostname": "example.com",
+          "zone_id": "zone",
+          "status": "active",
+          "routing_status": null,
+          "sending_subdomain_tag": null,
+          "sending_enabled": 0,
+          "routing_enabled": 0,
+          "created_at": 1,
+          "sending_requested": 0,
+          "sending_provider": "none",
+          "receiving_provider": "cloudflare"
+        }
+      ],
+      "mailboxes": [
+        {
+          "id": "mailbox",
+          "user_id": "owner",
+          "domain_id": "domain",
+          "local_part": "hello",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        },
+        {
+          "id": "stranger-mailbox",
+          "user_id": "stranger",
+          "domain_id": "domain",
+          "local_part": "private",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        }
+      ],
+      "mailbox_access": [],
+      "contacts": [],
+      "folders": [],
+      "api_keys": [],
+      "messages": [],
+      "message_attachments": [],
+      "shared_attachment_links": [],
+      "outbound_jobs": [],
+      "routing_rules": [],
+      "webhooks": [],
+      "webhook_deliveries": [],
+      "sessions": [],
+      "push_subscriptions": [],
+      "audit_logs": [],
+      "backup_settings": [
+        {
+          "id": "default",
+          "enabled": 0,
+          "schedule_type": "daily",
+          "schedule_value": null,
+          "retention_enabled": 0,
+          "retention_days": 30,
+          "updated_at": 1793289664,
+          "excluded_table_groups": "[]"
+        }
+      ],
+      "backups": [],
+      "app_settings": [
+        {
+          "id": "default",
+          "app_name": "Mailflare",
+          "icon_key": null,
+          "updated_at": 1793289664,
+          "agent_provider": null,
+          "agent_preset": null,
+          "agent_base_url": null,
+          "agent_api_key": null,
+          "agent_model": null,
+          "agent_enabled": 1,
+          "agent_model_rates": null,
+          "outbound_attachment_max_mb": 25,
+          "resend_api_key": null,
+          "aws_config": null,
+          "ses_receiving": null,
+          "resend_webhook_id": null,
+          "resend_webhook_secret": null,
+          "drive_storage_limit_bytes": null
+        }
+      ],
+      "license_settings": [],
+      "email_templates": [],
+      "calendar_events": [],
+      "booking_events": [],
+      "auto_reply_deliveries": [],
+      "spam_token_stats": [],
+      "spam_reputation": [],
+      "spam_feedback": [],
+      "mailbox_aliases": [],
+      "password_reset_tokens": [],
+      "mfa_recovery_codes": [],
+      "login_challenges": [],
+      "mailbox_agent_settings": [],
+      "agent_conversations": [],
+      "agent_chat_messages": [],
+      "agent_jobs": [],
+      "agent_draft_metadata": [],
+      "agent_send_approvals": [],
+      "mcp_key_mailboxes": [],
+      "ai_usage": [],
+      "drive_items": [
+        {
+          "id": "pending",
+          "owner_id": "owner",
+          "parent_id": null,
+          "kind": "file",
+          "name": "pending.txt",
+          "r2_key": "drive/owner/pending",
+          "size": 3,
+          "content_type": "text/plain",
+          "link_token": null,
+          "trashed_at": null,
+          "created_at": 1793289664,
+          "updated_at": 1793289664,
+          "upload_id": "dae80860-a05e-4f24-af5a-d12e67b023a4",
+          "upload_part_size": 67108864,
+          "upload_fingerprint": "source-fingerprint"
+        }
+      ],
+      "drive_shares": [],
+      "drive_upload_parts": [
+        {
+          "item_id": "pending",
+          "part_number": 1,
+          "etag": "1-3"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "uploads": [
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_xUmNAH-dZpnMtXTu561en",
+        "userId": "owner",
+        "type": "message/rfc822",
+        "size": 213,
+        "name": "Original café.eml",
+        "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+      },
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_fhDXTTfiJX6s2qccDVU5n",
+        "userId": "owner",
+        "type": "text/plain",
+        "size": 25,
+        "name": "loose.txt",
+        "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+      },
+      {
+        "accountId": "stranger",
+        "blobId": "up~upl_ME0kyiHsgniryae-IISES",
+        "userId": "stranger",
+        "type": "application/octet-stream",
+        "size": 21,
+        "name": null,
+        "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+      }
+    ],
+    "mime": "From: hello@example.com\r\nTo: recipient@example.org\r\nSubject: Captured source upload\r\nMessage-ID: <captured-upload@example.com>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nOriginal upload café\r\n",
+    "drive": {
+      "id": "pending",
+      "uploadId": "dae80860-a05e-4f24-af5a-d12e67b023a4",
+      "part": {
+        "partNumber": 1,
+        "etag": "1-3"
+      }
+    },
+    "externalRequests": 0
+  },
+  "files": [
+    {
+      "key": ".multipart/dae80860-a05e-4f24-af5a-d12e67b023a4/meta.json",
+      "base64": "eyJjb250ZW50VHlwZSI6InRleHQvcGxhaW4ifQ==",
+      "sha256": "6580bcf1a2ff78e9228fe8f3431bbec6c8c5b2afa2847734bd4dcbc309e309cc"
+    },
+    {
+      "key": ".multipart/dae80860-a05e-4f24-af5a-d12e67b023a4/part-1",
+      "base64": "YWJj",
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "key": "avatars/source-preview.png",
+      "base64": "T3JpZ2luYWwgcHJldmlldyBieXRlcw==",
+      "sha256": "004046c490d458f88d6390d6b6f2ba92a40d21836eb8a04081149b16c05f0e2c"
+    },
+    {
+      "key": "avatars/source-preview.png.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6MjIsInVwbG9hZGVkIjoiMjAyNi0xMC0yOVQxNjowMTowNC44ODRaIiwiZXRhZyI6IjFhMTg4NjRiOTc0LTE2In0=",
+      "sha256": "21985801a5044c7eb07af10697ecf8e4b5f2ac16f8c8fec49e56a4c90d2a43a5"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_fhDXTTfiJX6s2qccDVU5n",
+      "base64": "T3JpZ2luYWwgbG9vc2UgYXR0YWNobWVudA==",
+      "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_fhDXTTfiJX6s2qccDVU5n.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sImN1c3RvbU1ldGFkYXRhIjp7InVzZXJJZCI6Im93bmVyIiwibmFtZSI6Imxvb3NlLnR4dCJ9LCJzaXplIjoyNSwidXBsb2FkZWQiOiIyMDI2LTEwLTI5VDE2OjAxOjA0Ljg4MVoiLCJldGFnIjoiMWExODg2NGI5NzEtMTkifQ==",
+      "sha256": "43e6613d71876e1e63391e562fd0204ca2b24704dac3ab1c9e7a890590225b73"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_xUmNAH-dZpnMtXTu561en",
+      "base64": "RnJvbTogaGVsbG9AZXhhbXBsZS5jb20NClRvOiByZWNpcGllbnRAZXhhbXBsZS5vcmcNClN1YmplY3Q6IENhcHR1cmVkIHNvdXJjZSB1cGxvYWQNCk1lc3NhZ2UtSUQ6IDxjYXB0dXJlZC11cGxvYWRAZXhhbXBsZS5jb20+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNCk9yaWdpbmFsIHVwbG9hZCBjYWbDqQ0K",
+      "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_xUmNAH-dZpnMtXTu561en.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJjdXN0b21NZXRhZGF0YSI6eyJ1c2VySWQiOiJvd25lciIsIm5hbWUiOiJPcmlnaW5hbCBjYWbDqS5lbWwifSwic2l6ZSI6MjEzLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMjlUMTY6MDE6MDQuODgwWiIsImV0YWciOiIxYTE4ODY0Yjk3MC1kNSJ9",
+      "sha256": "d5abb6c126d7f624df9fa6f36c38932da8292eb9d1dc947fba03cee135a841c8"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_ME0kyiHsgniryae-IISES",
+      "base64": "UHJpdmF0ZSBzb3VyY2UgdXBsb2Fk",
+      "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_ME0kyiHsgniryae-IISES.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0ifSwiY3VzdG9tTWV0YWRhdGEiOnsidXNlcklkIjoic3RyYW5nZXIifSwic2l6ZSI6MjEsInVwbG9hZGVkIjoiMjAyNi0xMC0yOVQxNjowMTowNC44ODJaIiwiZXRhZyI6IjFhMTg4NjRiOTcyLTE1In0=",
+      "sha256": "7a6f32e23b4d545121d28b1343c7b9ffcc8320c44934f6ab0c5e4941b943aae8"
+    }
+  ]
+}
