@@ -59,6 +59,7 @@ import {
 	messageRecord,
 	snooze,
 	toggleStar,
+	markRead,
 	messageStatusSchema,
 	updateMessageStatus,
 } from "../mail/message-actions";
@@ -351,17 +352,19 @@ export async function dispatchMailApi(
 			return json({ success: true });
 		}
 		if (action === "snooze" && method === "POST") {
-			const data = z
-				.object({ snoozedUntil: z.iso.datetime() })
-				.parse(await request.json());
-			return json(await snooze(user, messageId, data.snoozedUntil));
+			const data: unknown = await request.json();
+			const until =
+				data && typeof data === "object" && "snoozedUntil" in data
+					? data.snoozedUntil
+					: undefined;
+			if (typeof until !== "string")
+				return json({ error: "Choose a future snooze time" }, 400);
+			return json(await snooze(user, messageId, until));
 		}
 		if (action === "snooze" && method === "DELETE")
 			return json(await snooze(user, messageId, null));
 		if (action === "read" && method === "POST")
-			return json(
-				await bulkAction(user, { messageIds: [messageId], action: "read" }),
-			);
+			return json(await markRead(user, messageId));
 	}
 	return json({ error: "Not found" }, 404);
 }

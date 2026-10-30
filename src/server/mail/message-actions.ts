@@ -42,9 +42,30 @@ export async function audit(
 	mailboxId: string | null,
 	messageId: string | null,
 	action: string,
-	metadata: Record<string, unknown>,
+	metadata: Record<string, unknown> | null = null,
 ) {
-	await sql.MailAudit`INSERT INTO audit_logs (id,actor_user_id,mailbox_id,message_id,action,metadata,created_at) VALUES (${id("audit")},${user.id},${mailboxId},${messageId},${action},${JSON.stringify(metadata)},${seconds()})`;
+	await sql.MailAudit`INSERT INTO audit_logs (id,actor_user_id,mailbox_id,message_id,action,metadata,created_at) VALUES (${id("audit")},${user.id},${mailboxId},${messageId},${action},${metadata === null ? null : JSON.stringify(metadata)},${seconds()})`;
+}
+async function actionMessage(
+	sql: AppSQL,
+	user: User,
+	messageId: string,
+	level: "read" | "manage",
+) {
+	const [message] =
+		await sql.NativeActionMessage`SELECT m.id,m.mailbox_id,m.status,m.direction FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id WHERE m.id=${messageId} AND b.disabled=0 AND (m.status!='draft' OR m.user_id=${user.id}) AND (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings WHERE id='default' AND plan='team' AND state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission IN('read_only','send_on_behalf','send_as','full_access') AND (${level}='read' OR a.permission='full_access')))) LIMIT 1`;
+	if (!message) throw new Response("Message not found", { status: 404 });
+	return message;
+}
+export async function markRead(user: User, messageId: string) {
+	await withDatabase((sql) =>
+		sql.begin(async (sql) => {
+			const message = await actionMessage(sql, user, messageId, "read");
+			await sql.NativeMarkMessageRead`UPDATE messages SET read=1 WHERE id=${messageId}`;
+			await audit(sql, user, message.mailbox_id, messageId, "email.read");
+		}),
+	);
+	return { success: true };
 }
 export const messageStatusSchema = z.enum([
 	"received",
@@ -211,29 +232,31 @@ export async function snooze(
 	messageId: string,
 	until: string | null,
 ) {
-	const message = await messageRecord(user, messageId, "manage");
-	const when = until ? z.iso.datetime().parse(until) : null;
-	if (when && Date.parse(when) <= Date.now())
+	const when = until === null ? null : new Date(until);
+	if (when && (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()))
 		throw new Response("Choose a future snooze time", { status: 400 });
-	if (when && message.status !== "received")
-		throw new Response("Message not found", { status: 404 });
-	if (message.direction !== "inbound")
-		throw new Response("Only incoming messages can be snoozed", {
-			status: 400,
-		});
-	await withDatabase(
-		(sql) =>
-			sql.SourceSnooze`UPDATE messages SET snoozed_until=${when ? Math.floor(Date.parse(when) / 1000) : null} WHERE id=${messageId}`,
+	await withDatabase((sql) =>
+		sql.begin(async (sql) => {
+			const message = await actionMessage(sql, user, messageId, "manage");
+			if (
+				message.direction !== "inbound" ||
+				(when && message.status !== "received")
+			)
+				throw new Response("Message not found", { status: 404 });
+			await sql.SourceSnooze`UPDATE messages SET snoozed_until=${when ? Math.floor(when.getTime() / 1000) : null} WHERE id=${messageId}`;
+		}),
 	);
 	return { ok: true };
 }
 export async function toggleStar(user: User, messageId: string) {
-	await messageRecord(user, messageId, "manage");
-	const [row] = await withDatabase(
-		(sql) =>
-			sql.SourceToggleStar`UPDATE messages SET starred=CASE WHEN starred=1 THEN 0 ELSE 1 END WHERE id=${messageId} RETURNING starred`,
+	return withDatabase((sql) =>
+		sql.begin(async (sql) => {
+			await actionMessage(sql, user, messageId, "read");
+			const [row] =
+				await sql.SourceToggleStar`UPDATE messages SET starred=CASE WHEN starred=1 THEN 0 ELSE 1 END WHERE id=${messageId} RETURNING starred`;
+			return { starred: !!row?.starred };
+		}),
 	);
-	return { starred: !!row?.starred };
 }
 
 export async function permanentlyDeleteMessages(

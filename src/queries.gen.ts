@@ -3888,6 +3888,18 @@ export interface ISourceMessageRecordResult {
 export interface IMailAuditResult {
 }
 
+/** Result of query `NativeActionMessage`. */
+export interface INativeActionMessageResult {
+    id: string | null;
+    mailbox_id: string | null;
+    status: IMessagesColumns["status"];
+    direction: IMessagesColumns["direction"];
+}
+
+/** Result of query `NativeMarkMessageRead`. */
+export interface INativeMarkMessageReadResult {
+}
+
 /** Result of query `NativeStatusMessage`. */
 export interface INativeStatusMessageResult {
     id: string | null;
@@ -5381,6 +5393,8 @@ export interface Queries {
     DeleteRoutingRule: IDeleteRoutingRuleResult;
     SourceMessageRecord: ISourceMessageRecordResult;
     MailAudit: IMailAuditResult;
+    NativeActionMessage: INativeActionMessageResult;
+    NativeMarkMessageRead: INativeMarkMessageReadResult;
     NativeStatusMessage: INativeStatusMessageResult;
     NativeStatusSendingGuard: INativeStatusSendingGuardResult;
     NativeUpdateMessageStatus: INativeUpdateMessageStatusResult;

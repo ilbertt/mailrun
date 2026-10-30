@@ -123,7 +123,7 @@ test("list and thread APIs never expose private shared drafts or inaccessible ma
 		queryMessages(stranger, { mailboxId: "missing" }),
 	).rejects.toMatchObject({ status: 404 });
 });
-test("read-only shares may mark mail read but cannot move, star or snooze", async () => {
+test("read-only shares may mark mail read and star but cannot move or snooze", async () => {
 	enableTeamSharing(state.db);
 	state.db.exec(
 		"INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_at) VALUES ('share','mailbox','stranger','read_only',1)",
@@ -135,10 +135,10 @@ test("read-only shares may mark mail read but cannot move, star or snooze", asyn
 	await expect(
 		bulkAction(stranger, { messageIds: ["message"], action: "trash" }),
 	).rejects.toMatchObject({ status: 404 });
-	await expect(toggleStar(stranger, "message")).rejects.toThrow("permission");
+	expect(await toggleStar(stranger, "message")).toEqual({ starred: true });
 	await expect(
 		snooze(stranger, "message", new Date(Date.now() + 60000).toISOString()),
-	).rejects.toThrow("permission");
+	).rejects.toMatchObject({ status: 404 });
 });
 test("permanent deletion skips live mail and removes trashed MIME, files, links and search entries", async () => {
 	const storage = new LocalStorage();

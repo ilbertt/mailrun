@@ -125,6 +125,58 @@ try {
 			throw new Error("Compiled message-status mutation differs: " + status);
 	}
 	state.db.exec(
+		"UPDATE messages SET status='received',read=0,starred=0 WHERE id='status-http'",
+	);
+	for (const action of ["read", "star", "snooze", "unsnooze"]) {
+		const until = "2099-01-01T12:00:00+02:00";
+		const response = await fetch(
+			base +
+				`/api/messages/status-http/${action === "unsnooze" ? "snooze" : action}`,
+			{
+				method: action === "unsnooze" ? "DELETE" : "POST",
+				headers: {
+					Cookie: "ep_session=" + token,
+					Origin: publicBase,
+					"Content-Type": "application/json",
+				},
+				body:
+					action === "snooze"
+						? JSON.stringify({ snoozedUntil: until })
+						: "not JSON",
+			},
+		);
+		const result: unknown = await response.json();
+		const expected =
+			action === "read"
+				? { success: true }
+				: action === "star"
+					? { starred: true }
+					: { ok: true };
+		if (!response.ok || JSON.stringify(result) !== JSON.stringify(expected))
+			throw new Error("Compiled message action differs: " + action);
+		if (
+			action === "read" &&
+			(
+				state.db
+					.query(
+						"SELECT metadata FROM audit_logs WHERE message_id='status-http' AND action='email.read'",
+					)
+					.get() as { metadata: string | null } | null
+			)?.metadata !== null
+		)
+			throw new Error("Single-message read audit metadata differs");
+		if (
+			action === "snooze" &&
+			(
+				state.db
+					.query("SELECT snoozed_until FROM messages WHERE id='status-http'")
+					.get() as { snoozed_until: number } | null
+			)?.snoozed_until !==
+				Date.parse(until) / 1000
+		)
+			throw new Error("Offset snooze time differs");
+	}
+	state.db.exec(
 		"DELETE FROM audit_logs WHERE message_id='status-http'; DELETE FROM messages WHERE id='status-http'",
 	);
 	// These responses were captured from the real original server, independently
