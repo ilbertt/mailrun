@@ -38,6 +38,7 @@ export async function upsertContact(
 export async function messageContacts<T extends Message>(
 	userId: string,
 	messages: T[],
+	includeAvatar = true,
 ): Promise<T[]> {
 	const emails = [
 		...new Set(
@@ -62,9 +63,9 @@ export async function messageContacts<T extends Message>(
 			);
 		return {
 			...message,
-			fromContactName: from?.display_name ?? null,
-			toContactName: to?.display_name ?? null,
-			fromContactHasAvatar: !!from?.avatar_key,
+			fromContactName: from?.display_name || null,
+			toContactName: to?.display_name || null,
+			...(includeAvatar ? { fromContactHasAvatar: !!from?.avatar_key } : {}),
 		};
 	});
 }

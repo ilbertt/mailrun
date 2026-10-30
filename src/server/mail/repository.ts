@@ -10,6 +10,13 @@ import {
 	messageActionSchema,
 } from "../../shared/contracts";
 import { z } from "zod";
+import { mailboxAccess, MailboxAccessError } from "./access";
+export class MessageReadError extends Error {
+	constructor() {
+		super("Message not found");
+		this.name = "MessageReadError";
+	}
+}
 
 export async function listMailboxes(user: User) {
 	return withDatabase(async (sql) => {
@@ -160,33 +167,44 @@ async function authorizeMessage(sql: AppSQL, user: User, messageId: string) {
 	const [message] = await sql.AuthorizedMessage`
 			/* @notNull id */
 			/* @notNull mailbox_id */
-			SELECT m.id,m.mailbox_id,m.thread_id FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id
+			/* @notNull user_id */
+			SELECT m.id,m.mailbox_id,m.thread_id,m.user_id,m.raw_r2_key FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id
 			JOIN domains d ON d.id=b.domain_id WHERE m.id=${messageId} AND b.disabled=0
 			AND (m.status!='draft' OR m.user_id=${user.id})
 			AND (b.user_id=${user.id}
-				OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id}))) LIMIT 1`;
-	if (!message) throw new Error("Message not found");
+				OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS (SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission IN('read_only','send_on_behalf','send_as','full_access')))) LIMIT 1`;
+	if (!message) throw new MessageReadError();
 	return message;
 }
-export async function getThread(user: User, messageId: string) {
+export async function messageReference(user: User, messageId: string) {
+	return withDatabase((sql) => authorizeMessage(sql, user, messageId));
+}
+export async function getThreadWithRecord(user: User, messageId: string) {
 	return withDatabase(async (sql) => {
 		const message = await authorizeMessage(sql, user, messageId);
 		const rows = await sql.ThreadMessages`
-			SELECT id,user_id,folder_id,direction,bcc_addr,snippet,snoozed_until,spam_score,spam_verdict,spam_signals,spam_analyzed_at,spam_analysis_error,from_addr,to_addr,cc_addr,reply_to,subject,text_body,html_body,created_at,read,starred,status,provider_message_id,in_reply_to,references_header,thread_id,mailbox_id
+			SELECT id,user_id,folder_id,direction,bcc_addr,snippet,snoozed_until,spam_score,spam_verdict,spam_signals,spam_analyzed_at,spam_analysis_error,from_addr,to_addr,cc_addr,reply_to,subject,text_body,html_body,created_at,read,starred,status,provider_message_id,in_reply_to,references_header,thread_id,mailbox_id,trashed_at
 			FROM messages WHERE mailbox_id=${message.mailbox_id}
-			AND ((${message.thread_id} IS NULL AND id=${message.id}) OR (${message.thread_id} IS NOT NULL AND thread_id=${message.thread_id} AND status NOT IN ('draft','trash')))
+			AND ((${message.thread_id || null} IS NULL AND id=${message.id}) OR (${message.thread_id || null} IS NOT NULL AND thread_id=${message.thread_id} AND status NOT IN ('draft','trash')))
 			ORDER BY created_at ASC,id ASC LIMIT 200`;
 
 		const attachments = await sql.ThreadAttachments`
  SELECT a.id,a.message_id,a.filename,a.size,a.content_id,a.content_type,a.disposition FROM message_attachments a WHERE a.message_id IN(SELECT value FROM json_each(${JSON.stringify(rows.map((row) => row.id))})) AND a.trashed_at IS NULL`;
 
-		return rows.map((row) => ({
-			...row,
-			attachments: attachments.filter(
-				(attachment) => attachment.message_id === row.id,
-			),
-		}));
+		return {
+			record: message,
+			messages: rows.map((row) => ({
+				...row,
+				attachments: attachments.filter(
+					(attachment) => attachment.message_id === row.id,
+				),
+			})),
+		};
 	});
+}
+
+export async function getThread(user: User, messageId: string) {
+	return (await getThreadWithRecord(user, messageId)).messages;
 }
 
 export async function messageFile(
@@ -195,14 +213,31 @@ export async function messageFile(
 	attachmentId?: string,
 ) {
 	return withDatabase(async (sql) => {
-		await authorizeMessage(sql, user, messageId);
+		if (attachmentId) {
+			const [message] =
+				await sql.SourceAttachmentMessage`SELECT id,user_id,mailbox_id,status FROM messages WHERE id=${messageId}`;
+			if (
+				!message ||
+				(message.status === "draft" && message.user_id !== user.id)
+			)
+				throw new MessageReadError();
+			if (message.mailbox_id) {
+				try {
+					await mailboxAccess(user, message.mailbox_id, "read", sql);
+				} catch (error) {
+					if (error instanceof MailboxAccessError) throw new MessageReadError();
+					throw error;
+				}
+			} else if (message.user_id !== user.id) throw new MessageReadError();
+		} else await authorizeMessage(sql, user, messageId);
 		if (attachmentId) {
 			const [attachment] = await sql.DownloadAttachment`
-				SELECT r2_key,filename,content_type,disposition FROM message_attachments
+				SELECT r2_key,filename,content_type,disposition,size FROM message_attachments
 				WHERE id=${attachmentId} AND message_id=${messageId} AND trashed_at IS NULL LIMIT 1`;
-			if (!attachment) throw new Error("Attachment not found");
+			if (!attachment) throw new MessageReadError();
 			return {
 				key: attachment.r2_key,
+				size: attachment.size,
 				filename: attachment.filename,
 				contentType: attachment.content_type,
 				disposition: attachment.disposition,

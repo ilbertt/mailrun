@@ -22,7 +22,12 @@ export default createServerEntry({
 			handler.fetch(current, options),
 		);
 		const headers = new Headers(withSecurityHeaders(response).headers);
-		if (!headers.has("Cache-Control"))
+		const missingMessageAttachment =
+			response.status === 404 &&
+			/^\/api\/messages\/[^/]+\/attachments\/[^/]+$/.test(
+				new URL(request.url).pathname,
+			);
+		if (!headers.has("Cache-Control") && !missingMessageAttachment)
 			headers.set("Cache-Control", "private, no-store");
 		headers.set(
 			"Server-Timing",

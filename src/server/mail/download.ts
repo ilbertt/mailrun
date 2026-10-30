@@ -1,6 +1,7 @@
 import { requireUser } from "../auth/request";
-import { messageFile } from "./repository";
+import { messageFile, MessageReadError } from "./repository";
 import { LocalStorage } from "../storage";
+import { getAttachmentContentDisposition } from "../../app/api/messages/[messageId]/attachments/[attachmentId]/utils";
 import {
 	getInlineContentType,
 	getMimeEssence,
@@ -10,11 +11,20 @@ export async function downloadMessageFile(
 	attachmentId?: string,
 	options: boolean | { preview?: boolean; download?: boolean } = false,
 ) {
-	const user = await requireUser(),
+	const user = await requireUser();
+	let metadata: Awaited<ReturnType<typeof messageFile>>;
+	try {
 		metadata = await messageFile(user, messageId, attachmentId);
+	} catch (error) {
+		if (attachmentId && error instanceof MessageReadError)
+			return missingAttachment();
+		throw error;
+	}
 	const file = new LocalStorage().file(metadata.key);
 	if (!(await file.exists()))
-		return new Response("File not found", { status: 404 });
+		return attachmentId
+			? missingAttachment()
+			: new Response("File not found", { status: 404 });
 	const preview = typeof options === "boolean" ? options : options.preview,
 		download = typeof options === "boolean" ? false : options.download;
 	const inlineType = download
@@ -32,13 +42,26 @@ export async function downloadMessageFile(
 					? inlineType
 					: (getMimeEssence(metadata.contentType) ??
 						"application/octet-stream"),
-			"Content-Disposition": `${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(metadata.filename)}`,
-			"Content-Length": String(file.size),
-			"Cache-Control": "private, no-store",
+			"Content-Disposition": attachmentId
+				? getAttachmentContentDisposition(metadata.filename, inline)
+				: `${inline ? "inline" : "attachment"}; filename*=UTF-8''${encodeURIComponent(metadata.filename)}`,
+			"Content-Length": String(
+				attachmentId && "size" in metadata ? metadata.size : file.size,
+			),
+			"Cache-Control": attachmentId
+				? "private, max-age=3600"
+				: "private, no-store",
 			"X-Content-Type-Options": "nosniff",
 			"X-Frame-Options": "SAMEORIGIN",
 			"Content-Security-Policy":
 				"default-src 'none'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'unsafe-inline'; frame-ancestors 'self'; sandbox",
 		},
+	});
+}
+
+function missingAttachment() {
+	return new Response("Not found", {
+		status: 404,
+		headers: { "Content-Type": "text/plain;charset=UTF-8" },
 	});
 }

@@ -1,4 +1,4 @@
-import { withDatabase } from "../db";
+import { withDatabase, type AppSQL } from "../db";
 import type { User } from "../../shared/contracts";
 export class MailboxAccessError extends Error {
 	constructor() {
@@ -10,9 +10,9 @@ export async function mailboxAccess(
 	user: User,
 	mailboxId: string,
 	level: "read" | "send" | "manage" = "read",
+	context?: AppSQL,
 ) {
-	const [row] = await withDatabase(
-		(sql) => sql.MailboxPermission`
+	const read = (sql: AppSQL) => sql.MailboxPermission`
 		/* @notNull id */
 		/* @notNull user_id */
 		SELECT b.id,b.user_id,b.domain_id,b.local_part,b.use_all_domains,b.display_name,b.type,d.hostname,d.user_id AS domain_owner,owner.name AS owner_name,owner.email AS owner_email,CASE WHEN b.user_id=${user.id} THEN 'full_access' ELSE (SELECT permission FROM mailbox_access WHERE mailbox_id=b.id AND user_id=${user.id} LIMIT 1) END AS permission
@@ -21,8 +21,8 @@ export async function mailboxAccess(
 			SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id}
 			AND a.permission IN('read_only','send_on_behalf','send_as','full_access')
 			AND (${level}='read' OR a.permission='full_access' OR (${level}='send' AND a.permission IN ('send_as','send_on_behalf')))
-		))) LIMIT 1`,
-	);
+		))) LIMIT 1`;
+	const [row] = await (context ? read(context) : withDatabase(read));
 	if (!row) throw new MailboxAccessError();
 	return row;
 }

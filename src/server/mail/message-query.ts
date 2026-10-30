@@ -111,6 +111,22 @@ export function toMessage(value: unknown): Message {
 		spamAnalysisError: row.spam_analysis_error,
 	};
 }
+// Only the original source columns belong on the legacy detail wire contract.
+// Native delivery revisions and other runtime-only columns stay internal.
+const storedBodySchema = z.object({
+	text_body: z.string().nullable(),
+	html_body: z.string().nullable(),
+	raw_r2_key: z.string().nullable(),
+});
+export function toStoredSourceMessage(value: unknown) {
+	const row = storedBodySchema.parse(value);
+	return {
+		...toMessage(value),
+		textBody: row.text_body,
+		htmlBody: row.html_body,
+		rawR2Key: row.raw_r2_key,
+	};
+}
 export async function queryMessages(
 	user: User,
 	input: MessageQueryInput,

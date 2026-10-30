@@ -1117,11 +1117,6 @@ export interface ISourceDetailAttachmentsResult {
     content_type: IMessageAttachmentsColumns["content_type"];
 }
 
-/** Result of query `SourceScheduledTime`. */
-export interface ISourceScheduledTimeResult {
-    scheduled_at: IOutboundJobsColumns["scheduled_at"];
-}
-
 /** Result of query `NativeMailboxDetail`. */
 export interface INativeMailboxDetailResult {
     id: string | null;
@@ -4166,6 +4161,8 @@ export interface IAuthorizedMessageResult {
     id: string;
     mailbox_id: string;
     thread_id: IMessagesColumns["thread_id"];
+    user_id: string;
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
 }
 
 /** Result of query `ThreadMessages`. */
@@ -4198,6 +4195,7 @@ export interface IThreadMessagesResult {
     references_header: IMessagesColumns["references_header"];
     thread_id: IMessagesColumns["thread_id"];
     mailbox_id: IMessagesColumns["mailbox_id"];
+    trashed_at: IMessagesColumns["trashed_at"];
 }
 
 /** Result of query `ThreadAttachments`. */
@@ -4211,12 +4209,21 @@ export interface IThreadAttachmentsResult {
     disposition: IMessageAttachmentsColumns["disposition"];
 }
 
+/** Result of query `SourceAttachmentMessage`. */
+export interface ISourceAttachmentMessageResult {
+    id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    status: IMessagesColumns["status"];
+}
+
 /** Result of query `DownloadAttachment`. */
 export interface IDownloadAttachmentResult {
     r2_key: IMessageAttachmentsColumns["r2_key"];
     filename: IMessageAttachmentsColumns["filename"];
     content_type: IMessageAttachmentsColumns["content_type"];
     disposition: IMessageAttachmentsColumns["disposition"];
+    size: IMessageAttachmentsColumns["size"];
 }
 
 /** Result of query `DownloadOriginal`. */
@@ -5026,7 +5033,6 @@ export interface Queries {
     NativeSetupMetadata: INativeSetupMetadataResult;
     NativeFolderList: INativeFolderListResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
-    SourceScheduledTime: ISourceScheduledTimeResult;
     NativeMailboxDetail: INativeMailboxDetailResult;
     NativeMailboxOwner: INativeMailboxOwnerResult;
     NativeMailboxDomain: INativeMailboxDomainResult;
@@ -5459,6 +5465,7 @@ export interface Queries {
     AuthorizedMessage: IAuthorizedMessageResult;
     ThreadMessages: IThreadMessagesResult;
     ThreadAttachments: IThreadAttachmentsResult;
+    SourceAttachmentMessage: ISourceAttachmentMessageResult;
     DownloadAttachment: IDownloadAttachmentResult;
     DownloadOriginal: IDownloadOriginalResult;
     ChangeMessage: IChangeMessageResult;

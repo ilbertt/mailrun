@@ -47,6 +47,7 @@ import type { User } from "../../shared/contracts";
 import {
 	queryMessages,
 	toMessage,
+	toStoredSourceMessage,
 	iso,
 	messageQuerySchema,
 } from "../mail/message-query";
@@ -62,7 +63,12 @@ import {
 	updateMessageStatus,
 } from "../mail/message-actions";
 import { createFolder } from "../mail/management";
-import { listMailboxes, getThread } from "../mail/repository";
+import {
+	listMailboxes,
+	getThreadWithRecord,
+	messageReference,
+	MessageReadError,
+} from "../mail/repository";
 import { navigationCounts, sourceMessageNavigation } from "../mail/navigation";
 import { mailboxAccess, MailboxAccessError } from "../mail/access";
 import { folderSchema as createFolderSchema } from "../../lib/validators";
@@ -280,14 +286,26 @@ export async function dispatchMailApi(
 		const messageId = decodeURIComponent(match[1] ?? ""),
 			action = match[2];
 		if (method === "GET" && (!action || action === "metadata")) {
-			const message = await messageRecord(user, messageId);
+			let message:
+				| Awaited<ReturnType<typeof messageRecord>>
+				| Awaited<ReturnType<typeof messageReference>>;
+			try {
+				message =
+					action === "metadata"
+						? await messageReference(user, messageId)
+						: await messageRecord(user, messageId);
+			} catch (error) {
+				if (
+					error instanceof MailboxAccessError ||
+					error instanceof MessageReadError ||
+					(error instanceof Response && error.status === 404)
+				)
+					return json({ error: "Not found" }, 404);
+				throw error;
+			}
 			const attachments = await withDatabase(
 				(sql) =>
-					sql.SourceDetailAttachments`SELECT id,message_id,filename,size,content_id,disposition,content_type FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL ORDER BY created_at,id`,
-			);
-			const [job] = await withDatabase(
-				(sql) =>
-					sql.SourceScheduledTime`SELECT scheduled_at FROM outbound_jobs WHERE message_id=${messageId} AND status='queued' AND scheduled_at IS NOT NULL ORDER BY created_at DESC LIMIT 1`,
+					sql.SourceDetailAttachments`SELECT id,message_id,filename,size,content_id,disposition,content_type FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL`,
 			);
 			const raw = message.raw_r2_key
 				? new LocalStorage().file(message.raw_r2_key)
@@ -309,33 +327,29 @@ export async function dispatchMailApi(
 			}));
 			if (action === "metadata")
 				return json({ attachments: files, unsubscribeUrl });
-			const [enriched] = await messageContacts(message.user_id, [
-				toMessage(message),
-			]);
+			const body = toStoredSourceMessage(message);
+			const [enriched] = await messageContacts(message.user_id, [body], false);
 			return json({
 				unsubscribeUrl,
 				message: enriched,
-				body: { textBody: message.text_body, htmlBody: message.html_body },
-				attachments: attachments.map((file) => ({
-					id: file.id,
-					messageId: file.message_id,
-					filename: file.filename,
-					size: file.size,
-					contentId: file.content_id,
-					disposition: file.disposition,
-					type: file.content_type,
-				})),
-				scheduledAt: iso(job?.scheduled_at),
+				body,
+				attachments: files,
 			});
 		}
 		if (method === "GET" && action === "thread") {
-			const record = await messageRecord(user, messageId),
-				thread = await getThread(user, messageId);
+			let data: Awaited<ReturnType<typeof getThreadWithRecord>>;
+			try {
+				data = await getThreadWithRecord(user, messageId);
+			} catch (error) {
+				if (error instanceof MessageReadError)
+					return json({ error: "Not found" }, 404);
+				throw error;
+			}
 			return json({
-				threadId: record.thread_id,
+				threadId: data.record.thread_id,
 				messages: await messageContacts(
-					record.user_id,
-					thread.map((message) => ({
+					data.record.user_id,
+					data.messages.map((message) => ({
 						...toMessage(message),
 						textBody: message.text_body,
 						htmlBody: message.html_body,
@@ -352,6 +366,7 @@ export async function dispatchMailApi(
 				),
 			});
 		}
+
 		if (action === "star" && method === "POST")
 			return json(await toggleStar(user, messageId));
 		if (action === "status" && method === "POST") {
