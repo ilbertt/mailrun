@@ -498,6 +498,25 @@ export interface INativeAutoDraftPublishGuardResult {
     id: string | null;
 }
 
+/** Result of query `NativeClaimAgentDispatcher`. */
+export interface INativeClaimAgentDispatcherResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeDueAgentDraftJobs`. */
+export interface INativeDueAgentDraftJobsResult {
+    id: IAgentJobsColumns["id"];
+}
+
+/** Result of query `NativeRenewAgentDispatcher`. */
+export interface INativeRenewAgentDispatcherResult {
+    owner: IMailrunJobLeasesColumns["owner"];
+}
+
+/** Result of query `NativeReleaseAgentDispatcher`. */
+export interface INativeReleaseAgentDispatcherResult {
+}
+
 /** Result of query `NativeAutoDraftScheduleReviewer`. */
 export interface INativeAutoDraftScheduleReviewerResult {
     id: string | null;
@@ -610,25 +629,6 @@ export interface INativeRetryAutoDraftFailureResult {
 export interface INativeAutoDraftContextBodyResult {
     text: string | null;
     html: string | null;
-}
-
-/** Result of query `NativeClaimAgentDispatcher`. */
-export interface INativeClaimAgentDispatcherResult {
-    owner: IMailrunJobLeasesColumns["owner"];
-}
-
-/** Result of query `NativeDueAgentDraftJobs`. */
-export interface INativeDueAgentDraftJobsResult {
-    id: IAgentJobsColumns["id"];
-}
-
-/** Result of query `NativeRenewAgentDispatcher`. */
-export interface INativeRenewAgentDispatcherResult {
-    owner: IMailrunJobLeasesColumns["owner"];
-}
-
-/** Result of query `NativeReleaseAgentDispatcher`. */
-export interface INativeReleaseAgentDispatcherResult {
 }
 
 /** Result of query `NativeAgentMessage`. */
@@ -4884,6 +4884,10 @@ export interface Queries {
     NativeAgentDiscard: INativeAgentDiscardResult;
     NativeAutoDraftPublishLease: INativeAutoDraftPublishLeaseResult;
     NativeAutoDraftPublishGuard: INativeAutoDraftPublishGuardResult;
+    NativeClaimAgentDispatcher: INativeClaimAgentDispatcherResult;
+    NativeDueAgentDraftJobs: INativeDueAgentDraftJobsResult;
+    NativeRenewAgentDispatcher: INativeRenewAgentDispatcherResult;
+    NativeReleaseAgentDispatcher: INativeReleaseAgentDispatcherResult;
     NativeAutoDraftScheduleReviewer: INativeAutoDraftScheduleReviewerResult;
     NativeScheduleAutoDraft: INativeScheduleAutoDraftResult;
     NativeScheduledAutoDraft: INativeScheduledAutoDraftResult;
@@ -4899,10 +4903,6 @@ export interface Queries {
     NativeReleaseExpiredAutoDraft: INativeReleaseExpiredAutoDraftResult;
     NativeRetryAutoDraftFailure: INativeRetryAutoDraftFailureResult;
     NativeAutoDraftContextBody: INativeAutoDraftContextBodyResult;
-    NativeClaimAgentDispatcher: INativeClaimAgentDispatcherResult;
-    NativeDueAgentDraftJobs: INativeDueAgentDraftJobsResult;
-    NativeRenewAgentDispatcher: INativeRenewAgentDispatcherResult;
-    NativeReleaseAgentDispatcher: INativeReleaseAgentDispatcherResult;
     NativeAgentMessage: INativeAgentMessageResult;
     NativeAgentMoveCurrent: INativeAgentMoveCurrentResult;
     NativeAgentMoveSending: INativeAgentMoveSendingResult;

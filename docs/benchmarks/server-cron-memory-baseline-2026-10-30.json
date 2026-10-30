@@ -1,0 +1,47 @@
+{
+  "binarySha256": "be29e1a81361dcb11c73a15fc78e047d45437bdae69e124f898a0c873f28f1f7",
+  "memoryLimitMiB": 256,
+  "cpus": 1,
+  "cronMode": "parallel",
+  "largeSends": 3,
+  "attachmentBytesPerSend": 24000000,
+  "samples": [
+    {
+      "phase": "cold",
+      "currentMiB": 138,
+      "peakMiB": 139,
+      "events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "phase": "warm-documents-and-assets",
+      "currentMiB": 183,
+      "peakMiB": 185,
+      "events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "phase": "large-send-1-with-crons",
+      "currentMiB": 149,
+      "peakMiB": 256,
+      "events": "low 0\nhigh 0\nmax 704\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "phase": "large-send-2-with-crons",
+      "currentMiB": 148,
+      "peakMiB": 256,
+      "events": "low 0\nhigh 0\nmax 968\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "phase": "large-send-3-with-crons",
+      "currentMiB": 147,
+      "peakMiB": 256,
+      "events": "low 0\nhigh 0\nmax 1307\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "phase": "metadata-verification",
+      "currentMiB": 154,
+      "peakMiB": 256,
+      "events": "low 0\nhigh 0\nmax 1307\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    }
+  ],
+  "externalEmail": 0
+}

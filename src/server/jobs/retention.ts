@@ -1,5 +1,4 @@
 import { withDatabase, seconds } from "../db";
-import { permanentlyDeleteMessages } from "../mail/message-actions";
 import { userSchema } from "../../shared/contracts";
 import {
 	normalizeTrashRetentionDays,
@@ -21,6 +20,9 @@ export async function runTrashRetention(now = seconds()) {
 				sql.NativeExpiredMail`SELECT id,mailbox_id,status FROM messages WHERE user_id=${owner.id} AND status IN ('trash','spam') AND trashed_at<${cutoff} ORDER BY trashed_at,id LIMIT ${budget}`,
 		);
 		if (!rows.length) continue;
+		const { permanentlyDeleteMessages } = await import(
+			"../mail/message-actions"
+		);
 		const user = userSchema.parse({
 			...owner,
 			isPrimaryAdmin: !!owner.is_primary_admin,

@@ -1,4 +1,4 @@
-import { jobNameSchema } from "./runner";
+import { jobNameSchema } from "./contract";
 
 export const cronJobs = [
 	{ title: "mailrun-scheduled", schedule: "* * * * *", command: "scheduled" },

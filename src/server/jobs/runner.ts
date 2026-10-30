@@ -1,14 +1,8 @@
-import { runAvatarJobs } from "../avatars/jobs";
-import { clearSendingStaging } from "../mail/sending-staging";
-import { runWebhookJobs } from "../webhooks/delivery";
-import { runDriveRetention } from "../drive/retention";
-import { runTrashRetention } from "./retention";
-import { z } from "zod";
+import { jobNameSchema } from "./contract";
+export { jobNameSchema } from "./contract";
+import type { z } from "zod";
 import { withDatabase, seconds, id } from "../db";
-import { deliverJob } from "../mail/send";
-import { scheduledBackup } from "./backup";
 
-export const jobNameSchema = z.enum(["scheduled", "maintenance", "backup"]);
 export async function runJob(name: z.infer<typeof jobNameSchema>) {
 	const owner = id("lease");
 	const [lease] = await withDatabase(
@@ -24,15 +18,22 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 				(sql) =>
 					sql.DueOutboundJobs`/* @notNull id */ SELECT id FROM outbound_jobs WHERE status='queued' AND EXISTS (SELECT 1 FROM messages WHERE messages.id=outbound_jobs.message_id AND messages.status='queued') AND (scheduled_at IS NULL OR scheduled_at<=${seconds()}) ORDER BY scheduled_at LIMIT 10`,
 			);
-			for (const job of jobs)
+
+			for (const job of jobs) {
+				const { deliverJob } = await import("../mail/send");
 				await deliverJob(job.id).catch((error) =>
 					console.error(`Scheduled send ${job.id} failed`, error),
 				);
+			}
 		} else if (name === "maintenance") {
+			const { clearSendingStaging } = await import("../mail/sending-staging");
+			const { runAvatarJobs } = await import("../avatars/jobs");
+			const { runWebhookJobs } = await import("../webhooks/delivery");
+			const { runTrashRetention } = await import("./retention");
 			await clearSendingStaging();
 			await runAvatarJobs();
 			await runWebhookJobs();
-			const { recoverAgentDraftJobs } = await import("../agent/jobs");
+			const { recoverAgentDraftJobs } = await import("../agent/job-recovery");
 			await recoverAgentDraftJobs();
 			await runTrashRetention();
 			await withDatabase(async (sql) => {
@@ -43,6 +44,8 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 				await sql.PruneLoginChallenges`DELETE FROM login_challenges WHERE expires_at<${seconds()}`;
 			});
 		} else {
+			const { runDriveRetention } = await import("../drive/retention");
+			const { scheduledBackup } = await import("./backup");
 			await runDriveRetention();
 			await scheduledBackup();
 		}

@@ -68,3 +68,7 @@ before HTML can render, mobile parity or the full source-data cutover. Peak memo
 under the actual 256 MiB nibrun limit also remains an open gate: the unconstrained
 Linux smoke reports a 275 MiB public-send peak, so a successful functional smoke
 must not be described as proof that every workload fits that limit.
+
+The subsequent [constrained server/cron check](../benchmarks/server-cron-memory-2026-10-30.md)
+passes the selected synthetic large-send workload at 256 MiB with zero OOM events.
+That result narrows the RSS concern; the full guest/resource gate remains open.

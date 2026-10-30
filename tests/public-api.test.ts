@@ -663,3 +663,149 @@ test("chunked public JSON enforces the original 40 MiB limit while cancelling ov
 		),
 	).toEqual([]);
 });
+
+test("streamed send JSON retains native JSON values, duplicate keys and own prototype-named fields", async () => {
+	for (const text of [
+		' {"text":"first","text":"last","__proto__":{"polluted":true},"constructor":"own","unicode":"€😀\\ud800","escaped":"\\u0041\\n\\\""} \n',
+		'[{"x":false},null,true,-0,1e300,"\\udfff"]',
+		"null",
+		"42",
+		'"€😀"',
+	]) {
+		const bytes = new TextEncoder().encode(text);
+		const parsed = await readPublicSendBody(
+			new Request("http://localhost/send", {
+				method: "POST",
+				body: new ReadableStream<Uint8Array>({
+					start(controller) {
+						for (const byte of bytes) controller.enqueue(Uint8Array.of(byte));
+						controller.close();
+					},
+				}),
+			}),
+		);
+		expect(parsed).toEqual(JSON.parse(text));
+		if (parsed && !Array.isArray(parsed) && typeof parsed === "object") {
+			expect(Object.getPrototypeOf(parsed)).toBe(Object.prototype);
+			expect(Object.hasOwn(parsed, "__proto__")).toBe(true);
+		}
+	}
+});
+
+test("streamed send JSON rejects incomplete and trailing documents as syntax errors", async () => {
+	for (const text of [
+		'{"text":',
+		'{"x":1,}',
+		'{"x":1} {"x":2}',
+		'"unterminated',
+		"",
+		"true false",
+	]) {
+		await expect(
+			readPublicSendBody(
+				new Request("http://localhost/send", { method: "POST", body: text }),
+			),
+		).rejects.toBeInstanceOf(SyntaxError);
+	}
+});
+
+test("streamed send JSON preserves the request decoder's invalid-UTF8 replacement behavior", async () => {
+	const bytes = Uint8Array.from([
+		0x7b, 0x22, 0x78, 0x22, 0x3a, 0x22, 0xff, 0x22, 0x7d,
+	]);
+	expect(
+		await readPublicSendBody(
+			new Request("http://localhost/send", { method: "POST", body: bytes }),
+		),
+	).toEqual(JSON.parse(new TextDecoder().decode(bytes)));
+});
+
+test("large API attachments preserve last duplicate JSON keys and remove all private staging files", async () => {
+	const key = await personal();
+	const bytes = Buffer.alloc(450_000, 0x42),
+		encoded = bytes.toString("base64"),
+		unused = "!".repeat(600_000);
+	const prefix = JSON.stringify({
+		mailboxId: "mailbox",
+		from: "hello@example.com",
+		to: "recipient@example.org",
+		subject: "Staged bytes",
+		scheduledAt: "2099-01-01T00:00:00Z",
+	}).slice(0, -1);
+	const response = await serveV1Api(
+		new Request("https://mail.example.com/api/v1/send", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${key.key}`,
+				"Content-Type": "application/json",
+			},
+			body:
+				prefix +
+				',"attachments":[{"filename":"unused","contentBase64":' +
+				JSON.stringify(unused) +
+				'}],"attachments":[{"filename":"last.bin","contentBase64":' +
+				JSON.stringify(unused) +
+				',"contentBase64":' +
+				JSON.stringify(encoded) +
+				"}]}",
+		}),
+	);
+	expect(response.status).toBe(200);
+	const result = (await response.json()) as {
+		messageId: string;
+		scheduled: boolean;
+	};
+	expect(result.scheduled).toBe(true);
+	const row = state.db
+		.query(
+			"SELECT filename,r2_key,size FROM message_attachments WHERE message_id=?",
+		)
+		.get(result.messageId) as {
+		filename: string;
+		r2_key: string;
+		size: number;
+	};
+	expect(row.filename).toBe("last.bin");
+	expect(row.size).toBe(bytes.length);
+	expect(
+		Buffer.from(await new LocalStorage().file(row.r2_key).arrayBuffer()),
+	).toEqual(bytes);
+	expect(
+		await Array.fromAsync(
+			new Bun.Glob("import-staging/*").scan({
+				cwd: new LocalStorage().root,
+				onlyFiles: false,
+			}),
+		),
+	).toEqual([]);
+});
+
+test("large attachment staging is removed when full-body validation or mailbox authorization fails", async () => {
+	const key = await personal();
+	for (const overrides of [{ subject: "" }, { mailboxId: "ungranted" }]) {
+		const response = await serveV1Api(
+			request("/send", key.key, "POST", {
+				mailboxId: "mailbox",
+				from: "hello@example.com",
+				to: "recipient@example.org",
+				subject: "Staged failure",
+				attachments: [
+					{ filename: "large.bin", contentBase64: "A".repeat(600_000) },
+				],
+				...overrides,
+			}),
+		);
+		expect([400, 404]).toContain(response.status);
+		expect(
+			await Array.fromAsync(
+				new Bun.Glob("import-staging/*").scan({
+					cwd: new LocalStorage().root,
+					onlyFiles: false,
+				}),
+			),
+		).toEqual([]);
+	}
+	expect(
+		state.db.query("SELECT count(*) AS n FROM outbound_jobs").get(),
+	).toEqual({ n: 0 });
+});

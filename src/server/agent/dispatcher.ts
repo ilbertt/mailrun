@@ -1,6 +1,6 @@
 import type { AgentFetch } from "./provider";
 import { AsyncResource } from "node:async_hooks";
-import { recoverAgentDraftJobs } from "./jobs";
+import { recoverAgentDraftJobs } from "./job-recovery";
 declare global {
 	var __mailrunAgentWake: (() => void) | undefined;
 }
