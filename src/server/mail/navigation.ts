@@ -1,5 +1,6 @@
 import { withDatabase, seconds } from "../db";
 import { mailboxAccess } from "./access";
+import { readMailboxScope } from "./read-scope";
 import type { User, Folder } from "../../shared/contracts";
 import {
 	emptyNavigationCounts,
@@ -83,4 +84,57 @@ export async function shortcutSettings(user: User, enabled?: boolean) {
 			sql.KeyboardShortcuts`SELECT keyboard_shortcuts_enabled FROM users WHERE id=${user.id}`,
 	);
 	return { enabled: !!row?.keyboard_shortcuts_enabled };
+}
+
+// Navigation uses each stored message's unread flag, rather than list badges
+// (which describe the entire conversation and can include other folders).
+export async function sourceMessageNavigation(
+	user: User,
+	params: URLSearchParams,
+) {
+	const folder = params.get("folder");
+	if (
+		!folder ||
+		![
+			"inbox",
+			"starred",
+			"snoozed",
+			"sent",
+			"scheduled",
+			"archived",
+			"spam",
+			"trash",
+		].includes(folder)
+	)
+		throw new Response("Invalid folder", { status: 400 });
+	const { ids: scope, fallback } = await readMailboxScope(
+		user,
+		params.get("mailboxId") || undefined,
+	);
+	const folderId = params.get("folderId") || null;
+	const rows = await withDatabase(
+		(sql) => sql.SourceMessageNavigation`
+ /* @notNull id */
+ SELECT m.id,m.read,m.direction,m.thread_id FROM messages m
+ WHERE (m.mailbox_id IN(SELECT value FROM json_each(${scope})) OR (${fallback}=1 AND m.user_id=${user.id}))
+ AND (${folderId} IS NULL OR m.folder_id=${folderId})
+ AND (
+ (${folder}='inbox' AND m.direction='inbound' AND m.status='received' AND (${folderId} IS NOT NULL OR (m.folder_id IS NULL AND (m.snoozed_until IS NULL OR m.snoozed_until<=${seconds()}))))
+ OR (${folder}='starred' AND m.starred=1)
+ OR (${folder}='snoozed' AND m.status='received' AND m.folder_id IS NULL AND m.snoozed_until>${seconds()})
+ OR (${folder}='sent' AND m.direction='outbound' AND m.status='sent')
+ OR (${folder}='scheduled' AND m.direction='outbound' AND m.status='queued' AND EXISTS(SELECT 1 FROM outbound_jobs j WHERE j.message_id=m.id AND j.status='queued' AND j.scheduled_at IS NOT NULL))
+ OR (${folder} IN('archived','spam','trash') AND m.status=${folder})
+ ) ORDER BY m.created_at DESC,m.id DESC`,
+	);
+	const grouped = params.get("group") === "thread";
+	const entries = new Map<string, { id: string; unread: boolean }>();
+	for (const row of rows) {
+		const key = grouped ? (row.thread_id ?? row.id) : row.id,
+			unread = row.direction === "inbound" && !row.read;
+		const existing = entries.get(key);
+		if (existing) existing.unread ||= unread;
+		else entries.set(key, { id: row.id, unread });
+	}
+	return { messages: [...entries.values()] };
 }

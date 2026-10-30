@@ -4006,6 +4006,7 @@ export interface ISourceMessagePageResult {
     in_reply_to: IMessagesColumns["in_reply_to"];
     references_header: IMessagesColumns["references_header"];
     created_at: number | null;
+    trashed_at: number | null;
     spam_score: IMessagesColumns["spam_score"];
     spam_verdict: IMessagesColumns["spam_verdict"];
     spam_signals: IMessagesColumns["spam_signals"];
@@ -4022,9 +4023,9 @@ export interface ISourceMessagePageResult {
 
 /** Result of query `MessagePartyContacts`. */
 export interface IMessagePartyContactsResult {
+    user_id: IContactsColumns["user_id"];
     email: IContactsColumns["email"];
     display_name: IContactsColumns["display_name"];
-    avatar_key: IContactsColumns["avatar_key"];
 }
 
 /** Result of query `NavigationCounts`. */
@@ -4051,6 +4052,14 @@ export interface IKeyboardShortcutsResult {
     keyboard_shortcuts_enabled: IUsersColumns["keyboard_shortcuts_enabled"];
 }
 
+/** Result of query `SourceMessageNavigation`. */
+export interface ISourceMessageNavigationResult {
+    id: string;
+    read: IMessagesColumns["read"];
+    direction: IMessagesColumns["direction"];
+    thread_id: IMessagesColumns["thread_id"];
+}
+
 /** Result of query `NativeProviderInboundDomain`. */
 export interface INativeProviderInboundDomainResult {
     id: IDomainsColumns["id"];
@@ -4061,6 +4070,16 @@ export interface INativeOutboundProviderResult {
     sending_provider: IDomainsColumns["sending_provider"];
     sending_enabled: IDomainsColumns["sending_enabled"];
     status: IDomainsColumns["status"];
+}
+
+/** Result of query `SourceReadMailboxes`. */
+export interface ISourceReadMailboxesResult {
+    id: string | null;
+    user_id: string | null;
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    type: IMailboxesColumns["type"];
+    hostname: IDomainsColumns["hostname"];
 }
 
 /** Result of query `ListMailboxes`. */
@@ -5426,8 +5445,10 @@ export interface Queries {
     MoveNavigationMessage: IMoveNavigationMessageResult;
     UpdateKeyboardShortcuts: IUpdateKeyboardShortcutsResult;
     KeyboardShortcuts: IKeyboardShortcutsResult;
+    SourceMessageNavigation: ISourceMessageNavigationResult;
     NativeProviderInboundDomain: INativeProviderInboundDomainResult;
     NativeOutboundProvider: INativeOutboundProviderResult;
+    SourceReadMailboxes: ISourceReadMailboxesResult;
     ListMailboxes: IListMailboxesResult;
     MailboxSenderDomains: IMailboxSenderDomainsResult;
     MailboxSenderAliases: IMailboxSenderAliasesResult;

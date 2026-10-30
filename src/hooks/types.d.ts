@@ -56,6 +56,7 @@ export type Message = {
 	spamSignals?: string | null;
 	spamAnalyzedAt?: string | null;
 	spamAnalysisError?: string | null;
+	trashedAt?: string | null;
 	/** Messages in the same conversation (excluding drafts and trash), when the list API computed it. */
 	threadCount?: number;
 	/** Unread messages in the conversation; zero means the grouped thread is read. */

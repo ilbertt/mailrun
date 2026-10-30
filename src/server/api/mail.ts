@@ -43,14 +43,12 @@ import { isV1Path, serveV1Api } from "./v1";
 import { publicOrigin } from "../config";
 import { requireUser } from "../auth/request";
 import { withDatabase, seconds } from "../db";
-import type { User, Folder } from "../../shared/contracts";
-import { folderSchema } from "../../shared/contracts";
+import type { User } from "../../shared/contracts";
 import {
 	queryMessages,
 	toMessage,
 	iso,
 	messageQuerySchema,
-	type MessageQueryInput,
 } from "../mail/message-query";
 import {
 	bulkAction,
@@ -65,28 +63,10 @@ import {
 } from "../mail/message-actions";
 import { createFolder } from "../mail/management";
 import { listMailboxes, getThread } from "../mail/repository";
-import { navigationCounts } from "../mail/navigation";
+import { navigationCounts, sourceMessageNavigation } from "../mail/navigation";
 import { mailboxAccess, MailboxAccessError } from "../mail/access";
 import { folderSchema as createFolderSchema } from "../../lib/validators";
 
-function folderInput(folder: Folder): MessageQueryInput {
-	switch (folder) {
-		case "inbox":
-			return { direction: "inbound", status: "received" };
-		case "sent":
-			return { direction: "outbound", status: "sent" };
-		case "scheduled":
-			return { direction: "outbound", scheduled: "true" };
-		case "drafts":
-			return { direction: "outbound", status: "draft" };
-		case "snoozed":
-			return { snoozed: "true" };
-		case "starred":
-			return { starred: "true" };
-		default:
-			return { status: folder };
-	}
-}
 export async function dispatchMailApi(
 	request: Request,
 	user: User,
@@ -228,7 +208,9 @@ export async function dispatchMailApi(
 			await queryMessages(
 				user,
 				messageQuerySchema.parse({
-					...Object.fromEntries(params),
+					...Object.fromEntries(
+						[...new Set(params.keys())].map((key) => [key, params.get(key)]),
+					),
 					timeZone: getRequestTimeZone(request, profile.time_zone),
 				}),
 			),
@@ -238,29 +220,8 @@ export async function dispatchMailApi(
 		return json({
 			counts: await sourceCounts(user, params.get("mailboxId") ?? undefined),
 		});
-	if (method === "GET" && path === "/api/messages/navigation") {
-		const folder = folderSchema.parse(params.get("folder"));
-		const data = await queryMessages(
-			user,
-			{
-				...folderInput(folder),
-				mailboxId: params.get("mailboxId") ?? undefined,
-				folderId: params.get("folderId") ?? undefined,
-				group: params.get("group") === "thread" ? "thread" : undefined,
-			},
-			true,
-		);
-		return json({
-			messages: data.messages.map((message) => ({
-				id: message.id,
-				unread:
-					message.direction === "inbound" &&
-					(message.threadUnread !== undefined
-						? message.threadUnread > 0
-						: !message.read),
-			})),
-		});
-	}
+	if (method === "GET" && path === "/api/messages/navigation")
+		return json(await sourceMessageNavigation(user, params));
 	if (method === "POST" && path === "/api/messages/bulk") {
 		const payload = z
 			.object({

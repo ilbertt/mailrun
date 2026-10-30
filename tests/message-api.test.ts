@@ -97,7 +97,7 @@ test("Gmail search operators, phrases, exclusions and dates remain bound data", 
 			.messages,
 	).toEqual([]);
 });
-test("list and thread APIs never expose private shared drafts or inaccessible mailboxes", async () => {
+test("shared inbox lists include draft metadata while reading a conversation excludes drafts", async () => {
 	enableTeamSharing(state.db);
 	state.db.exec(
 		"INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_at) VALUES ('share','mailbox','stranger','read_only',1); INSERT INTO messages (id,user_id,mailbox_id,direction,from_addr,to_addr,subject,status,thread_id,created_at) VALUES ('draft','owner','mailbox','outbound','hello@example.com','maya@example.net','Private','draft','thread',2); UPDATE messages SET thread_id='thread' WHERE id='message'",
@@ -106,11 +106,12 @@ test("list and thread APIs never expose private shared drafts or inaccessible ma
 		(
 			await queryMessages(stranger, { mailboxId: "mailbox", group: "thread" })
 		).messages.flatMap((message) => message.threadMessageIds ?? []),
-	).not.toContain("draft");
+	).toContain("draft");
 	expect(
-		(await queryMessages(stranger, { mailboxId: "mailbox", status: "draft" }))
-			.messages,
-	).toEqual([]);
+		(
+			await queryMessages(stranger, { mailboxId: "mailbox", status: "draft" })
+		).messages.map((message) => message.id),
+	).toEqual(["draft"]);
 	const response = await dispatchMailApi(
 		new Request("https://mail.example/api/messages/message/thread"),
 		stranger,

@@ -20,8 +20,11 @@ export async function v1Messages(request: Request, key: ApiKeyAuthorization) {
 			limit: empty ? 1 : Number(url.searchParams.get("limit") ?? 50),
 			timeZone: getRequestTimeZone(request, profile.time_zone),
 		},
-		false,
-		{ mailboxIds: key.mailboxIds, includeTemplates: true },
+		{
+			mailboxIds: key.mailboxIds,
+			includeTemplates: true,
+			authorDraftsOnly: true,
+		},
 	);
 	if (empty) return [];
 	const ids = result.messages.map((row) => row.id);
