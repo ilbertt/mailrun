@@ -1096,6 +1096,16 @@ export interface INativeSetupMetadataResult {
     id: IDomainsColumns["id"];
 }
 
+/** Result of query `NativeFolderList`. */
+export interface INativeFolderListResult {
+    id: IFoldersColumns["id"];
+    user_id: IFoldersColumns["user_id"];
+    mailbox_id: IFoldersColumns["mailbox_id"];
+    name: IFoldersColumns["name"];
+    color: IFoldersColumns["color"];
+    created_at: IFoldersColumns["created_at"];
+}
+
 /** Result of query `SourceDetailAttachments`. */
 export interface ISourceDetailAttachmentsResult {
     id: IMessageAttachmentsColumns["id"];
@@ -4995,6 +5005,7 @@ export interface Queries {
     ReturnScheduledToDraft: IReturnScheduledToDraftResult;
     NativeDriveOwnerAvatar: INativeDriveOwnerAvatarResult;
     NativeSetupMetadata: INativeSetupMetadataResult;
+    NativeFolderList: INativeFolderListResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
     SourceScheduledTime: ISourceScheduledTimeResult;
     NativeMailboxDetail: INativeMailboxDetailResult;

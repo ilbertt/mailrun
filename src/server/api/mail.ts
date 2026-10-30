@@ -63,10 +63,11 @@ import {
 	messageStatusSchema,
 	updateMessageStatus,
 } from "../mail/message-actions";
-import { mailSettings, createFolder } from "../mail/management";
+import { createFolder } from "../mail/management";
 import { listMailboxes, getThread } from "../mail/repository";
 import { navigationCounts } from "../mail/navigation";
-import { mailboxAccess } from "../mail/access";
+import { mailboxAccess, MailboxAccessError } from "../mail/access";
+import { folderSchema as createFolderSchema } from "../../lib/validators";
 
 function folderInput(folder: Folder): MessageQueryInput {
 	switch (folder) {
@@ -187,28 +188,38 @@ export async function dispatchMailApi(
 		if (method === "GET") {
 			const mailboxId = params.get("mailboxId");
 			if (!mailboxId) return json({ folders: [] });
-			await mailboxAccess(user, mailboxId);
-			const settings = await mailSettings(user);
+			try {
+				await mailboxAccess(user, mailboxId);
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					return json({ error: "Mailbox not found" }, 404);
+				throw error;
+			}
+			const folders = await withDatabase(
+				(sql) =>
+					sql.NativeFolderList`SELECT id,user_id,mailbox_id,name,color,created_at FROM folders WHERE mailbox_id=${mailboxId} ORDER BY name`,
+			);
 			return json({
-				folders: settings.folders
-					.filter((folder) => folder.mailbox_id === mailboxId)
-					.map((folder) => ({
-						id: folder.id,
-						name: folder.name,
-						color: folder.color,
-						mailboxId: folder.mailbox_id,
-					})),
+				folders: folders.map((folder) => ({
+					id: folder.id,
+					userId: folder.user_id,
+					name: folder.name,
+					color: folder.color,
+					mailboxId: folder.mailbox_id,
+					createdAt: iso(folder.created_at),
+				})),
 			});
 		}
 		if (method === "POST") {
-			const input = z
-				.object({
-					mailboxId: z.string(),
-					name: z.string().trim().min(1).max(100),
-					color: z.string().optional(),
-				})
-				.parse(await request.json());
-			return json(await createFolder(user, input));
+			const input = createFolderSchema.safeParse(await request.json());
+			if (!input.success) return json({ error: input.error.flatten() }, 400);
+			try {
+				return json(await createFolder(user, input.data));
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					return json({ error: "Mailbox not found" }, 404);
+				throw error;
+			}
 		}
 	}
 	if (method === "GET" && path === "/api/messages") {
@@ -250,15 +261,55 @@ export async function dispatchMailApi(
 			})),
 		});
 	}
-	if (method === "POST" && path === "/api/messages/bulk")
-		return json(
-			await bulkAction(user, bulkActionSchema.parse(await request.json())),
-		);
+	if (method === "POST" && path === "/api/messages/bulk") {
+		const payload = z
+			.object({
+				messageIds: z.array(z.unknown()).optional().default([]),
+				action: z.unknown(),
+				folderId: z.unknown().optional(),
+			})
+			.safeParse(await request.json());
+		if (!payload.success)
+			return json({ error: "Invalid bulk message action" }, 400);
+		const ids = payload.data.messageIds.filter(Boolean);
+		if (
+			ids.length &&
+			payload.data.action === "folder" &&
+			!payload.data.folderId
+		)
+			return json({ error: "Folder is required" }, 400);
+		const data = bulkActionSchema.safeParse({
+			messageIds: ids,
+			action: payload.data.action,
+			...(payload.data.action === "folder"
+				? { folderId: payload.data.folderId }
+				: {}),
+		});
+		if (!data.success)
+			return json({ error: "Invalid bulk message action" }, 400);
+		return json(await bulkAction(user, data.data));
+	}
 	if (method === "POST" && path === "/api/messages/empty") {
 		const data = z
-			.object({ mailboxId: z.string(), folder: z.enum(["trash", "spam"]) })
-			.parse(await request.json());
-		return json(await emptyFolder(user, data.mailboxId, data.folder));
+			.object({
+				mailboxId: z.string().min(1),
+				folder: z.enum(["trash", "spam"]),
+			})
+			.safeParse(await request.json().catch(() => ({})));
+		if (!data.success)
+			return json(
+				{ error: "A mailbox and a Trash or Spam folder are required" },
+				400,
+			);
+		try {
+			return json(
+				await emptyFolder(user, data.data.mailboxId, data.data.folder),
+			);
+		} catch (error) {
+			if (error instanceof MailboxAccessError)
+				return json({ error: "Mailbox not found" }, 404);
+			throw error;
+		}
 	}
 	const match =
 		/^\/api\/messages\/([^/]+)(?:\/(thread|snooze|star|read|metadata|status))?$/.exec(

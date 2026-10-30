@@ -7,6 +7,7 @@ import type { User } from "../../shared/contracts";
 import { aliasSchema, ruleSchema } from "../../shared/mail-contracts";
 import { mailboxAccess, managedDomain } from "./access";
 import { normalizeLocalPart } from "./routing";
+import { folderSchema } from "../../lib/validators";
 
 export async function mailSettings(user: User) {
 	const accessible = await listMailboxes(user),
@@ -160,29 +161,19 @@ export async function createFolder(
 	user: User,
 	input: { mailboxId: string; name: string; color?: string },
 ) {
-	const name = z.string().trim().min(1).max(100).parse(input.name);
-	const mailbox = await mailboxAccess(user, input.mailboxId, "manage");
+	const data = folderSchema.parse(input),
+		name = data.name,
+		color = data.color;
+	const mailbox = await mailboxAccess(user, data.mailboxId, "manage");
 	const folderId = id("folder");
-	const color = z
-		.enum([
-			"#2563eb",
-			"#7c3aed",
-			"#db2777",
-			"#dc2626",
-			"#ea580c",
-			"#d97706",
-			"#16a34a",
-			"#0d9488",
-		])
-		.parse(input.color ?? "#2563eb");
 	const created = await withDatabase(
 		(sql) => sql.CreateCustomFolder`
  INSERT INTO folders (id,user_id,mailbox_id,name,color,created_at)
- SELECT ${folderId},${mailbox.user_id},${input.mailboxId},${name},${color},${seconds()}
- WHERE NOT EXISTS(SELECT 1 FROM folders WHERE mailbox_id=${input.mailboxId} AND name=${name}) RETURNING id`,
+ SELECT ${folderId},${mailbox.user_id},${data.mailboxId},${name},${color},${seconds()}
+ WHERE NOT EXISTS(SELECT 1 FROM folders WHERE mailbox_id=${data.mailboxId} AND name=${name}) RETURNING id`,
 	);
 	if (!created.length) throw new Error("Folder already exists");
-	return { id: folderId, mailboxId: input.mailboxId, name, color };
+	return { id: folderId, mailboxId: data.mailboxId, name, color };
 }
 export async function removeRule(user: User, ruleId: string) {
 	const [rule] = await withDatabase(

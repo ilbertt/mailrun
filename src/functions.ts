@@ -27,6 +27,7 @@ import {
 } from "./server/mail/repository";
 import { provisionEmail, refreshRelay } from "./server/cloudflare/setup";
 import { installationStatus } from "./server/cloudflare/installation";
+import { folderSchema as createFolderSchema } from "./lib/validators";
 import { sendMessage, sendDraft } from "./server/mail/send";
 import {
 	saveDraft,
@@ -180,13 +181,7 @@ export const domainAliasesFn = createServerFn({ method: "POST" })
 		return { ok: true };
 	});
 export const createFolderFn = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			mailboxId: z.string(),
-			name: z.string().trim().min(1).max(100),
-			color: z.string().optional(),
-		}),
-	)
+	.validator(createFolderSchema)
 	.handler(async ({ data }) => createFolder(await requireUser(), data));
 
 export const navigationCountsFn = createServerFn({ method: "GET" })

@@ -1,12 +1,12 @@
 import { spamFeedback } from "./spam-feedback";
 import { z } from "zod";
 import { withDatabase, id, seconds, type AppSQL } from "../db";
-import { mailboxAccess } from "./access";
+import { mailboxAccess, MailboxAccessError } from "./access";
 import type { User } from "../../shared/contracts";
 import { deleteUnreferencedObjects } from "../storage";
 
 export const bulkActionSchema = z.object({
-	messageIds: z.array(z.string().min(1).max(200)).min(1).max(10000),
+	messageIds: z.array(z.string().min(1)).min(1),
 	action: z.enum([
 		"archive",
 		"trash",
@@ -116,6 +116,8 @@ export async function bulkAction(
 ) {
 	const data = bulkActionSchema.parse(input),
 		ids = [...new Set(data.messageIds)];
+	if (data.action === "folder" && !data.folderId)
+		throw new Response("Folder is required", { status: 400 });
 	const folder =
 		data.action === "folder"
 			? await withDatabase(
@@ -127,7 +129,13 @@ export async function bulkAction(
 			: undefined;
 	if (data.action === "folder") {
 		if (!folder) throw new Response("Folder not found", { status: 404 });
-		await mailboxAccess(user, folder.mailbox_id, "manage");
+		try {
+			await mailboxAccess(user, folder.mailbox_id, "manage");
+		} catch (error) {
+			if (error instanceof MailboxAccessError)
+				throw new Response("Folder not found", { status: 404 });
+			throw error;
+		}
 	}
 	const selected = await withDatabase(
 		(sql) => sql.BulkAuthorizedMessages`
@@ -135,7 +143,7 @@ export async function bulkAction(
  /* @notNull status */
  SELECT m.id,m.mailbox_id,m.status,m.raw_r2_key,m.direction FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id JOIN domains d ON d.id=b.domain_id
  WHERE m.id IN (SELECT value FROM json_each(${JSON.stringify(ids)})) AND b.disabled=0 AND (m.status!='draft' OR m.user_id=${user.id})
- AND (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND (${data.action === "read" || data.action === "unread" ? 1 : 0}=1 OR a.permission='full_access'))))`,
+ AND (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=b.id AND a.user_id=${user.id} AND a.permission IN('read_only','send_on_behalf','send_as','full_access') AND (${data.action === "read" || data.action === "unread" ? 1 : 0}=1 OR a.permission='full_access'))))`,
 	);
 	const allowed = selected.filter(
 		(message) => !folder || message.mailbox_id === folder.mailbox_id,
@@ -174,27 +182,28 @@ export async function bulkAction(
 						user,
 						message.id,
 						data.action === "spam" ? "spam" : "ham",
+						false,
 					);
 					continue;
 				}
 				await sql.SourceBulkUpdate`UPDATE messages SET
     status=coalesce(${status},status),read=coalesce(${read},read),
     folder_id=CASE WHEN ${data.action === "read" || data.action === "unread" ? 1 : 0}=1 THEN folder_id ELSE ${folder?.id ?? null} END,
-    snoozed_until=CASE WHEN ${data.action}='inbox' THEN NULL ELSE snoozed_until END,
-    trashed_at=CASE WHEN ${data.action}='trash' THEN ${seconds()} WHEN ${status} IS NOT NULL THEN NULL ELSE trashed_at END
+    snoozed_until=CASE WHEN ${data.action}='inbox' THEN NULL ELSE snoozed_until END
     WHERE id=${message.id} AND (status!='draft' OR user_id=${user.id})`;
 				if (data.action === "trash")
 					await sql.CancelBulkTrashedSends`UPDATE outbound_jobs SET status='cancelled',updated_at=${seconds()} WHERE message_id=${message.id} AND status='queued'`;
-				await audit(
-					sql,
-					user,
-					message.mailbox_id,
-					message.id,
-					data.action === "read" || data.action === "unread"
-						? "email.read"
-						: "email.delete",
-					{ bulkAction: data.action },
-				);
+				if (data.action !== "inbox")
+					await audit(
+						sql,
+						user,
+						null,
+						message.id,
+						data.action === "read" || data.action === "unread"
+							? "email.read"
+							: "email.delete",
+						{ bulkAction: data.action },
+					);
 			}
 		}),
 	);
@@ -208,7 +217,7 @@ export async function emptyFolder(
 	await mailboxAccess(user, mailboxId, "manage");
 	const rows = await withDatabase(
 		(sql) =>
-			sql.EmptyFolderCandidates`SELECT id FROM messages WHERE mailbox_id=${mailboxId} AND status=${folder} ORDER BY created_at,id LIMIT 250`,
+			sql.EmptyFolderCandidates`SELECT id FROM messages WHERE mailbox_id=${mailboxId} AND status=${folder} ORDER BY created_at,id LIMIT 100`,
 	);
 	const result = rows.length
 		? await bulkAction(
