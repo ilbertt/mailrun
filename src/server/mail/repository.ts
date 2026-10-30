@@ -24,7 +24,7 @@ export async function listMailboxes(user: User) {
  /* @notNull id */
  /* @notNull user_id */
  /* @notNull domain_owner */
- SELECT m.id,m.local_part,m.display_name,d.hostname,m.user_id,m.domain_id,d.user_id AS domain_owner,m.use_all_domains,m.signature,m.type,m.avatar_key,m.auto_reply_enabled,m.auto_reply_subject,m.auto_reply_body,u.email AS owner_email,u.name AS owner_name,u.avatar_key AS owner_avatar,
+ SELECT m.id,m.local_part,m.display_name,d.hostname,m.user_id,m.domain_id,d.user_id AS domain_owner,m.use_all_domains,m.signature,m.type,m.avatar_key,m.disabled,m.created_at,m.auto_reply_enabled,m.auto_reply_subject,m.auto_reply_body,u.email AS owner_email,u.name AS owner_name,u.avatar_key AS owner_avatar,
  CASE WHEN m.user_id=${user.id} THEN 'full_access' ELSE (SELECT permission FROM mailbox_access WHERE mailbox_id=m.id AND user_id=${user.id} LIMIT 1) END AS permission
  FROM mailboxes m JOIN domains d ON d.id=m.domain_id JOIN users u ON u.id=m.user_id WHERE m.disabled=0 AND (m.user_id=${user.id} OR (m.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id}))) ORDER BY m.created_at,m.id`;
 		if (!rows.length) return [];

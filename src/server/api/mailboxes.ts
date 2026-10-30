@@ -14,6 +14,29 @@ import { localPartSchema } from "../../shared/mail-contracts";
 import { currentProfile } from "./settings";
 import { readLimitedBody } from "../mail/inbound";
 import { iso } from "../mail/message-query";
+// The original inbox list repairs accounts lacking any enabled owned personal box.
+// The relay already forwards this domain; address resolution stays local here.
+export async function ensurePersonalMailbox(user: User) {
+	const current = await listMailboxes(user);
+	if (current.some((box) => box.user_id === user.id && box.type === "personal"))
+		return current;
+	const [localPart, hostname] = user.email.toLowerCase().split("@");
+	if (!localPart || !hostname) return current;
+	try {
+		const created = await withDatabase(
+			(sql) => sql.NativeEnsurePersonalMailbox`
+ INSERT INTO mailboxes(id,user_id,domain_id,local_part,display_name,type,created_at)
+ SELECT ${id("mbx")},${user.id},d.id,${localPart},${user.name || localPart},'personal',${seconds()}
+ FROM domains d WHERE d.hostname=${hostname}
+ AND NOT EXISTS(SELECT 1 FROM mailboxes b WHERE b.user_id=${user.id} AND b.type='personal' AND b.disabled=0)
+ AND NOT EXISTS(SELECT 1 FROM mailboxes b WHERE b.domain_id=d.id AND b.local_part=${localPart})
+ LIMIT 1 RETURNING id`,
+		);
+		return created.length ? listMailboxes(user) : current;
+	} catch {
+		return current;
+	}
+}
 export async function mailboxDetail(user: User, mailboxId: string) {
 	const access = await mailboxAccess(user, mailboxId);
 	const [row] = await withDatabase(
@@ -63,7 +86,7 @@ export async function mailboxesApi(
 		);
 	if (!match) {
 		if (method === "GET") {
-			const rows = await listMailboxes(user);
+			const rows = await ensurePersonalMailbox(user);
 			return json({
 				mailboxes: rows.map((row) => ({
 					id: row.id,
@@ -79,6 +102,9 @@ export async function mailboxesApi(
 					autoReplyEnabled: !!row.auto_reply_enabled,
 					autoReplySubject: row.auto_reply_subject,
 					autoReplyBody: row.auto_reply_body,
+					useAllDomains: !!row.use_all_domains,
+					disabled: !!row.disabled,
+					createdAt: iso(row.created_at),
 					isPrimary:
 						`${row.local_part}@${row.hostname}`.toLowerCase() ===
 						user.email.toLowerCase(),

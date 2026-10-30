@@ -1117,6 +1117,11 @@ export interface ISourceDetailAttachmentsResult {
     content_type: IMessageAttachmentsColumns["content_type"];
 }
 
+/** Result of query `NativeEnsurePersonalMailbox`. */
+export interface INativeEnsurePersonalMailboxResult {
+    id: string | null;
+}
+
 /** Result of query `NativeMailboxDetail`. */
 export interface INativeMailboxDetailResult {
     id: string | null;
@@ -4090,6 +4095,8 @@ export interface IListMailboxesResult {
     signature: IMailboxesColumns["signature"];
     type: IMailboxesColumns["type"];
     avatar_key: string | null;
+    disabled: number | null;
+    created_at: number | null;
     auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
     auto_reply_subject: IMailboxesColumns["auto_reply_subject"];
     auto_reply_body: IMailboxesColumns["auto_reply_body"];
@@ -5033,6 +5040,7 @@ export interface Queries {
     NativeSetupMetadata: INativeSetupMetadataResult;
     NativeFolderList: INativeFolderListResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
+    NativeEnsurePersonalMailbox: INativeEnsurePersonalMailboxResult;
     NativeMailboxDetail: INativeMailboxDetailResult;
     NativeMailboxOwner: INativeMailboxOwnerResult;
     NativeMailboxDomain: INativeMailboxDomainResult;

@@ -5,10 +5,13 @@ import type { Database } from "bun:sqlite";
 import { deepStrictEqual, equal, ok } from "node:assert/strict";
 
 export const sourceUploadsCapture = capture;
-export function verifyOriginalRecordFields(db: Database) {
+export function verifyOriginalRecordFields(
+	db: Database,
+	tables: Record<string, Record<string, unknown>[]> = capture.backup.tables,
+) {
 	let records = 0,
 		columns = 0;
-	for (const [table, sourceRows] of Object.entries(capture.backup.tables)) {
+	for (const [table, sourceRows] of Object.entries(tables)) {
 		const quote = (name: string) => `"${name.replaceAll('"', '""')}"`;
 		const rows = db.query(`SELECT * FROM ${quote(table)}`).all() as Record<
 			string,
@@ -49,15 +52,21 @@ export function verifyOriginalRecordFields(db: Database) {
 		columns += rows.length * keys.length;
 	}
 	return {
-		tables: Object.keys(capture.backup.tables).length,
+		tables: Object.keys(tables).length,
 		records,
 		fields: columns,
 	};
 }
-export async function prepareSourceUploads(directory: string) {
+export async function prepareSourceUploads(
+	directory: string,
+	source: {
+		backup: unknown;
+		files: { key: string; base64: string; sha256: string }[];
+	} = capture,
+) {
 	const bucket = join(directory, "original-bucket"),
 		store = new LocalStorage(bucket);
-	for (const file of capture.files) {
+	for (const file of source.files) {
 		const bytes = Buffer.from(file.base64, "base64");
 		if (
 			new Bun.CryptoHasher("sha256").update(bytes).digest("hex") !== file.sha256
@@ -68,7 +77,7 @@ export async function prepareSourceUploads(directory: string) {
 	const backup = join(directory, "original-records.json");
 	await new LocalStorage(directory).put(
 		"original-records.json",
-		JSON.stringify(capture.backup),
+		JSON.stringify(source.backup),
 	);
 	return { bucket, backup };
 }

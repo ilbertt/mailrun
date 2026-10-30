@@ -260,13 +260,13 @@ export async function downloadBackup(
 	const file = new LocalStorage().file(row.r2_key!);
 	if (!(await file.exists()))
 		throw new Response("Backup file not found", { status: 404 });
-	const filename = (row.filename ?? `${backupId}.json`).replace(
+	const filename = (row.filename ?? `${backupId}.sql`).replace(
 		/[\r\n"\\]/g,
 		"_",
 	);
 	return new Response(head ? null : file, {
 		headers: {
-			"Content-Type": "application/json",
+			"Content-Type": "application/sql",
 			"Content-Length": String(file.size),
 			"Content-Disposition": `attachment; filename="${filename}"`,
 			"Cache-Control": "no-store",

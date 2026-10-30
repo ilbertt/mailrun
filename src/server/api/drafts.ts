@@ -36,6 +36,8 @@ async function sourceDraft(user: User, id: string) {
 	);
 	return {
 		id: draft.id,
+		userId: draft.user_id,
+		status: draft.status,
 		mailboxId: draft.mailbox_id,
 		fromAddr: draft.from_addr,
 		toAddr: draft.to_addr,
@@ -50,6 +52,8 @@ async function sourceDraft(user: User, id: string) {
 		revision: draft.draft_revision,
 		attachments: draft.attachments.map((file) => ({
 			id: file.id,
+			messageId: file.message_id,
+			contentId: file.content_id,
 			filename: file.filename,
 			size: file.size,
 			type: file.content_type,
@@ -70,8 +74,9 @@ export async function draftResponse(
 	attachmentsOnly = false,
 ) {
 	const draft = await sourceDraft(user, id);
+	const { revision, ...body } = draft;
 	return Response.json(
-		attachmentsOnly ? { attachments: draft.attachments } : { draft },
+		attachmentsOnly ? { attachments: draft.attachments } : { draft: body },
 		{
 			headers: {
 				ETag: `"${draft.revision}"`,

@@ -18,3 +18,16 @@ jobs:
       - run: bun run check
       - run: bun scripts/compile.ts
       - run: bun scripts/smoke.ts dist/mailrun
+      - run: bun scripts/smoke-mail-reads.ts dist/mailrun
+      - run: bun scripts/smoke-message-details.ts dist/mailrun
+      - run: bun run smoke:source-uploads dist/mailrun
+      - run: bun run smoke:source-features dist/mailrun
+      - run: sha256sum dist/mailrun > dist/mailrun.sha256
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: mailrun-linux-${{ github.sha }}
+          path: |
+            dist/mailrun
+            dist/mailrun.sha256
+          retention-days: 1
