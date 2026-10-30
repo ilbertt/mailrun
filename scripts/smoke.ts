@@ -11,6 +11,7 @@ import { createHmac } from "node:crypto";
 import { LocalStorage } from "../src/server/storage";
 import { sourceRouteContracts } from "../src/server/http/route-contract";
 import sourceHttpMethods from "../tests/source-http-methods.json";
+import sourcePages from "../tests/source-pages.json";
 
 const state = await fixture();
 const token = crypto.randomUUID();
@@ -78,6 +79,54 @@ try {
 	const base = log.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
 	if (!base) throw new Error(`Unexpected startup output: ${log}`);
 	reader.releaseLock();
+	for (const [path, page] of Object.entries(sourcePages.pages)) {
+		if (!("redirectTo" in page)) continue;
+		for (const query of ["", "?mailboxId=legacy&token=123&from=%2Fcompose"]) {
+			const response = await fetch(base + path + query, { redirect: "manual" });
+			if (
+				response.status !== 307 ||
+				response.headers.get("Location") !== page.redirectTo
+			)
+				throw new Error(`Original page alias differs: ${path}${query}`);
+			await response.body?.cancel();
+		}
+	}
+	const seed = await fetch(base + "/api/seed", {
+		method: "POST",
+		body: "not JSON",
+	});
+	if (
+		seed.status !== 403 ||
+		(await seed.json()).error !== "Not available in production"
+	)
+		throw new Error("Production demo-seed refusal differs");
+	state.db.exec(
+		"INSERT INTO messages(id,user_id,mailbox_id,direction,from_addr,to_addr,subject,status,created_at) VALUES('status-http','owner','mailbox','inbound','sender@example.org','hello@example.com','Status HTTP','received',1)",
+	);
+	for (const status of ["trash", "received", "sent", "draft"]) {
+		const response = await fetch(base + "/api/messages/status-http/status", {
+			method: "POST",
+			headers: {
+				Cookie: "ep_session=" + token,
+				Origin: publicBase,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ status }),
+		});
+		if (
+			!response.ok ||
+			(await response.json()).success !== true ||
+			(
+				state.db
+					.query("SELECT status FROM messages WHERE id='status-http'")
+					.get() as { status: string } | null
+			)?.status !== status
+		)
+			throw new Error("Compiled message-status mutation differs: " + status);
+	}
+	state.db.exec(
+		"DELETE FROM audit_logs WHERE message_id='status-http'; DELETE FROM messages WHERE id='status-http'",
+	);
 	// These responses were captured from the real original server, independently
 	// of our method table. Keep authentication absent in both fixtures.
 	for (const sample of sourceHttpMethods.cases) {

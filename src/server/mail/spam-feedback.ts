@@ -15,6 +15,7 @@ export async function spamFeedback(
 	user: User,
 	messageId: string,
 	classification: "spam" | "ham",
+	clearSnooze = true,
 ) {
 	const [message] =
 		await sql.FeedbackMessage`SELECT * FROM messages WHERE id=${messageId}`;
@@ -71,7 +72,7 @@ export async function spamFeedback(
 			{ classification },
 		);
 	}
-	await sql.ApplySpamVerdict`UPDATE messages SET status=${status},folder_id=NULL,snoozed_until=CASE WHEN ${classification}='ham' THEN NULL ELSE snoozed_until END WHERE id=${messageId}`;
+	await sql.ApplySpamVerdict`UPDATE messages SET status=${status},folder_id=NULL,snoozed_until=CASE WHEN ${classification}='ham' AND ${clearSnooze ? 1 : 0}=1 THEN NULL ELSE snoozed_until END WHERE id=${messageId}`;
 	return true;
 }
 export async function observeReputation(

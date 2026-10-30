@@ -59,6 +59,8 @@ import {
 	messageRecord,
 	snooze,
 	toggleStar,
+	messageStatusSchema,
+	updateMessageStatus,
 } from "../mail/message-actions";
 import { mailSettings, createFolder } from "../mail/management";
 import { listMailboxes, getThread } from "../mail/repository";
@@ -258,7 +260,7 @@ export async function dispatchMailApi(
 		return json(await emptyFolder(user, data.mailboxId, data.folder));
 	}
 	const match =
-		/^\/api\/messages\/([^/]+)(?:\/(thread|snooze|star|read|metadata))?$/.exec(
+		/^\/api\/messages\/([^/]+)(?:\/(thread|snooze|star|read|metadata|status))?$/.exec(
 			path,
 		);
 	if (match) {
@@ -339,6 +341,15 @@ export async function dispatchMailApi(
 		}
 		if (action === "star" && method === "POST")
 			return json(await toggleStar(user, messageId));
+		if (action === "status" && method === "POST") {
+			const body: unknown = await request.json();
+			const parsed = z.object({ status: messageStatusSchema }).safeParse(body);
+			if (!parsed.success)
+				return json({ error: "Invalid message status" }, 400);
+			if (!(await updateMessageStatus(user, messageId, parsed.data.status)))
+				return json({ error: "Message not found" }, 404);
+			return json({ success: true });
+		}
 		if (action === "snooze" && method === "POST") {
 			const data = z
 				.object({ snoozedUntil: z.iso.datetime() })
@@ -356,6 +367,15 @@ export async function dispatchMailApi(
 }
 export async function serveMailApi(request: Request) {
 	try {
+		if (
+			process.env.NODE_ENV === "production" &&
+			new URL(request.url).pathname === "/api/seed" &&
+			request.method === "POST"
+		)
+			return Response.json(
+				{ error: "Not available in production" },
+				{ status: 403 },
+			);
 		if (new URL(request.url).pathname === "/api/agent/chat") {
 			const { serveAgentChat } = await import("./agent-chat");
 			return serveAgentChat(request);

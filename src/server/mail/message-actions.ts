@@ -46,6 +46,48 @@ export async function audit(
 ) {
 	await sql.MailAudit`INSERT INTO audit_logs (id,actor_user_id,mailbox_id,message_id,action,metadata,created_at) VALUES (${id("audit")},${user.id},${mailboxId},${messageId},${action},${JSON.stringify(metadata)},${seconds()})`;
 }
+export const messageStatusSchema = z.enum([
+	"received",
+	"sent",
+	"draft",
+	"trash",
+	"spam",
+]);
+export async function updateMessageStatus(
+	user: User,
+	messageId: string,
+	status: z.infer<typeof messageStatusSchema>,
+) {
+	return withDatabase((sql) =>
+		sql.begin(async (sql) => {
+			const [message] =
+				await sql.NativeStatusMessage`SELECT m.id,m.mailbox_id,m.status FROM messages m JOIN mailboxes b ON b.id=m.mailbox_id WHERE m.id=${messageId} AND b.disabled=0 AND (m.status!='draft' OR m.user_id=${user.id}) AND (b.user_id=${user.id} OR (b.type='shared' AND EXISTS(SELECT 1 FROM license_settings WHERE id='default' AND plan='team' AND state='active') AND EXISTS(SELECT 1 FROM mailbox_access WHERE mailbox_id=b.id AND user_id=${user.id} AND permission='full_access'))) LIMIT 1`;
+			if (!message) return false;
+			const [sending] =
+				await sql.NativeStatusSendingGuard`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${messageId} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${messageId}) LIMIT 1`;
+			if (sending)
+				throw new Response("A message is being sent. Try again shortly.", {
+					status: 409,
+				});
+			if (
+				status === "spam" ||
+				(status === "received" && message.status === "spam")
+			)
+				return spamFeedback(
+					sql,
+					user,
+					messageId,
+					status === "spam" ? "spam" : "ham",
+					false,
+				);
+			await sql.NativeUpdateMessageStatus`UPDATE messages SET status=${status} WHERE id=${messageId}`;
+			await audit(sql, user, message.mailbox_id, messageId, "email.delete", {
+				status,
+			});
+			return true;
+		}),
+	);
+}
 export async function bulkAction(
 	user: User,
 	input: z.input<typeof bulkActionSchema>,

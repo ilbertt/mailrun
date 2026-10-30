@@ -3888,6 +3888,22 @@ export interface ISourceMessageRecordResult {
 export interface IMailAuditResult {
 }
 
+/** Result of query `NativeStatusMessage`. */
+export interface INativeStatusMessageResult {
+    id: string | null;
+    mailbox_id: string | null;
+    status: IMessagesColumns["status"];
+}
+
+/** Result of query `NativeStatusSendingGuard`. */
+export interface INativeStatusSendingGuardResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `NativeUpdateMessageStatus`. */
+export interface INativeUpdateMessageStatusResult {
+}
+
 /** Result of query `BulkTargetFolder`. */
 export interface IBulkTargetFolderResult {
     id: IFoldersColumns["id"];
@@ -5365,6 +5381,9 @@ export interface Queries {
     DeleteRoutingRule: IDeleteRoutingRuleResult;
     SourceMessageRecord: ISourceMessageRecordResult;
     MailAudit: IMailAuditResult;
+    NativeStatusMessage: INativeStatusMessageResult;
+    NativeStatusSendingGuard: INativeStatusSendingGuardResult;
+    NativeUpdateMessageStatus: INativeUpdateMessageStatusResult;
     BulkTargetFolder: IBulkTargetFolderResult;
     BulkAuthorizedMessages: IBulkAuthorizedMessagesResult;
     NativeBulkSendingGuard: INativeBulkSendingGuardResult;

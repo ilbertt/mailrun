@@ -1,0 +1,302 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "pages": {
+    "/": {
+      "file": "src/app/page.tsx",
+      "sha256": "50b4a3d90fa6250f8e06ccf29061113b0418160b6e22380a07dc07cc215a360d"
+    },
+    "/accounts": {
+      "file": "src/app/(admin)/accounts/page.tsx",
+      "sha256": "da680fa7eec7667f1cc3d81bfe668e2063934f2a440e07a7ede4acadaf4c0302"
+    },
+    "/accounts/[id]": {
+      "file": "src/app/(admin)/accounts/[id]/page.tsx",
+      "sha256": "daa1fa3ea0817e273a76e8df3b93b7617c68e39315c03836e1e3262182f011dc"
+    },
+    "/accounts/[id]/mailboxes": {
+      "file": "src/app/(admin)/accounts/[id]/mailboxes/page.tsx",
+      "sha256": "1b571eea16178df5d65777318227615ebd5eed2a6963f2c9e44ccbed6435bf76"
+    },
+    "/accounts/[id]/password": {
+      "file": "src/app/(admin)/accounts/[id]/password/page.tsx",
+      "sha256": "35aad1c270d1447db5b094a1c01c04b43d839b34ca046ebd6a595b4897904eae"
+    },
+    "/accounts/[id]/permissions": {
+      "file": "src/app/(admin)/accounts/[id]/permissions/page.tsx",
+      "sha256": "5f3aea04ffe65dcf27717bfdcebaaedcc392a35ad2ee835f3ffeb5b157ada5f7"
+    },
+    "/activity": {
+      "file": "src/app/(admin)/activity/page.tsx",
+      "sha256": "cae0ffec6700aa01be0e6bbf81a1c6a0b0d297a4ce3493e21c487a65cf27ed2d"
+    },
+    "/admin": {
+      "file": "src/app/(admin)/admin/page.tsx",
+      "sha256": "1284a00aacb8b9d62ebb64364c659f1ec36817f7479861eeba3ffbddb1032cab"
+    },
+    "/agent": {
+      "file": "src/app/(admin)/agent/page.tsx",
+      "sha256": "e4d120f8d1dc84fa18661b36db9b0b7dd19850c3281a70cc44b23a56d81a7944"
+    },
+    "/agent/review/[id]": {
+      "file": "src/app/(dashboard)/agent/review/[id]/page.tsx",
+      "sha256": "2b11e4f51acb9f7c9ce10415f3d20b4d11b4903ba8ba36e8c3d7bc7bfb53ba8d"
+    },
+    "/ai-usage": {
+      "file": "src/app/(admin)/ai-usage/page.tsx",
+      "sha256": "bd5335dfd3594d8226b4c94643dc40199f22d67563110f6167a458479185a8f2"
+    },
+    "/api-keys": {
+      "file": "src/app/(admin)/api-keys/page.tsx",
+      "sha256": "09f0c0f56371e0ddc364d20675162804bc0d8812df9b8e166740aaa77db7ac46"
+    },
+    "/archived": {
+      "file": "src/app/(dashboard)/archived/page.tsx",
+      "sha256": "5b9653b3f8af4ecc09f5a3224412fc7562f31dc38d12d7633edd4e65ce176c2d"
+    },
+    "/archived/[messageId]": {
+      "file": "src/app/(dashboard)/archived/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/audit-logs": {
+      "file": "src/app/(admin)/audit-logs/page.tsx",
+      "sha256": "1aee8c9deb2eca325f42f8ef28b5fafb87fe08b324d0d88e4e5a06ff8b9f9033",
+      "redirectTo": "/activity"
+    },
+    "/backups": {
+      "file": "src/app/(admin)/backups/page.tsx",
+      "sha256": "ee5e1f1962cb1b456cf33554d1df17fc37d0ff53084505e79e3cc17c8581a112"
+    },
+    "/book/[userId]": {
+      "file": "src/app/book/[userId]/page.tsx",
+      "sha256": "ac60e1127ecf7075afe0e5c45cfa37f659fb2373c832e39c7a714fdb5089f3b3"
+    },
+    "/book/[userId]/[eventId]": {
+      "file": "src/app/book/[userId]/[eventId]/page.tsx",
+      "sha256": "c63de9dcd3eb917118001e13ffb94ab92b3f35bf6c52b88d961084756ce2fc64"
+    },
+    "/booking": {
+      "file": "src/app/(calendar)/booking/page.tsx",
+      "sha256": "fc089cc9351af49a3069f3c9f8d46f522f3f4aa5f681f96ba3c5ae7ae6fdd1c0"
+    },
+    "/branding": {
+      "file": "src/app/(admin)/branding/page.tsx",
+      "sha256": "13e0d027cb010d2c4d3eb2317b2eae68555863d2e60989419ef1b71886b153fe"
+    },
+    "/c/[username]": {
+      "file": "src/app/c/[username]/page.tsx",
+      "sha256": "d5339f2ea44ffc67606c4a11dd106a4db90c4c9281a73c27dac28259ae868f03"
+    },
+    "/c/[username]/[slug]": {
+      "file": "src/app/c/[username]/[slug]/page.tsx",
+      "sha256": "bea6a97c389584bcc99cf69b0a339fdd7cbe6fd4b474fcc10080e75fb74c69ed"
+    },
+    "/calendar": {
+      "file": "src/app/(calendar)/calendar/page.tsx",
+      "sha256": "5f434ff1baa5a89f38dc9685ead9979ba365ad06a21649dd1f631c4d02219552"
+    },
+    "/compose": {
+      "file": "src/app/(dashboard)/compose/page.tsx",
+      "sha256": "69209e9837a0a453e051e42e070f3ff492545aec3fdb6ed2bf902a985e167915"
+    },
+    "/d/[token]": {
+      "file": "src/app/d/[token]/page.tsx",
+      "sha256": "4a17de1eaaa2abf6aa5d23e61b6c2f378a7685353f82ebe77287ef5198c7bac1"
+    },
+    "/domains": {
+      "file": "src/app/(admin)/domains/page.tsx",
+      "sha256": "84b5de913188243b59d312006b5fc196155deb9cfa686bd6217d1003fc1a4982"
+    },
+    "/drafts": {
+      "file": "src/app/(dashboard)/drafts/page.tsx",
+      "sha256": "e7fd5edf8a041d73a1a8c3f11a76a964d7328cf67839af6e3fe12410e383c786"
+    },
+    "/drafts/[messageId]": {
+      "file": "src/app/(dashboard)/drafts/[messageId]/page.tsx",
+      "sha256": "76a40c674eab72916ce810cd6074e8fa58571a25afb2cddf7b52d9cb83202ad2"
+    },
+    "/drive": {
+      "file": "src/app/(drive)/drive/page.tsx",
+      "sha256": "566fc4120eb89215f672ffee63c48b57912b5401dc75c8c1031c66fbacbe7220"
+    },
+    "/folders/[folderId]": {
+      "file": "src/app/(dashboard)/folders/[folderId]/page.tsx",
+      "sha256": "d2b1793adf8028be9ce751906d2789ecea441569eebabc121baa8dc58f8a5519"
+    },
+    "/folders/[folderId]/[messageId]": {
+      "file": "src/app/(dashboard)/folders/[folderId]/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/forgot-password": {
+      "file": "src/app/(auth)/forgot-password/page.tsx",
+      "sha256": "1f8a4dc4949039c13706ccfa48d5a7e8093720d9e6233aca252cef0e96026a04"
+    },
+    "/general": {
+      "file": "src/app/(admin)/general/page.tsx",
+      "sha256": "1d59fc301d7d19ec8198313834e6d5b5b08b530d739c39f2b23a476a7e5bc7c4"
+    },
+    "/import-export": {
+      "file": "src/app/(dashboard)/import-export/page.tsx",
+      "sha256": "744eec50e6dc8687f02126ecbaa17adf5e9faaadd33590997ae220b19014c605",
+      "redirectTo": "/settings/import"
+    },
+    "/inbox": {
+      "file": "src/app/(dashboard)/inbox/page.tsx",
+      "sha256": "56cc305c50997a5a13cd9715849617d99b23499b0dad24e83f939ba9dd259e75"
+    },
+    "/inbox/[messageId]": {
+      "file": "src/app/(dashboard)/inbox/[messageId]/page.tsx",
+      "sha256": "2713ea9db56cce9d532e5d2e91b7d95a6aff2e7b42a965adcb17cfe81d5a6887"
+    },
+    "/licenses": {
+      "file": "src/app/(admin)/licenses/page.tsx",
+      "sha256": "1f9b8243629bd7384254fd5f8cd46d4ab5e88a1829dabe27ac586aa3c373b5fe"
+    },
+    "/login": {
+      "file": "src/app/(auth)/login/page.tsx",
+      "sha256": "ef9ae5cb6b6276a1fa04134ae65f935791ce65ecce261128dff7dfb825f9628c"
+    },
+    "/mailboxes": {
+      "file": "src/app/(admin)/mailboxes/page.tsx",
+      "sha256": "882e8acd9c49bba903fb19f18d3b7f046c5bace3c7effe72b9faa901f9f4b0ed"
+    },
+    "/mailboxes/[id]": {
+      "file": "src/app/(admin)/mailboxes/[id]/page.tsx",
+      "sha256": "211a8607114997eb1b442e1949c47fdae95826ebf06a7396ebecc045fd0f65d7"
+    },
+    "/onboarding": {
+      "file": "src/app/(auth)/onboarding/page.tsx",
+      "sha256": "72e42713ce7572cf00a88bf1298e3c52fec29ab64c51c76ac76781c9bf7991ef",
+      "redirectTo": "/setup"
+    },
+    "/register": {
+      "file": "src/app/(auth)/register/page.tsx",
+      "sha256": "a9b54d490753d0c93d6b9a868d69065467be9e869351ff0848b9ae90443a1f40",
+      "redirectTo": "/setup"
+    },
+    "/reset-password": {
+      "file": "src/app/(auth)/reset-password/page.tsx",
+      "sha256": "eef1de0d9dd253a0e0c186e9a352d7344f1c20201dd182b742362aa1be3562d5"
+    },
+    "/routing": {
+      "file": "src/app/(admin)/routing/page.tsx",
+      "sha256": "1329e40e36397d52958895299c56b473e3bedddd9e218a4dda68ea3b76d43e8e"
+    },
+    "/rules": {
+      "file": "src/app/(dashboard)/rules/page.tsx",
+      "sha256": "2bc79bfc5e9cff5037e409ddcd8d6b9e1656e7d267e99c09264ee1c2ba0e9f36",
+      "redirectTo": "/settings/account"
+    },
+    "/scheduled": {
+      "file": "src/app/(dashboard)/scheduled/page.tsx",
+      "sha256": "8d0a476bfbf0fcc67a2b7b7a4b5354d1bd936c86603cc8aa1cbc1e8fc9b070bd"
+    },
+    "/scheduled/[messageId]": {
+      "file": "src/app/(dashboard)/scheduled/[messageId]/page.tsx",
+      "sha256": "c79564daaad8569a47599a06d7ac751573e7516e532d6ed5f921e0cca6606b10"
+    },
+    "/sent": {
+      "file": "src/app/(dashboard)/sent/page.tsx",
+      "sha256": "21d7a1eaf960f15a42609fb092de89a5789b02321963cc2005ff90c7cd4c2b69"
+    },
+    "/sent/[messageId]": {
+      "file": "src/app/(dashboard)/sent/[messageId]/page.tsx",
+      "sha256": "c79564daaad8569a47599a06d7ac751573e7516e532d6ed5f921e0cca6606b10"
+    },
+    "/settings": {
+      "file": "src/app/(settings)/settings/page.tsx",
+      "sha256": "4e46f0e505378696ea79785c47bb059b5ca7aa3778fe82d439efcb1b020ef96b",
+      "redirectTo": "/settings/account"
+    },
+    "/settings/account": {
+      "file": "src/app/(settings)/settings/account/page.tsx",
+      "sha256": "3232d7ad8bc97402bda6ed722cd91defd6124749aeda640d8d9051885e4264ef"
+    },
+    "/settings/api-keys": {
+      "file": "src/app/(settings)/settings/api-keys/page.tsx",
+      "sha256": "991e422020a0421e9aa35b47644a7646f6b81927d25b09a7a0a1f7da3dae1b34"
+    },
+    "/settings/app-passwords": {
+      "file": "src/app/(settings)/settings/app-passwords/page.tsx",
+      "sha256": "fb64bb3bf5c61d1f21adc8a1f94db4720aaa78a8c16ff003d7165bf96de9092c"
+    },
+    "/settings/auto-reply": {
+      "file": "src/app/(settings)/settings/auto-reply/page.tsx",
+      "sha256": "d66ba23db5e42ab70a0865f25927b6656f3372b535085d1de3220ed8f73feb9b",
+      "redirectTo": "/settings/inbox"
+    },
+    "/settings/export": {
+      "file": "src/app/(settings)/settings/export/page.tsx",
+      "sha256": "2f0b5d44b6c5e7151adcf1afc7fab2c9f1faeec6fb0a31737b928a2824b828ed"
+    },
+    "/settings/import": {
+      "file": "src/app/(settings)/settings/import/page.tsx",
+      "sha256": "b01116207aa0e5015331f6060621c3b44e107a24b8d4c16a8be1cf266e0ca859"
+    },
+    "/settings/import-export": {
+      "file": "src/app/(settings)/settings/import-export/page.tsx",
+      "sha256": "2f2fcff33dbadac646c65ac23f7f0d534dbf7a5ba3e98bb9d40f204288090853",
+      "redirectTo": "/settings/import"
+    },
+    "/settings/inbox": {
+      "file": "src/app/(settings)/settings/inbox/page.tsx",
+      "sha256": "bdf8bb6069b02455fe8fe4d976c7bd16304eda38402542963009d1eb46955d33"
+    },
+    "/settings/mailboxes": {
+      "file": "src/app/(settings)/settings/mailboxes/page.tsx",
+      "sha256": "c5cbd13f34d6064ce9988ab00f90b4feaaf033a82f0fd6733a5fe42370247d7c"
+    },
+    "/settings/mailboxes/[id]": {
+      "file": "src/app/(settings)/settings/mailboxes/[id]/page.tsx",
+      "sha256": "eeb02d22ce053282e611a60f64265e6fdd60b6f33b7ad9db088f3c12592a5881"
+    },
+    "/settings/rules": {
+      "file": "src/app/(settings)/settings/rules/page.tsx",
+      "sha256": "8a536c237d47ed5642bcd234e5c1c0c5cb7c9247d4a21d321875d71107b43393"
+    },
+    "/settings/security": {
+      "file": "src/app/(settings)/settings/security/page.tsx",
+      "sha256": "63721d9733d05662dcd34069b7b26552e5d6573d6d114545031ef92694943fed"
+    },
+    "/setup": {
+      "file": "src/app/(auth)/setup/page.tsx",
+      "sha256": "0f8e1f5fdd087de138f512d33e6e22aab69d10fc91ca04397a537dfeca52b529"
+    },
+    "/snoozed": {
+      "file": "src/app/(dashboard)/snoozed/page.tsx",
+      "sha256": "0e7b8346c2fbe25d1cb9a2f88b4d989c2eb4696d563b51e68a662aca871593c3"
+    },
+    "/snoozed/[messageId]": {
+      "file": "src/app/(dashboard)/snoozed/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/spam": {
+      "file": "src/app/(dashboard)/spam/page.tsx",
+      "sha256": "22b93718c34082f36d95a441761b8bcb368d2f51f6e450e0133d4f98bcf2dcad"
+    },
+    "/spam/[messageId]": {
+      "file": "src/app/(dashboard)/spam/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/starred": {
+      "file": "src/app/(dashboard)/starred/page.tsx",
+      "sha256": "f632c80d1e9c525ddfdb855add8678800a78806166575b55513978a91b53d369"
+    },
+    "/starred/[messageId]": {
+      "file": "src/app/(dashboard)/starred/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/trash": {
+      "file": "src/app/(dashboard)/trash/page.tsx",
+      "sha256": "8a27366c950b33dbd8f73e494fde41fdad974f84229a4db7536b703c15310c12"
+    },
+    "/trash/[messageId]": {
+      "file": "src/app/(dashboard)/trash/[messageId]/page.tsx",
+      "sha256": "86f8376ab513f111a4cc3a6544b2c209cdedb42f33ede75b51ce184b891fa4f2"
+    },
+    "/webhooks": {
+      "file": "src/app/(admin)/webhooks/page.tsx",
+      "sha256": "b237760104337c831d688e7ac6b9bdf96ffb5daef9adbb5b49a521f4011d803b"
+    }
+  }
+}
