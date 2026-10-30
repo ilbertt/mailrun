@@ -1649,6 +1649,7 @@ export interface INativeRouteSessionResult {
     role: IUsersColumns["role"] | null;
     is_primary_admin: IUsersColumns["is_primary_admin"] | null;
     time_zone: IUsersColumns["time_zone"];
+    transport: unknown | null;
     has_admin: number | null;
     has_domain: number | null;
 }

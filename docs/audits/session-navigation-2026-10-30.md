@@ -1,5 +1,8 @@
 # Session navigation and account-switch audit
 
+Historical audit for `d681055`. The [browser-authentication follow-up](browser-auth-2026-10-30.md)
+addresses its cookie/bearer, deadline and transient-probe gaps and records current verification.
+
 The original `71aa49b` client AuthGuard fetches `/api/auth/me` with `no-store`
 on pathname changes and redirects using current roles. Its primary-only fallback
 is `/admin`; ordinary users return to `/inbox`, and a revoked session goes to

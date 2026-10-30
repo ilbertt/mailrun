@@ -21,7 +21,14 @@ export type MailboxOption = {
 };
 
 export function useSelectedMailbox() {
-	const { user, mailboxes: rows, mailboxId, setMailboxId } = useMail();
+	const {
+		user,
+		scopeId,
+		mailboxes: rows,
+		mailboxesLoading,
+		mailboxId,
+		setMailboxId,
+	} = useMail();
 	const router = useRouter();
 	const location = useLocation();
 	const client = useQueryClient();
@@ -36,16 +43,14 @@ export function useSelectedMailbox() {
 				signature: row.signature,
 				type: row.type === "shared" ? "shared" : "personal",
 				permission: row.permission,
-				isPrimary:
-					`${row.local_part}@${row.hostname}`.toLowerCase() ===
-					user.email.toLowerCase(),
+				isPrimary: row.isPrimary,
 				hasAvatar: !!row.avatar_key,
 				autoReplyEnabled: !!row.auto_reply_enabled,
 				autoReplySubject: row.auto_reply_subject,
 				autoReplyBody: row.auto_reply_body,
 				senderAddresses: row.senderAddresses,
 			})),
-		[rows, user.email],
+		[rows, user?.email],
 	);
 	const selectedMailbox =
 		mailboxes.find((item) => item.id === mailboxId) ?? mailboxes[0] ?? null;
@@ -53,7 +58,7 @@ export function useSelectedMailbox() {
 		(item: MailboxOption | null) => {
 			if (!item) return;
 			setMailboxId(item.id);
-			client.setQueryData(mailboxesQuery(user.id).queryKey, (current) =>
+			client.setQueryData(mailboxesQuery(scopeId).queryKey, (current) =>
 				current?.map((row) =>
 					row.id === item.id
 						? {
@@ -67,7 +72,7 @@ export function useSelectedMailbox() {
 		},
 		[
 			client,
-			user.id,
+			scopeId,
 			setMailboxId,
 			mailboxId,
 			router,
@@ -75,5 +80,10 @@ export function useSelectedMailbox() {
 			location.searchStr,
 		],
 	);
-	return { mailboxes, selectedMailbox, setSelectedMailbox, isLoading: false };
+	return {
+		mailboxes,
+		selectedMailbox,
+		setSelectedMailbox,
+		isLoading: mailboxesLoading,
+	};
 }

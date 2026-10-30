@@ -1,7 +1,10 @@
 # Navigation with current-session validation
 
+Historical build `d681055`. The [fresh background-authentication comparison](navigation-async-auth-2026-10-30.md)
+supersedes these figures for the current implementation; the data below is retained.
+
 This [report](navigation-session-recheck-2026-10-30.json) supersedes the earlier
-navigation comparison for the current implementation. The earlier Mailrun build
+navigation comparison for that implementation. The earlier Mailrun build
 reused its session snapshot indefinitely during warm navigation. Original
 Mailflare rechecks authentication and roles on pathname changes; the updated
 Mailrun guard now does so too. The document locale/branding cache is still reused.

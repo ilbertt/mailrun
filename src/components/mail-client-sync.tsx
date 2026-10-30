@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMail } from "./mail-context";
 export function MailClientSync({ timeZone }: { timeZone: string | null }) {
-	const { user } = useMail(),
+	const { user, scopeId } = useMail(),
 		client = useQueryClient();
 	useEffect(() => {
-		saveUserTimeZonePreference(user.id, timeZone);
-	}, [user.id, timeZone]);
+		if (user) saveUserTimeZonePreference(user.id, timeZone);
+	}, [user?.id, timeZone]);
 	useEffect(() => {
 		const changed = (event: Event) => {
 			const path = (event as CustomEvent<{ path?: unknown }>).detail?.path;
@@ -17,14 +17,14 @@ export function MailClientSync({ timeZone }: { timeZone: string | null }) {
 					path,
 				)
 			) {
-				void client.invalidateQueries({ queryKey: ["mailboxes", user.id] });
-				void client.invalidateQueries({ queryKey: ["mail-settings", user.id] });
+				void client.invalidateQueries({ queryKey: ["mailboxes", scopeId] });
+				void client.invalidateQueries({ queryKey: ["mail-settings", scopeId] });
 			}
 		};
 		window.addEventListener("mailflare:api-mutated", changed);
 		return () => {
 			window.removeEventListener("mailflare:api-mutated", changed);
 		};
-	}, [client, user.id]);
+	}, [client, scopeId]);
 	return null;
 }

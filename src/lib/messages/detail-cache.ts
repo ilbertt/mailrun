@@ -2,6 +2,7 @@ import {
 	authFetch,
 	getClientSessionToken,
 	getClientSessionGeneration,
+	getClientPrincipalId,
 } from "@/lib/auth/client";
 import type { Message } from "@/hooks/types";
 import type { CachedMessageDetail } from "./detail-cache-types";
@@ -11,11 +12,13 @@ const detailRequests = new Map<string, Promise<CachedMessageDetail>>();
 let detailGeneration = 0;
 let cacheSessionGeneration = getClientSessionGeneration();
 let cacheSessionToken = getClientSessionToken();
+let cachePrincipal = getClientPrincipalId();
 
 export function clearMessageDetailCache() {
 	detailGeneration++;
 	cacheSessionGeneration = getClientSessionGeneration();
 	cacheSessionToken = getClientSessionToken();
+	cachePrincipal = getClientPrincipalId();
 	detailCache.clear();
 	detailRequests.clear();
 }
@@ -23,7 +26,8 @@ export function clearMessageDetailCache() {
 function syncSession() {
 	if (
 		cacheSessionGeneration !== getClientSessionGeneration() ||
-		cacheSessionToken !== getClientSessionToken()
+		cacheSessionToken !== getClientSessionToken() ||
+		cachePrincipal !== getClientPrincipalId()
 	)
 		clearMessageDetailCache();
 }

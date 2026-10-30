@@ -213,18 +213,17 @@ try {
 		redirect: "manual",
 	});
 	if (
-		![302, 307].includes(missingDomain.status) ||
-		missingDomain.headers.get("Location") !== "/setup"
+		missingDomain.status !== 200 ||
+		!(await missingDomain.text()).includes("Loading")
 	)
-		throw new Error("Administrator without a domain did not enter onboarding");
-	await missingDomain.body?.cancel();
+		throw new Error("Onboarding did not preserve the source browser-auth bootstrap");
 	const onboarding = await fetch(base + "/setup", {
 		headers: { Cookie: "ep_session=" + session.data.token },
 		redirect: "manual",
 	});
 	if (
 		!onboarding.ok ||
-		!(await onboarding.text()).includes("Connect mail routing")
+		!(await onboarding.text()).includes("Loading")
 	)
 		throw new Error("Original authenticated onboarding did not render");
 	const domainAgain = await fetch(base + "/api/domains", {

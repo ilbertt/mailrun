@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AUTH_SESSION_CHANGED_EVENT, authFetch } from "@/lib/auth/client";
+import {
+	AUTH_SESSION_CHANGED_EVENT,
+	AUTH_PRINCIPAL_CHANGED_EVENT,
+	authFetch,
+} from "@/lib/auth/client";
 
 export type CurrentUser = {
 	id: string;
@@ -66,8 +70,14 @@ export function useCurrentUser(): CurrentUser | null {
 			setReloadKey((key) => key + 1);
 		}
 		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, onSessionChanged);
-		return () =>
+		window.addEventListener(AUTH_PRINCIPAL_CHANGED_EVENT, onSessionChanged);
+		return () => {
 			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, onSessionChanged);
+			window.removeEventListener(
+				AUTH_PRINCIPAL_CHANGED_EVENT,
+				onSessionChanged,
+			);
+		};
 	}, []);
 
 	return user;

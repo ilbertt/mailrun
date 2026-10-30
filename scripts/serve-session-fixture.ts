@@ -84,6 +84,10 @@ try {
 		let seedDocument = true,
 			held = 0,
 			hold: ReturnType<typeof Promise.withResolvers<void>> | undefined;
+		let cookies = true;
+		let probeMode: "none" | "503" | "stall" | "401" = "none";
+		let releaseProbe = Promise.withResolvers<void>();
+		releases.push(releaseProbe.resolve);
 		const requests: Record<string, number> = {};
 		proxies.push(
 			Bun.serve({
@@ -95,6 +99,8 @@ try {
 						return Response.json({
 							name,
 							held,
+							cookies,
+							probeMode,
 							requests,
 							user: db
 								.query(
@@ -116,10 +122,30 @@ try {
 									"hold-detail",
 									"release",
 									"new-york",
+									"cookies-off",
+									"cookies-on",
+									"probe-503",
+									"probe-stall",
+									"probe-401",
+									"probe-ok",
 								]),
 							})
 							.parse(await request.json());
-						if (action === "reset") {
+						if (action === "cookies-off") {
+							cookies = false;
+						} else if (action === "cookies-on") {
+							cookies = true;
+							seedDocument = true;
+						} else if (action === "probe-503") probeMode = "503";
+						else if (action === "probe-401") probeMode = "401";
+						else if (action === "probe-stall") {
+							probeMode = "stall";
+							releaseProbe = Promise.withResolvers<void>();
+							releases.push(releaseProbe.resolve);
+						} else if (action === "probe-ok") {
+							probeMode = "none";
+							releaseProbe.resolve();
+						} else if (action === "reset") {
 							db.exec(
 								"UPDATE users SET role='admin',is_primary_admin=1,disabled=0,time_zone=NULL WHERE id='owner'; UPDATE users SET is_primary_admin=0 WHERE id='other-admin'; DELETE FROM sessions WHERE user_id='owner'",
 							);
@@ -156,9 +182,19 @@ try {
 						initial =
 							seedDocument &&
 							request.headers.get("accept")?.includes("text/html");
-					if (initial) {
+					if (initial && cookies) {
 						headers.set("Cookie", "ep_session=" + token);
 						seedDocument = false;
+					}
+					if (!cookies) headers.delete("Cookie");
+					const probe =
+						url.pathname === "/api/auth/me" ||
+						request.headers.get("X-Mailflare-Session-Probe") === "1";
+					if (probe && probeMode !== "none") {
+						if (probeMode === "stall") await releaseProbe.promise;
+						return new Response("Synthetic probe failure", {
+							status: probeMode === "401" ? 401 : 503,
+						});
 					}
 					headers.set("Host", `127.0.0.1:${target}`);
 					headers.delete("Accept-Encoding");
@@ -174,7 +210,8 @@ try {
 					const outgoing = new Headers(response.headers);
 					outgoing.delete("Content-Encoding");
 					outgoing.delete("Content-Length");
-					if (initial)
+					if (!cookies) outgoing.delete("Set-Cookie");
+					if (initial && cookies)
 						outgoing.append(
 							"Set-Cookie",
 							"ep_session=" + token + "; Path=/; HttpOnly; SameSite=Lax",

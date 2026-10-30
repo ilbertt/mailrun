@@ -76,7 +76,11 @@ export function SidebarProvider({
 	}, [width, minimal]);
 
 	useEffect(() => {
-		setUserId(user.id);
+		setUserId(user?.id ?? null);
+		if (!user) {
+			setStorageKey(null);
+			return;
+		}
 		const key = `mailflare-sidebar-minimal:${user.id}`;
 		setStorageKey(key);
 		if (isMobileViewport()) return;
@@ -99,7 +103,7 @@ export function SidebarProvider({
 			setWidth(savedWidth);
 			saveColumnWidth(user.id, "sidebar", savedWidth);
 		} catch {}
-	}, [user.id, expandedWidth]);
+	}, [user?.id, expandedWidth]);
 
 	function toggle() {
 		if (overlay) {

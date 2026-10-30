@@ -63,6 +63,9 @@ export async function listMailboxes(user: User) {
 			const { owner_email, owner_name, owner_avatar, ...mailbox } = row;
 			return {
 				...mailbox,
+				isPrimary:
+					`${row.local_part}@${row.hostname}`.toLowerCase() ===
+					user.email.toLowerCase(),
 				display_name: resolveMailboxDisplayName(
 					identity,
 					owner_email,

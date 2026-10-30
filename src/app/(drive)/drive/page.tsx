@@ -139,7 +139,7 @@ export default function DrivePage() {
 	const [movingIds, setMovingIds] = useState<Set<string>>(new Set());
 	const [dropFolder, setDropFolder] = useState<string | null>(null);
 
-	const userId = useContext(MailContext)?.user.id ?? "";
+	const userId = useContext(MailContext)?.scopeId ?? "";
 	const requestKey = `${userId}|${view}|${folder ?? ""}|${query}|${typesParam}`;
 	// A listing seen before renders straight from memory while it is refetched; only a new one shows the skeleton.
 	const current =

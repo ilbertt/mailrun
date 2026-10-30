@@ -31,18 +31,18 @@ import {
 import { ruleSchema } from "../shared/mail-contracts";
 import type { z } from "zod";
 export function RelayUpdate() {
-	const { user } = useMail();
+	const { user, scopeId } = useMail();
 	const client = useQueryClient();
 	const status = useQuery({
-		queryKey: ["email-setup", user.id],
+		queryKey: ["email-setup", scopeId],
 		queryFn: () => setupStatusFn(),
-		enabled: user.isPrimaryAdmin,
+		enabled: !!user?.isPrimaryAdmin,
 		staleTime: 60000,
 	});
 	const update = useMutation({
 		mutationFn: () => refreshRelayFn(),
 		onSuccess: () =>
-			client.invalidateQueries({ queryKey: ["email-setup", user.id] }),
+			client.invalidateQueries({ queryKey: ["email-setup", scopeId] }),
 	});
 	if (!status.data?.needsRelayUpdate) return null;
 	return (
@@ -69,14 +69,14 @@ export function RelayUpdate() {
 }
 
 export function MailboxSettings() {
-	const { user, mailboxes } = useMail();
+	const { user, scopeId, mailboxes } = useMail();
 	const client = useQueryClient();
-	const { data } = useSuspenseQuery(mailSettingsQuery(user.id));
+	const { data } = useSuspenseQuery(mailSettingsQuery(scopeId));
 	const [adding, setAdding] = useState<string | null>(null);
 	const refresh = async () => {
 		await Promise.all([
-			client.invalidateQueries({ queryKey: ["mail-settings", user.id] }),
-			client.invalidateQueries({ queryKey: ["mailboxes", user.id] }),
+			client.invalidateQueries({ queryKey: ["mail-settings", scopeId] }),
+			client.invalidateQueries({ queryKey: ["mailboxes", scopeId] }),
 		]);
 	};
 	const add = useMutation({
@@ -213,7 +213,7 @@ export function MailboxSettings() {
 									}
 								>
 									{data.domains
-										.filter((domain) => domain.user_id === user.id)
+										.filter((domain) => domain.user_id === scopeId)
 										.map((domain) => (
 											<option key={domain.id} value={domain.id}>
 												@{domain.hostname}
@@ -237,13 +237,13 @@ export function MailboxSettings() {
 	);
 }
 export function ForwardingSettings() {
-	const { user } = useMail();
+	const { user, scopeId } = useMail();
 	const client = useQueryClient();
-	const { data } = useSuspenseQuery(mailSettingsQuery(user.id));
+	const { data } = useSuspenseQuery(mailSettingsQuery(scopeId));
 	const mutation = useMutation({
 		mutationFn: forwardingFn,
 		onSuccess: () =>
-			client.invalidateQueries({ queryKey: ["mail-settings", user.id] }),
+			client.invalidateQueries({ queryKey: ["mail-settings", scopeId] }),
 	});
 	return (
 		<div className="max-w-2xl">
@@ -295,9 +295,9 @@ export function ForwardingSettings() {
 	);
 }
 export function RoutingSettings() {
-	const { user, mailboxes } = useMail();
+	const { user, scopeId, mailboxes } = useMail();
 	const client = useQueryClient();
-	const { data } = useSuspenseQuery(mailSettingsQuery(user.id));
+	const { data } = useSuspenseQuery(mailSettingsQuery(scopeId));
 	const [editing, setEditing] = useState<z.infer<typeof ruleSchema> | null>(
 		null,
 	);
@@ -317,7 +317,7 @@ export function RoutingSettings() {
 		priority: 0,
 	});
 	const refresh = () =>
-		client.invalidateQueries({ queryKey: ["mail-settings", user.id] });
+		client.invalidateQueries({ queryKey: ["mail-settings", scopeId] });
 	const save = useMutation({
 		mutationFn: saveRuleFn,
 		onSuccess: async () => {

@@ -17,6 +17,7 @@ test("the route snapshot reads current timezone, role, disabled and expired-sess
 		const token = await createSession(owner.id);
 		expect(await routeSession(token)).toEqual({
 			user: owner,
+			transport: "cookie",
 			timeZone: null,
 			needsSetup: false,
 			needsOnboarding: false,
@@ -26,6 +27,7 @@ test("the route snapshot reads current timezone, role, disabled and expired-sess
 		);
 		expect(await routeSession(token)).toEqual({
 			user: { ...owner, isPrimaryAdmin: false },
+			transport: "cookie",
 			timeZone: "America/New_York",
 			needsSetup: false,
 			needsOnboarding: false,
@@ -57,9 +59,37 @@ test("the route snapshot retains first-account and administrator-onboarding gate
 		state.db.exec("DELETE FROM users");
 		expect(await routeSession(token)).toEqual({
 			user: null,
+			transport: null,
 			timeZone: null,
 			needsSetup: true,
 			needsOnboarding: false,
+		});
+	} finally {
+		await state.close();
+	}
+});
+
+test("route authentication keeps valid cookies authoritative and falls back only to a valid user-session bearer", async () => {
+	const state = await fixture();
+	try {
+		const cookie = await createSession(owner.id),
+			bearer = await createSession(stranger.id);
+		expect(await routeSession(cookie, bearer)).toMatchObject({
+			user: owner,
+			transport: "cookie",
+		});
+		expect(await routeSession("invalid-cookie", bearer)).toMatchObject({
+			user: stranger,
+			transport: "bearer",
+		});
+		expect(await routeSession(undefined, bearer)).toMatchObject({
+			user: stranger,
+			transport: "bearer",
+		});
+		state.db.exec("UPDATE users SET disabled=1 WHERE id='stranger'");
+		expect(await routeSession(undefined, bearer)).toMatchObject({
+			user: null,
+			transport: null,
 		});
 	} finally {
 		await state.close();

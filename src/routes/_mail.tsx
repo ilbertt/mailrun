@@ -4,12 +4,15 @@ import {
 	Outlet,
 	redirect,
 	useChildMatches,
+	useRouter,
 } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { getClientSessionGeneration } from "../lib/auth/client";
 import { MailSessionProvider } from "../components/mail-session-provider";
 import { MailClientSync } from "../components/mail-client-sync";
 import { LoadingTransition } from "../components/loading-transition";
-import { sessionQuery, mailboxesQuery } from "../queries";
+import { loadRouteSession, mailboxesQuery } from "../queries";
 import DashboardLayout from "../app/(dashboard)/layout";
 import SettingsLayout from "../app/(settings)/layout";
 import AdminLayout from "../app/(admin)/layout";
@@ -21,19 +24,37 @@ import {
 } from "../lib/auth/route-access";
 export const Route = createFileRoute("/_mail")({
 	validateSearch: z.object({ mailboxId: z.string().optional() }),
-	beforeLoad: async ({ context, location }) => {
-		const session = await context.queryClient.fetchQuery(sessionQuery());
-		const access = protectedRouteAccess(session, location.pathname);
-		if ("redirect" in access) throw redirect({ to: access.redirect });
-		return { ...access, timeZone: session.timeZone };
+	beforeLoad: async ({ context, location, preload }) => {
+		const session = await loadRouteSession(
+			context.queryClient,
+			location.pathname,
+			preload,
+		);
+		if (!preload && !session.fromServer && session.verified) {
+			const access = protectedRouteAccess(session, location.pathname);
+			if ("redirect" in access) throw redirect({ to: access.redirect });
+		}
+		return {
+			user: session.user,
+			timeZone: session.timeZone,
+			fromServer: session.fromServer,
+			verified: session.verified,
+		};
 	},
-	loader: ({ context }) =>
-		context.queryClient.ensureQueryData(mailboxesQuery(context.user.id)),
 	component: MailLayout,
 });
 function MailLayout() {
-	const { user, timeZone } = Route.useRouteContext();
-	const mailboxes = useSuspenseQuery(mailboxesQuery(user.id)).data;
+	const { user, timeZone, fromServer } = Route.useRouteContext();
+	const router = useRouter();
+	useEffect(() => {
+		if (fromServer) void router.invalidate();
+	}, [fromServer, router]);
+	const scopeId = user?.id ?? `unverified:${getClientSessionGeneration()}`;
+	const mailboxQuery = useQuery({
+		...mailboxesQuery(scopeId),
+		enabled: !fromServer,
+	});
+	const mailboxes = mailboxQuery.data ?? [];
 	const pathname = useChildMatches({
 		select: (matches) => matches.at(-1)?.pathname ?? "/inbox",
 	});
@@ -47,13 +68,19 @@ function MailLayout() {
 					? DriveLayout
 					: DashboardLayout;
 	return (
-		<MailSessionProvider key={user.id} user={user} mailboxes={mailboxes}>
-			<LoadingTransition ready>
+		<LoadingTransition ready={!fromServer}>
+			<MailSessionProvider
+				key={scopeId}
+				user={user}
+				scopeId={scopeId}
+				mailboxesLoading={mailboxQuery.isPending && mailboxQuery.isFetching}
+				mailboxes={mailboxes}
+			>
 				<MailClientSync timeZone={timeZone} />
 				<Layout>
 					<Outlet />
 				</Layout>
-			</LoadingTransition>
-		</MailSessionProvider>
+			</MailSessionProvider>
+		</LoadingTransition>
 	);
 }

@@ -1028,7 +1028,7 @@ try {
 		`${base}/agent/review/${mcpApproval.approvalId}`,
 		{ headers: { Cookie: sessionCookie } },
 	);
-	if (!reviewPage.ok || !(await reviewPage.text()).includes("AI draft review"))
+	if (!reviewPage.ok || !(await reviewPage.text()).includes("Loading"))
 		throw new Error("Original review page failed");
 	const reviewUserToken = crypto.randomUUID();
 	state.db
@@ -1045,7 +1045,7 @@ try {
 	);
 	if (
 		otherReview.status !== 200 ||
-		!(await otherReview.text()).includes("AI draft review")
+		!(await otherReview.text()).includes("Loading")
 	)
 		throw new Error("Non-admin review was redirected into administration");
 	if (
@@ -1869,8 +1869,10 @@ try {
 	if (!health.ok)
 		throw new Error(`Health failed: ${health.status} ${await health.text()}`);
 	const anonymous = await fetch(`${base}/inbox`, { redirect: "manual" });
-	if (anonymous.status !== 307 && anonymous.status !== 302)
-		throw new Error(`Anonymous inbox was not redirected: ${anonymous.status}`);
+	if (anonymous.status !== 200 || !(await anonymous.text()).includes("Loading"))
+		throw new Error(
+			`Anonymous inbox did not preserve the source client-auth bootstrap: ${anonymous.status}`,
+		);
 	const authenticated = await fetch(`${base}/inbox`, {
 		headers: { Cookie: `ep_session=${token}` },
 	});

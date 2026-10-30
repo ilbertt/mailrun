@@ -12,6 +12,7 @@ import {
 	getCookie,
 	getRequest,
 	setResponseHeader,
+	getRequestHeader,
 } from "@tanstack/react-start/server";
 import { z } from "zod";
 import * as auth from "./server/auth/service";
@@ -61,7 +62,10 @@ import {
 
 export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
 	setResponseHeader("Cache-Control", "private, no-store");
-	return routeSession(getCookie(auth.SESSION_COOKIE));
+	return routeSession(
+		getCookie(auth.SESSION_COOKIE),
+		getRequestHeader("Authorization")?.match(/^Bearer (.+)$/)?.[1],
+	);
 });
 export const registerFn = createServerFn({ method: "POST" })
 	.validator(registerSchema.extend({ turnstileToken: z.string().optional() }))

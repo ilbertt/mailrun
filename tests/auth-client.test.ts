@@ -4,6 +4,9 @@ import {
 	clearClientSessionToken,
 	getClientSessionToken,
 	setClientSessionToken,
+	clientSessionScope,
+	recordClientTransport,
+	sessionServerFetch,
 } from "../src/lib/auth/client";
 import { expectedDraftRevision } from "../src/server/api/drafts";
 
@@ -77,6 +80,94 @@ test("an unauthorized response from the current session still signs out and redi
 	expect((await authFetch("/api/messages/current")).status).toBe(401);
 	expect(getClientSessionToken()).toBeNull();
 	expect(redirects).toEqual(["/login"]);
+});
+
+test("verified cookie sessions keep cookie priority while unavailable cookies recover safe reads through the stored bearer", async () => {
+	setClientSessionToken("stored-session");
+	recordClientTransport("cookie", clientSessionScope());
+	const seen: (string | null)[] = [];
+	globalThis.fetch = Object.assign(
+		async (_input: RequestInfo | URL, init?: RequestInit) => {
+			const auth = new Headers(init?.headers).get("Authorization");
+			seen.push(auth);
+			return auth
+				? Response.json({ ok: true })
+				: new Response(null, { status: 401 });
+		},
+		{ preconnect: previousFetch.preconnect },
+	);
+	expect((await authFetch("/api/auth/me")).ok).toBe(true);
+	await authFetch("/api/messages/example", { method: "PATCH", body: "{}" });
+	expect(seen).toEqual([
+		null,
+		"Bearer stored-session",
+		"Bearer stored-session",
+	]);
+});
+
+test("cookie failures never replay writes or streams and server-function transport remains confined to this origin", async () => {
+	setClientSessionToken("stored-session");
+	recordClientTransport("cookie", clientSessionScope());
+	let calls = 0;
+	const seen: (string | null)[] = [];
+	globalThis.fetch = Object.assign(
+		async (_input: RequestInfo | URL, init?: RequestInit) => {
+			calls++;
+			seen.push(new Headers(init?.headers).get("Authorization"));
+			return new Response(null, { status: 401 });
+		},
+		{ preconnect: previousFetch.preconnect },
+	);
+	await authFetch("/api/messages/example", {
+		method: "PATCH",
+		body: "{}",
+		redirectOnUnauthorized: false,
+	});
+	expect(calls).toBe(1);
+	globalThis.fetch = Object.assign(
+		async (_input: RequestInfo | URL, init?: RequestInit) => {
+			seen.push(new Headers(init?.headers).get("Authorization"));
+			return Response.json({});
+		},
+		{ preconnect: previousFetch.preconnect },
+	);
+	await sessionServerFetch("https://external.example/fn");
+	await sessionServerFetch("/internal-fn");
+	expect(seen).toEqual([null, null, "Bearer stored-session"]);
+});
+
+test("a verified principal change invalidates former responses even when the stored token stays the same", async () => {
+	setClientSessionToken("stored-session");
+	recordClientTransport("cookie", clientSessionScope(), "cookie-user");
+	const pending = Promise.withResolvers<Response>();
+	globalThis.fetch = Object.assign(async () => pending.promise, {
+		preconnect: previousFetch.preconnect,
+	});
+	const old = authFetch("/api/messages/example");
+	recordClientTransport("bearer", clientSessionScope(), "bearer-user");
+	pending.resolve(new Response(null, { status: 401 }));
+	await old;
+	expect(getClientSessionToken()).toBe("stored-session");
+	expect(redirects).toEqual([]);
+});
+
+test("late server-function metadata cannot replace the selected bearer transport", async () => {
+	setClientSessionToken("stored-session");
+	recordClientTransport("bearer", clientSessionScope());
+	const seen: (string | null)[] = [];
+	globalThis.fetch = Object.assign(
+		async (_input: RequestInfo | URL, init?: RequestInit) => {
+			seen.push(new Headers(init?.headers).get("Authorization"));
+			return Response.json(
+				{},
+				{ headers: { "X-Mailflare-Session-Transport": "cookie" } },
+			);
+		},
+		{ preconnect: previousFetch.preconnect },
+	);
+	await sessionServerFetch("/private-fn");
+	await authFetch("/api/messages/example", { method: "PATCH", body: "{}" });
+	expect(seen).toEqual(["Bearer stored-session", "Bearer stored-session"]);
 });
 
 test("switching away and back does not accept a previous request's draft revision or mutation events", async () => {

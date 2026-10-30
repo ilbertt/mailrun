@@ -7,19 +7,19 @@ export function MailSessionProvider({
 	user,
 	mailboxes,
 	children,
+	scopeId = user?.id ?? "unverified",
+	mailboxesLoading = false,
 }: {
-	user: User;
+	user: User | null;
+	scopeId?: string;
+	mailboxesLoading?: boolean;
 	mailboxes: Mailbox[];
 	children: ReactNode;
 }) {
 	const search = useSearch({ strict: false });
 	const [selected, setSelected] = useState("");
 	const requested = search.mailboxId || selected;
-	const primary = mailboxes.find(
-		(mailbox) =>
-			`${mailbox.local_part}@${mailbox.hostname}`.toLowerCase() ===
-			user.email.toLowerCase(),
-	);
+	const primary = mailboxes.find((mailbox) => mailbox.isPrimary);
 	const mailboxId = mailboxes.some((mailbox) => mailbox.id === requested)
 		? requested
 		: (primary?.id ?? mailboxes[0]?.id ?? "");
@@ -38,7 +38,14 @@ export function MailSessionProvider({
 	};
 	return (
 		<MailContext.Provider
-			value={{ user, mailboxes, mailboxId, setMailboxId: select }}
+			value={{
+				user,
+				scopeId,
+				mailboxes,
+				mailboxesLoading,
+				mailboxId,
+				setMailboxId: select,
+			}}
 		>
 			{children}
 		</MailContext.Provider>

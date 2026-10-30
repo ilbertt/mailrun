@@ -3,7 +3,9 @@ import type { User } from "../shared/contracts";
 import type { mailboxesFn } from "../functions";
 export type Mailbox = Awaited<ReturnType<typeof mailboxesFn>>[number];
 export const MailContext = createContext<{
-	user: User;
+	user: User | null;
+	scopeId: string;
+	mailboxesLoading: boolean;
 	mailboxes: Mailbox[];
 	mailboxId: string;
 	setMailboxId: (value: string) => void;
