@@ -6,7 +6,7 @@ import { LoginClient } from "../app/(auth)/login/login-client";
 export const Route = createFileRoute("/login")({
 	validateSearch: z.object({ add: z.string().optional() }),
 	beforeLoad: async ({ context, search }) => {
-		const session = await context.queryClient.ensureQueryData(sessionQuery());
+		const session = await context.queryClient.fetchQuery(sessionQuery());
 		if (session.needsSetup) throw redirect({ to: "/setup" });
 		if (session.user && search.add !== "1") throw redirect({ to: "/inbox" });
 	},

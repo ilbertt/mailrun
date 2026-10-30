@@ -64,6 +64,9 @@ for (const name of ["original", "before", "after"] as const) {
 	const functions = requests.filter((request) =>
 		request.path.startsWith("/_serverFn/"),
 	);
+	const authRequests = requests.filter(
+		(request) => request.path === "/api/auth/me",
+	);
 	const middle = Math.floor(times.length / 2);
 	const median =
 		times.length % 2
@@ -76,6 +79,11 @@ for (const name of ["original", "before", "after"] as const) {
 		p95Ms: Number(times[Math.ceil(times.length * 0.95) - 1]!.toFixed(2)),
 		timingsMs: times.map((value) => Number(value.toFixed(2))),
 		serverFunctionRequests: functions.length,
+		authMeRequests: authRequests.length,
+		authMeBodyBytes: authRequests.reduce(
+			(total, request) => total + request.bytes,
+			0,
+		),
 		serverFunctionBodyBytes: functions.reduce(
 			(total, request) => total + request.bytes,
 			0,

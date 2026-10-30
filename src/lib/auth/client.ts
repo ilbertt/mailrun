@@ -12,8 +12,14 @@ import type {
 const draftRevisions = new Map<string, string>();
 const SESSION_STORAGE_KEY = "mailflare-session-token";
 export const AUTH_SESSION_CHANGED_EVENT = "mailflare:auth-session-changed";
+let sessionGeneration = 0;
+
+export function getClientSessionGeneration() {
+	return sessionGeneration;
+}
 
 function dispatchAuthSessionChanged(authenticated: boolean): void {
+	sessionGeneration++;
 	if (typeof window === "undefined") return;
 	window.dispatchEvent(
 		new CustomEvent<AuthSessionChangedDetail>(AUTH_SESSION_CHANGED_EVENT, {
@@ -89,6 +95,7 @@ export async function authFetch(
 	)
 		requestHeaders.set("If-Match", draftRevisions.get(draftId) ?? "");
 	const session = getClientSessionToken();
+	const requestGeneration = sessionGeneration;
 	const response = await fetch(input, {
 		...requestInit,
 		headers: requestHeaders,
@@ -104,9 +111,13 @@ export async function authFetch(
 			Number.isSafeInteger(Number(applicationRevision))
 				? `"${applicationRevision}"`
 				: response.headers.get("ETag");
-	if (returnedId && revision && session === getClientSessionToken())
+	const currentSession =
+		requestGeneration === sessionGeneration &&
+		session === getClientSessionToken();
+	if (returnedId && revision && currentSession)
 		draftRevisions.set(returnedId, revision);
 	if (
+		currentSession &&
 		response.ok &&
 		requestInit.method &&
 		!["GET", "HEAD", "OPTIONS"].includes(requestInit.method.toUpperCase())
@@ -120,6 +131,7 @@ export async function authFetch(
 			window.dispatchEvent(new Event("mailflare:messages-changed"));
 	}
 	if (
+		currentSession &&
 		response.status === 401 &&
 		redirectOnUnauthorized &&
 		typeof window !== "undefined"

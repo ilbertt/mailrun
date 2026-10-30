@@ -28,13 +28,18 @@ export function AuthClientSync() {
 			if (typeof path === "string" && /^\/api\/branding(?:\/|$)/.test(path))
 				documentChanged();
 		};
+		const timeZoneChanged = (event: StorageEvent) => {
+			if (event.key === "mailflare-user-time-zone") window.location.reload();
+		};
 		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, changed);
 		window.addEventListener("mailflare:locale-changed", documentChanged);
 		window.addEventListener("mailflare:api-mutated", apiChanged);
+		window.addEventListener("storage", timeZoneChanged);
 		return () => {
 			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, changed);
 			window.removeEventListener("mailflare:locale-changed", documentChanged);
 			window.removeEventListener("mailflare:api-mutated", apiChanged);
+			window.removeEventListener("storage", timeZoneChanged);
 		};
 	}, [client, router]);
 	return null;

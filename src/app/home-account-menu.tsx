@@ -18,7 +18,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
 			user={session.user}
 			mailboxes={mailboxes}
 		>
-			<MailClientSync />
+			<MailClientSync timeZone={session.timeZone} />
 			<MailboxSelector initialUser={user} />
 		</MailSessionProvider>
 	);

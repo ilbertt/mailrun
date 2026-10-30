@@ -179,6 +179,18 @@ try {
 	if (!login.ok || !cookie?.toLowerCase().includes("httponly"))
 		throw new Error(`HTTP login failed: ${login.status}`);
 	const sessionCookie = cookie.split(";")[0] ?? "";
+	const protectedDocument = await fetch(base + "/inbox", {
+		headers: { Cookie: sessionCookie },
+	});
+	if (
+		!protectedDocument.ok ||
+		!protectedDocument.headers.get("Cache-Control")?.includes("no-store") ||
+		!protectedDocument.headers.get("Cache-Control")?.includes("private")
+	)
+		throw new Error(
+			"The current-session document must not be stored by browser/shared caches",
+		);
+	await protectedDocument.text();
 	const addAccount = await fetch(base + "/login?add=1", {
 		headers: { Cookie: sessionCookie },
 		redirect: "manual",

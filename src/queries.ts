@@ -8,7 +8,7 @@ import {
 	localeFn,
 } from "./functions";
 import type { ListInput } from "./shared/contracts";
-import { documentCacheOptions } from "./query-client";
+import { documentCacheOptions, sessionCacheOptions } from "./query-client";
 
 export const documentQuery = () =>
 	queryOptions({
@@ -18,10 +18,8 @@ export const documentQuery = () =>
 
 export const sessionQuery = () =>
 	queryOptions({
-		queryKey: ["session"],
-		queryFn: () => sessionFn(),
-		staleTime: 60_000,
-		retry: false,
+		...sessionCacheOptions,
+		queryFn: ({ signal }) => sessionFn({ signal }),
 	});
 export const mailboxesQuery = (userId: string) =>
 	queryOptions({

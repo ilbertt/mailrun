@@ -29,7 +29,9 @@ export function clearMailboxesCache() {
 export function clearMailboxClientState() {
 	clearMailboxesCache();
 	if (typeof window !== "undefined") {
-		localStorage.removeItem(SELECTED_MAILBOX_STORAGE_KEY);
+		try {
+			localStorage.removeItem(SELECTED_MAILBOX_STORAGE_KEY);
+		} catch {}
 	}
 }
 

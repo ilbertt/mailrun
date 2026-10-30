@@ -1,5 +1,13 @@
 import { QueryClient } from "@tanstack/react-query";
 
+// Authentication is rechecked at each route transition, like the source guard.
+// Document preferences have a separate lifetime and remain reusable.
+export const sessionCacheOptions = {
+	queryKey: ["session"] as const,
+	staleTime: 0,
+	retry: false,
+};
+
 export const documentCacheOptions = {
 	queryKey: ["document"] as const,
 	staleTime: Infinity,

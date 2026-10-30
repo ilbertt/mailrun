@@ -1641,6 +1641,18 @@ export interface INativeResetRevokeSessionsResult {
 export interface INativeResetRevokeChallengesResult {
 }
 
+/** Result of query `NativeRouteSession`. */
+export interface INativeRouteSessionResult {
+    id: string | null;
+    email: IUsersColumns["email"] | null;
+    name: IUsersColumns["name"] | null;
+    role: IUsersColumns["role"] | null;
+    is_primary_admin: IUsersColumns["is_primary_admin"] | null;
+    time_zone: IUsersColumns["time_zone"];
+    has_admin: number | null;
+    has_domain: number | null;
+}
+
 /** Result of query `HasUsers`. */
 export interface IHasUsersResult {
     id: IUsersColumns["id"];
@@ -5043,6 +5055,7 @@ export interface Queries {
     NativeResetPassword: INativeResetPasswordResult;
     NativeResetRevokeSessions: INativeResetRevokeSessionsResult;
     NativeResetRevokeChallenges: INativeResetRevokeChallengesResult;
+    NativeRouteSession: INativeRouteSessionResult;
     HasUsers: IHasUsersResult;
     NativeHasAdminAccount: INativeHasAdminAccountResult;
     SessionUser: ISessionUserResult;

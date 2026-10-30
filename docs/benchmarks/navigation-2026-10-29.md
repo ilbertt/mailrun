@@ -1,5 +1,10 @@
 # Inbox/Sent navigation comparison
 
+The [session-recheck comparison](navigation-session-recheck-2026-10-30.md)
+supersedes this report for the current build. This historical optimized build had
+a stale session guard; its roughly 34 ms figure omitted the original's required
+per-path authentication/role recheck.
+
 The optimized build reuses document preferences instead of fetching locale,
 translations and branding on every route change. Internal links preload on
 pointer intent, keyboard focus or touch. The original initial loading transition

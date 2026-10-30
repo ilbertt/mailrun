@@ -1,17 +1,14 @@
-import { fetchCurrentUser } from "../hooks/use-current-user";
 import { saveUserTimeZonePreference } from "../lib/time/client";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMail } from "./mail-context";
-export function MailClientSync() {
+export function MailClientSync({ timeZone }: { timeZone: string | null }) {
 	const { user } = useMail(),
 		client = useQueryClient();
 	useEffect(() => {
-		let active = true;
-		void fetchCurrentUser().then((profile) => {
-			if (active && profile?.id === user.id)
-				saveUserTimeZonePreference(profile.id, profile.timeZone ?? null);
-		});
+		saveUserTimeZonePreference(user.id, timeZone);
+	}, [user.id, timeZone]);
+	useEffect(() => {
 		const changed = (event: Event) => {
 			const path = (event as CustomEvent<{ path?: unknown }>).detail?.path;
 			if (typeof path !== "string") return;
@@ -26,7 +23,6 @@ export function MailClientSync() {
 		};
 		window.addEventListener("mailflare:api-mutated", changed);
 		return () => {
-			active = false;
 			window.removeEventListener("mailflare:api-mutated", changed);
 		};
 	}, [client, user.id]);

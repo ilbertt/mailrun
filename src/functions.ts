@@ -1,6 +1,5 @@
 import { branding } from "./server/branding";
 import { DEFAULT_BRANDING } from "./components/branding-provider-utils";
-import { setupSnapshot } from "./server/setup/service";
 import { publicAuthGuard } from "./server/auth/public-guard";
 import { getRequestLocale, loadServerMessages } from "./lib/i18n/server";
 import {
@@ -9,9 +8,14 @@ import {
 	shortcutSettings,
 } from "./server/mail/navigation";
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, getRequest } from "@tanstack/react-start/server";
+import {
+	getCookie,
+	getRequest,
+	setResponseHeader,
+} from "@tanstack/react-start/server";
 import { z } from "zod";
 import * as auth from "./server/auth/service";
+import { routeSession } from "./server/auth/route-session";
 import { requireUser, sessionCookie } from "./server/auth/request";
 import {
 	listMessages,
@@ -56,13 +60,8 @@ import {
 } from "./shared/contracts";
 
 export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
-	const user = await auth.getUser(getCookie(auth.SESSION_COOKIE));
-	const status = await setupSnapshot();
-	return {
-		user,
-		needsSetup: !status.hasAdminAccount,
-		needsOnboarding: user?.role === "admin" && !status.hasPrimaryDomain,
-	};
+	setResponseHeader("Cache-Control", "private, no-store");
+	return routeSession(getCookie(auth.SESSION_COOKIE));
 });
 export const registerFn = createServerFn({ method: "POST" })
 	.validator(registerSchema.extend({ turnstileToken: z.string().optional() }))

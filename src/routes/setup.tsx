@@ -4,7 +4,7 @@ import { RegisterClient } from "../app/(auth)/register/register-client";
 import { OnboardingClient } from "../app/(auth)/onboarding/onboarding-client";
 export const Route = createFileRoute("/setup")({
 	loader: async ({ context }) => {
-		const session = await context.queryClient.ensureQueryData(sessionQuery());
+		const session = await context.queryClient.fetchQuery(sessionQuery());
 		if (!session.needsSetup && !session.user) throw redirect({ to: "/login" });
 		if (session.user && !session.needsSetup) {
 			if (session.user.role !== "admin" || !session.needsOnboarding)

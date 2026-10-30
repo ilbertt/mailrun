@@ -6,7 +6,7 @@ import { ResetPasswordClient } from "../app/(auth)/reset-password/reset-password
 export const Route = createFileRoute("/reset-password")({
 	validateSearch: z.object({ token: z.string().optional() }),
 	beforeLoad: async ({ context }) => {
-		const session = await context.queryClient.ensureQueryData(sessionQuery());
+		const session = await context.queryClient.fetchQuery(sessionQuery());
 		if (session.user) throw redirect({ to: "/inbox" });
 	},
 	head: ({ match }) => ({
