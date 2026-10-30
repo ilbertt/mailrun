@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { join, resolve } from "node:path";
 import { z } from "zod";
+import { Database } from "bun:sqlite";
 import { fixture, owner, stranger } from "../tests/fixtures";
 import {
 	prepareSourceUploads,
 	sourceUploadsCapture as capture,
+	verifyOriginalRecordFields,
 } from "../tests/source-upload-fixture";
 import { createManagedKey } from "../src/server/auth/key-management";
 import { LocalStorage } from "../src/server/storage";
@@ -124,7 +126,7 @@ try {
 		z.object({
 			jmapUploads: z.literal(3),
 			driveParts: z.literal(1),
-			objects: z.literal(4),
+			objects: z.literal(7),
 		}).parse(JSON.parse(output));
 	} finally {
 		clearTimeout(timer);
@@ -135,6 +137,15 @@ try {
 		"Migration command started the normal app initialization",
 	);
 	process.env.DATA_DIR = destination;
+	const records = new Database(join(destination, "mailflare.sqlite"), {
+		readonly: true,
+	});
+	let originalFields: ReturnType<typeof verifyOriginalRecordFields>;
+	try {
+		originalFields = verifyOriginalRecordFields(records);
+	} finally {
+		records.close();
+	}
 	const ownerKey = (
 		await createManagedKey(owner, "personal", {
 			name: "Migrated owner",
@@ -265,6 +276,26 @@ try {
 		?.split(";")[0];
 	if (!cookie) throw new Error("Missing source fixture session");
 	await signedIn.body?.cancel();
+	for (const id of ["retained-trash", "retained-spam"]) {
+		const response: Response = await fetch(
+			base + `/api/messages/${id}/original`,
+			{
+				headers: { Cookie: cookie },
+			},
+		);
+		assert.equal(response.status, 200);
+		const expected = capture.files.find(
+			(file) => file.key === `source-state/${id}.eml`,
+		);
+		if (!expected) throw new Error("Missing retained source MIME");
+		assert.equal(checksum(await response.arrayBuffer()), expected.sha256);
+	}
+	const retained = await fetch(
+		base + "/api/messages/retained-trash/attachments/retained-file",
+		{ headers: { Cookie: cookie } },
+	);
+	assert.equal(retained.status, 200);
+	assert.equal(await retained.text(), "Retained original attachment");
 	const completed = await fetch(base + "/api/drive/upload/pending", {
 		method: "POST",
 		headers: { Origin: origin, Cookie: cookie },
@@ -275,6 +306,53 @@ try {
 	});
 	assert.equal(content.status, 200);
 	assert.equal(await content.text(), "abc");
+	await stop();
+	const maintenance = Bun.spawn([binary, "jobs", "maintenance"], {
+		cwd: state.directory,
+		env: { ...environment, DATA_DIR: destination },
+		stdout: "pipe",
+		stderr: "pipe",
+	});
+	const [maintenanceExit, maintenanceOut, maintenanceError] = await Promise.all(
+		[
+			maintenance.exited,
+			new Response(maintenance.stdout).text(),
+			new Response(maintenance.stderr).text(),
+		],
+	);
+	assert.equal(maintenanceExit, 0, maintenanceError);
+	z.object({ job: z.literal("maintenance"), skipped: z.literal(false) }).parse(
+		JSON.parse(maintenanceOut),
+	);
+	const after = new Database(join(destination, "mailflare.sqlite"), {
+		readonly: true,
+	});
+	try {
+		assert.equal(
+			after.query("SELECT id FROM messages WHERE id='retained-trash'").get(),
+			null,
+		);
+		assert.deepEqual(
+			after
+				.query("SELECT trashed_at FROM messages WHERE id='retained-spam'")
+				.get(),
+			{ trashed_at: null },
+		);
+	} finally {
+		after.close();
+	}
+	assert.equal(
+		await new LocalStorage().file("source-state/retained-trash.eml").exists(),
+		false,
+	);
+	assert.equal(
+		await new LocalStorage().file("source-state/retained.txt").exists(),
+		false,
+	);
+	assert.equal(
+		await new LocalStorage().file("source-state/retained-spam.eml").exists(),
+		true,
+	);
 	for (const file of capture.files)
 		assert.equal(
 			checksum(
@@ -286,6 +364,8 @@ try {
 		JSON.stringify(
 			{
 				originalFullExport: "passed",
+				originalRecordFields: originalFields,
+				historicalRetentionAndMaintenance: "passed",
 				standaloneMigrationCommand: "passed",
 				exactUploadBlobIdsAndMetadata: "passed",
 				ownerIsolation: "passed",
@@ -293,7 +373,8 @@ try {
 				mimeClaimAndOriginalBytes: "passed",
 				originalMultipartCompletion: "passed",
 				unchangedSourceObjects: "passed",
-				externalRequests: 0,
+				sourceCaptureExternalRequests: capture.expected.externalRequests,
+				externalEmail: 0,
 			},
 			null,
 			2,

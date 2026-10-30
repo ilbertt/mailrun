@@ -13,6 +13,7 @@ import { startUpload, finishUpload } from "../src/server/drive/uploads";
 import {
 	prepareSourceUploads,
 	sourceUploadsCapture,
+	verifyOriginalRecordFields,
 } from "./source-upload-fixture";
 
 test("unmodified source uploader, FileBucket multipart parts and original full export migrate without changing client blob IDs", async () => {
@@ -21,9 +22,17 @@ test("unmodified source uploader, FileBucket multipart parts and original full e
 		const source = await prepareSourceUploads(state.directory),
 			destination = join(state.directory, "captured-import");
 		expect(await migrateSourceBucket({ ...source, destination })).toMatchObject(
-			{ objects: 4, jmapUploads: 3, driveParts: 1 },
+			{ objects: 7, jmapUploads: 3, driveParts: 1 },
 		);
 		process.env.DATA_DIR = destination;
+		const records = new Database(join(destination, "mailflare.sqlite"), {
+			readonly: true,
+		});
+		try {
+			expect(verifyOriginalRecordFields(records).records).toBeGreaterThan(0);
+		} finally {
+			records.close();
+		}
 		const key = (
 			await createManagedKey(owner, "personal", {
 				name: "Migrated client",

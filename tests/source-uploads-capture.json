@@ -9,7 +9,7 @@
   "backup": {
     "format": "mailflare-database-backup",
     "version": 1,
-    "createdAt": "2026-10-29T16:01:04.886Z",
+    "createdAt": "2026-10-30T12:57:38.096Z",
     "includedTables": [
       "users",
       "domains",
@@ -60,7 +60,7 @@
         {
           "id": "owner",
           "email": "owner@example.com",
-          "password_hash": "$2b$04$xo7KOgYtCoyFBu1TVvy2b.edoOf5SV7FY00Kos/2GL9SyPTbLtJaa",
+          "password_hash": "$2b$04$4jvPOywJzLoGhk8m5B/3peXHFdXFtShm46eLyn0.Ie7U5nITOFCBy",
           "name": "Owner",
           "created_at": 1,
           "reset_email": null,
@@ -81,12 +81,12 @@
           "can_manage_domains": 0,
           "can_manage_users": 0,
           "show_full_recipient_addresses": 0,
-          "trash_retention_days": null
+          "trash_retention_days": 30
         },
         {
           "id": "stranger",
           "email": "stranger@example.com",
-          "password_hash": "$2b$04$xo7KOgYtCoyFBu1TVvy2b.edoOf5SV7FY00Kos/2GL9SyPTbLtJaa",
+          "password_hash": "$2b$04$4jvPOywJzLoGhk8m5B/3peXHFdXFtShm46eLyn0.Ie7U5nITOFCBy",
           "name": "Stranger",
           "created_at": 1,
           "reset_email": null,
@@ -163,10 +163,97 @@
       ],
       "mailbox_access": [],
       "contacts": [],
-      "folders": [],
+      "folders": [
+        {
+          "id": "historical-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Historical",
+          "created_at": 1,
+          "color": "#7c3aed"
+        }
+      ],
       "api_keys": [],
-      "messages": [],
-      "message_attachments": [],
+      "messages": [
+        {
+          "id": "retained-trash",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Retained original Trash",
+          "snippet": null,
+          "status": "trash",
+          "thread_id": null,
+          "created_at": 1,
+          "read": 0,
+          "folder_id": "historical-folder",
+          "snoozed_until": null,
+          "starred": 1,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-trash.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": 123,
+          "reply_to": null
+        },
+        {
+          "id": "retained-spam",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Original unknown-age Spam",
+          "snippet": null,
+          "status": "spam",
+          "thread_id": null,
+          "created_at": 2,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-spam.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        }
+      ],
+      "message_attachments": [
+        {
+          "id": "retained-file",
+          "message_id": "retained-trash",
+          "filename": "retained.txt",
+          "content_type": "text/plain",
+          "size": 28,
+          "disposition": "attachment",
+          "content_id": null,
+          "r2_key": "source-state/retained.txt",
+          "created_at": 1,
+          "trashed_at": null
+        }
+      ],
       "shared_attachment_links": [],
       "outbound_jobs": [],
       "routing_rules": [],
@@ -183,7 +270,7 @@
           "schedule_value": null,
           "retention_enabled": 0,
           "retention_days": 30,
-          "updated_at": 1793289664,
+          "updated_at": 1793365058,
           "excluded_table_groups": "[]"
         }
       ],
@@ -193,7 +280,7 @@
           "id": "default",
           "app_name": "Mailflare",
           "icon_key": null,
-          "updated_at": 1793289664,
+          "updated_at": 1793365058,
           "agent_provider": null,
           "agent_preset": null,
           "agent_base_url": null,
@@ -242,9 +329,9 @@
           "content_type": "text/plain",
           "link_token": null,
           "trashed_at": null,
-          "created_at": 1793289664,
-          "updated_at": 1793289664,
-          "upload_id": "dae80860-a05e-4f24-af5a-d12e67b023a4",
+          "created_at": 1793365058,
+          "updated_at": 1793365058,
+          "upload_id": "81772b22-7790-4d6f-b232-6be7fc573dcf",
           "upload_part_size": 67108864,
           "upload_fingerprint": "source-fingerprint"
         }
@@ -263,7 +350,7 @@
     "uploads": [
       {
         "accountId": "owner",
-        "blobId": "up~upl_xUmNAH-dZpnMtXTu561en",
+        "blobId": "up~upl_SK3f6rclA2plWCPRMyn-c",
         "userId": "owner",
         "type": "message/rfc822",
         "size": 213,
@@ -272,7 +359,7 @@
       },
       {
         "accountId": "owner",
-        "blobId": "up~upl_fhDXTTfiJX6s2qccDVU5n",
+        "blobId": "up~upl_3j1YcwYxzWQAVhSNK2Bff",
         "userId": "owner",
         "type": "text/plain",
         "size": 25,
@@ -281,7 +368,7 @@
       },
       {
         "accountId": "stranger",
-        "blobId": "up~upl_ME0kyiHsgniryae-IISES",
+        "blobId": "up~upl_0k-svVkAajQ4eXL9jtbDx",
         "userId": "stranger",
         "type": "application/octet-stream",
         "size": 21,
@@ -292,7 +379,7 @@
     "mime": "From: hello@example.com\r\nTo: recipient@example.org\r\nSubject: Captured source upload\r\nMessage-ID: <captured-upload@example.com>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nOriginal upload café\r\n",
     "drive": {
       "id": "pending",
-      "uploadId": "dae80860-a05e-4f24-af5a-d12e67b023a4",
+      "uploadId": "81772b22-7790-4d6f-b232-6be7fc573dcf",
       "part": {
         "partNumber": 1,
         "etag": "1-3"
@@ -302,12 +389,12 @@
   },
   "files": [
     {
-      "key": ".multipart/dae80860-a05e-4f24-af5a-d12e67b023a4/meta.json",
+      "key": ".multipart/81772b22-7790-4d6f-b232-6be7fc573dcf/meta.json",
       "base64": "eyJjb250ZW50VHlwZSI6InRleHQvcGxhaW4ifQ==",
       "sha256": "6580bcf1a2ff78e9228fe8f3431bbec6c8c5b2afa2847734bd4dcbc309e309cc"
     },
     {
-      "key": ".multipart/dae80860-a05e-4f24-af5a-d12e67b023a4/part-1",
+      "key": ".multipart/81772b22-7790-4d6f-b232-6be7fc573dcf/part-1",
       "base64": "YWJj",
       "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
     },
@@ -318,38 +405,68 @@
     },
     {
       "key": "avatars/source-preview.png.meta.json",
-      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6MjIsInVwbG9hZGVkIjoiMjAyNi0xMC0yOVQxNjowMTowNC44ODRaIiwiZXRhZyI6IjFhMTg4NjRiOTc0LTE2In0=",
-      "sha256": "21985801a5044c7eb07af10697ecf8e4b5f2ac16f8c8fec49e56a4c90d2a43a5"
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6MjIsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxMjo1NzozOC4wOTNaIiwiZXRhZyI6IjFhMThjZTMyMjJkLTE2In0=",
+      "sha256": "adb4f988336d4c268110545a2ca314e8015ae6980c46e34d715b7d285d125325"
     },
     {
-      "key": "jmap-uploads/owner/upl_fhDXTTfiJX6s2qccDVU5n",
+      "key": "jmap-uploads/owner/upl_3j1YcwYxzWQAVhSNK2Bff",
       "base64": "T3JpZ2luYWwgbG9vc2UgYXR0YWNobWVudA==",
       "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
     },
     {
-      "key": "jmap-uploads/owner/upl_fhDXTTfiJX6s2qccDVU5n.meta.json",
-      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sImN1c3RvbU1ldGFkYXRhIjp7InVzZXJJZCI6Im93bmVyIiwibmFtZSI6Imxvb3NlLnR4dCJ9LCJzaXplIjoyNSwidXBsb2FkZWQiOiIyMDI2LTEwLTI5VDE2OjAxOjA0Ljg4MVoiLCJldGFnIjoiMWExODg2NGI5NzEtMTkifQ==",
-      "sha256": "43e6613d71876e1e63391e562fd0204ca2b24704dac3ab1c9e7a890590225b73"
+      "key": "jmap-uploads/owner/upl_3j1YcwYxzWQAVhSNK2Bff.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sImN1c3RvbU1ldGFkYXRhIjp7InVzZXJJZCI6Im93bmVyIiwibmFtZSI6Imxvb3NlLnR4dCJ9LCJzaXplIjoyNSwidXBsb2FkZWQiOiIyMDI2LTEwLTMwVDEyOjU3OjM4LjA5MFoiLCJldGFnIjoiMWExOGNlMzIyMmEtMTkifQ==",
+      "sha256": "0f76215dfdf3e4eb90ba8a9de7c3821ff742c949da6c1dc1991b982d72b0a435"
     },
     {
-      "key": "jmap-uploads/owner/upl_xUmNAH-dZpnMtXTu561en",
+      "key": "jmap-uploads/owner/upl_SK3f6rclA2plWCPRMyn-c",
       "base64": "RnJvbTogaGVsbG9AZXhhbXBsZS5jb20NClRvOiByZWNpcGllbnRAZXhhbXBsZS5vcmcNClN1YmplY3Q6IENhcHR1cmVkIHNvdXJjZSB1cGxvYWQNCk1lc3NhZ2UtSUQ6IDxjYXB0dXJlZC11cGxvYWRAZXhhbXBsZS5jb20+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNCk9yaWdpbmFsIHVwbG9hZCBjYWbDqQ0K",
       "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
     },
     {
-      "key": "jmap-uploads/owner/upl_xUmNAH-dZpnMtXTu561en.meta.json",
-      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJjdXN0b21NZXRhZGF0YSI6eyJ1c2VySWQiOiJvd25lciIsIm5hbWUiOiJPcmlnaW5hbCBjYWbDqS5lbWwifSwic2l6ZSI6MjEzLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMjlUMTY6MDE6MDQuODgwWiIsImV0YWciOiIxYTE4ODY0Yjk3MC1kNSJ9",
-      "sha256": "d5abb6c126d7f624df9fa6f36c38932da8292eb9d1dc947fba03cee135a841c8"
+      "key": "jmap-uploads/owner/upl_SK3f6rclA2plWCPRMyn-c.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJjdXN0b21NZXRhZGF0YSI6eyJ1c2VySWQiOiJvd25lciIsIm5hbWUiOiJPcmlnaW5hbCBjYWbDqS5lbWwifSwic2l6ZSI6MjEzLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTI6NTc6MzguMDg5WiIsImV0YWciOiIxYTE4Y2UzMjIyOS1kNSJ9",
+      "sha256": "21bb1e83fb507dd45b7dcb01d9ab5d59e569cdb3705dbdeeb2f7e113f65313e4"
     },
     {
-      "key": "jmap-uploads/stranger/upl_ME0kyiHsgniryae-IISES",
+      "key": "jmap-uploads/stranger/upl_0k-svVkAajQ4eXL9jtbDx",
       "base64": "UHJpdmF0ZSBzb3VyY2UgdXBsb2Fk",
       "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
     },
     {
-      "key": "jmap-uploads/stranger/upl_ME0kyiHsgniryae-IISES.meta.json",
-      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0ifSwiY3VzdG9tTWV0YWRhdGEiOnsidXNlcklkIjoic3RyYW5nZXIifSwic2l6ZSI6MjEsInVwbG9hZGVkIjoiMjAyNi0xMC0yOVQxNjowMTowNC44ODJaIiwiZXRhZyI6IjFhMTg4NjRiOTcyLTE1In0=",
-      "sha256": "7a6f32e23b4d545121d28b1343c7b9ffcc8320c44934f6ab0c5e4941b943aae8"
+      "key": "jmap-uploads/stranger/upl_0k-svVkAajQ4eXL9jtbDx.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0ifSwiY3VzdG9tTWV0YWRhdGEiOnsidXNlcklkIjoic3RyYW5nZXIifSwic2l6ZSI6MjEsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxMjo1NzozOC4wOTFaIiwiZXRhZyI6IjFhMThjZTMyMjJiLTE1In0=",
+      "sha256": "2595b5d486378092a3a3a84b9123d5af0ad8fa193b667a4a8985dee0aca1725a"
+    },
+    {
+      "key": "source-state/retained-spam.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IE9yaWdpbmFsIHVua25vd24tYWdlIFNwYW0NCk1lc3NhZ2UtSUQ6IDxyZXRhaW5lZC1zcGFtQGV4YW1wbGUub3JnPg0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNClJldGFpbmVkIG9yaWdpbmFsIGJvZHkgY2Fmw6kNCg==",
+      "sha256": "ca8888be45c01aa7b442909c0d2116a33625ab346c2d60f3f690189fe182cfa3"
+    },
+    {
+      "key": "source-state/retained-spam.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjoxOTksInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxMjo1NzozOC4wOTRaIiwiZXRhZyI6IjFhMThjZTMyMjJlLWM3In0=",
+      "sha256": "2091ac3b6d237fda2764e6dc25b47e52fcf2e84c138840480e47e9de9d12624c"
+    },
+    {
+      "key": "source-state/retained-trash.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IFJldGFpbmVkIG9yaWdpbmFsIFRyYXNoDQpNZXNzYWdlLUlEOiA8cmV0YWluZWQtdHJhc2hAZXhhbXBsZS5vcmc+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSJzb3VyY2UtcmV0ZW50aW9uLWJvdW5kYXJ5Ig0KDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA0KDQpSZXRhaW5lZCBvcmlnaW5hbCBib2R5IGNhZsOpDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbg0KQ29udGVudC1EaXNwb3NpdGlvbjogYXR0YWNobWVudDsgZmlsZW5hbWU9InJldGFpbmVkLnR4dCINCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IGJhc2U2NA0KDQpVbVYwWVdsdVpXUWdiM0pwWjJsdVlXd2dZWFIwWVdOb2JXVnVkQT09DQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnktLQ0K",
+      "sha256": "b14d01037f13ceffbca356d89583396bcd6c3a3e80e0e0bbb7213f7ffc7ac4f7"
+    },
+    {
+      "key": "source-state/retained-trash.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjo1NDAsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxMjo1NzozOC4wOTRaIiwiZXRhZyI6IjFhMThjZTMyMjJlLTIxYyJ9",
+      "sha256": "5164b093c7897bf21fb5cd7d4fac2854dc7c38c55a155cbcba6cd9af6df56931"
+    },
+    {
+      "key": "source-state/retained.txt",
+      "base64": "UmV0YWluZWQgb3JpZ2luYWwgYXR0YWNobWVudA==",
+      "sha256": "06c5d8f7780b0de9761fc7a501bd37c9c0b86afa756215221d2fe6d110025797"
+    },
+    {
+      "key": "source-state/retained.txt.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sInNpemUiOjI4LCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTI6NTc6MzguMDk0WiIsImV0YWciOiIxYTE4Y2UzMjIyZS0xYyJ9",
+      "sha256": "4d9838b380154d34c9229950123276885307f8f87a730050c44d0778abb22a82"
     }
   ]
 }

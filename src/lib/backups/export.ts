@@ -281,6 +281,19 @@ export function restoreBackup(db: Database, input: unknown) {
 				db.query(
 					`INSERT INTO ${identifier(table)} (${keys.map(identifier).join(",")}) VALUES (${keys.map(() => "?").join(",")})`,
 				).run(...keys.map((key) => row[key] ?? null));
+				if (
+					table === "messages" &&
+					(row.status === "trash" || row.status === "spam") &&
+					keys.includes("trashed_at")
+				) {
+					// Insertion triggers initialize new Trash/Spam ages. Historical
+					// records must retain their exported value, including explicit null.
+					// Keep triggers enabled for FTS, revisions and legacy missing fields.
+					const entered = row.trashed_at ?? null;
+					db.query(
+						'UPDATE "messages" SET "trashed_at"=? WHERE "id"=? AND "trashed_at" IS NOT ?',
+					).run(entered, row.id ?? null, entered);
+				}
 			}
 		}
 		if (db.query("PRAGMA foreign_key_check").all().length)

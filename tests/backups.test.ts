@@ -8,12 +8,24 @@ import {
 	restoreBackup,
 	writeBackup,
 } from "../src/lib/backups/export";
+
 import { getMigrations } from "../src/server/assets";
 import { migrate } from "../src/server/db";
+import { z } from "zod";
 import {
 	saveInstallation,
 	getInstallation,
 } from "../src/server/cloudflare/installation";
+const backupRows = z
+	.object({
+		tables: z.record(
+			z.string(),
+			z.array(
+				z.record(z.string(), z.union([z.string(), z.number(), z.null()])),
+			),
+		),
+	})
+	.passthrough();
 
 test("token and Global API Key record backups preserve credentials across migration 0069", async () => {
 	const state = await fixture();
@@ -277,6 +289,154 @@ test("domain relay columns retain old full backups and backfill only a verified 
 		expect(legacy.query("SELECT id FROM messages").all()).toEqual([
 			{ id: "message" },
 		]);
+		expect(legacy.query("PRAGMA foreign_key_check").all()).toEqual([]);
+	} finally {
+		legacy.close();
+		await state.close();
+	}
+});
+
+test("full restore preserves explicit retention timestamps instead of treating old mail as new", async () => {
+	const state = await fixture();
+	try {
+		state.db.exec(
+			"UPDATE messages SET status='trash' WHERE id='message'; UPDATE messages SET trashed_at=123 WHERE id='message'; INSERT INTO messages(id,user_id,mailbox_id,direction,from_addr,to_addr,subject,status,created_at) VALUES('unknown-age','owner','mailbox','inbound','sender@example.org','hello@example.com','Unknown age','spam',1); UPDATE messages SET trashed_at=NULL WHERE id='unknown-age'",
+		);
+		const path = join(state.directory, "retention-records.json");
+		await writeBackup(state.path, path);
+		const backup: unknown = await Bun.file(path).json();
+		restoreBackup(state.db, backup);
+		expect(
+			state.db
+				.query("SELECT id,status,trashed_at FROM messages ORDER BY id")
+				.all(),
+		).toEqual([
+			{ id: "message", status: "trash", trashed_at: 123 },
+			{ id: "unknown-age", status: "spam", trashed_at: null },
+		]);
+	} finally {
+		await state.close();
+	}
+});
+
+test("legacy missing retention fields keep insertion defaults and restore keeps indexing triggers active", async () => {
+	const state = await fixture();
+	try {
+		state.db.exec("UPDATE messages SET status='trash' WHERE id='message'");
+		const path = join(state.directory, "legacy-retention.json");
+		await writeBackup(state.path, path);
+		const backup = backupRows.parse(await Bun.file(path).json());
+		for (const row of backup.tables.messages ?? []) delete row.trashed_at;
+		const started = Math.floor(Date.now() / 1000);
+		restoreBackup(state.db, backup);
+		const row = state.db
+			.query("SELECT trashed_at FROM messages WHERE id='message'")
+			.get() as { trashed_at: number };
+		expect(row.trashed_at).toBeGreaterThanOrEqual(started);
+		expect(row.trashed_at).toBeLessThanOrEqual(Math.floor(Date.now() / 1000));
+		expect(
+			state.db
+				.query(
+					"SELECT rowid FROM messages_fts WHERE messages_fts MATCH 'searchable'",
+				)
+				.all(),
+		).toHaveLength(1);
+		state.db.exec("UPDATE messages SET status='received' WHERE id='message'");
+		expect(
+			state.db
+				.query("SELECT trashed_at FROM messages WHERE id='message'")
+				.get(),
+		).toEqual({ trashed_at: null });
+		state.db.exec("UPDATE messages SET status='spam' WHERE id='message'");
+		expect(
+			(
+				state.db
+					.query("SELECT trashed_at FROM messages WHERE id='message'")
+					.get() as { trashed_at: number }
+			).trashed_at,
+		).toBeGreaterThanOrEqual(started);
+	} finally {
+		await state.close();
+	}
+});
+
+test("a late invalid reference rolls back historical-field repair and the full restore", async () => {
+	const state = await fixture();
+	try {
+		state.db.exec(
+			"UPDATE messages SET status='trash' WHERE id='message'; UPDATE messages SET trashed_at=123 WHERE id='message'",
+		);
+		const path = join(state.directory, "invalid-retention.json");
+		await writeBackup(state.path, path);
+		const backup = backupRows.parse(await Bun.file(path).json());
+		for (const row of backup.tables.messages ?? []) row.trashed_at = 456;
+		backup.tables.message_attachments = [
+			{
+				id: "invalid-file",
+				message_id: "missing",
+				filename: "missing.txt",
+				content_type: "text/plain",
+				size: 1,
+				r2_key: "missing",
+				created_at: 1,
+			},
+		];
+		expect(() => restoreBackup(state.db, backup)).toThrow(
+			"invalid foreign keys",
+		);
+		expect(
+			state.db
+				.query("SELECT trashed_at FROM messages WHERE id='message'")
+				.get(),
+		).toEqual({ trashed_at: 123 });
+		expect(state.db.query("SELECT id FROM message_attachments").all()).toEqual(
+			[],
+		);
+		expect(
+			state.db
+				.query(
+					"SELECT rowid FROM messages_fts WHERE messages_fts MATCH 'searchable'",
+				)
+				.all(),
+		).toHaveLength(1);
+		expect(state.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
+	} finally {
+		await state.close();
+	}
+});
+
+test("pre-retention full documents restore on both sides of migration 0053", async () => {
+	const state = await fixture(),
+		path = join(state.directory, "before-retention.sqlite"),
+		legacy = new Database(path);
+	try {
+		legacy.exec(
+			"CREATE TABLE d1_migrations(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT UNIQUE,applied_at TEXT DEFAULT CURRENT_TIMESTAMP)",
+		);
+		for (const [name, file] of getMigrations())
+			if (name.endsWith(".sql") && name.slice(0, 4) < "0053") {
+				legacy.exec(await file.text());
+				legacy.query("INSERT INTO d1_migrations(name) VALUES(?)").run(name);
+			}
+		state.db.exec("UPDATE messages SET status='trash' WHERE id='message'");
+		const saved = join(state.directory, "pre-retention-records.json");
+		await writeBackup(state.path, saved);
+		const backup = backupRows.parse(await Bun.file(saved).json());
+		for (const row of backup.tables.messages ?? []) delete row.trashed_at;
+		restoreBackup(legacy, backup);
+		expect(legacy.query("SELECT id,status FROM messages").all()).toEqual([
+			{ id: "message", status: "trash" },
+		]);
+		const started = Math.floor(Date.now() / 1000);
+		await migrate(path);
+		restoreBackup(legacy, backup);
+		const record = legacy
+			.query("SELECT trashed_at FROM messages WHERE id='message'")
+			.get() as { trashed_at: number };
+		expect(record.trashed_at).toBeGreaterThanOrEqual(started);
+		expect(record.trashed_at).toBeLessThanOrEqual(
+			Math.floor(Date.now() / 1000),
+		);
 		expect(legacy.query("PRAGMA foreign_key_check").all()).toEqual([]);
 	} finally {
 		legacy.close();
