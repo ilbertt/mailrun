@@ -81,8 +81,18 @@ coverage and strict TypeScript pass.
 Local Docker is unresponsive. Existing Ubuntu CI is therefore expanded to run the
 compiled read/detail/upload/populated-feature rehearsals in addition to the full
 suite and normal HTTP checks. Successful push runs retain the exact tested Linux
-binary and checksum for one day; deployment can use that artifact. Linux results
-and the preview update remain pending until this commit's CI completes.
+binary and checksum for one day; deployment can use that artifact. [Ubuntu run 41097245963](https://github.com/ilbertt/mailrun/actions/runs/41097245963)
+passed all 797 tests and every compiled rehearsal, including 48 populated-feature
+comparisons, 104 detail/download cases, 115 source read matches and the explicitly
+retained native draft guards. The exact uploaded artifact was downloaded and its
+checksum verified before CLI deployment to the existing preview.
+
+Deployment `01a18dd4-939e-738e-9c93-868386f39be5` serves source `0fa251b`, artifact
+SHA-256 `a8a1b78f44aeb81a19e56b07f85559f0a3124907b2e9483327c345431f1d012c`.
+Post-update checks find one account/five messages intact, installation ready,
+ilbert.dev routing/sending active, relay health 200 with a successful signed
+callback, and all three native schedules registered. Login/setup HTTPS checks
+also pass. The update changed the binary without restoring live data.
 
 This establishes a populated representative state for every original table; it
 does not prove every value/combination, mutation or external integration. Restore

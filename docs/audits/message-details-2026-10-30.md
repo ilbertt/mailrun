@@ -4,8 +4,9 @@ The unmodified `71aa49b` / 0.5.2 production handlers generated 104 HTTP captures
 covering message details, metadata, threads and attachment downloads. Their module
 hashes and responses are retained in `tests/source-message-details.json`.
 The preceding `5e24868` standalone binary fails 86 cases; the updated host
-standalone binary passes the selected contracts. Linux x64 verification is pending
-because the local container engine is not responding. Four additional native
+standalone binary passes the selected contracts. The later
+[Ubuntu run](https://github.com/ilbertt/mailrun/actions/runs/41097245963) also verifies
+these contracts natively on Linux x64 in source `0fa251b`. Four additional native
 permission checks retain author-only access to another user's draft body/files;
 those checks are explicitly outside the source-parity count.
 
@@ -78,13 +79,13 @@ as UTF-8 bytes read as Latin-1; comparison decodes that source header once to it
 filename intent. The capture itself remains unchanged. This is a functional header
 comparison, not a claim of identical HTTP wire encoding or every global CSP header.
 
-The full 794-test suite, generated SQL/coverage and strict TypeScript pass.
-The host artifact passes all 104 selected contracts and the four separate native
-draft-read denials, plus the regular HTTP/WebSocket suite. The Linux artifact is
-built, but its two verification processes are still waiting on the unresponsive
-local Docker engine; even the engine's status and bounded socket ping cannot
-complete. Verification uses the existing local amd64 image with external networking
-disabled. The preview has not been updated with this patch. No real account, sharing grant, message or file is modified, and no
+The latest full 797-test suite, generated SQL/coverage and strict TypeScript pass.
+The host and native Ubuntu Linux x64 artifact pass all 104 selected contracts and
+the four separate native draft-read denials, plus the regular HTTP/WebSocket suite.
+The exact CI-tested Linux artifact is deployed to the existing preview; see the
+[populated-state audit](populated-source-state-2026-10-30.md) for checksum and
+post-update evidence. Local Docker remains unresponsive, so those old local
+verification processes are not used as release evidence. No real account, sharing grant, message or file is modified, and no
 external email is sent by these tests.
 
 The prior [mailbox audit](mailbox-reads-2026-10-30.md) records the pending owner
