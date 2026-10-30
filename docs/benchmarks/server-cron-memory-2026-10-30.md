@@ -5,6 +5,9 @@ The [updated artifact](server-cron-memory-2026-10-30.json) and
 both complete the selected workload with one CPU, 256 MiB and no swap.
 The test driver runs on the host, outside the server's memory cgroup. Each
 container has only synthetic data and explicitly supplied non-secret settings.
+The Docker engine is aarch64/OrbStack; Linux amd64 runs under emulation on this
+ARM host. Its memory figures include that local runtime environment and must not
+be presented as native nibrun guest measurements.
 
 `scripts/smoke-memory.ts` warms seven document routes and embedded JS/CSS/fonts,
 then submits three future scheduled sends. Each send contains three distinct
