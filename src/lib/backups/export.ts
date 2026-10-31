@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { open, type FileHandle } from "node:fs/promises";
 import { z } from "zod";
 import { BACKUP_TABLE_GROUPS } from "./table-groups";
-import type { DatabaseBackupTable } from "./types";
+import type { DatabaseBackupTable, DatabaseRecord } from "./types";
 
 // Parent-first order, also checked against SQLite's foreign-key catalog.
 export const BACKUP_TABLES: DatabaseBackupTable[] = [
@@ -202,7 +202,7 @@ export async function writeBackup(
 	}
 }
 
-export function restoreBackup(db: Database, input: unknown) {
+export function parseBackupDocument(input: unknown) {
 	const document = documentSchema.parse(input);
 	for (const table of Object.keys(document.tables)) {
 		if (
@@ -211,6 +211,18 @@ export function restoreBackup(db: Database, input: unknown) {
 		)
 			throw new Error(`Unknown backup table: ${table}`);
 	}
+	return document;
+}
+export function restoreBackup(
+	db: Database,
+	input: unknown,
+	options?: {
+		missingTableRows?: Partial<
+			Record<DatabaseBackupTable, () => Iterable<DatabaseRecord>>
+		>;
+	},
+) {
+	const document = parseBackupDocument(input);
 	const tables = coveredTables(db);
 	if (
 		document.includedTables &&
@@ -269,7 +281,9 @@ export function restoreBackup(db: Database, input: unknown) {
 					.parse(db.query(`PRAGMA table_info(${identifier(table)})`).all())
 					.map((row) => row.name),
 			);
-			for (const row of document.tables[table] ?? []) {
+			for (const row of document.tables[table] ??
+				options?.missingTableRows?.[table]?.() ??
+				[]) {
 				if (
 					table === "booking_events" &&
 					row.slug === undefined &&

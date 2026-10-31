@@ -21,7 +21,9 @@ import {
 
 const source = resolve(z.string().min(1).parse(process.argv[2]));
 const destination = resolve(z.string().min(1).parse(process.argv[3]));
-const featureSeed = process.argv[4] ? resolve(process.argv[4]) : undefined;
+const captureRestore = process.argv[4] === "--restore";
+const featureSeed =
+	process.argv[4] && !captureRestore ? resolve(process.argv[4]) : undefined;
 const digest = (bytes: Uint8Array) =>
 	createHash("sha256").update(bytes).digest("hex");
 const provenance = {
@@ -76,14 +78,14 @@ if (!node) throw new Error("Reference SQLite runtime requires Node");
 const directory = await mkdtemp(join(source, ".mailrun-upload-capture-"));
 try {
 	const helper = `
-import {writeFile,readFile,readdir} from 'node:fs/promises';
+import {writeFile,readFile,readdir,cp} from 'node:fs/promises';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {hash} from 'bcryptjs';
 import {SqliteDatabase} from 'original-database';
 import {FileBucket} from 'original-bucket';
 import {storeUpload,readUpload} from 'original-blobs';
-import {exportDatabaseRecords} from 'original-backup';
+import {exportDatabaseRecords,restoreDatabaseRecords} from 'original-backup';
 const dir=process.argv[2],ref=process.argv[3],db=new SqliteDatabase(join(dir,'mailflare.sqlite'));
 for(const name of (await readdir(ref+'/drizzle/migrations')).filter(x=>x.endsWith('.sql')).sort()) db.db.exec(await readFile(join(ref,'drizzle/migrations',name),'utf8'));
 db.db.exec("INSERT INTO users(id,email,name,password_hash,role,is_primary_admin,created_at) VALUES('owner','owner@example.com','Owner','test-only','admin',1,1),('stranger','stranger@example.com','Stranger','test-only','user',0,1); INSERT INTO domains(id,user_id,hostname,zone_id,status,created_at) VALUES('domain','owner','example.com','zone','active',1); INSERT INTO mailboxes(id,user_id,domain_id,local_part,created_at) VALUES('mailbox','owner','domain','hello',1),('stranger-mailbox','stranger','domain','private',1)");
@@ -136,7 +138,27 @@ if(process.argv[4]){
  if(db.db.prepare('PRAGMA foreign_key_check').all().length)throw new Error('Invalid source feature foreign keys');
 }
 await writeFile(join(dir,'backup.json'),await exportDatabaseRecords(db));
-await writeFile(join(dir,'expected.json'),JSON.stringify({uploads:expected,mime,drive:{id:'pending',uploadId:multipart.uploadId,part},externalRequests}));
+let restoredObjects;
+if(process.argv.includes('--restore')){
+ const restored=new SqliteDatabase(join(dir,'restore.sqlite'));
+ for(const name of (await readdir(ref+'/drizzle/migrations')).filter(x=>x.endsWith('.sql')).sort())restored.db.exec(await readFile(join(ref,'drizzle/migrations',name),'utf8'));
+ const records=await readFile(join(dir,'backup.json'));
+ await restoreDatabaseRecords(restored,records.buffer.slice(records.byteOffset,records.byteOffset+records.byteLength));
+ await cp(join(dir,'bucket'),join(dir,'restore-bucket'),{recursive:true});
+ const restoredBucket=new FileBucket(join(dir,'restore-bucket')),uploads=[];
+ for(const upload of expected){
+  const read=await readUpload({auth:{userId:upload.userId},env:{BUCKET:restoredBucket}},upload.blobId.slice(3));
+  if(!read)throw new Error('Original restore lost an uploaded object');
+  uploads.push({blobId:upload.blobId,userId:upload.userId,type:read.type,name:read.name,sha256:createHash('sha256').update(new Uint8Array(read.content)).digest('hex')});
+ }
+ const item=restored.db.prepare("SELECT * FROM drive_items WHERE id='pending'").get();
+ const parts=restored.db.prepare("SELECT part_number AS partNumber,etag FROM drive_upload_parts WHERE item_id='pending'").all();
+ const complete=await restoredBucket.resumeMultipartUpload(item.r2_key,item.upload_id).complete(parts);
+ const bytes=await complete.arrayBuffer();
+ restoredObjects={uploads,drive:{id:item.id,size:bytes.byteLength,sha256:createHash('sha256').update(new Uint8Array(bytes)).digest('hex')}};
+ restored.db.close();
+}
+await writeFile(join(dir,'expected.json'),JSON.stringify({uploads:expected,mime,drive:{id:'pending',uploadId:multipart.uploadId,part},externalRequests,...(restoredObjects?{restoredObjects}:{})}));
 db.db.exec('CREATE TABLE d1_migrations(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT UNIQUE,applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)');
 for(const name of (await readdir(ref+'/drizzle/migrations')).filter(name=>name.endsWith('.sql')).sort())db.db.prepare('INSERT INTO d1_migrations(name) VALUES(?)').run(name);
 db.db.close();
@@ -179,7 +201,13 @@ db.db.close();
 	});
 	execFileSync(
 		node,
-		[bundle, directory, source, ...(featureSeed ? [featureSeed] : [])],
+		[
+			bundle,
+			directory,
+			source,
+			featureSeed ?? "",
+			...(captureRestore ? ["--restore"] : []),
+		],
 		{
 			stdio: "inherit",
 			timeout: 30000,
@@ -208,6 +236,24 @@ db.db.close();
 				part: z.object({ partNumber: z.number(), etag: z.string() }),
 			}),
 			externalRequests: z.literal(0),
+			restoredObjects: z
+				.object({
+					uploads: z.array(
+						z.object({
+							blobId: z.string(),
+							userId: z.string(),
+							type: z.string(),
+							name: z.string().nullable(),
+							sha256: z.string(),
+						}),
+					),
+					drive: z.object({
+						id: z.string(),
+						size: z.number(),
+						sha256: z.string(),
+					}),
+				})
+				.optional(),
 		})
 		.parse(
 			JSON.parse(await readFile(join(directory, "expected.json"), "utf8")),

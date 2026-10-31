@@ -17,6 +17,11 @@ import { restoreBackup } from "../../lib/backups/export";
 import { migrate, withDatabase } from "../db";
 import { LocalStorage } from "../storage";
 import { syncDirectory } from "../filesystem";
+import {
+	sourceDriveUploadId,
+	sourceDriveMetadataKey,
+	sourceDriveMetadataSchema,
+} from "./restore-objects";
 
 const metadataSchema = z.object({
 	httpMetadata: z.object({ contentType: z.string().optional() }).optional(),
@@ -182,7 +187,7 @@ export async function migrateSourceBucket(input: {
 		}
 		const pending = await withDatabase(
 			(sql) =>
-				sql.NativeSourceDriveUploads`SELECT id,upload_id,upload_part_size,size FROM drive_items WHERE upload_id IS NOT NULL`,
+				sql.NativeSourceDriveUploads`SELECT id,owner_id,r2_key,upload_id,upload_part_size,size FROM drive_items WHERE upload_id IS NOT NULL`,
 			path,
 		);
 		for (const item of pending) {
@@ -193,11 +198,12 @@ export async function migrateSourceBucket(input: {
 				item.upload_part_size < 1
 			)
 				throw new Error("Invalid source Drive multipart metadata");
-			const nativeUploadId =
-				"local_migrated_" +
-				new Bun.CryptoHasher("sha256")
-					.update(item.id + "\0" + item.upload_id)
-					.digest("hex");
+			const nativeUploadId = sourceDriveUploadId(item.id, item.upload_id);
+			const translated: {
+				number: number;
+				sourceEtag: string;
+				sha256: string;
+			}[] = [];
 			const parts = await withDatabase(
 				(sql) =>
 					sql.NativeSourceDriveParts`SELECT part_number,etag FROM drive_upload_parts WHERE item_id=${item.id} ORDER BY part_number`,
@@ -230,6 +236,11 @@ export async function migrateSourceBucket(input: {
 						sql.NativeSourceDrivePartHash`UPDATE drive_upload_parts SET etag=${hash.sha256} WHERE item_id=${item.id} AND part_number=${part.part_number} AND etag=${part.etag}`,
 					path,
 				);
+				translated.push({
+					number: part.part_number,
+					sourceEtag: part.etag,
+					sha256: hash.sha256,
+				});
 				report.driveParts++;
 				report.bytes += copied.size;
 			}
@@ -237,6 +248,22 @@ export async function migrateSourceBucket(input: {
 				(sql) =>
 					sql.NativeSourceDriveUploadId`UPDATE drive_items SET upload_id=${nativeUploadId} WHERE id=${item.id} AND upload_id=${item.upload_id}`,
 				path,
+			);
+			await store.put(
+				sourceDriveMetadataKey(item.id, item.upload_id),
+				JSON.stringify(
+					sourceDriveMetadataSchema.parse({
+						format: "mailrun-source-drive-upload",
+						version: 1,
+						itemId: item.id,
+						ownerId: item.owner_id,
+						sourceId: item.upload_id,
+						size: item.size,
+						partSize: item.upload_part_size,
+						r2Key: item.r2_key,
+						parts: translated,
+					}),
+				),
 			);
 		}
 		const referenced = await withDatabase(

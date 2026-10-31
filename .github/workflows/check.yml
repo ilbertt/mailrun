@@ -22,6 +22,7 @@ jobs:
       - run: bun scripts/smoke-message-details.ts dist/mailrun
       - run: bun run smoke:source-uploads dist/mailrun
       - run: bun run smoke:source-features dist/mailrun
+      - run: bun run smoke:source-record-restore dist/mailrun
       - run: sha256sum dist/mailrun > dist/mailrun.sha256
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'push'

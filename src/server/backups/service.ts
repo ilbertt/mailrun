@@ -9,6 +9,7 @@ import { withDatabase, databasePath, id, seconds, type AppSQL } from "../db";
 import { keyActor } from "../auth/key-management";
 import { LocalStorage, deleteUnreferencedObjects } from "../storage";
 import { adminWrite } from "../admin/accounts";
+import { prepareObjectRestore } from "../migration/restore-objects";
 
 const group = z.enum(["accounts", "mail", "automation", "assistant", "system"]);
 export const backupSettingsSchema = z
@@ -280,10 +281,13 @@ export async function restoreRecords(user: User, document: unknown) {
 		// SQLite commits all table replacements and FTS changes atomically.
 		await withDatabase(async (sql) => {
 			await keyActor(sql, user, true);
+			const prepared = await prepareObjectRestore(sql, document);
 			const db = new Database(databasePath());
 			try {
 				db.exec("PRAGMA busy_timeout=5000");
-				restoreBackup(db, document);
+				restoreBackup(db, prepared.document, {
+					missingTableRows: prepared.missingTableRows,
+				});
 			} finally {
 				db.close();
 			}

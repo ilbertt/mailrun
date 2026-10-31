@@ -4526,6 +4526,43 @@ export interface INativeMcpApprovalKeyResult {
     mailbox_id: IAgentSendApprovalsColumns["mailbox_id"];
 }
 
+/** Result of query `NativeRestoreUploadMetadataPage`. */
+export interface INativeRestoreUploadMetadataPageResult {
+    id: IMailrunJmapUploadsColumns["id"];
+    user_id: IMailrunJmapUploadsColumns["user_id"];
+    r2_key: IMailrunJmapUploadsColumns["r2_key"];
+    content_type: IMailrunJmapUploadsColumns["content_type"];
+    name: IMailrunJmapUploadsColumns["name"];
+    size: IMailrunJmapUploadsColumns["size"];
+    created_at: IMailrunJmapUploadsColumns["created_at"];
+}
+
+/** Result of query `NativeRestoreCurrentInstallation`. */
+export interface INativeRestoreCurrentInstallationResult {
+    id: IMailrunInstallationColumns["id"];
+    account_id: IMailrunInstallationColumns["account_id"];
+    zone_id: IMailrunInstallationColumns["zone_id"];
+    hostname: IMailrunInstallationColumns["hostname"];
+    worker_name: IMailrunInstallationColumns["worker_name"];
+    public_origin: IMailrunInstallationColumns["public_origin"];
+    api_token: IMailrunInstallationColumns["api_token"];
+    relay_secret: IMailrunInstallationColumns["relay_secret"];
+    relay_version: IMailrunInstallationColumns["relay_version"];
+    phase: IMailrunInstallationColumns["phase"];
+    updated_at: IMailrunInstallationColumns["updated_at"];
+    api_key: IMailrunInstallationColumns["api_key"];
+    api_email: IMailrunInstallationColumns["api_email"];
+}
+
+/** Result of query `NativeRestoreCurrentRelayBinding`. */
+export interface INativeRestoreCurrentRelayBindingResult {
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    zone_id: IDomainsColumns["zone_id"];
+    mailrun_relay_worker_name: IDomainsColumns["mailrun_relay_worker_name"];
+    mailrun_relay_zone_id: IDomainsColumns["mailrun_relay_zone_id"];
+}
+
 /** Result of query `NativeSourceUploadOwner`. */
 export interface INativeSourceUploadOwnerResult {
     id: IUsersColumns["id"];
@@ -4538,6 +4575,8 @@ export interface INativeSourceUploadMetadataResult {
 /** Result of query `NativeSourceDriveUploads`. */
 export interface INativeSourceDriveUploadsResult {
     id: IDriveItemsColumns["id"];
+    owner_id: IDriveItemsColumns["owner_id"];
+    r2_key: IDriveItemsColumns["r2_key"];
     upload_id: IDriveItemsColumns["upload_id"];
     upload_part_size: IDriveItemsColumns["upload_part_size"];
     size: IDriveItemsColumns["size"];
@@ -5518,6 +5557,9 @@ export interface Queries {
     NativeMcpCancelScheduledJob: INativeMcpCancelScheduledJobResult;
     NativeMcpCancelScheduledMessage: INativeMcpCancelScheduledMessageResult;
     NativeMcpApprovalKey: INativeMcpApprovalKeyResult;
+    NativeRestoreUploadMetadataPage: INativeRestoreUploadMetadataPageResult;
+    NativeRestoreCurrentInstallation: INativeRestoreCurrentInstallationResult;
+    NativeRestoreCurrentRelayBinding: INativeRestoreCurrentRelayBindingResult;
     NativeSourceUploadOwner: INativeSourceUploadOwnerResult;
     NativeSourceUploadMetadata: INativeSourceUploadMetadataResult;
     NativeSourceDriveUploads: INativeSourceDriveUploadsResult;
