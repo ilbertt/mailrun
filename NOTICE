@@ -1,0 +1,11 @@
+Mailrun includes schema migrations and adapted authentication/backup code, original application layouts,
+mail and settings components, recipient/rich-text editors, email rendering, spam algorithms and stylesheet code from
+Mailflare, https://github.com/ilbertt/mailflare, commit 71aa49b.
+Mailflare - Email for professionals and teams
+Copyright (C) 2026 Hieu Nguyen
+
+The combined application is distributed under the GNU Affero General Public
+License, version 3 or later; see LICENSE. The original Mailrun repository's
+public-domain dedication is retained in LICENSE-MAILRUN.
+
+Modified source: https://github.com/ilbertt/mailrun

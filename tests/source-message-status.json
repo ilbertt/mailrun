@@ -1,0 +1,345 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/app/api/messages/[messageId]/status/route.ts": "ea7190371d65a358ef7bf05e69b7f0d4f0d3d9dae27bfd57a80b738c6e7b409a",
+    "src/app/api/messages/[messageId]/status/utils.ts": "c56af507691f6455bdb6b03cf1c72305bed80b56658b02e37e8a2ea82874d21a",
+    "src/lib/user.ts": "e038eae3bc9ae9e9030cd4308adb768c05ccdbb1a455f2d7a6feed3938ec0ca0",
+    "src/lib/spam/feedback.ts": "9f87ba2d1590bf85b71a6a87399d097587346a95162d36a80d25c569ae522336"
+  },
+  "cases": [
+    {
+      "name": "owner-received",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "received",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": [
+        {
+          "action": "email.delete",
+          "metadata": {
+            "status": "received"
+          }
+        }
+      ]
+    },
+    {
+      "name": "owner-sent",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "sent",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "sent",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": [
+        {
+          "action": "email.delete",
+          "metadata": {
+            "status": "sent"
+          }
+        }
+      ]
+    },
+    {
+      "name": "owner-draft",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "draft",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "draft",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": [
+        {
+          "action": "email.delete",
+          "metadata": {
+            "status": "draft"
+          }
+        }
+      ]
+    },
+    {
+      "name": "owner-trash",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "trash",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "trash",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": "now",
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": [
+        {
+          "action": "email.delete",
+          "metadata": {
+            "status": "trash"
+          }
+        }
+      ]
+    },
+    {
+      "name": "owner-spam",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "spam",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "spam",
+        "direction": "inbound",
+        "folder_id": null,
+        "snoozed_until": 4000000000,
+        "trashed_at": "now",
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": {
+        "classification": "spam"
+      },
+      "audit": [
+        {
+          "action": "email.spam_feedback",
+          "metadata": {
+            "classification": "spam"
+          }
+        }
+      ]
+    },
+    {
+      "name": "owner-spam-to-received",
+      "actor": "owner",
+      "initialStatus": "spam",
+      "status": "received",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": null,
+        "snoozed_until": 4000000000,
+        "trashed_at": null,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": {
+        "classification": "ham"
+      },
+      "audit": [
+        {
+          "action": "email.spam_feedback",
+          "metadata": {
+            "classification": "ham"
+          }
+        }
+      ]
+    },
+    {
+      "name": "invalid-archived",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "archived",
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Invalid message status"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": []
+    },
+    {
+      "name": "missing-message",
+      "actor": "owner",
+      "initialStatus": "received",
+      "status": "trash",
+      "messageId": "missing",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": []
+    },
+    {
+      "name": "unshared",
+      "actor": "stranger",
+      "initialStatus": "received",
+      "status": "trash",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": []
+    },
+    {
+      "name": "read-only",
+      "actor": "stranger",
+      "initialStatus": "received",
+      "status": "trash",
+      "permission": "read_only",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": []
+    },
+    {
+      "name": "full-access",
+      "actor": "stranger",
+      "initialStatus": "received",
+      "status": "trash",
+      "permission": "full_access",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "trash",
+        "direction": "inbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": "now",
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": [
+        {
+          "action": "email.delete",
+          "metadata": {
+            "status": "trash"
+          }
+        }
+      ]
+    },
+    {
+      "name": "outbound-spam",
+      "actor": "owner",
+      "initialStatus": "sent",
+      "status": "spam",
+      "direction": "outbound",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "sent",
+        "direction": "outbound",
+        "folder_id": "status-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "feedback": null,
+      "audit": []
+    }
+  ]
+}

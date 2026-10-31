@@ -1,0 +1,5690 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/app/api/messages/bulk/route.ts": "317b8e7a02ce8cc15b0d3925402933e740fbf55a911739a7e902e6cbebd83f43",
+    "src/app/api/messages/bulk/utils.ts": "c6f4a6ddc3cc5032069de013b66ce04c045996754567f2ded0e15ca773f73adb",
+    "src/app/api/messages/empty/route.ts": "7f6636af3606d24520c9eff22c86d37f9e523ba38e3d04594c1f873b7a50ba83",
+    "src/app/api/messages/empty/utils.ts": "9994407a8b766b13a150378259857dea4a4d2c2b6c6c480f324c82b9cb2a923f",
+    "src/app/api/folders/route.ts": "173a41fdd9eab4a53f515c7a4088b577028616a36d5f9c8b736ec345ee5fb10c",
+    "src/app/api/folders/utils.ts": "9b68b40b193bbdf39483ab870e986c427ff5a88776c675a03020048171208f58",
+    "src/lib/email/permanent-delete.ts": "381604090c73527279bf13c6a1151541c55215012176066f87a99ab166e17185",
+    "src/lib/email/message-cleanup.ts": "9249e5f6891f874f6f6aded6a9a9096e51b8aa9fec78ac6941b361886ae55552",
+    "src/lib/spam/feedback.ts": "9f87ba2d1590bf85b71a6a87399d097587346a95162d36a80d25c569ae522336",
+    "server/runtime/env.ts": "0f0c7bdb6c30ab12907d786b0cb17209c6b6efb44d848e6dbfaaf721578af1be",
+    "server/runtime/file-bucket.ts": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2"
+  },
+  "cases": [
+    {
+      "name": "owner-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "archived",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "archive"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "trash",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": "now",
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "spam",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": "now",
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.spam_feedback",
+          "mailboxId": "mailbox",
+          "messageId": "message",
+          "metadata": {
+            "classification": "spam"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": [
+        {
+          "message_id": "message",
+          "classification": "spam"
+        }
+      ]
+    },
+    {
+      "name": "owner-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "unread"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": null,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "target-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "folder"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 0,
+        "skipped": 1
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "unread"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 404,
+      "body": {
+        "error": "Folder not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "unread"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 404,
+      "body": {
+        "error": "Folder not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_on_behalf-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "unread"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 404,
+      "body": {
+        "error": "Folder not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "send_as-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "archived",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "archive"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "trash",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": "now",
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "spam",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": "now",
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.spam_feedback",
+          "mailboxId": "mailbox",
+          "messageId": "message",
+          "metadata": {
+            "classification": "spam"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": [
+        {
+          "message_id": "message",
+          "classification": "spam"
+        }
+      ]
+    },
+    {
+      "name": "full_access-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "unread"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": null,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "target-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "folder"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 0,
+        "skipped": 1
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-archive",
+      "requestSha256": "0cd209364650bf75041b71d28d47ccd51ae68fd27f9a3e6bf272049676dbe5dc",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-trash",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-read",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-unread",
+      "requestSha256": "125e58989068bfd3b551e86a063b3849e0040ad068032db87419bb26e1b6d859",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-folder",
+      "requestSha256": "752e584bda67536e59f0dbe5b5ea5b579df3fd7f00ba037f3cd93ba52f987e8d",
+      "status": 404,
+      "body": {
+        "error": "Folder not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-delete",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "trash-again",
+      "requestSha256": "f32de8c7a8fcf948651819eff856891480c2b13a95588458d94f2370e886034d",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "trash",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "spam-to-inbox",
+      "requestSha256": "f65f1d17b6426df360333a9b98ab9dac525d7b8432aa4153f379dc4c54f003a4",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.spam_feedback",
+          "mailboxId": "mailbox",
+          "messageId": "message",
+          "metadata": {
+            "classification": "ham"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": [
+        {
+          "message_id": "message",
+          "classification": "ham"
+        }
+      ]
+    },
+    {
+      "name": "outbound-spam",
+      "requestSha256": "93013b8aa77e2991f95d0870101d4f191ce0c9893e1becfb3c84562afcae18fa",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "sent",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "trash-delete-with-objects",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 1,
+        "skipped": 0
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "bulk",
+            "messageId": "message",
+            "previousStatus": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": null,
+        "attachment.bin": null
+      },
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "live-delete-preserves-objects",
+      "requestSha256": "3461df60d0ead034c51afd8d2ee3c7828be6125c602c0ad6c0392ad5fec17307",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 0,
+        "skipped": 1
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": "c11cc427848534c158b833d857eace5ef63a2d8f0bacfc7d40f430d05a275cdd",
+        "attachment.bin": "12b6374d77ce5915ee2b5c07effacd8ee0d02a240e16bdc79bda1e43dc538f2a"
+      },
+      "attachments": [
+        {
+          "id": "bulk-attachment",
+          "message_id": "message",
+          "r2_key": "bulk-contract/attachment.bin"
+        }
+      ],
+      "links": [
+        {
+          "id": "bulk-link",
+          "attachment_id": "bulk-attachment"
+        }
+      ],
+      "feedback": []
+    },
+    {
+      "name": "mixed-access",
+      "requestSha256": "1755e8d9196fcf2f95d04e2df9c57f50b84306332622bdad613815593b7ed752",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "duplicate-and-empty-ids",
+      "requestSha256": "479d334e1901288e1a4fab0000e9353acc94ecb853a41998c20c2fce8489463e",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "missing-ids",
+      "requestSha256": "edc67c912ba80bd94e7f41b031d67b4aeba23c9ab7e9529eade45a80f448fa54",
+      "status": 400,
+      "body": {
+        "error": "Invalid bulk message action"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "invalid-action",
+      "requestSha256": "1fe2a4f6f1838070afca5e4d05a4650667b42a4a992893a20f7c493fa568bc45",
+      "status": 400,
+      "body": {
+        "error": "Invalid bulk message action"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-required",
+      "requestSha256": "adeb6b89c82a14d27b3acc196c96173f687e97558b779d2a460a1d8c9dd15206",
+      "status": 400,
+      "body": {
+        "error": "Folder is required"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-missing",
+      "requestSha256": "68237e9041032d6ab67e9a71c86c8e782d96f6f21c6a035add9d72f075977a97",
+      "status": 404,
+      "body": {
+        "error": "Folder not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "invalid-read-grant",
+      "requestSha256": "1163abc893899c1eacea0c63bb093a8c102233f9a446ec7db5f2eedbf78aa7ab",
+      "status": 404,
+      "body": {
+        "error": "No accessible messages"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "many-duplicate-ids",
+      "requestSha256": "e17d8ba24d1dcb059e8572a648f71b35aa9d93a7362344753b8bde29a4d564a1",
+      "status": 200,
+      "body": {
+        "ok": true
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 1,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.read",
+          "mailboxId": null,
+          "messageId": "message",
+          "metadata": {
+            "bulkAction": "read"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-empty-trash",
+      "requestSha256": "97ae78fbad5bffe0b508304c09c1df5e542e3040ff84f499c9b50d67594d2ed3",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 1,
+        "remaining": 0
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "messageId": "message",
+            "previousStatus": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": null,
+        "attachment.bin": null
+      },
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-empty-trash",
+      "requestSha256": "97ae78fbad5bffe0b508304c09c1df5e542e3040ff84f499c9b50d67594d2ed3",
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "trash",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": "c11cc427848534c158b833d857eace5ef63a2d8f0bacfc7d40f430d05a275cdd",
+        "attachment.bin": "12b6374d77ce5915ee2b5c07effacd8ee0d02a240e16bdc79bda1e43dc538f2a"
+      },
+      "attachments": [
+        {
+          "id": "bulk-attachment",
+          "message_id": "message",
+          "r2_key": "bulk-contract/attachment.bin"
+        }
+      ],
+      "links": [
+        {
+          "id": "bulk-link",
+          "attachment_id": "bulk-attachment"
+        }
+      ],
+      "feedback": []
+    },
+    {
+      "name": "full_access-empty-trash",
+      "requestSha256": "97ae78fbad5bffe0b508304c09c1df5e542e3040ff84f499c9b50d67594d2ed3",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 1,
+        "remaining": 0
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "messageId": "message",
+            "previousStatus": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": null,
+        "attachment.bin": null
+      },
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-empty-trash",
+      "requestSha256": "97ae78fbad5bffe0b508304c09c1df5e542e3040ff84f499c9b50d67594d2ed3",
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "trash",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": "c11cc427848534c158b833d857eace5ef63a2d8f0bacfc7d40f430d05a275cdd",
+        "attachment.bin": "12b6374d77ce5915ee2b5c07effacd8ee0d02a240e16bdc79bda1e43dc538f2a"
+      },
+      "attachments": [
+        {
+          "id": "bulk-attachment",
+          "message_id": "message",
+          "r2_key": "bulk-contract/attachment.bin"
+        }
+      ],
+      "links": [
+        {
+          "id": "bulk-link",
+          "attachment_id": "bulk-attachment"
+        }
+      ],
+      "feedback": []
+    },
+    {
+      "name": "empty-spam",
+      "requestSha256": "33dee113e97311694ad5bec6b9486c4e8691dbf17130e49c8c9af35b259e8d34",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 1,
+        "remaining": 0
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "messageId": "message",
+            "previousStatus": "spam"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {
+        "raw.eml": null,
+        "attachment.bin": null
+      },
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "empty-invalid-folder",
+      "requestSha256": "72ef08e8ab7650c6fb94605d75db8f1da99c2b7dd8fe57cd46467238c66a33e6",
+      "status": 400,
+      "body": {
+        "error": "A mailbox and a Trash or Spam folder are required"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "empty-malformed-json",
+      "requestSha256": "62b8125a6f6d924ec53345b5fcd58ca3ed3f5e7d51e2e146e5f1346508acce69",
+      "status": 400,
+      "body": {
+        "error": "A mailbox and a Trash or Spam folder are required"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "empty-batch-101",
+      "requestSha256": "97ae78fbad5bffe0b508304c09c1df5e542e3040ff84f499c9b50d67594d2ed3",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "deleted": 100,
+        "remaining": 1
+      },
+      "messages": {
+        "received": 2,
+        "trash": 1
+      },
+      "audit": [
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        },
+        {
+          "action": "email.delete",
+          "mailboxId": "mailbox",
+          "messageId": null,
+          "metadata": {
+            "permanent": true,
+            "source": "empty",
+            "previousStatus": "trash"
+          }
+        }
+      ],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-folders-get",
+      "requestSha256": null,
+      "status": 200,
+      "body": {
+        "folders": [
+          {
+            "id": "target-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Alpha",
+            "color": "#2563eb",
+            "createdAt": "1970-01-01T00:00:02.000Z"
+          },
+          {
+            "id": "start-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Zulu",
+            "color": "#7c3aed",
+            "createdAt": "1970-01-01T00:00:01.000Z"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "owner-folders-post",
+      "requestSha256": "783444e1317e9228389cdec57de6e2fd19765ec9e35531aa0858cca8736f4709",
+      "status": 200,
+      "body": {
+        "id": "<created>",
+        "mailboxId": "mailbox",
+        "name": "New folder",
+        "color": "#2563eb"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "<created>",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "New folder",
+          "color": "#2563eb",
+          "created_at": "now"
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-folders-get",
+      "requestSha256": null,
+      "status": 200,
+      "body": {
+        "folders": [
+          {
+            "id": "target-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Alpha",
+            "color": "#2563eb",
+            "createdAt": "1970-01-01T00:00:02.000Z"
+          },
+          {
+            "id": "start-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Zulu",
+            "color": "#7c3aed",
+            "createdAt": "1970-01-01T00:00:01.000Z"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "read_only-folders-post",
+      "requestSha256": "783444e1317e9228389cdec57de6e2fd19765ec9e35531aa0858cca8736f4709",
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-folders-get",
+      "requestSha256": null,
+      "status": 200,
+      "body": {
+        "folders": [
+          {
+            "id": "target-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Alpha",
+            "color": "#2563eb",
+            "createdAt": "1970-01-01T00:00:02.000Z"
+          },
+          {
+            "id": "start-folder",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "name": "Zulu",
+            "color": "#7c3aed",
+            "createdAt": "1970-01-01T00:00:01.000Z"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "full_access-folders-post",
+      "requestSha256": "783444e1317e9228389cdec57de6e2fd19765ec9e35531aa0858cca8736f4709",
+      "status": 200,
+      "body": {
+        "id": "<created>",
+        "mailboxId": "mailbox",
+        "name": "New folder",
+        "color": "#2563eb"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "<created>",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "New folder",
+          "color": "#2563eb",
+          "created_at": "now"
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-folders-get",
+      "requestSha256": null,
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unshared-folders-post",
+      "requestSha256": "783444e1317e9228389cdec57de6e2fd19765ec9e35531aa0858cca8736f4709",
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unknown-folders-get",
+      "requestSha256": null,
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "unknown-folders-post",
+      "requestSha256": "783444e1317e9228389cdec57de6e2fd19765ec9e35531aa0858cca8736f4709",
+      "status": 404,
+      "body": {
+        "error": "Mailbox not found"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folders-no-mailbox",
+      "requestSha256": null,
+      "status": 200,
+      "body": {
+        "folders": []
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-name-81",
+      "requestSha256": "e1d4387d4a4fe5680185e513a6f8d7c7d9037c714dce69ccf202a65581d0e92f",
+      "status": 400,
+      "body": {
+        "error": {
+          "formErrors": [],
+          "fieldErrors": {
+            "name": [
+              "Too big: expected string to have <=80 characters"
+            ]
+          }
+        }
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-invalid-color",
+      "requestSha256": "73c8fdb33a82fa5f4e36d5d57ee5e2c03e886b62d85245049eac00f1febcb427",
+      "status": 400,
+      "body": {
+        "error": {
+          "formErrors": [],
+          "fieldErrors": {
+            "color": [
+              "Invalid option: expected one of \"#2563eb\"|\"#7c3aed\"|\"#db2777\"|\"#dc2626\"|\"#ea580c\"|\"#d97706\"|\"#16a34a\"|\"#0d9488\""
+            ]
+          }
+        }
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-duplicate",
+      "requestSha256": "f941caa62914c404602d632ab92edd1ea153c48028a61197af75bffbaff00412",
+      "status": 409,
+      "body": {
+        "error": "Folder already exists"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    },
+    {
+      "name": "folder-trim-and-color",
+      "requestSha256": "28a1b9269420f4c07da495049715e47b457e6e7f368207771b9d4c7795a3d49c",
+      "status": 200,
+      "body": {
+        "id": "<created>",
+        "mailboxId": "mailbox",
+        "name": "Trimmed",
+        "color": "#db2777"
+      },
+      "messages": [
+        {
+          "id": "bulk-foreign-message",
+          "status": "received",
+          "folder_id": null,
+          "snoozed_until": 4000000000,
+          "trashed_at": null,
+          "read": 0,
+          "starred": 1
+        },
+        {
+          "id": "message",
+          "status": "received",
+          "folder_id": "start-folder",
+          "snoozed_until": 4000000000,
+          "trashed_at": 123,
+          "read": 0,
+          "starred": 1
+        }
+      ],
+      "audit": [],
+      "folders": [
+        {
+          "id": "target-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Alpha",
+          "color": "#2563eb",
+          "created_at": 2
+        },
+        {
+          "id": "<created>",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Trimmed",
+          "color": "#db2777",
+          "created_at": "now"
+        },
+        {
+          "id": "start-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Zulu",
+          "color": "#7c3aed",
+          "created_at": 1
+        }
+      ],
+      "objects": {},
+      "attachments": [],
+      "links": [],
+      "feedback": []
+    }
+  ]
+}

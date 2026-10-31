@@ -1,0 +1,502 @@
+{
+  "provenance": {
+    "source": "71aa49b",
+    "version": "0.5.2",
+    "blobsModuleSha256": "e5edc4f987aa990e0219a6d79488b772a32be461ef7574a271631192b33d2269",
+    "bucketModuleSha256": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2",
+    "backupModuleSha256": "aff55286a3c6c8b77750751cb9f4ea9c3b1b3649a6235f03d2d6154d3bf136d8"
+  },
+  "backup": {
+    "format": "mailflare-database-backup",
+    "version": 1,
+    "createdAt": "2026-10-30T17:36:11.722Z",
+    "includedTables": [
+      "users",
+      "domains",
+      "mailboxes",
+      "mailbox_access",
+      "contacts",
+      "folders",
+      "api_keys",
+      "messages",
+      "message_attachments",
+      "shared_attachment_links",
+      "outbound_jobs",
+      "routing_rules",
+      "webhooks",
+      "webhook_deliveries",
+      "sessions",
+      "push_subscriptions",
+      "audit_logs",
+      "backup_settings",
+      "backups",
+      "app_settings",
+      "license_settings",
+      "email_templates",
+      "calendar_events",
+      "booking_events",
+      "auto_reply_deliveries",
+      "spam_token_stats",
+      "spam_reputation",
+      "spam_feedback",
+      "mailbox_aliases",
+      "password_reset_tokens",
+      "mfa_recovery_codes",
+      "login_challenges",
+      "mailbox_agent_settings",
+      "agent_conversations",
+      "agent_chat_messages",
+      "agent_jobs",
+      "agent_draft_metadata",
+      "agent_send_approvals",
+      "mcp_key_mailboxes",
+      "ai_usage",
+      "drive_items",
+      "drive_shares",
+      "drive_upload_parts"
+    ],
+    "tables": {
+      "users": [
+        {
+          "id": "owner",
+          "email": "owner@example.com",
+          "password_hash": "$2b$04$ErNFufu2nNHyWAAiY4V2Iejbm.1tu63d3oXYUQIxl2WTQpEX.rnRK",
+          "name": "Owner",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "admin",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 1,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": 30
+        },
+        {
+          "id": "stranger",
+          "email": "stranger@example.com",
+          "password_hash": "$2b$04$ErNFufu2nNHyWAAiY4V2Iejbm.1tu63d3oXYUQIxl2WTQpEX.rnRK",
+          "name": "Stranger",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "user",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 0,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": null
+        }
+      ],
+      "domains": [
+        {
+          "id": "domain",
+          "user_id": "owner",
+          "hostname": "example.com",
+          "zone_id": "zone",
+          "status": "active",
+          "routing_status": null,
+          "sending_subdomain_tag": null,
+          "sending_enabled": 0,
+          "routing_enabled": 0,
+          "created_at": 1,
+          "sending_requested": 0,
+          "sending_provider": "none",
+          "receiving_provider": "cloudflare"
+        }
+      ],
+      "mailboxes": [
+        {
+          "id": "mailbox",
+          "user_id": "owner",
+          "domain_id": "domain",
+          "local_part": "hello",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        },
+        {
+          "id": "stranger-mailbox",
+          "user_id": "stranger",
+          "domain_id": "domain",
+          "local_part": "private",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        }
+      ],
+      "mailbox_access": [],
+      "contacts": [],
+      "folders": [
+        {
+          "id": "historical-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Historical",
+          "created_at": 1,
+          "color": "#7c3aed"
+        }
+      ],
+      "api_keys": [],
+      "messages": [
+        {
+          "id": "retained-trash",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Retained original Trash",
+          "snippet": null,
+          "status": "trash",
+          "thread_id": null,
+          "created_at": 1,
+          "read": 0,
+          "folder_id": "historical-folder",
+          "snoozed_until": null,
+          "starred": 1,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-trash.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": 123,
+          "reply_to": null
+        },
+        {
+          "id": "retained-spam",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Original unknown-age Spam",
+          "snippet": null,
+          "status": "spam",
+          "thread_id": null,
+          "created_at": 2,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-spam.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        }
+      ],
+      "message_attachments": [
+        {
+          "id": "retained-file",
+          "message_id": "retained-trash",
+          "filename": "retained.txt",
+          "content_type": "text/plain",
+          "size": 28,
+          "disposition": "attachment",
+          "content_id": null,
+          "r2_key": "source-state/retained.txt",
+          "created_at": 1,
+          "trashed_at": null
+        }
+      ],
+      "shared_attachment_links": [],
+      "outbound_jobs": [],
+      "routing_rules": [],
+      "webhooks": [],
+      "webhook_deliveries": [],
+      "sessions": [],
+      "push_subscriptions": [],
+      "audit_logs": [],
+      "backup_settings": [
+        {
+          "id": "default",
+          "enabled": 0,
+          "schedule_type": "daily",
+          "schedule_value": null,
+          "retention_enabled": 0,
+          "retention_days": 30,
+          "updated_at": 1793381771,
+          "excluded_table_groups": "[]"
+        }
+      ],
+      "backups": [],
+      "app_settings": [
+        {
+          "id": "default",
+          "app_name": "Mailflare",
+          "icon_key": null,
+          "updated_at": 1793381771,
+          "agent_provider": null,
+          "agent_preset": null,
+          "agent_base_url": null,
+          "agent_api_key": null,
+          "agent_model": null,
+          "agent_enabled": 1,
+          "agent_model_rates": null,
+          "outbound_attachment_max_mb": 25,
+          "resend_api_key": null,
+          "aws_config": null,
+          "ses_receiving": null,
+          "resend_webhook_id": null,
+          "resend_webhook_secret": null,
+          "drive_storage_limit_bytes": null
+        }
+      ],
+      "license_settings": [],
+      "email_templates": [],
+      "calendar_events": [],
+      "booking_events": [],
+      "auto_reply_deliveries": [],
+      "spam_token_stats": [],
+      "spam_reputation": [],
+      "spam_feedback": [],
+      "mailbox_aliases": [],
+      "password_reset_tokens": [],
+      "mfa_recovery_codes": [],
+      "login_challenges": [],
+      "mailbox_agent_settings": [],
+      "agent_conversations": [],
+      "agent_chat_messages": [],
+      "agent_jobs": [],
+      "agent_draft_metadata": [],
+      "agent_send_approvals": [],
+      "mcp_key_mailboxes": [],
+      "ai_usage": [],
+      "drive_items": [
+        {
+          "id": "pending",
+          "owner_id": "owner",
+          "parent_id": null,
+          "kind": "file",
+          "name": "pending.txt",
+          "r2_key": "drive/owner/pending",
+          "size": 3,
+          "content_type": "text/plain",
+          "link_token": null,
+          "trashed_at": null,
+          "created_at": 1793381771,
+          "updated_at": 1793381771,
+          "upload_id": "1d3ed512-f7f1-486f-877b-b2fdbadd15b5",
+          "upload_part_size": 67108864,
+          "upload_fingerprint": "source-fingerprint"
+        }
+      ],
+      "drive_shares": [],
+      "drive_upload_parts": [
+        {
+          "item_id": "pending",
+          "part_number": 1,
+          "etag": "1-3"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "uploads": [
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_Tv4LPR4pgsXzbL2USyyIG",
+        "userId": "owner",
+        "type": "message/rfc822",
+        "size": 213,
+        "name": "Original café.eml",
+        "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+      },
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_QVPdCpXaTC6Sn_jJ11c13",
+        "userId": "owner",
+        "type": "text/plain",
+        "size": 25,
+        "name": "loose.txt",
+        "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+      },
+      {
+        "accountId": "stranger",
+        "blobId": "up~upl_ikNCAeVAfsrwSxDhoAgm0",
+        "userId": "stranger",
+        "type": "application/octet-stream",
+        "size": 21,
+        "name": null,
+        "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+      }
+    ],
+    "mime": "From: hello@example.com\r\nTo: recipient@example.org\r\nSubject: Captured source upload\r\nMessage-ID: <captured-upload@example.com>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nOriginal upload café\r\n",
+    "drive": {
+      "id": "pending",
+      "uploadId": "1d3ed512-f7f1-486f-877b-b2fdbadd15b5",
+      "part": {
+        "partNumber": 1,
+        "etag": "1-3"
+      }
+    },
+    "externalRequests": 0,
+    "restoredObjects": {
+      "uploads": [
+        {
+          "blobId": "up~upl_Tv4LPR4pgsXzbL2USyyIG",
+          "userId": "owner",
+          "type": "message/rfc822",
+          "name": "Original café.eml",
+          "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+        },
+        {
+          "blobId": "up~upl_QVPdCpXaTC6Sn_jJ11c13",
+          "userId": "owner",
+          "type": "text/plain",
+          "name": "loose.txt",
+          "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+        },
+        {
+          "blobId": "up~upl_ikNCAeVAfsrwSxDhoAgm0",
+          "userId": "stranger",
+          "type": "application/octet-stream",
+          "name": null,
+          "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+        }
+      ],
+      "drive": {
+        "id": "pending",
+        "size": 3,
+        "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      }
+    }
+  },
+  "files": [
+    {
+      "key": ".multipart/1d3ed512-f7f1-486f-877b-b2fdbadd15b5/meta.json",
+      "base64": "eyJjb250ZW50VHlwZSI6InRleHQvcGxhaW4ifQ==",
+      "sha256": "6580bcf1a2ff78e9228fe8f3431bbec6c8c5b2afa2847734bd4dcbc309e309cc"
+    },
+    {
+      "key": ".multipart/1d3ed512-f7f1-486f-877b-b2fdbadd15b5/part-1",
+      "base64": "YWJj",
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "key": "avatars/source-preview.png",
+      "base64": "T3JpZ2luYWwgcHJldmlldyBieXRlcw==",
+      "sha256": "004046c490d458f88d6390d6b6f2ba92a40d21836eb8a04081149b16c05f0e2c"
+    },
+    {
+      "key": "avatars/source-preview.png.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6MjIsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzozNjoxMS43MTlaIiwiZXRhZyI6IjFhMThkZTIyOWM3LTE2In0=",
+      "sha256": "927d81e007b0a4067259ef302702916588e30e27335a2ebb9aa949973945046e"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_QVPdCpXaTC6Sn_jJ11c13",
+      "base64": "T3JpZ2luYWwgbG9vc2UgYXR0YWNobWVudA==",
+      "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_QVPdCpXaTC6Sn_jJ11c13.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sImN1c3RvbU1ldGFkYXRhIjp7InVzZXJJZCI6Im93bmVyIiwibmFtZSI6Imxvb3NlLnR4dCJ9LCJzaXplIjoyNSwidXBsb2FkZWQiOiIyMDI2LTEwLTMwVDE3OjM2OjExLjcxNloiLCJldGFnIjoiMWExOGRlMjI5YzQtMTkifQ==",
+      "sha256": "19e8d821c5ae0e551043e4004d7678a7dc3aadf13b8d9d6b97c2aaa26bba87fc"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_Tv4LPR4pgsXzbL2USyyIG",
+      "base64": "RnJvbTogaGVsbG9AZXhhbXBsZS5jb20NClRvOiByZWNpcGllbnRAZXhhbXBsZS5vcmcNClN1YmplY3Q6IENhcHR1cmVkIHNvdXJjZSB1cGxvYWQNCk1lc3NhZ2UtSUQ6IDxjYXB0dXJlZC11cGxvYWRAZXhhbXBsZS5jb20+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNCk9yaWdpbmFsIHVwbG9hZCBjYWbDqQ0K",
+      "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_Tv4LPR4pgsXzbL2USyyIG.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJjdXN0b21NZXRhZGF0YSI6eyJ1c2VySWQiOiJvd25lciIsIm5hbWUiOiJPcmlnaW5hbCBjYWbDqS5lbWwifSwic2l6ZSI6MjEzLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MzY6MTEuNzE0WiIsImV0YWciOiIxYTE4ZGUyMjljMy1kNSJ9",
+      "sha256": "4ec90dda177bebc9dc98eefd31b26134db47c298e43d10aa0d71b2cab68cb9bd"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_ikNCAeVAfsrwSxDhoAgm0",
+      "base64": "UHJpdmF0ZSBzb3VyY2UgdXBsb2Fk",
+      "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_ikNCAeVAfsrwSxDhoAgm0.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0ifSwiY3VzdG9tTWV0YWRhdGEiOnsidXNlcklkIjoic3RyYW5nZXIifSwic2l6ZSI6MjEsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzozNjoxMS43MTZaIiwiZXRhZyI6IjFhMThkZTIyOWM0LTE1In0=",
+      "sha256": "a6b90e4c7bf16b9bb733b7ce9531d2d41e76f18b7bd2c38566c4569b6b4bba9d"
+    },
+    {
+      "key": "source-state/retained-spam.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IE9yaWdpbmFsIHVua25vd24tYWdlIFNwYW0NCk1lc3NhZ2UtSUQ6IDxyZXRhaW5lZC1zcGFtQGV4YW1wbGUub3JnPg0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNClJldGFpbmVkIG9yaWdpbmFsIGJvZHkgY2Fmw6kNCg==",
+      "sha256": "ca8888be45c01aa7b442909c0d2116a33625ab346c2d60f3f690189fe182cfa3"
+    },
+    {
+      "key": "source-state/retained-spam.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjoxOTksInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzozNjoxMS43MTlaIiwiZXRhZyI6IjFhMThkZTIyOWM3LWM3In0=",
+      "sha256": "a24808a1a590e284384d7b7e7a93ae95ff610d84d2d7501047d9d9eb2d9953fa"
+    },
+    {
+      "key": "source-state/retained-trash.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IFJldGFpbmVkIG9yaWdpbmFsIFRyYXNoDQpNZXNzYWdlLUlEOiA8cmV0YWluZWQtdHJhc2hAZXhhbXBsZS5vcmc+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSJzb3VyY2UtcmV0ZW50aW9uLWJvdW5kYXJ5Ig0KDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA0KDQpSZXRhaW5lZCBvcmlnaW5hbCBib2R5IGNhZsOpDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbg0KQ29udGVudC1EaXNwb3NpdGlvbjogYXR0YWNobWVudDsgZmlsZW5hbWU9InJldGFpbmVkLnR4dCINCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IGJhc2U2NA0KDQpVbVYwWVdsdVpXUWdiM0pwWjJsdVlXd2dZWFIwWVdOb2JXVnVkQT09DQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnktLQ0K",
+      "sha256": "b14d01037f13ceffbca356d89583396bcd6c3a3e80e0e0bbb7213f7ffc7ac4f7"
+    },
+    {
+      "key": "source-state/retained-trash.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjo1NDAsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzozNjoxMS43MTlaIiwiZXRhZyI6IjFhMThkZTIyOWM3LTIxYyJ9",
+      "sha256": "904c4f765a8638df73c48d24da79dbf932f5d457eba65b9b0e9c1ca0a19483fe"
+    },
+    {
+      "key": "source-state/retained.txt",
+      "base64": "UmV0YWluZWQgb3JpZ2luYWwgYXR0YWNobWVudA==",
+      "sha256": "06c5d8f7780b0de9761fc7a501bd37c9c0b86afa756215221d2fe6d110025797"
+    },
+    {
+      "key": "source-state/retained.txt.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sInNpemUiOjI4LCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MzY6MTEuNzIwWiIsImV0YWciOiIxYTE4ZGUyMjljOC0xYyJ9",
+      "sha256": "f3f82cc47c6434ccbab091e426f75dcb29018407e50012a21d52ee7c684becff"
+    }
+  ]
+}

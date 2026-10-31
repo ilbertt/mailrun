@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.tanstack/
+.output/
+data/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+coverage/
+src/generated/
