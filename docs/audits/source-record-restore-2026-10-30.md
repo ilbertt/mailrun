@@ -81,8 +81,26 @@ source file's hash. It uses synthetic accounts and credentials exclusively.
 The full host suite passed 807 tests before the added paging regression; all 11
 focused restore cases, strict TypeScript and SQL checks pass. Existing standalone
 upload/retention, populated-feature and normal HTTP/WebSocket rehearsals also pass.
-The added compiled restore rehearsal runs in Ubuntu CI before artifact upload.
-Linux results and deployment are pending for this checkpoint.
+[Ubuntu CI 41239602926](https://github.com/ilbertt/mailrun/actions/runs/41239602926)
+passes all 808 tests and the compiled HTTP/WebSocket, mailbox-read,
+message-detail, upload, populated-feature and original-record restore rehearsals.
+The compiled restore reports nine JMAP downloads, relay configuration retention,
+Drive completion across restarts and unchanged frozen source objects.
+
+On November 1, the exact CI-tested source `36e15b8` binary was deployed through
+the nibrun CLI to the existing `mailrun-preview-5te0ab` app. Two direct upload
+attempts failed before creating a deployment. The supported server-side HTTPS
+archive path succeeded, validating GitHub's archive checksum and extracting the
+same Linux executable: SHA-256
+`68b6122627825bd01a0bc6a2cb38bdeaf8bd2a6f4915854113bc2186f0c6d27b`.
+Deployment `01a19697-1835-7790-85fb-0b01654ec04c` is running. Public login and
+completed setup return 200; read-only checks retain one account, five messages,
+ready installation and active ilbert.dev routing/sending. The email relay returns
+200 with a successful signed callback, and all three UTC cron jobs are registered
+against this deployment. No live restore, test send, data reset or credential
+change was performed. Local OrbStack was subsequently restarted with the owner's
+authorization; Docker responds, but local Docker execution is not release evidence
+for this checkpoint.
 
 ## Limits and remaining scope
 
