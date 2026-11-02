@@ -80,8 +80,9 @@ publication and mailbox-versus-alias reservation across independent Bun
 processes. The latter repeats four actual process races.
 
 The compiled rehearsal compares all 133 contracts over real HTTP and checks the
-resolver observations. It then creates a shared inbox, grants a child read
-access, receives signed MIME, verifies shared body access and write denial,
+resolver observations against the same database. Target probes invoke the current
+resolver code; the following signed intake exercises the compiled resolver. It
+then creates a shared inbox, grants a child read access, receives signed MIME, verifies shared body access and write denial,
 restarts, revokes access and checks immediate body denial, deletes the inbox,
 then restarts again and verifies retained message/MIME data. No external email
 is sent. The separate 58-contract compiled alias comparison also passes.
@@ -91,8 +92,32 @@ cases; earlier fixture leakage is excluded from verification counts. The
 133-case dataset also checks retained calendar/audit records and missing-license
 initialization. All 1,769 host tests, generated SQL/coverage, TypeScript and the
 production build pass, together with the 133-case compiled lifecycle and
-171-case preference/restart rehearsals. Final native Linux and deployment
-results follow below.
+171-case preference/restart rehearsals.
+
+[Ubuntu CI 41514503670](https://github.com/ilbertt/mailrun/actions/runs/41514503670)
+and independent PR run 41514516976 both pass all 1,769 tests, generated SQL,
+TypeScript and every compiled rehearsal. This includes the 133 lifecycle cases,
+665 targets, full shared-inbox restart journey, 171 preferences and 45 automatic
+replies. The selected one-CPU/256-MiB/no-swap rule workload passes with
+114,970,624-byte cgroup peak and zero OOM kills; this is not full-guest
+cold/concurrent resource proof.
+
+Source `a468797` was deployed on November 2 through the nibrun CLI's
+checksum-verified archive fetch to the existing preview. The CI executable was
+also downloaded privately and verified against its manifest. Executable SHA:
+`4e0a6e53697c694408d1d458ed5553833348455c3f58fdfbaf82eace061dc67d`;
+119,371,744 bytes. Archive artifact 13174233485 has SHA-256
+`3ff49cce6222cfa904fa0828a46d3ddce4aa848b27facaa612f91dbf5324266a`.
+Deployment `01a19dde-e672-740c-9b75-26baccbcb4ea` is running.
+
+Post-release checks confirm public login/setup HTTP 200, one account and five
+messages retained, ready installation, active ilbert.dev routing/sending,
+email-relay HTTP 200 with a successful signed callback, and three UTC cron
+registrations against this deployment. A status sample reports 71,319,552 bytes
+in use; this is not a peak measurement. Release checks used read-only queries
+and health requests, with no live mailbox/message mutation, real email,
+credential/provider change, restore or reset. The approved private recovery
+export remains retained without a new download.
 
 This compares deletion's immediate persisted state. Native queued delivery still
 rechecks current sender rights; original scheduled-worker authorization and
