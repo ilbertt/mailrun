@@ -1062,6 +1062,47 @@ export interface ISourceDraftAgentResult {
     scheduled_at: IAgentDraftMetadataColumns["scheduled_at"];
 }
 
+/** Result of query `SourceDraftSenderExists`. */
+export interface ISourceDraftSenderExistsResult {
+    id: IMailboxesColumns["id"];
+}
+
+/** Result of query `SourceOwnDraftList`. */
+export interface ISourceOwnDraftListResult {
+    id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    direction: IMessagesColumns["direction"];
+    provider_message_id: IMessagesColumns["provider_message_id"];
+    from_addr: IMessagesColumns["from_addr"];
+    to_addr: IMessagesColumns["to_addr"];
+    subject: IMessagesColumns["subject"];
+    snippet: IMessagesColumns["snippet"];
+    status: IMessagesColumns["status"];
+    thread_id: IMessagesColumns["thread_id"];
+    created_at: IMessagesColumns["created_at"];
+    read: IMessagesColumns["read"];
+    folder_id: IMessagesColumns["folder_id"];
+    snoozed_until: IMessagesColumns["snoozed_until"];
+    starred: IMessagesColumns["starred"];
+    text_body: IMessagesColumns["text_body"];
+    html_body: IMessagesColumns["html_body"];
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    cc_addr: IMessagesColumns["cc_addr"];
+    bcc_addr: IMessagesColumns["bcc_addr"];
+    in_reply_to: IMessagesColumns["in_reply_to"];
+    references_header: IMessagesColumns["references_header"];
+    spam_score: IMessagesColumns["spam_score"];
+    spam_verdict: IMessagesColumns["spam_verdict"];
+    spam_signals: IMessagesColumns["spam_signals"];
+    spam_analyzed_at: IMessagesColumns["spam_analyzed_at"];
+    spam_analysis_error: IMessagesColumns["spam_analysis_error"];
+    trashed_at: IMessagesColumns["trashed_at"];
+    reply_to: IMessagesColumns["reply_to"];
+    draft_revision: IMessagesColumns["draft_revision"];
+    draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
+}
+
 /** Result of query `MutableDraftAgent`. */
 export interface IMutableDraftAgentResult {
     mailbox_id: IAgentDraftMetadataColumns["mailbox_id"];
@@ -5070,6 +5111,8 @@ export interface Queries {
     NativeSaveManualContact: INativeSaveManualContactResult;
     NativeContactDetail: INativeContactDetailResult;
     SourceDraftAgent: ISourceDraftAgentResult;
+    SourceDraftSenderExists: ISourceDraftSenderExistsResult;
+    SourceOwnDraftList: ISourceOwnDraftListResult;
     MutableDraftAgent: IMutableDraftAgentResult;
     AgentSendingGuard: IAgentSendingGuardResult;
     OwnScheduledDraft: IOwnScheduledDraftResult;

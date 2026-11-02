@@ -1767,6 +1767,7 @@ try {
 		throw new Error("Public booking route failed");
 	const draftInput = {
 		mailboxId: "mailbox",
+		from: "hello@example.com",
 		to: "maya@example.net",
 		subject: "Smoke draft",
 		html: "<p>Draft</p>",

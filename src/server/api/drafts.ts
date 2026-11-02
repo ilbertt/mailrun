@@ -9,12 +9,16 @@ import {
 	deleteDraft,
 	attachmentLimit,
 	draftLock,
+	formattedSender,
 } from "../mail/drafts";
 import { sendDraft } from "../mail/send";
 import { withDatabase, seconds } from "../db";
-import { iso } from "../mail/message-query";
+import { iso, toStoredSourceMessage } from "../mail/message-query";
 import { readLimitedBody } from "../mail/inbound";
 import { messageRecord } from "../mail/message-actions";
+import { parseAgentScheduledAt } from "../agent/schedule";
+import { MailboxAccessError } from "../mail/access";
+import { readDraftAttachmentFiles } from "../http/draft-form";
 export function expectedDraftRevision(request: Request, current: number) {
 	const match = request.headers.get("if-match");
 	if (!match) return current;
@@ -88,17 +92,118 @@ export async function draftResponse(
 	);
 }
 async function jsonBody(request: Request) {
-	return JSON.parse(
-		new TextDecoder().decode(await readLimitedBody(request, 2_100_000)),
-	) as unknown;
+	try {
+		return JSON.parse(
+			new TextDecoder().decode(await readLimitedBody(request, 1024 * 1024)),
+		) as unknown;
+	} catch (error) {
+		throw new Response("Invalid draft request", {
+			status:
+				error instanceof Error && error.message === "Message too large"
+					? 413
+					: 400,
+		});
+	}
 }
 const uploadFiles = (form: FormData) =>
-	form.getAll("attachments").map((value) => {
-		if (!(value instanceof File))
-			throw new Response("Invalid attachment", { status: 400 });
-		return value;
+	form
+		.getAll("attachments")
+		.filter((value): value is File => value instanceof File && value.size > 0);
+const sourceInput = draftSchema
+	.omit({ id: true, revision: true })
+	.partial({ mailboxId: true })
+	.extend({
+		subject: draftSchema.shape.subject.removeDefault().optional(),
+		scheduledAt: z.string().nullable().optional(),
 	});
+async function draftData(
+	user: User,
+	input: unknown,
+	agent?: { mailbox_id: string },
+) {
+	const data = sourceInput.parse(input);
+	if (agent && data.mailboxId !== agent.mailbox_id)
+		throw new Response("Agent draft mailbox cannot be changed", {
+			status: 409,
+		});
+	let scheduledAt: string | null | undefined;
+	if (agent && data.scheduledAt !== undefined) {
+		try {
+			scheduledAt =
+				parseAgentScheduledAt(data.scheduledAt)?.toISOString() ?? null;
+		} catch (error) {
+			throw new Response(
+				error instanceof Error ? error.message : "Invalid schedule",
+				{ status: 400 },
+			);
+		}
+	}
+	if (!data.mailboxId)
+		throw new Response("Mailbox is required", { status: 403 });
+	try {
+		await formattedSender(user, data.mailboxId, data.from ?? "");
+	} catch (error) {
+		if (error instanceof MailboxAccessError) {
+			const [mailbox] = await withDatabase(
+				(sql) =>
+					sql.SourceDraftSenderExists`SELECT id FROM mailboxes WHERE id=${data.mailboxId}`,
+			);
+			throw new Response(
+				mailbox
+					? "You do not have permission to send from this mailbox"
+					: "Mailbox not found",
+				{ status: 403 },
+			);
+		}
+		if (
+			error instanceof Error &&
+			error.message === "Sender address is not assigned to this mailbox"
+		)
+			throw new Response("Sender address does not match the selected mailbox", {
+				status: 403,
+			});
+		throw error;
+	}
+	return { ...data, mailboxId: data.mailboxId, scheduledAt };
+}
+function draftHeaders(draft: { id: string; draft_revision: number }) {
+	return {
+		ETag: `"${draft.draft_revision}"`,
+		"X-Mailflare-Draft-Revision": String(draft.draft_revision),
+		"X-Mailflare-Draft-Id": draft.id,
+		"Cache-Control": "private, no-store, no-transform",
+	};
+}
+function attachmentDto(
+	file: Awaited<ReturnType<typeof getDraft>>["attachments"][number],
+) {
+	return {
+		id: file.id,
+		messageId: file.message_id,
+		filename: file.filename,
+		type: file.content_type,
+		size: file.size,
+		disposition: file.disposition === "inline" ? "inline" : "attachment",
+		contentId: file.content_id,
+	};
+}
 export async function draftsApi(
+	request: Request,
+	user: User,
+): Promise<Response | null> {
+	try {
+		return await dispatchDraftsApi(request, user);
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			(error.message === "Draft not found" ||
+				error.message === "Attachment not found")
+		)
+			return Response.json({ error: error.message }, { status: 404 });
+		throw error;
+	}
+}
+async function dispatchDraftsApi(
 	request: Request,
 	user: User,
 ): Promise<Response | null> {
@@ -109,12 +214,36 @@ export async function draftsApi(
 			maxMb: (await attachmentLimit()) / 1_000_000,
 			cloudThresholdBytes: 3_000_000,
 		});
+	if (path === "/api/drafts" && method === "GET") {
+		const mailboxId =
+			new URL(request.url).searchParams.get("mailboxId") || null;
+		const rows = await withDatabase(
+			(sql) =>
+				sql.SourceOwnDraftList`SELECT * FROM messages WHERE user_id=${user.id} AND direction='outbound' AND status='draft' AND (${mailboxId} IS NULL OR mailbox_id=${mailboxId}) ORDER BY created_at DESC LIMIT 100`,
+		);
+		return Response.json({ drafts: rows.map(toStoredSourceMessage) });
+	}
 	if (path === "/api/drafts" && method === "POST") {
-		const data = draftSchema
-			.omit({ id: true, revision: true })
-			.parse(await jsonBody(request));
+		const data = await draftData(user, await jsonBody(request));
+		if (data.forwardOfMessageId) {
+			try {
+				await messageRecord(user, data.forwardOfMessageId, "read");
+			} catch (error) {
+				if (error instanceof Error && /not found/.test(error.message))
+					throw new Response("Message not found", { status: 404 });
+				throw error;
+			}
+		}
 		const draft = await saveDraft(user, data);
-		return draftResponse(user, draft.id);
+		return Response.json(
+			{
+				draft: {
+					id: draft.id,
+					attachments: draft.attachments.map(attachmentDto),
+				},
+			},
+			{ headers: draftHeaders(draft) },
+		);
 	}
 	const match = /^\/api\/drafts\/([^/]+)(?:\/attachments(?:\/([^/]+))?)?$/.exec(
 		path,
@@ -125,21 +254,19 @@ export async function draftsApi(
 		const attachments = path.includes("/attachments");
 		if (method === "GET" && !attachments) return draftResponse(user, draftId);
 		if (method === "PATCH" && !attachments) {
+			const input = await jsonBody(request);
 			const draft = await getDraft(user, draftId),
 				revision = expectedDraftRevision(request, draft.draft_revision);
-			const data = draftSchema
-				.omit({ id: true, revision: true })
-				.parse(await jsonBody(request));
 			const [agent] = await withDatabase(
 				(sql) =>
 					sql.MutableDraftAgent`SELECT mailbox_id FROM agent_draft_metadata WHERE draft_id=${draftId}`,
 			);
-			if (agent && agent.mailbox_id !== data.mailboxId)
-				throw new Response("Agent draft mailbox cannot be changed", {
-					status: 409,
-				});
+			const data = await draftData(user, input, agent);
 			const saved = await saveDraft(user, { ...data, id: draftId, revision });
-			return draftResponse(user, saved.id);
+			return Response.json(
+				{ draft: { id: saved.id } },
+				{ headers: draftHeaders(saved) },
+			);
 		}
 		if (method === "DELETE" && !attachments) {
 			const draft = await getDraft(user, draftId);
@@ -150,19 +277,47 @@ export async function draftsApi(
 		if (method === "POST" && attachments && !fileId) {
 			const draft = await getDraft(user, draftId);
 			expectedDraftRevision(request, draft.draft_revision);
-			await uploadAttachments(
+			const files = await readDraftAttachmentFiles(request);
+			if (!files.length)
+				throw new Response("No attachments provided", { status: 400 });
+			const maxBytes = await attachmentLimit();
+			if (
+				draft.attachments.length + files.length > 10 ||
+				files.some((file) => file.size > maxBytes) ||
+				draft.attachments.reduce((n, file) => n + file.size, 0) +
+					files.reduce((n, file) => n + file.size, 0) >
+					maxBytes
+			)
+				throw new Response(
+					"Draft attachments exceed the allowed count or outgoing size limit",
+					{ status: 400 },
+				);
+			const saved = await uploadAttachments(
 				user,
 				draftId,
-				uploadFiles(await request.formData()),
+				files,
 				draft.draft_revision,
 			);
-			return draftResponse(user, draftId, true);
+			const existing = new Set(draft.attachments.map((file) => file.id));
+			return Response.json(
+				{
+					attachments: saved.attachments
+						.filter((file) => !existing.has(file.id))
+						.map((file) => ({ ...attachmentDto(file), r2Key: file.r2_key })),
+				},
+				{ headers: draftHeaders(saved) },
+			);
 		}
 		if (method === "DELETE" && fileId) {
 			const draft = await getDraft(user, draftId);
 			expectedDraftRevision(request, draft.draft_revision);
-			await removeAttachment(user, draftId, fileId, draft.draft_revision);
-			return draftResponse(user, draftId, true);
+			const saved = await removeAttachment(
+				user,
+				draftId,
+				fileId,
+				draft.draft_revision,
+			);
+			return Response.json({ ok: true }, { headers: draftHeaders(saved) });
 		}
 	}
 	if (path === "/api/send" && method === "POST") {

@@ -65,6 +65,13 @@ try {
 		Origin: origin,
 		"Content-Type": "application/json",
 	};
+	const draftRevisions = new Map<string, number>();
+	function draftRevision(id: string) {
+		const revision = draftRevisions.get(id);
+		if (revision === undefined)
+			throw new Error("Missing draft revision header");
+		return revision;
+	}
 	async function api(path: string, method = "GET", body?: unknown) {
 		const response = await fetch(base + path, {
 				method,
@@ -75,6 +82,13 @@ try {
 		if (!response.ok)
 			throw new Error(
 				`${method} ${path} (${response.status}): ${JSON.stringify(data)}`,
+			);
+		const draftId = response.headers.get("X-Mailflare-Draft-Id"),
+			revision = response.headers.get("X-Mailflare-Draft-Revision");
+		if (draftId && revision !== null)
+			draftRevisions.set(
+				draftId,
+				z.coerce.number().int().nonnegative().parse(revision),
 			);
 		return data;
 	}
@@ -130,16 +144,15 @@ try {
 	)
 		throw new Error("Early SNS confirmation was not accepted");
 	await api("/api/domains/domain/ses", "POST", { action: "test" });
-	const created = z
-		.object({ draft: z.object({ id: z.string() }) })
-		.parse(
-			await api("/api/drafts", "POST", {
-				mailboxId: "mailbox",
-				to: "recipient@example.net",
-				subject: "Compiled SES attachment",
-				text: "Direct SES attachment",
-			}),
-		);
+	const created = z.object({ draft: z.object({ id: z.string() }) }).parse(
+		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
+			mailboxId: "mailbox",
+			to: "recipient@example.net",
+			subject: "Compiled SES attachment",
+			text: "Direct SES attachment",
+		}),
+	);
 	const content = new Uint8Array(24_000_003);
 	crypto.getRandomValues(content.subarray(0, 64));
 	content[content.length - 1] = 255;
@@ -249,19 +262,22 @@ try {
 		throw new Error("Signed attachment content differs");
 	if (state.db.query("SELECT id FROM shared_attachment_links").all().length)
 		throw new Error("SES attachment replaced with a link");
-	const failed = z
-		.object({ draft: z.object({ id: z.string(), revision: z.number() }) })
-		.parse(
-			await api("/api/drafts", "POST", {
-				mailboxId: "mailbox",
-				to: "recipient@example.net",
-				subject: "SES failure",
-				text: "Keep this draft",
-			}),
-		);
+	const failed = z.object({ draft: z.object({ id: z.string() }) }).parse(
+		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
+			mailboxId: "mailbox",
+			to: "recipient@example.net",
+			subject: "SES failure",
+			text: "Keep this draft",
+		}),
+	);
 	provider.provider.sendStatus = 503;
 	try {
-		await sendForm(failed.draft.id, "SES failure", failed.draft.revision);
+		await sendForm(
+			failed.draft.id,
+			"SES failure",
+			draftRevision(failed.draft.id),
+		);
 		throw new Error("Provider failure unexpectedly succeeded");
 	} catch (error) {
 		if (
@@ -327,20 +343,19 @@ try {
 		throw new Error("SNS delivery was not idempotent");
 	if (provider.provider.objects.size)
 		throw new Error("Temporary object was not consumed");
-	const later = z
-		.object({ draft: z.object({ id: z.string(), revision: z.number() }) })
-		.parse(
-			await api("/api/drafts", "POST", {
-				mailboxId: "mailbox",
-				to: "recipient@example.net",
-				subject: "SES cron recovery",
-				text: "Body",
-			}),
-		);
+	const later = z.object({ draft: z.object({ id: z.string() }) }).parse(
+		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
+			mailboxId: "mailbox",
+			to: "recipient@example.net",
+			subject: "SES cron recovery",
+			text: "Body",
+		}),
+	);
 	await sendForm(
 		later.draft.id,
 		"SES cron recovery",
-		later.draft.revision,
+		draftRevision(later.draft.id),
 		new Date(Date.now() + 120_000).toISOString(),
 	);
 	for (const route of ["/domains", "/mailboxes", "/settings/account"]) {

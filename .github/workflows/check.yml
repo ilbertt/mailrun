@@ -20,6 +20,7 @@ jobs:
       - run: bun scripts/smoke.ts dist/mailrun
       - run: bun scripts/smoke-mail-reads.ts dist/mailrun
       - run: bun scripts/smoke-message-details.ts dist/mailrun
+      - run: bun scripts/smoke-drafts.ts dist/mailrun
       - run: bun run smoke:source-uploads dist/mailrun
       - run: bun run smoke:source-features dist/mailrun
       - run: bun run smoke:source-record-restore dist/mailrun

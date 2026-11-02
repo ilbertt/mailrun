@@ -61,6 +61,13 @@ try {
 		Origin: origin,
 		"Content-Type": "application/json",
 	};
+	const draftRevisions = new Map<string, number>();
+	function draftRevision(id: string) {
+		const revision = draftRevisions.get(id);
+		if (revision === undefined)
+			throw new Error("Missing draft revision header");
+		return revision;
+	}
 	async function api(path: string, method = "GET", body?: unknown) {
 		const response = await fetch(base + path, {
 			method,
@@ -71,6 +78,13 @@ try {
 		if (!response.ok)
 			throw new Error(
 				`${method} ${path} (${response.status}): ${JSON.stringify(data)}`,
+			);
+		const draftId = response.headers.get("X-Mailflare-Draft-Id"),
+			revision = response.headers.get("X-Mailflare-Draft-Revision");
+		if (draftId && revision !== null)
+			draftRevisions.set(
+				draftId,
+				z.coerce.number().int().nonnegative().parse(revision),
 			);
 		return data;
 	}
@@ -99,6 +113,7 @@ try {
 	await api("/api/domains/domain/resend", "POST", { action: "test" });
 	const created = z.object({ draft: z.object({ id: z.string() }) }).parse(
 		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
 			mailboxId: "mailbox",
 			to: "recipient@example.net",
 			subject: "Compiled Resend attachment",
@@ -196,16 +211,15 @@ try {
 		throw new Error("Streamed Resend attachment differs");
 	if (state.db.query("SELECT id FROM shared_attachment_links").all().length)
 		throw new Error("Resend file was replaced with a link");
-	const failedDraft = z
-		.object({ draft: z.object({ id: z.string(), revision: z.number() }) })
-		.parse(
-			await api("/api/drafts", "POST", {
-				mailboxId: "mailbox",
-				to: "recipient@example.net",
-				subject: "Provider failure recovery",
-				text: "Preserve this draft",
-			}),
-		);
+	const failedDraft = z.object({ draft: z.object({ id: z.string() }) }).parse(
+		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
+			mailboxId: "mailbox",
+			to: "recipient@example.net",
+			subject: "Provider failure recovery",
+			text: "Preserve this draft",
+		}),
+	);
 	provider.provider.sendStatus = 503;
 	try {
 		await sendForm(
@@ -213,7 +227,7 @@ try {
 			"Provider failure recovery",
 			"recipient@example.net",
 			"Preserve this draft",
-			failedDraft.draft.revision,
+			draftRevision(failedDraft.draft.id),
 		);
 		throw new Error("Provider failure unexpectedly succeeded");
 	} catch (error) {
@@ -269,23 +283,22 @@ try {
 			.all().length !== 1
 	)
 		throw new Error("Provider replay duplicated the message");
-	const scheduled = z
-		.object({ draft: z.object({ id: z.string(), revision: z.number() }) })
-		.parse(
-			await api("/api/drafts", "POST", {
-				mailboxId: "mailbox",
-				to: "later@example.net",
-				subject: "Resend cron recovery",
-				text: "Persisted schedule",
-				scheduledAt: new Date(Date.now() + 120_000).toISOString(),
-			}),
-		);
+	const scheduled = z.object({ draft: z.object({ id: z.string() }) }).parse(
+		await api("/api/drafts", "POST", {
+			from: "hello@example.com",
+			mailboxId: "mailbox",
+			to: "later@example.net",
+			subject: "Resend cron recovery",
+			text: "Persisted schedule",
+			scheduledAt: new Date(Date.now() + 120_000).toISOString(),
+		}),
+	);
 	await sendForm(
 		scheduled.draft.id,
 		"Resend cron recovery",
 		"later@example.net",
 		"Persisted schedule",
-		scheduled.draft.revision,
+		draftRevision(scheduled.draft.id),
 		new Date(Date.now() + 120_000).toISOString(),
 	);
 	for (const route of ["/domains", "/mailboxes", "/settings/account"]) {

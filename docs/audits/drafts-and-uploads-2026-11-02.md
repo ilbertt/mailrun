@@ -1,0 +1,86 @@
+# Original draft and attachment contracts
+
+The original composer appends the attachment rows returned by an upload. Native
+uploads returned the complete existing list, so a second upload could duplicate
+previous files in the composer. Native draft collection GET was also missing;
+save responses, snippets, null body/subject values and assistant schedule edits
+differed from Mailflare `71aa49b` (v0.5.2).
+
+## Evidence
+
+`tests/source-draft-contracts.json` contains 57 actual original HTTP responses
+with their persisted message/attachment/assistant state and object byte hashes.
+The original handlers and helpers are unmodified; their hashes are recorded in
+the capture. Generated message/attachment IDs and current edit/create times are
+the only normalized values. Object-key structure, field presence, ordering, nulls,
+content types and hashes remain compared.
+
+```sh
+bun scripts/serve-session-fixture.ts \
+  --reference /path/to/original-71aa49b \
+  --before /path/to/previous-host-binary --after dist/mailrun-local --port 4780
+bun scripts/capture-source-drafts.ts /path/to/original-71aa49b \
+  /path/to/printed/mailrun-test-directory http://127.0.0.1:4780
+bun test tests/source-drafts.test.ts tests/draft-form.test.ts tests/drafts.test.ts
+bun scripts/smoke-drafts.ts dist/mailrun-local
+```
+
+The preceding standalone host binary passes three and fails 54 of the captured
+cases. The updated standalone binary passes all 57. The fixture uses synthetic
+users and files on loopback; it sends no email and changes no provider resources.
+
+## Behavior
+
+- Collection GET returns the original newest 100 author-owned outbound drafts,
+  optional mailbox filter and complete source fields. Detail GET retains source
+  owner/status semantics, including historical inbound-direction draft records.
+- POST returns `{draft:{id,attachments}}`; PATCH returns `{draft:{id}}`.
+  Revision/identity headers remain available, with strong stale-write checks and
+  private no-store/no-transform responses. HTTP callers supply the original
+  selected mailbox/from pair. Sender errors and shared send grants match the
+  source captures; foreign authors and non-draft records remain inaccessible.
+- Saves use the original HTML/text snippet builder and nullable empty bodies and
+  omitted subjects. Updates preserve existing threading. Assistant edits retain
+  an omitted schedule, explicitly clear null, accept future offset timestamps,
+  reject missing timezone/past values and retain mailbox ownership constraints.
+- Upload responses contain only newly added rows, in request order, including
+  source metadata. Removal returns `{ok:true}`. Empty fields/files are ignored;
+  missing files, invalid form bodies and count/size errors use source responses.
+  Uploads remain atomic and revision-checked. Filenames use the original
+  trim/slash/backslash/NUL sanitation rather than truncation.
+- `@remix-run/multipart-parser` is pinned to 1.1.0. A streaming request counter
+  enforces the original 30 MiB multipart limit including headers; it avoids first
+  copying the whole raw body. Explicit and streamed overflow tests verify 413
+  and stream cancellation. The parser retains MIME headers Bun loses for the
+  captured whitespace/NUL filename. Original literal-backslash filename behavior
+  is preserved before sanitation. File parts are still buffered; this is not
+  proof of the full nibrun concurrent memory budget.
+- Forwarding copies independent objects with source metadata/order, skips absent
+  objects and excludes trashed files. Imported messages with more than ten
+  attachments can be forwarded into a draft as in the source; send-time limits
+  remain separate. Local copies consume file objects directly rather than
+  materializing every file's bytes again. Failure cleanup and draft ownership
+  protections remain in place.
+
+No persisted table, schema migration, backup table/group or format changes.
+
+## Validation and limits
+
+All 867 host tests, generated SQL/coverage and strict TypeScript pass with
+loopback networking enabled. The first sandboxed full run could not bind sockets
+for three existing webhook/IMAP tests; the complete authorized run passes them.
+The compiled normal HTTP/WebSocket suite and isolated Resend/SES rehearsals pass,
+including 24,000,003-byte attachments, provider failure and cron recovery. Those
+rehearsals now obtain revisions from headers instead of native-only response
+fields and supply the original `from` input.
+
+The new compiled draft comparison runs in Ubuntu CI before artifact retention.
+Native Linux verification and preview deployment are pending for this checkpoint.
+
+The original browser composer displayed the first synthetic file as saved. The
+second file chooser lost its backend node and did not complete, so no paired
+browser workflow or visual parity claim is made. Both disposable fixture groups
+were stopped afterward. Rendered/mobile/touch/keyboard comparisons, other draft
+payload/error/concurrency combinations, client/provider interoperability, original
+data cutover and native guest peak/cold-start checks remain open. This audit does
+not resolve the separate shared-reader draft-body permission decision.

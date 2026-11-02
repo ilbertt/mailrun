@@ -9,6 +9,7 @@ import { deleteUnreferencedObjects, LocalStorage } from "../storage";
 import { getThread } from "./repository";
 import { normalizeLocalPart } from "./routing";
 import { getEmailAddress } from "../../lib/email/address";
+import { buildSnippet } from "../../lib/email/parse";
 
 export async function draftLock<T>(draftId: string, run: () => Promise<T>) {
 	const owner = id("lock");
@@ -95,12 +96,12 @@ export async function formattedSender(
 export async function getDraft(user: User, draftId: string) {
 	const [draft] = await withDatabase(
 		(sql) =>
-			sql.OwnDraft`SELECT * FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND direction='outbound'`,
+			sql.OwnDraft`SELECT * FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft'`,
 	);
 	if (!draft) throw new Error("Draft not found");
 	const attachments = await withDatabase(
 		(sql) =>
-			sql.DraftAttachments`SELECT id,message_id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${draft.id} AND trashed_at IS NULL ORDER BY created_at,id`,
+			sql.DraftAttachments`SELECT id,message_id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${draft.id} AND trashed_at IS NULL ORDER BY rowid`,
 	);
 	return { ...draft, mailbox_id: draft.mailbox_id, attachments };
 }
@@ -113,7 +114,7 @@ export async function attachmentLimit() {
 }
 export async function saveDraft(
 	user: User,
-	input: z.infer<typeof draftSchema>,
+	input: z.input<typeof draftSchema>,
 ) {
 	const data = draftSchema.parse(input);
 	const from = await formattedSender(user, data.mailboxId, data.from);
@@ -128,10 +129,10 @@ export async function saveDraft(
 			const updated = await withDatabase((sql) =>
 				sql.begin(async (sql) => {
 					const updated = await sql.UpdateDraft`
-				UPDATE messages SET mailbox_id=${data.mailboxId},from_addr=${from},to_addr=${data.to},cc_addr=${data.cc || null},bcc_addr=${data.bcc || null},subject=${data.subject},text_body=${data.text},html_body=${data.html},snippet=${data.text.slice(0, 200)},draft_revision=draft_revision+1,draft_scheduled_at=${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null}
+				UPDATE messages SET mailbox_id=${data.mailboxId},from_addr=${from},to_addr=${data.to},cc_addr=${data.cc || null},bcc_addr=${data.bcc || null},subject=${input.subject ?? null},text_body=${data.text || null},html_body=${data.html || null},snippet=${buildSnippet(data.text || null, data.html || null)},draft_revision=draft_revision+1,draft_scheduled_at=CASE WHEN ${data.scheduledAt === undefined ? 1 : 0}=1 THEN draft_scheduled_at ELSE ${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null} END
 				WHERE id=${draftId} AND user_id=${user.id} AND status='draft' AND draft_revision=${data.revision} RETURNING id`;
 					if (updated.length)
-						await sql.NativeHumanAgentDraftSave`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()},scheduled_at=${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null} WHERE draft_id=${draftId}`;
+						await sql.NativeHumanAgentDraftSave`UPDATE agent_draft_metadata SET revision=revision+1,human_edited_at=${seconds()},scheduled_at=CASE WHEN ${data.scheduledAt === undefined ? 1 : 0}=1 THEN scheduled_at ELSE ${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null} END WHERE draft_id=${draftId}`;
 					return updated;
 				}),
 			);
@@ -143,7 +144,7 @@ export async function saveDraft(
 			await withDatabase(
 				(sql) => sql.CreateDraft`
 				INSERT INTO messages (id,user_id,mailbox_id,direction,from_addr,to_addr,cc_addr,bcc_addr,subject,text_body,html_body,snippet,status,read,in_reply_to,references_header,thread_id,draft_scheduled_at,created_at)
-				VALUES (${draftId},${user.id},${data.mailboxId},'outbound',${from},${data.to},${data.cc || null},${data.bcc || null},${data.subject},${data.text},${data.html},${data.text.slice(0, 200)},'draft',1,${data.inReplyTo ?? null},${data.references ?? null},${data.threadId ?? null},${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null},${seconds()})`,
+				VALUES (${draftId},${user.id},${data.mailboxId},'outbound',${from},${data.to},${data.cc || null},${data.bcc || null},${input.subject ?? null},${data.text || null},${data.html || null},${buildSnippet(data.text || null, data.html || null)},'draft',1,${data.inReplyTo || null},${data.references || null},${data.threadId || null},${data.scheduledAt ? Math.floor(Date.parse(data.scheduledAt) / 1000) : null},${seconds()})`,
 			);
 			if (data.forwardOfMessageId) {
 				try {
@@ -165,23 +166,20 @@ async function copyAttachments(sourceId: string, draftId: string) {
 		(sql) =>
 			sql.ForwardAttachments`SELECT filename,content_type,size,r2_key,content_id,disposition FROM message_attachments WHERE message_id=${sourceId} AND trashed_at IS NULL`,
 	);
-	if (
-		attachments.length > 10 ||
-		attachments.reduce((total, file) => total + file.size, 0) >
-			(await attachmentLimit())
-	)
-		throw new Error("Attachments exceed the count or size limit");
 	const storage = new LocalStorage();
 	const created: string[] = [];
 	try {
 		for (const attachment of attachments) {
-			const key = `attachments/${draftId}/${id("file")}`;
-			await storage.put(key, await storage.file(attachment.r2_key).bytes());
+			const source = storage.file(attachment.r2_key);
+			if (!(await source.exists())) continue;
+			const attachmentId = id("att");
+			const key = `attachments/${draftId}/${attachmentId}/${attachment.filename}`;
+			await storage.put(key, source);
 			created.push(key);
 			await withDatabase(
 				(sql) => sql.CopyForwardAttachment`
 				INSERT INTO message_attachments (id,message_id,filename,content_type,size,r2_key,content_id,disposition,created_at)
-				VALUES (${id("att")},${draftId},${attachment.filename},${attachment.content_type},${attachment.size},${key},${attachment.content_id},${attachment.disposition},${seconds()})`,
+				VALUES (${attachmentId},${draftId},${attachment.filename},${attachment.content_type},${attachment.size},${key},${attachment.content_id},${attachment.disposition},${seconds()})`,
 			);
 		}
 	} catch (error) {
@@ -221,20 +219,24 @@ export async function uploadAttachments(
 		const uploaded: string[] = [];
 		try {
 			const entries: {
+				id: string;
 				key: string;
 				name: string;
 				type: string;
 				size: number;
 			}[] = [];
 			for (const file of files) {
-				const key = `attachments/${draftId}/${id("file")}`;
+				const attachmentId = id("att"),
+					name = file.name.trim().replace(/[/\\\0]/g, "_") || "attachment",
+					key = `attachments/${draftId}/${attachmentId}/${name}`;
 				// Bun.write can consume the multipart File directly. Materializing
 				// bytes here retained another full attachment beside the form body.
 				await storage.put(key, file);
 				uploaded.push(key);
 				entries.push({
+					id: attachmentId,
 					key,
-					name: file.name.slice(0, 255),
+					name,
 					type: file.type || "application/octet-stream",
 					size: file.size,
 				});
@@ -248,7 +250,7 @@ export async function uploadAttachments(
 					for (const entry of entries)
 						await sql.UploadDraftAttachment`
 					INSERT INTO message_attachments (id,message_id,filename,content_type,size,r2_key,created_at)
-					VALUES (${id("att")},${draftId},${entry.name},${entry.type},${entry.size},${entry.key},${seconds()})`;
+					VALUES (${entry.id},${draftId},${entry.name},${entry.type},${entry.size},${entry.key},${seconds()})`;
 				}),
 			);
 		} catch (error) {
