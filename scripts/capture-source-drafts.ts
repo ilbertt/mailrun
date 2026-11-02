@@ -68,6 +68,7 @@ try {
 		"src/app/api/drafts/[id]/attachments/route.ts",
 		"src/app/api/drafts/[id]/attachments/[attachmentId]/route.ts",
 		"src/lib/email/attachments.ts",
+		"src/lib/email/message-cleanup.ts",
 		"src/lib/email/sender.ts",
 		"src/lib/email/parse.ts",
 		"src/lib/agent/schedule.ts",

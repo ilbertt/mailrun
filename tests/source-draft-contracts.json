@@ -9,6 +9,7 @@
     "src/app/api/drafts/[id]/attachments/route.ts": "95c4223b89d5bb4145008cba98192665d874e2d3c3e59d8fe8b4d2c5ce2377b0",
     "src/app/api/drafts/[id]/attachments/[attachmentId]/route.ts": "107bf42f859b27a6084697a9213b151bd56aec6f9d8c01a2f4f022ef85dee30d",
     "src/lib/email/attachments.ts": "64952619a49258e34f682d2d860cec8365fd562ccc2e327104d70475371f5cbf",
+    "src/lib/email/message-cleanup.ts": "9249e5f6891f874f6f6aded6a9a9096e51b8aa9fec78ac6941b361886ae55552",
     "src/lib/email/sender.ts": "a3fcc66a9d50a03ab31726c9dfad5de4ac126fa79e2d33c4b66c511873cfd755",
     "src/lib/email/parse.ts": "dac4a48d1494d8160e30d90d779542eec86cfee663d3ebee042091e8f98a4ab8",
     "src/lib/agent/schedule.ts": "9cad912fdef8e17dcf94792c69ed5fa92887c7c6ea761f037943af81eb2e39a1",
@@ -74,6 +75,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -94,6 +96,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -114,6 +117,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -149,6 +153,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -213,6 +227,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -233,6 +248,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -253,6 +269,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -288,6 +305,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -319,6 +346,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -339,6 +367,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -359,6 +388,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -394,6 +424,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -458,6 +498,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -478,6 +519,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -498,6 +540,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -533,6 +576,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -597,6 +650,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -617,6 +671,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -637,6 +692,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -672,6 +728,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -736,6 +802,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -756,6 +823,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -776,6 +844,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -811,6 +880,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -4043,6 +4122,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -4063,6 +4143,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -4083,6 +4164,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -4103,6 +4185,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 100
           },
           {
@@ -4123,6 +4206,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 101
           },
           {
@@ -4143,6 +4227,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 102
           },
           {
@@ -4163,6 +4248,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 103
           },
           {
@@ -4183,6 +4269,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 104
           },
           {
@@ -4203,6 +4290,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 105
           },
           {
@@ -4223,6 +4311,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 106
           },
           {
@@ -4243,6 +4332,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 107
           },
           {
@@ -4263,6 +4353,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 108
           },
           {
@@ -4283,6 +4374,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 109
           },
           {
@@ -4303,6 +4395,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 110
           },
           {
@@ -4323,6 +4416,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 111
           },
           {
@@ -4343,6 +4437,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 112
           },
           {
@@ -4363,6 +4458,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 113
           },
           {
@@ -4383,6 +4479,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 114
           },
           {
@@ -4403,6 +4500,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 115
           },
           {
@@ -4423,6 +4521,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 116
           },
           {
@@ -4443,6 +4542,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 117
           },
           {
@@ -4463,6 +4563,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 118
           },
           {
@@ -4483,6 +4584,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 119
           },
           {
@@ -4503,6 +4605,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 120
           },
           {
@@ -4523,6 +4626,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 121
           },
           {
@@ -4543,6 +4647,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 122
           },
           {
@@ -4563,6 +4668,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 123
           },
           {
@@ -4583,6 +4689,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 124
           },
           {
@@ -4603,6 +4710,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 125
           },
           {
@@ -4623,6 +4731,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 126
           },
           {
@@ -4643,6 +4752,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 127
           },
           {
@@ -4663,6 +4773,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 128
           },
           {
@@ -4683,6 +4794,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 129
           },
           {
@@ -4703,6 +4815,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 130
           },
           {
@@ -4723,6 +4836,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 131
           },
           {
@@ -4743,6 +4857,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 132
           },
           {
@@ -4763,6 +4878,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 133
           },
           {
@@ -4783,6 +4899,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 134
           },
           {
@@ -4803,6 +4920,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 135
           },
           {
@@ -4823,6 +4941,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 136
           },
           {
@@ -4843,6 +4962,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 137
           },
           {
@@ -4863,6 +4983,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 138
           },
           {
@@ -4883,6 +5004,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 139
           },
           {
@@ -4903,6 +5025,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 140
           },
           {
@@ -4923,6 +5046,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 141
           },
           {
@@ -4943,6 +5067,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 142
           },
           {
@@ -4963,6 +5088,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 143
           },
           {
@@ -4983,6 +5109,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 144
           },
           {
@@ -5003,6 +5130,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 145
           },
           {
@@ -5023,6 +5151,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 146
           },
           {
@@ -5043,6 +5172,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 147
           },
           {
@@ -5063,6 +5193,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 148
           },
           {
@@ -5083,6 +5214,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 149
           },
           {
@@ -5103,6 +5235,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 150
           },
           {
@@ -5123,6 +5256,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 151
           },
           {
@@ -5143,6 +5277,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 152
           },
           {
@@ -5163,6 +5298,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 153
           },
           {
@@ -5183,6 +5319,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 154
           },
           {
@@ -5203,6 +5340,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 155
           },
           {
@@ -5223,6 +5361,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 156
           },
           {
@@ -5243,6 +5382,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 157
           },
           {
@@ -5263,6 +5403,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 158
           },
           {
@@ -5283,6 +5424,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 159
           },
           {
@@ -5303,6 +5445,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 160
           },
           {
@@ -5323,6 +5466,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 161
           },
           {
@@ -5343,6 +5487,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 162
           },
           {
@@ -5363,6 +5508,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 163
           },
           {
@@ -5383,6 +5529,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 164
           },
           {
@@ -5403,6 +5550,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 165
           },
           {
@@ -5423,6 +5571,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 166
           },
           {
@@ -5443,6 +5592,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 167
           },
           {
@@ -5463,6 +5613,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 168
           },
           {
@@ -5483,6 +5634,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 169
           },
           {
@@ -5503,6 +5655,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 170
           },
           {
@@ -5523,6 +5676,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 171
           },
           {
@@ -5543,6 +5697,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 172
           },
           {
@@ -5563,6 +5718,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 173
           },
           {
@@ -5583,6 +5739,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 174
           },
           {
@@ -5603,6 +5760,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 175
           },
           {
@@ -5623,6 +5781,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 176
           },
           {
@@ -5643,6 +5802,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 177
           },
           {
@@ -5663,6 +5823,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 178
           },
           {
@@ -5683,6 +5844,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 179
           },
           {
@@ -5703,6 +5865,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 180
           },
           {
@@ -5723,6 +5886,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 181
           },
           {
@@ -5743,6 +5907,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 182
           },
           {
@@ -5763,6 +5928,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 183
           },
           {
@@ -5783,6 +5949,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 184
           },
           {
@@ -5803,6 +5970,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 185
           },
           {
@@ -5823,6 +5991,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 186
           },
           {
@@ -5843,6 +6012,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 187
           },
           {
@@ -5863,6 +6033,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 188
           },
           {
@@ -5883,6 +6054,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 189
           },
           {
@@ -5903,6 +6075,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 190
           },
           {
@@ -5923,6 +6096,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 191
           },
           {
@@ -5943,6 +6117,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 192
           },
           {
@@ -5963,6 +6138,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 193
           },
           {
@@ -5983,6 +6159,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 194
           },
           {
@@ -6003,6 +6180,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 195
           },
           {
@@ -6023,6 +6201,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 196
           },
           {
@@ -6043,6 +6222,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 197
           },
           {
@@ -6063,6 +6243,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 198
           },
           {
@@ -6083,6 +6264,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 199
           },
           {
@@ -6103,6 +6285,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 200
           },
           {
@@ -6123,6 +6306,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 201
           },
           {
@@ -6143,6 +6327,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 202
           },
           {
@@ -6163,6 +6348,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 203
           }
         ],
@@ -6198,6 +6384,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -6256,6 +6452,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6276,6 +6473,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6296,6 +6494,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -6331,6 +6530,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -6389,6 +6598,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6409,6 +6619,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6429,6 +6640,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -6464,6 +6676,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -6526,6 +6748,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6546,6 +6769,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6566,6 +6790,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -6612,6 +6837,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -6644,6 +6879,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6664,6 +6900,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6684,6 +6921,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -6704,6 +6942,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -6739,6 +6978,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -6773,6 +7022,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6793,6 +7043,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6813,6 +7064,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -6833,6 +7085,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -6868,6 +7121,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -6902,6 +7165,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -6922,6 +7186,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -6942,6 +7207,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -6962,6 +7228,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -6997,6 +7264,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -7031,6 +7308,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7051,6 +7329,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7071,6 +7350,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -7091,6 +7371,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net> <parent@example.net>",
             "thread_id": "source-thread",
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -7128,6 +7409,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -7157,6 +7448,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7177,6 +7469,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7197,6 +7490,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -7232,6 +7526,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -7263,6 +7567,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7283,6 +7588,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7303,6 +7609,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -7338,6 +7645,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -7369,6 +7686,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7389,6 +7707,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7409,6 +7728,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -7444,6 +7764,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -7488,6 +7818,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7508,6 +7839,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7528,6 +7860,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -7548,6 +7881,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -7600,6 +7934,20 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/$created-draft/$attachment-1/before.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -7632,6 +7980,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7652,6 +8001,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7672,6 +8022,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -7692,6 +8043,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -7728,6 +8080,12 @@
             "id": "source-file",
             "exists": false
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -7760,6 +8118,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -7780,6 +8139,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -7800,6 +8160,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -7820,6 +8181,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -7855,6 +8217,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -7998,6 +8370,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8018,6 +8391,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8038,6 +8412,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -8058,6 +8433,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -8440,6 +8816,108 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/$created-draft/$attachment-1/before.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-10/more-8.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-11/more-9.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-12/more-10.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-2/more-0.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-3/more-1.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-4/more-2.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-5/more-3.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-6/more-4.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-7/more-5.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-8/more-6.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "attachments/$created-draft/$attachment-9/more-7.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-0.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-1.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-10.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-2.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-3.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-4.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-5.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-6.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-7.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-8.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "more-9.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -8469,6 +8947,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8489,6 +8968,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8509,6 +8989,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -8544,6 +9025,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -8575,6 +9066,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8595,6 +9087,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8615,6 +9108,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -8650,6 +9144,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -8681,6 +9185,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8701,6 +9206,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8721,6 +9227,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -8756,6 +9263,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -8789,6 +9306,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8809,6 +9327,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8829,6 +9348,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -8864,6 +9384,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -8897,6 +9427,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -8917,6 +9448,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -8937,6 +9469,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -8972,6 +9505,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9005,6 +9548,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9025,6 +9569,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9045,6 +9590,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9080,6 +9626,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9111,6 +9667,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9131,6 +9688,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9151,6 +9709,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9186,6 +9745,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9219,6 +9788,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9239,6 +9809,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9259,6 +9830,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9305,6 +9877,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -9336,6 +9918,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9356,6 +9939,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9376,6 +9960,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9422,6 +10007,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -9453,6 +10048,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9473,6 +10069,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9493,6 +10090,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9539,6 +10137,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -9568,6 +10176,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9588,6 +10197,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9608,6 +10218,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9652,6 +10263,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9683,6 +10304,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9703,6 +10325,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9723,6 +10346,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9767,6 +10391,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9798,6 +10432,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9818,6 +10453,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9838,6 +10474,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -9882,6 +10519,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -9924,6 +10571,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -9944,6 +10592,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -9964,6 +10613,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10016,6 +10666,20 @@
             "exists": true,
             "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/contract-draft/$attachment-1/upload-0.txt",
+            "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -10066,6 +10730,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10086,6 +10751,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10106,6 +10772,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10173,6 +10840,24 @@
             "exists": true,
             "sha256": "9e59128999443fcd202adf9eb634955caa793d0bfeb35680192bfe7a06caf2fe"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/contract-draft/$attachment-1/upload-0.txt",
+            "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
+          },
+          {
+            "key": "attachments/contract-draft/$attachment-2/upload-1.txt",
+            "sha256": "9e59128999443fcd202adf9eb634955caa793d0bfeb35680192bfe7a06caf2fe"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -10202,6 +10887,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10222,6 +10908,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10242,6 +10929,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10277,6 +10965,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -10308,6 +11006,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10328,6 +11027,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10348,6 +11048,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10383,6 +11084,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -10425,6 +11136,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10445,6 +11157,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10465,6 +11178,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10517,6 +11231,20 @@
             "exists": true,
             "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/contract-draft/$attachment-1/upload-0.txt",
+            "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -10546,6 +11274,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10566,6 +11295,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10586,6 +11316,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10621,6 +11352,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -10663,6 +11404,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10683,6 +11425,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10703,6 +11446,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10755,6 +11499,20 @@
             "exists": true,
             "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/contract-draft/$attachment-1/path_with_name.txt",
+            "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -10795,6 +11553,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10815,6 +11574,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10835,6 +11595,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10896,6 +11657,20 @@
             "exists": true,
             "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "attachments/contract-draft/$attachment-1/upload-0.txt",
+            "sha256": "ec4c0ab85b2f581e36d757f3484517d0733f1af1e28443cd860a665a1351ee78"
+          },
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -10925,6 +11700,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -10945,6 +11721,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -10965,6 +11742,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -10985,6 +11763,12 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11016,6 +11800,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11036,6 +11821,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11056,6 +11842,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11091,6 +11878,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11122,6 +11919,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11142,6 +11940,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11162,6 +11961,270 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ]
+      }
+    },
+    {
+      "name": "remove-trashed",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "ok": true
+        },
+        "messages": [
+          {
+            "id": "contract-draft",
+            "user_id": "owner",
+            "mailbox_id": "mailbox",
+            "direction": "outbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "draft",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 1
+          },
+          {
+            "id": "other-draft",
+            "user_id": "stranger",
+            "mailbox_id": "mailbox",
+            "direction": "outbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "draft",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 2
+          },
+          {
+            "id": "message",
+            "user_id": "owner",
+            "mailbox_id": "mailbox",
+            "direction": "inbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "received",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 3
+          }
+        ],
+        "files": [
+          {
+            "id": "source-file",
+            "message_id": "message",
+            "filename": "before.txt",
+            "content_type": "text/plain",
+            "size": 6,
+            "r2_key": "source-file.txt",
+            "disposition": "inline",
+            "content_id": "cid-before"
+          }
+        ],
+        "agents": [],
+        "objects": [
+          {
+            "id": "source-file",
+            "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-with-trashed",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "ok": true
+        },
+        "messages": [
+          {
+            "id": "other-draft",
+            "user_id": "stranger",
+            "mailbox_id": "mailbox",
+            "direction": "outbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "draft",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 2
+          },
+          {
+            "id": "message",
+            "user_id": "owner",
+            "mailbox_id": "mailbox",
+            "direction": "inbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "received",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 3
+          }
+        ],
+        "files": [
+          {
+            "id": "source-file",
+            "message_id": "message",
+            "filename": "before.txt",
+            "content_type": "text/plain",
+            "size": 6,
+            "r2_key": "source-file.txt",
+            "disposition": "inline",
+            "content_id": "cid-before"
+          }
+        ],
+        "agents": [],
+        "objects": [
+          {
+            "id": "source-file",
+            "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-with-raw",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "ok": true
+        },
+        "messages": [
+          {
+            "id": "other-draft",
+            "user_id": "stranger",
+            "mailbox_id": "mailbox",
+            "direction": "outbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "draft",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 2
+          },
+          {
+            "id": "message",
+            "user_id": "owner",
+            "mailbox_id": "mailbox",
+            "direction": "inbound",
+            "from_addr": "hello@example.com",
+            "to_addr": "maya@example.net",
+            "cc_addr": null,
+            "bcc_addr": null,
+            "subject": "Before",
+            "snippet": "Before body",
+            "text_body": "Before body",
+            "html_body": "<p>Before body</p>",
+            "status": "received",
+            "read": 1,
+            "in_reply_to": "<parent@example.net>",
+            "references_header": "<root@example.net>",
+            "thread_id": "original-thread",
+            "raw_r2_key": null,
+            "created_at": 3
+          }
+        ],
+        "files": [
+          {
+            "id": "source-file",
+            "message_id": "message",
+            "filename": "before.txt",
+            "content_type": "text/plain",
+            "size": 6,
+            "r2_key": "source-file.txt",
+            "disposition": "inline",
+            "content_id": "cid-before"
+          }
+        ],
+        "agents": [],
+        "objects": [
+          {
+            "id": "source-file",
+            "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11193,6 +12256,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11213,6 +12277,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11233,6 +12298,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11268,6 +12334,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11299,6 +12375,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11319,6 +12396,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11339,6 +12417,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11374,6 +12453,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11405,6 +12494,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11425,6 +12515,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11445,6 +12536,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11480,6 +12572,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11511,6 +12613,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11531,6 +12634,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11551,6 +12655,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11586,6 +12691,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11617,6 +12732,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11637,6 +12753,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11657,6 +12774,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11692,6 +12810,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11723,6 +12851,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11743,6 +12872,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11763,6 +12893,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11798,6 +12929,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11829,6 +12970,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11849,6 +12991,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11869,6 +13012,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -11904,6 +13048,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -11938,6 +13092,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -11958,6 +13113,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -11978,6 +13134,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -11998,6 +13155,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -12033,6 +13191,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -12067,6 +13235,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -12087,6 +13256,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -12107,6 +13277,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -12127,6 +13298,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -12162,6 +13334,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -12196,6 +13378,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -12216,6 +13399,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -12236,6 +13420,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           },
           {
@@ -12256,6 +13441,7 @@
             "in_reply_to": null,
             "references_header": null,
             "thread_id": null,
+            "raw_r2_key": null,
             "created_at": "$now"
           }
         ],
@@ -12293,6 +13479,16 @@
             "exists": true,
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
         ]
       }
     },
@@ -12322,6 +13518,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -12342,6 +13539,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -12362,6 +13560,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -12397,6 +13596,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]
@@ -12428,6 +13637,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 1
           },
           {
@@ -12448,6 +13658,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 2
           },
           {
@@ -12468,6 +13679,7 @@
             "in_reply_to": "<parent@example.net>",
             "references_header": "<root@example.net>",
             "thread_id": "original-thread",
+            "raw_r2_key": null,
             "created_at": 3
           }
         ],
@@ -12503,6 +13715,16 @@
           {
             "id": "source-file",
             "exists": true,
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          }
+        ],
+        "objectInventory": [
+          {
+            "key": "existing.txt",
+            "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
+          },
+          {
+            "key": "source-file.txt",
             "sha256": "6db7d803e74f1ffa7d8f5adc0bf95b3e15bf4c8373fffadf546227cc6c6742cb"
           }
         ]

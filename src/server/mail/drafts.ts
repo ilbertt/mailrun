@@ -275,8 +275,9 @@ export async function removeAttachment(
 			throw new Error(
 				"This draft changed in another tab. Reopen it before saving.",
 			);
-		const attachment = draft.attachments.find(
-			(attachment) => attachment.id === attachmentId,
+		const [attachment] = await withDatabase(
+			(sql) =>
+				sql.DraftRemovalObject`SELECT r2_key FROM message_attachments WHERE id=${attachmentId} AND message_id=${draftId}`,
 		);
 		if (!attachment) throw new Error("Attachment not found");
 		await withDatabase((sql) =>
@@ -304,12 +305,16 @@ export async function deleteDraft(
 			throw new Error(
 				"This draft changed in another tab. Reopen it before saving.",
 			);
-		await withDatabase(
-			(sql) =>
-				sql.DeleteOwnedDraft`DELETE FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft'`,
+		const files = await withDatabase((sql) =>
+			sql.begin(async (sql) => {
+				const files =
+					await sql.DraftDiscardObjects`SELECT r2_key FROM message_attachments WHERE message_id=${draftId}`;
+				await sql.DeleteOwnedDraft`DELETE FROM messages WHERE id=${draftId} AND user_id=${user.id} AND status='draft'`;
+				return files;
+			}),
 		);
 		await deleteUnreferencedObjects([
-			...draft.attachments.map((attachment) => attachment.r2_key),
+			...files.map((attachment) => attachment.r2_key),
 			...(draft.raw_r2_key ? [draft.raw_r2_key] : []),
 		]);
 	});

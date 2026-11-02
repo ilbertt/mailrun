@@ -3737,6 +3737,11 @@ export interface INativeHumanAgentAttachmentAddResult {
 export interface IUploadDraftAttachmentResult {
 }
 
+/** Result of query `DraftRemovalObject`. */
+export interface IDraftRemovalObjectResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
 /** Result of query `RemoveDraftAttachment`. */
 export interface IRemoveDraftAttachmentResult {
 }
@@ -3747,6 +3752,11 @@ export interface ITouchDraftRemovalResult {
 
 /** Result of query `NativeHumanAgentAttachmentRemove`. */
 export interface INativeHumanAgentAttachmentRemoveResult {
+}
+
+/** Result of query `DraftDiscardObjects`. */
+export interface IDraftDiscardObjectsResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
 }
 
 /** Result of query `DeleteOwnedDraft`. */
@@ -5490,9 +5500,11 @@ export interface Queries {
     TouchDraftUpload: ITouchDraftUploadResult;
     NativeHumanAgentAttachmentAdd: INativeHumanAgentAttachmentAddResult;
     UploadDraftAttachment: IUploadDraftAttachmentResult;
+    DraftRemovalObject: IDraftRemovalObjectResult;
     RemoveDraftAttachment: IRemoveDraftAttachmentResult;
     TouchDraftRemoval: ITouchDraftRemovalResult;
     NativeHumanAgentAttachmentRemove: INativeHumanAgentAttachmentRemoveResult;
+    DraftDiscardObjects: IDraftDiscardObjectsResult;
     DeleteOwnedDraft: IDeleteOwnedDraftResult;
     InboundForwarding: IInboundForwardingResult;
     InboundExists: IInboundExistsResult;

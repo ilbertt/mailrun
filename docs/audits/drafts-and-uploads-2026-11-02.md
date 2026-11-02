@@ -8,12 +8,14 @@ differed from Mailflare `71aa49b` (v0.5.2).
 
 ## Evidence
 
-`tests/source-draft-contracts.json` contains 57 actual original HTTP responses
+`tests/source-draft-contracts.json` contains 60 actual original HTTP responses
 with their persisted message/attachment/assistant state and object byte hashes.
 The original handlers and helpers are unmodified; their hashes are recorded in
 the capture. Generated message/attachment IDs and current edit/create times are
 the only normalized values. Object-key structure, field presence, ordering, nulls,
-content types and hashes remain compared.
+content types and hashes remain compared. The complete remaining object inventory
+is compared separately from metadata rows, detecting orphaned files after delete.
+Only original FileBucket metadata sidecars are excluded from content inventory.
 
 ```sh
 bun scripts/serve-session-fixture.ts \
@@ -25,8 +27,10 @@ bun test tests/source-drafts.test.ts tests/draft-form.test.ts tests/drafts.test.
 bun scripts/smoke-drafts.ts dist/mailrun-local
 ```
 
-The preceding standalone host binary passes three and fails 54 of the captured
-cases. The updated standalone binary passes all 57. The fixture uses synthetic
+The preceding standalone host binary passes three and fails 54 of the initial 57
+cases. Three added cleanup cases expose two more failures after the first fix:
+removing an already trashed attachment returns 404, and discarding its draft
+leaves that file on disk. Both are corrected; all 60 cases pass. The fixture uses synthetic
 users and files on loopback; it sends no email and changes no provider resources.
 
 ## Behavior
@@ -61,12 +65,17 @@ users and files on loopback; it sends no email and changes no provider resources
   remain separate. Local copies consume file objects directly rather than
   materializing every file's bytes again. Failure cleanup and draft ownership
   protections remain in place.
+- Attachment removal can delete a file already in attachment Trash. Draft
+  discard snapshots every attachment key, including trashed ones, in the same
+  transaction that removes the draft. Unreferenced file cleanup retains objects
+  still used elsewhere. Full inventory checks cover normal and trashed removals,
+  discard and raw MIME cleanup; deleting metadata alone cannot satisfy them.
 
 No persisted table, schema migration, backup table/group or format changes.
 
 ## Validation and limits
 
-All 867 host tests, generated SQL/coverage and strict TypeScript pass with
+All 870 host tests, generated SQL/coverage and strict TypeScript pass with
 loopback networking enabled. The first sandboxed full run could not bind sockets
 for three existing webhook/IMAP tests; the complete authorized run passes them.
 The compiled normal HTTP/WebSocket suite and isolated Resend/SES rehearsals pass,
@@ -74,8 +83,10 @@ including 24,000,003-byte attachments, provider failure and cron recovery. Those
 rehearsals now obtain revisions from headers instead of native-only response
 fields and supply the original `from` input.
 
-The new compiled draft comparison runs in Ubuntu CI before artifact retention.
-Native Linux verification and preview deployment are pending for this checkpoint.
+The expanded 76-case focused suite and standalone comparison pass. The new
+compiled draft comparison runs in Ubuntu CI before artifact retention.
+Native Linux verification of the cleanup addition
+and preview deployment are pending for this checkpoint.
 
 The original browser composer displayed the first synthetic file as saved. The
 second file chooser lost its backend node and did not complete, so no paired

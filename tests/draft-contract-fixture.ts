@@ -19,7 +19,9 @@ export type DraftSample = {
 		| "many"
 		| "missing-file"
 		| "trashed-file"
-		| "many-files";
+		| "many-files"
+		| "trashed-draft-file"
+		| "draft-raw";
 	permission?: string;
 };
 const payload = {
@@ -284,6 +286,24 @@ export const draftSamples: DraftSample[] = [
 		path: "/api/drafts/contract-draft/attachments/missing",
 	},
 	{ name: "delete", method: "DELETE", path: "/api/drafts/contract-draft" },
+	{
+		name: "remove-trashed",
+		method: "DELETE",
+		path: "/api/drafts/contract-draft/attachments/existing",
+		variant: "trashed-draft-file",
+	},
+	{
+		name: "delete-with-trashed",
+		method: "DELETE",
+		path: "/api/drafts/contract-draft",
+		variant: "trashed-draft-file",
+	},
+	{
+		name: "delete-with-raw",
+		method: "DELETE",
+		path: "/api/drafts/contract-draft",
+		variant: "draft-raw",
+	},
 ];
 for (const method of ["GET", "PATCH", "DELETE"] as const)
 	for (const variant of ["foreign", "sent"] as const)
@@ -371,6 +391,17 @@ export async function prepareDraftFixture(
 			).run("source-" + i, "more-" + i + ".txt", "more-" + i + ".txt");
 			await Bun.write(join(directory, "blobs", "more-" + i + ".txt"), "before");
 		}
+	if (sample.variant === "trashed-draft-file")
+		db.exec("UPDATE message_attachments SET trashed_at=1 WHERE id='existing'");
+	if (sample.variant === "draft-raw") {
+		db.exec(
+			"UPDATE messages SET raw_r2_key='draft.eml' WHERE id='contract-draft'",
+		);
+		await Bun.write(
+			join(directory, "blobs/draft.eml"),
+			"Synthetic original draft MIME",
+		);
+	}
 }
 export function draftRequest(
 	sample: DraftSample,
@@ -424,7 +455,7 @@ export async function draftSnapshot(
 	const body: unknown = await response.json();
 	const messages = db
 		.query(
-			"SELECT id,user_id,mailbox_id,direction,from_addr,to_addr,cc_addr,bcc_addr,subject,snippet,text_body,html_body,status,read,in_reply_to,references_header,thread_id,created_at FROM messages ORDER BY rowid",
+			"SELECT id,user_id,mailbox_id,direction,from_addr,to_addr,cc_addr,bcc_addr,subject,snippet,text_body,html_body,status,read,in_reply_to,references_header,thread_id,raw_r2_key,created_at FROM messages ORDER BY rowid",
 		)
 		.all();
 	const files = db
@@ -450,6 +481,20 @@ export async function draftSnapshot(
 							.digest("hex"),
 					}
 				: {}),
+		});
+	}
+	const objectInventory: { key: string; sha256: string }[] = [];
+	for await (const key of new Bun.Glob("**/*").scan({
+		cwd: join(directory, "blobs"),
+		onlyFiles: true,
+		dot: true,
+	})) {
+		if (key.endsWith(".meta.json")) continue; // Original FileBucket metadata, not object content.
+		objectInventory.push({
+			key,
+			sha256: new Bun.CryptoHasher("sha256")
+				.update(await Bun.file(join(directory, "blobs", key)).bytes())
+				.digest("hex"),
 		});
 	}
 	const ids = new Map<string, string>();
@@ -487,5 +532,8 @@ export async function draftSnapshot(
 		files,
 		agents,
 		objects,
+		objectInventory: (
+			normalize(objectInventory) as typeof objectInventory
+		).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)),
 	});
 }
