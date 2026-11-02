@@ -103,11 +103,33 @@ cron. In the selected host run, an authenticated probe took 4.73 ms while the
 deadline request finished in 105.13 ms; these observations are not guest latency
 or throughput guarantees. UTF-16 boundary and nonblocking/recovery tests pass.
 
-Native Linux CI now runs this compiled check normally and with one CPU, 256 MiB,
-no swap, a read-only Debian root filesystem, an unprivileged UID and 64 MiB temp
-space. The constrained mode checks cgroup peak/OOM counters. These Linux results
-and deployment are pending. This selected warm container workload does not prove
+The exact native Linux executable passes all 1,203 tests, SQL/type checks and
+all compiled parity rehearsals in
+[Ubuntu CI 41439491975](https://github.com/ilbertt/mailrun/actions/runs/41439491975).
+The independent PR run also passes. CI runs the rule check normally and with
+one CPU, 256 MiB, no swap, a read-only Debian root filesystem, an unprivileged
+UID and 64 MiB temp space. The constrained workload passes all 204 contracts,
+signed ingress, deadline/recovery, four-megabyte matching and CLI-mode checks.
+Cgroup peak is 115,589,120 bytes (110.23 MiB), with zero OOM kills. Its selected
+auth probe is 16.56 ms and deadline request 114.03 ms. This warm container
+workload does not prove
 the whole nibrun VM's cold peak, concurrent cron/backup/restore load or capacity.
+The check now pins the exact tested `debian:bookworm-slim` image digest,
+`sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3`.
+
+Source `8ec07a6` was deployed on November 2 through the nibrun CLI's
+checksum-verified archive URL path to the existing preview. Executable SHA-256:
+`28bc8b7d7a990ac2e66924750b5f3352e5f760a47f3fe4c33db04bab4876cf19`;
+archive digest:
+`01faf01dc528c238b2e03cf4fc09fffad0ba954c4d48aa078ed53a34b019471a`.
+Deployment `01a19c1e-4cfa-7c0b-8016-a655679d47ce` is running. The extracted
+nibrun artifact matches the downloaded, verified CI executable. Public
+login/setup return 200; read-only checks retain one account, five messages,
+zero rules, ready installation and active ilbert.dev routing/sending. The email
+relay returns 200 with a successful signed callback, and all three native UTC
+cron jobs are registered against this deployment. No live rule/mail mutation,
+email send, credential/provider change, restore or reset was used for these
+release checks.
 
 Computation deadlines are a native resource boundary, not a claim that every
 pathological pattern has the same wall time as the original Worker/runtime.

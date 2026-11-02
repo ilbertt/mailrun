@@ -79,7 +79,7 @@ const command = constrained
 					(entry): entry is [string, string] => typeof entry[1] === "string",
 				)
 				.flatMap(([key, value]) => ["--env", key + "=" + value]),
-			"debian:bookworm-slim",
+			"debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3",
 			binary,
 		]
 	: [binary];
