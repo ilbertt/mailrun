@@ -95,7 +95,7 @@ export const ruleSchema = z.object({
 		"ends_with",
 		"regex",
 	]),
-	matchValue: z.string().trim().min(1).max(256),
+	matchValue: z.string().trim().min(1).max(500),
 	action: z.enum(["store", "forward", "reject", "spam", "trash"]),
 	forwardTo: z.email().or(z.literal("")).default(""),
 	keepCopy: z.boolean().default(false),

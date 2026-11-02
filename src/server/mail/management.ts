@@ -1,7 +1,6 @@
 import { listMailboxes } from "./repository";
 import { licenseEntitlements } from "../licenses";
 import { z } from "zod";
-import safeRegex from "safe-regex2";
 import { withDatabase, id, seconds } from "../db";
 import type { User } from "../../shared/contracts";
 import { aliasSchema, ruleSchema } from "../../shared/mail-contracts";
@@ -122,8 +121,13 @@ export async function saveRule(user: User, input: z.infer<typeof ruleSchema>) {
 		if (data.action === "store" && !data.folderId)
 			throw new Error("Select a destination folder");
 	}
-	if (data.matchOperator === "regex" && !safeRegex(data.matchValue))
-		throw new Error("Invalid or unsafe regular expression");
+	if (data.matchOperator === "regex") {
+		try {
+			new RegExp(data.matchValue);
+		} catch {
+			throw new Error("Enter a valid regular expression");
+		}
+	}
 	if (data.action === "forward" && !data.forwardTo)
 		throw new Error("Forwarding destination is required");
 	if ((data.action === "store" || data.keepCopy) && !data.mailboxId)

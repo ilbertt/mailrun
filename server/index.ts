@@ -1,8 +1,15 @@
 import { migrate } from "../src/server/db";
 import { cronJobFromArgs } from "../src/server/jobs/cron";
+import { configureRegexEntrypoint } from "../src/server/mail/regex-execution";
 
 process.umask(0o077);
-if (process.argv[2] === "migrate-source") {
+configureRegexEntrypoint(import.meta.path);
+if (process.argv[2] === "regex-match") {
+	const { runRegexProcess } = await import(
+		"../src/server/mail/regex-execution"
+	);
+	await runRegexProcess();
+} else if (process.argv[2] === "migrate-source") {
 	const { runSourceMigration } = await import("../src/server/migration/cli");
 	await runSourceMigration(process.argv.slice(3));
 } else {

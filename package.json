@@ -66,7 +66,6 @@
 		"react-hot-toast": "2.6.1",
 		"react-markdown": "10.1.0",
 		"remark-gfm": "4.0.1",
-		"safe-regex2": "5.1.2",
 		"tailwind-merge": "3.7.0",
 		"zod": "4.6.7"
 	},

@@ -1292,6 +1292,53 @@ export interface INativePushSessionResult {
 export interface INativeSavePushResult {
 }
 
+/** Result of query `SourceRoutingFolder`. */
+export interface ISourceRoutingFolderResult {
+    id: IFoldersColumns["id"];
+}
+
+/** Result of query `SourceRoutingAdminDomain`. */
+export interface ISourceRoutingAdminDomainResult {
+    id: string | null;
+}
+
+/** Result of query `NativeDomainRuleGuard`. */
+export interface INativeDomainRuleGuardResult {
+    id: IRoutingRulesColumns["id"];
+    user_id: IRoutingRulesColumns["user_id"];
+    domain_id: IRoutingRulesColumns["domain_id"];
+    pattern: IRoutingRulesColumns["pattern"];
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+    action: IRoutingRulesColumns["action"];
+    forward_to: IRoutingRulesColumns["forward_to"];
+    priority: IRoutingRulesColumns["priority"];
+    created_at: IRoutingRulesColumns["created_at"];
+    folder_id: IRoutingRulesColumns["folder_id"];
+    match_field: IRoutingRulesColumns["match_field"];
+    match_operator: IRoutingRulesColumns["match_operator"];
+    match_value: IRoutingRulesColumns["match_value"];
+    scope: IRoutingRulesColumns["scope"];
+    name: IRoutingRulesColumns["name"];
+    enabled: IRoutingRulesColumns["enabled"];
+    keep_copy: IRoutingRulesColumns["keep_copy"];
+    reject_reason: IRoutingRulesColumns["reject_reason"];
+    last_matched_at: IRoutingRulesColumns["last_matched_at"];
+    match_count: IRoutingRulesColumns["match_count"];
+}
+
+/** Result of query `SourceAdminRuleDestination`. */
+export interface ISourceAdminRuleDestinationResult {
+    id: IMailboxesColumns["id"];
+}
+
+/** Result of query `SourceUpdateDomainRule`. */
+export interface ISourceUpdateDomainRuleResult {
+}
+
+/** Result of query `SourceCreateDomainRule`. */
+export interface ISourceCreateDomainRuleResult {
+}
+
 /** Result of query `NativeInboxRules`. */
 export interface INativeInboxRulesResult {
     id: IRoutingRulesColumns["id"];
@@ -1316,22 +1363,26 @@ export interface INativeInboxRulesResult {
     match_count: IRoutingRulesColumns["match_count"];
 }
 
-/** Result of query `NativeInboxRuleGuard`. */
-export interface INativeInboxRuleGuardResult {
-    scope: IRoutingRulesColumns["scope"];
+/** Result of query `SourceMutableInboxRule`. */
+export interface ISourceMutableInboxRuleResult {
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
 }
 
-/** Result of query `NativeDomainRuleGuard`. */
-export interface INativeDomainRuleGuardResult {
-    id: IRoutingRulesColumns["id"];
-    domain_id: IRoutingRulesColumns["domain_id"];
+/** Result of query `SourceUpdateInboxRule`. */
+export interface ISourceUpdateInboxRuleResult {
 }
 
-/** Result of query `NativeAdminRuleMailboxes`. */
-export interface INativeAdminRuleMailboxesResult {
-    id: IMailboxesColumns["id"];
-    local_part: IMailboxesColumns["local_part"];
-    display_name: IMailboxesColumns["display_name"];
+/** Result of query `SourceCreateInboxRule`. */
+export interface ISourceCreateInboxRuleResult {
+}
+
+/** Result of query `SourceDeletableInboxRule`. */
+export interface ISourceDeletableInboxRuleResult {
+    mailbox_id: IRoutingRulesColumns["mailbox_id"];
+}
+
+/** Result of query `SourceDeleteInboxRule`. */
+export interface ISourceDeleteInboxRuleResult {
 }
 
 /** Result of query `NativeDomainRules`. */
@@ -1358,8 +1409,20 @@ export interface INativeDomainRulesResult {
     match_count: IRoutingRulesColumns["match_count"];
 }
 
-/** Result of query `NativeSaveDomainRule`. */
-export interface INativeSaveDomainRuleResult {
+/** Result of query `NativeAdminRuleMailboxes`. */
+export interface INativeAdminRuleMailboxesResult {
+    id: IMailboxesColumns["id"];
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    disabled: IMailboxesColumns["disabled"];
+}
+
+/** Result of query `SourceManagedRuleMailboxes`. */
+export interface ISourceManagedRuleMailboxesResult {
+    id: string | null;
+    local_part: IMailboxesColumns["local_part"];
+    display_name: IMailboxesColumns["display_name"];
+    disabled: IMailboxesColumns["disabled"];
 }
 
 /** Result of query `NativeDeleteDomainRule`. */
@@ -4338,14 +4401,13 @@ export interface IDomainRoutingRulesResult {
 export interface IRecordRoutingMatchResult {
 }
 
-/** Result of query `RoutingMailboxes`. */
-export interface IRoutingMailboxesResult {
-    id: string;
-    user_id: string;
+/** Result of query `RoutingExactMailboxes`. */
+export interface IRoutingExactMailboxesResult {
+    id: IMailboxesColumns["id"];
+    user_id: IMailboxesColumns["user_id"];
     domain_id: IMailboxesColumns["domain_id"];
     local_part: IMailboxesColumns["local_part"];
     use_all_domains: IMailboxesColumns["use_all_domains"];
-    domain_owner: string | null;
 }
 
 /** Result of query `RoutingAliases`. */
@@ -4357,10 +4419,24 @@ export interface IRoutingAliasesResult {
     alias_local_part: string | null;
 }
 
-/** Result of query `RuleTarget`. */
-export interface IRuleTargetResult {
+/** Result of query `RoutingMailboxes`. */
+export interface IRoutingMailboxesResult {
     id: string;
     user_id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+}
+
+/** Result of query `RoutingCrossDomainOccupied`. */
+export interface IRoutingCrossDomainOccupiedResult {
+    id: string | null;
+}
+
+/** Result of query `RuleTarget`. */
+export interface IRuleTargetResult {
+    id: IMailboxesColumns["id"];
+    user_id: IMailboxesColumns["user_id"];
     domain_id: IMailboxesColumns["domain_id"];
     local_part: IMailboxesColumns["local_part"];
 }
@@ -5159,12 +5235,21 @@ export interface Queries {
     NativeDeletePush: INativeDeletePushResult;
     NativePushSession: INativePushSessionResult;
     NativeSavePush: INativeSavePushResult;
-    NativeInboxRules: INativeInboxRulesResult;
-    NativeInboxRuleGuard: INativeInboxRuleGuardResult;
+    SourceRoutingFolder: ISourceRoutingFolderResult;
+    SourceRoutingAdminDomain: ISourceRoutingAdminDomainResult;
     NativeDomainRuleGuard: INativeDomainRuleGuardResult;
-    NativeAdminRuleMailboxes: INativeAdminRuleMailboxesResult;
+    SourceAdminRuleDestination: ISourceAdminRuleDestinationResult;
+    SourceUpdateDomainRule: ISourceUpdateDomainRuleResult;
+    SourceCreateDomainRule: ISourceCreateDomainRuleResult;
+    NativeInboxRules: INativeInboxRulesResult;
+    SourceMutableInboxRule: ISourceMutableInboxRuleResult;
+    SourceUpdateInboxRule: ISourceUpdateInboxRuleResult;
+    SourceCreateInboxRule: ISourceCreateInboxRuleResult;
+    SourceDeletableInboxRule: ISourceDeletableInboxRuleResult;
+    SourceDeleteInboxRule: ISourceDeleteInboxRuleResult;
     NativeDomainRules: INativeDomainRulesResult;
-    NativeSaveDomainRule: INativeSaveDomainRuleResult;
+    NativeAdminRuleMailboxes: INativeAdminRuleMailboxesResult;
+    SourceManagedRuleMailboxes: ISourceManagedRuleMailboxesResult;
     NativeDeleteDomainRule: INativeDeleteDomainRuleResult;
     NativeClearRecovery: INativeClearRecoveryResult;
     NativeInsertRecovery: INativeInsertRecoveryResult;
@@ -5581,8 +5666,10 @@ export interface Queries {
     RoutingDomain: IRoutingDomainResult;
     DomainRoutingRules: IDomainRoutingRulesResult;
     RecordRoutingMatch: IRecordRoutingMatchResult;
-    RoutingMailboxes: IRoutingMailboxesResult;
+    RoutingExactMailboxes: IRoutingExactMailboxesResult;
     RoutingAliases: IRoutingAliasesResult;
+    RoutingMailboxes: IRoutingMailboxesResult;
+    RoutingCrossDomainOccupied: IRoutingCrossDomainOccupiedResult;
     RuleTarget: IRuleTargetResult;
     InboxRoutingRules: IInboxRoutingRulesResult;
     RuleFolder: IRuleFolderResult;

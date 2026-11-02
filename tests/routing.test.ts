@@ -54,7 +54,7 @@ test("exact and explicit aliases win over a catch-all; plus/dot normalization is
 	);
 	expect((await resolveRouting("unknown@example.com"))?.action).toBe("forward");
 });
-test("sender block rules precede exact addresses and invalid/unsafe regex cannot be saved", async () => {
+test("sender block rules precede exact addresses and valid nested regex retains source syntax", async () => {
 	await saveRule(
 		owner,
 		rule({
@@ -70,8 +70,22 @@ test("sender block rules precede exact addresses and invalid/unsafe regex cannot
 		await resolveRouting("hello@example.com", "blocked@example.org"),
 	).toEqual({ action: "reject", reason: "Blocked sender" });
 	await expect(
-		saveRule(owner, rule({ matchOperator: "regex", matchValue: "(a+)+$" })),
-	).rejects.toThrow("unsafe");
+		saveRule(owner, rule({ matchOperator: "regex", matchValue: "[" })),
+	).rejects.toThrow("valid regular expression");
+	await saveRule(
+		owner,
+		rule({
+			matchField: "sender",
+			matchOperator: "regex",
+			matchValue: "^(a+)+@example\\.org$",
+			action: "reject",
+			mailboxId: null,
+		}),
+	);
+	expect(
+		(await resolveRouting("hello@example.com", "aaaa@example.org", false))
+			?.action,
+	).toBe("reject");
 });
 test("cross-domain aliases stay within a domain owner and explicit assignments take precedence", async () => {
 	state.db.exec(
@@ -235,7 +249,7 @@ test("account forwarding keeps a local copy and refuses self-forwarding", async 
 	await expect(setForwarding(owner, owner.email)).rejects.toThrow("differ");
 });
 
-test("domain subject rules reject MIME content before exact-address delivery", async () => {
+test("domain rules retain source envelope-only matching before inbox MIME rules", async () => {
 	await saveRule(owner, {
 		domainId: "domain",
 		scope: "domain",
@@ -257,5 +271,8 @@ test("domain subject rules reject MIME content before exact-address delivery", a
 			"From: sender@example.net\r\nTo: hello@example.com\r\nSubject: A blocked subject\r\n\r\nText",
 		),
 	);
-	expect(decision.action).toBe("reject");
+	expect(decision.action).toBe("store");
+	expect(state.db.query("SELECT match_count FROM routing_rules").get()).toEqual(
+		{ match_count: 0 },
+	);
 });
