@@ -69,8 +69,8 @@ Avatar fetching stays in the native local background dispatcher. A focused
 failure guard rejects rule publication and proves the contact and avatar job
 roll back together. A second guard proves deletion retains objects referenced
 by another imported message. A publication-boundary permission downgrade guard
-checks that the sender uses the current on-behalf permission and account name. The existing shared-object guard is intentionally
-retained rather than deleting another message's data.
+checks that the sender uses the current on-behalf permission and account name. The existing shared-object guard is
+intentionally retained rather than deleting another message's data.
 
 No persisted table, migration, backup table/group or backup format changes.
 Original components, styles and route templates are unchanged by this patch.
@@ -111,6 +111,32 @@ Its test budget is now 15 seconds, matching other provisioning tests, with
 all behavior assertions and production retry timing unchanged. Retry cleanup
 and the following serialized registration pass together on host and isolated
 Linux. Final release verification follows below.
+
+
+[Final Ubuntu CI 41472303212](https://github.com/ilbertt/mailrun/actions/runs/41472303212)
+and the independent PR run 41472316710 both pass. All 1,410 tests, generated
+SQL/coverage, TypeScript and every compiled HTTP/WebSocket/parity rehearsal pass,
+including all 115 contact/template cases and restart. The selected one-CPU,
+256-MiB/no-swap rule workload still passes: 116,609,024-byte cgroup peak and zero
+OOM kills. This is not whole-guest cold/concurrent resource proof.
+
+Source `2538828` was deployed on November 2 to the existing preview through the
+nibrun CLI's checksum-verified archive fetch. The artifact from final CI was
+also downloaded privately and its executable checksum verified before release.
+Executable SHA-256:
+`c29487079ed64ea2a100275c32dd764fff683e038c67f5a5fd357ce62c9b784a`;
+119,338,976 bytes. Artifact archive 13156730432 has digest
+`fd151f6babb8a671b2fbd149b4193ae1bb6fd696846d5fc70f7e01c60ecd2ddf`.
+Deployment `01a19ce8-576d-7639-a38d-e7cc44b19884` is running.
+
+Post-deployment checks confirm login/setup HTTP 200; one account and five
+messages intact; ready installation and active ilbert.dev routing/sending;
+email relay HTTP 200 with a successful signed callback; and all three UTC cron
+jobs registered against this deployment. A status sample reports 42,369,024
+bytes in use; this is not a peak measurement. Release checks used read-only
+queries and health requests, with no live send, mailbox mutation, credential
+change, restore or reset. The previously approved private recovery export was
+retained without another download.
 
 Broader source/provider/client and cookie/origin/malformed-input matrices,
 rendered/mobile/keyboard workflows, full data cutover, and whole-guest
