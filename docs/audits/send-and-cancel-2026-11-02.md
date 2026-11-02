@@ -35,8 +35,8 @@ bun scripts/smoke-send.ts dist/mailrun-local
 
 The preceding code matched ten of the initial 80 cases and failed 70. Expanded
 captures add combined-recipient/rendered-header limits and immediate mixed-file
-order. The updated code matches the source cases; final complete-suite and native
-Linux release results are recorded below when available.
+order. The updated code matches all 83 source cases; complete-suite and native
+Linux release results are recorded below.
 
 ## Native behavior
 
@@ -80,8 +80,27 @@ deletes the original draft, stops HTTP, delivers the copy through cron and
 restarts. Cancellation also survives restart and a subsequent cron run without
 delivery. Existing isolated Resend/SES checks pass 24,000,003-byte attachment
 delivery, provider failure and cron recovery; those runners now follow the
-returned outbound message ID rather than the original draft ID. Native Linux
-verification and preview deployment are pending for this checkpoint.
+returned outbound message ID rather than the original draft ID.
+
+[Ubuntu CI 41460553590](https://github.com/ilbertt/mailrun/actions/runs/41460553590)
+passes all 1,292 tests, SQL/type checks and every compiled parity rehearsal,
+including the 83 send/cancel contracts and both restart/cron journeys. The
+independent PR run also passes. The existing constrained rule/regex workload
+still passes at one CPU/256 MiB without swap, with zero OOM kills; that result
+does not prove large-send or whole-guest concurrent peaks.
+
+Source `d0df55f` was deployed on November 2 through nibrun CLI's verified archive
+URL path to the existing preview. Executable SHA-256:
+`2ff903e87ad870e3ab7c92e9ddfcec37d6189b30701bfcaeed14a7b1b014413e`;
+archive digest:
+`71ef0883e4ddc70d67b43ee40f5c30e5a5e8e4546f9a60470301f7557f25af93`.
+Deployment `01a19ca6-0324-73ab-8d6e-d369159b3bb4` is running, and its artifact
+matches the downloaded, verified CI executable. Public login/setup return 200;
+read-only checks retain one account and five messages, ready installation,
+active ilbert.dev routing/sending, email-relay HTTP 200 with a successful signed
+callback and all three UTC cron registrations against this deployment. No live
+send, draft/message mutation, credential/provider change, restore or reset was
+used for these release checks.
 
 Ambiguous external-provider outcome handling, other recipient/header/malformed
 wire cases, broader source/provider/client and rendered/mobile/keyboard flows,
