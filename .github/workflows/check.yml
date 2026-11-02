@@ -22,6 +22,7 @@ jobs:
       - run: bun scripts/smoke-message-details.ts dist/mailrun
       - run: bun scripts/smoke-drafts.ts dist/mailrun
       - run: bun scripts/smoke-aliases.ts dist/mailrun
+      - run: bun scripts/smoke-send.ts dist/mailrun
       - run: bun scripts/smoke-rules.ts dist/mailrun
       - run: MAILRUN_RULE_CONTAINER=1 bun scripts/smoke-rules.ts dist/mailrun
       - run: bun run smoke:source-uploads dist/mailrun

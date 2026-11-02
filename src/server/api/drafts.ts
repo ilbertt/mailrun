@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sessionSendApi } from "./session-send";
 import type { User } from "../../shared/contracts";
 import { draftSchema } from "../../shared/mail-contracts";
 import {
@@ -8,30 +9,17 @@ import {
 	removeAttachment,
 	deleteDraft,
 	attachmentLimit,
-	draftLock,
 	formattedSender,
 } from "../mail/drafts";
-import { sendDraft } from "../mail/send";
-import { withDatabase, seconds } from "../db";
+import { withDatabase } from "../db";
 import { iso, toStoredSourceMessage } from "../mail/message-query";
 import { readLimitedBody } from "../mail/inbound";
-import { messageRecord } from "../mail/message-actions";
 import { parseAgentScheduledAt } from "../agent/schedule";
 import { MailboxAccessError } from "../mail/access";
 import { readDraftAttachmentFiles } from "../http/draft-form";
-export function expectedDraftRevision(request: Request, current: number) {
-	const match = request.headers.get("if-match");
-	if (!match) return current;
-	const value = /^"(\d+)"$/.exec(match)?.[1];
-	if (!value || !Number.isSafeInteger(Number(value)))
-		throw new Response("Invalid draft revision", { status: 412 });
-	if (Number(value) !== current)
-		throw new Response(
-			"This draft changed in another tab. Reopen it before saving.",
-			{ status: 409 },
-		);
-	return Number(value);
-}
+import { expectedDraftRevision } from "../mail/draft-revision";
+export { expectedDraftRevision };
+import { messageRecord } from "../mail/message-actions";
 async function sourceDraft(user: User, id: string) {
 	const draft = await getDraft(user, id);
 	const [agent] = await withDatabase(
@@ -105,10 +93,6 @@ async function jsonBody(request: Request) {
 		});
 	}
 }
-const uploadFiles = (form: FormData) =>
-	form
-		.getAll("attachments")
-		.filter((value): value is File => value instanceof File && value.size > 0);
 const sourceInput = draftSchema
 	.omit({ id: true, revision: true })
 	.partial({ mailboxId: true })
@@ -207,6 +191,8 @@ async function dispatchDraftsApi(
 	request: Request,
 	user: User,
 ): Promise<Response | null> {
+	const send = await sessionSendApi(request, user);
+	if (send) return send;
 	const path = new URL(request.url).pathname,
 		method = request.method;
 	if (path === "/api/attachment-policy" && method === "GET")
@@ -319,76 +305,6 @@ async function dispatchDraftsApi(
 			);
 			return Response.json({ ok: true }, { headers: draftHeaders(saved) });
 		}
-	}
-	if (path === "/api/send" && method === "POST") {
-		const form = await request.formData();
-		const draftId = form.get("draftId");
-		const old =
-			typeof draftId === "string" && draftId
-				? await getDraft(user, draftId)
-				: null;
-		if (old) {
-			const [agent] = await withDatabase(
-				(sql) =>
-					sql.AgentSendingGuard`SELECT draft_id FROM agent_draft_metadata WHERE draft_id=${old.id}`,
-			);
-			if (agent)
-				throw new Response(
-					"Review and approve this assistant draft before sending",
-					{ status: 409 },
-				);
-		}
-		const data = draftSchema.parse({
-			mailboxId: form.get("mailboxId"),
-			from: form.get("from") ?? undefined,
-			to: form.get("to") ?? "",
-			cc: form.get("cc") ?? "",
-			bcc: form.get("bcc") ?? "",
-			subject: form.get("subject") ?? "",
-			text: form.get("text") ?? "",
-			html: form.get("html") ?? "",
-			inReplyTo: form.get("inReplyTo"),
-			references: form.get("references"),
-			threadId: form.get("threadId"),
-			scheduledAt: form.get("scheduledAt"),
-		});
-		const saved = await saveDraft(user, {
-			...data,
-			...(old
-				? {
-						id: old.id,
-						revision: expectedDraftRevision(request, old.draft_revision),
-					}
-				: {}),
-		});
-		const files = uploadFiles(form);
-		const ready = files.length
-			? await uploadAttachments(user, saved.id, files, saved.draft_revision)
-			: saved;
-		return Response.json(await sendDraft(user, ready.id, ready.draft_revision));
-	}
-	const cancel = /^\/api\/messages\/([^/]+)\/cancel-schedule$/.exec(path);
-	if (cancel && method === "POST") {
-		const id = decodeURIComponent(cancel[1] ?? "");
-		await messageRecord(user, id, "send");
-		await draftLock(id, async () =>
-			withDatabase((sql) =>
-				sql.begin(async (sql) => {
-					const [message] =
-						await sql.OwnScheduledDraft`SELECT id FROM messages WHERE id=${id} AND direction='outbound' AND status='queued'`;
-					if (!message)
-						throw new Response("Scheduled message not found", { status: 404 });
-					const jobs =
-						await sql.CancelScheduledJob`DELETE FROM outbound_jobs WHERE message_id=${id} AND status='queued' AND scheduled_at IS NOT NULL RETURNING id`;
-					if (!jobs.length)
-						throw new Response("This send has already started", {
-							status: 409,
-						});
-					await sql.ReturnScheduledToDraft`UPDATE messages SET status='draft',draft_scheduled_at=NULL,draft_revision=draft_revision+1 WHERE id=${id} AND status='queued'`;
-				}),
-			),
-		);
-		return Response.json({ ok: true });
 	}
 	return null;
 }

@@ -153,6 +153,7 @@ try {
 		for (const [key, value] of Object.entries({
 			draftId,
 			mailboxId: "mailbox",
+			from: "hello@example.com",
 			to,
 			subject,
 			text,
@@ -173,7 +174,8 @@ try {
 			throw new Error(
 				`Compiled send failed (${result.status}): ` + (await result.text()),
 			);
-		await result.body?.cancel();
+		return z.object({ messageId: z.string() }).parse(await result.json())
+			.messageId;
 	}
 	let peak = 0;
 	const measure = () => {
@@ -293,7 +295,7 @@ try {
 			scheduledAt: new Date(Date.now() + 120_000).toISOString(),
 		}),
 	);
-	await sendForm(
+	const scheduledMessageId = await sendForm(
 		scheduled.draft.id,
 		"Resend cron recovery",
 		"later@example.net",
@@ -342,7 +344,7 @@ try {
 			.safeParse(
 				state.db
 					.query("SELECT status FROM messages WHERE id=?")
-					.get(scheduled.draft.id),
+					.get(scheduledMessageId),
 			).success !== true
 	)
 		throw new Error("Cron delivery did not commit its sent state");

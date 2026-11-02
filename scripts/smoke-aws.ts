@@ -182,6 +182,7 @@ try {
 		for (const [key, value] of Object.entries({
 			draftId: id,
 			mailboxId: "mailbox",
+			from: "hello@example.com",
 			to: "recipient@example.net",
 			subject,
 			text: "Direct SES attachment",
@@ -202,7 +203,8 @@ try {
 			throw new Error(
 				`SES send (${response.status}): ` + (await response.text()),
 			);
-		await response.body?.cancel();
+		return z.object({ messageId: z.string() }).parse(await response.json())
+			.messageId;
 	}
 	let peak = 0;
 	const measure = () => {
@@ -352,7 +354,7 @@ try {
 			text: "Body",
 		}),
 	);
-	await sendForm(
+	const scheduledMessageId = await sendForm(
 		later.draft.id,
 		"SES cron recovery",
 		draftRevision(later.draft.id),
@@ -390,7 +392,7 @@ try {
 			.safeParse(
 				state.db
 					.query("SELECT status FROM messages WHERE id=?")
-					.get(later.draft.id),
+					.get(scheduledMessageId),
 			).success
 	)
 		throw new Error("Cron did not commit sent state");

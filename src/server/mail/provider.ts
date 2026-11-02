@@ -110,7 +110,15 @@ export async function sendThroughProvider(
 	if (config.provider === "ses")
 		return sendSesMail(config.config, message, send);
 	if (config.provider === "cloudflare") {
-		const body = JSON.stringify(message);
+		const body = JSON.stringify({
+			...message,
+			cc: message.cc?.length ? message.cc : undefined,
+			bcc: message.bcc?.length ? message.bcc : undefined,
+			headers:
+				message.headers && Object.keys(message.headers).length
+					? message.headers
+					: undefined,
+		});
 		if (Buffer.byteLength(body) > 5 * 1024 * 1024)
 			throw new Error("Message exceeds Cloudflare's 5 MiB API limit");
 		const result = await cloudflare(

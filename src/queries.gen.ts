@@ -1108,25 +1108,6 @@ export interface IMutableDraftAgentResult {
     mailbox_id: IAgentDraftMetadataColumns["mailbox_id"];
 }
 
-/** Result of query `AgentSendingGuard`. */
-export interface IAgentSendingGuardResult {
-    draft_id: IAgentDraftMetadataColumns["draft_id"];
-}
-
-/** Result of query `OwnScheduledDraft`. */
-export interface IOwnScheduledDraftResult {
-    id: IMessagesColumns["id"];
-}
-
-/** Result of query `CancelScheduledJob`. */
-export interface ICancelScheduledJobResult {
-    id: IOutboundJobsColumns["id"];
-}
-
-/** Result of query `ReturnScheduledToDraft`. */
-export interface IReturnScheduledToDraftResult {
-}
-
 /** Result of query `NativeDriveOwnerAvatar`. */
 export interface INativeDriveOwnerAvatarResult {
     avatar_key: IUsersColumns["avatar_key"];
@@ -1427,6 +1408,11 @@ export interface ISourceManagedRuleMailboxesResult {
 
 /** Result of query `NativeDeleteDomainRule`. */
 export interface INativeDeleteDomainRuleResult {
+}
+
+/** Result of query `SourceSessionSendAgent`. */
+export interface ISourceSessionSendAgentResult {
+    draft_id: IAgentDraftMetadataColumns["draft_id"];
 }
 
 /** Result of query `NativeClearRecovery`. */
@@ -4551,6 +4537,67 @@ export interface INativeRestoreSubmittedDraftResult {
 export interface IFailSentMessageResult {
 }
 
+/** Result of query `SourceSendMailboxExists`. */
+export interface ISourceSendMailboxExistsResult {
+    id: string | null;
+}
+
+/** Result of query `SourceSendActor`. */
+export interface ISourceSendActorResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    name: IUsersColumns["name"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+}
+
+/** Result of query `SourceSessionSendFence`. */
+export interface ISourceSessionSendFenceResult {
+}
+
+/** Result of query `SourceTouchSubmittedDraft`. */
+export interface ISourceTouchSubmittedDraftResult {
+    draft_revision: IMessagesColumns["draft_revision"];
+}
+
+/** Result of query `SourceSessionSendMessage`. */
+export interface ISourceSessionSendMessageResult {
+}
+
+/** Result of query `SourceSessionSendFile`. */
+export interface ISourceSessionSendFileResult {
+}
+
+/** Result of query `SourceSessionSendJob`. */
+export interface ISourceSessionSendJobResult {
+}
+
+/** Result of query `SourceCancelSendFence`. */
+export interface ISourceCancelSendFenceResult {
+}
+
+/** Result of query `SourceCancelMessage`. */
+export interface ISourceCancelMessageResult {
+    id: IMessagesColumns["id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    direction: IMessagesColumns["direction"];
+    status: IMessagesColumns["status"];
+}
+
+/** Result of query `SourceScheduledJob`. */
+export interface ISourceScheduledJobResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `CancelScheduledJob`. */
+export interface ICancelScheduledJobResult {
+    id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `ReturnScheduledToDraft`. */
+export interface IReturnScheduledToDraftResult {
+}
+
 /** Result of query `FeedbackMessage`. */
 export interface IFeedbackMessageResult {
     id: IMessagesColumns["id"];
@@ -5205,10 +5252,6 @@ export interface Queries {
     SourceDraftSenderExists: ISourceDraftSenderExistsResult;
     SourceOwnDraftList: ISourceOwnDraftListResult;
     MutableDraftAgent: IMutableDraftAgentResult;
-    AgentSendingGuard: IAgentSendingGuardResult;
-    OwnScheduledDraft: IOwnScheduledDraftResult;
-    CancelScheduledJob: ICancelScheduledJobResult;
-    ReturnScheduledToDraft: IReturnScheduledToDraftResult;
     NativeDriveOwnerAvatar: INativeDriveOwnerAvatarResult;
     NativeSetupMetadata: INativeSetupMetadataResult;
     NativeFolderList: INativeFolderListResult;
@@ -5251,6 +5294,7 @@ export interface Queries {
     NativeAdminRuleMailboxes: INativeAdminRuleMailboxesResult;
     SourceManagedRuleMailboxes: ISourceManagedRuleMailboxesResult;
     NativeDeleteDomainRule: INativeDeleteDomainRuleResult;
+    SourceSessionSendAgent: ISourceSessionSendAgentResult;
     NativeClearRecovery: INativeClearRecoveryResult;
     NativeInsertRecovery: INativeInsertRecoveryResult;
     NativeMfaSettings: INativeMfaSettingsResult;
@@ -5690,6 +5734,18 @@ export interface Queries {
     NativeFailAgentApproval: INativeFailAgentApprovalResult;
     NativeRestoreSubmittedDraft: INativeRestoreSubmittedDraftResult;
     FailSentMessage: IFailSentMessageResult;
+    SourceSendMailboxExists: ISourceSendMailboxExistsResult;
+    SourceSendActor: ISourceSendActorResult;
+    SourceSessionSendFence: ISourceSessionSendFenceResult;
+    SourceTouchSubmittedDraft: ISourceTouchSubmittedDraftResult;
+    SourceSessionSendMessage: ISourceSessionSendMessageResult;
+    SourceSessionSendFile: ISourceSessionSendFileResult;
+    SourceSessionSendJob: ISourceSessionSendJobResult;
+    SourceCancelSendFence: ISourceCancelSendFenceResult;
+    SourceCancelMessage: ISourceCancelMessageResult;
+    SourceScheduledJob: ISourceScheduledJobResult;
+    CancelScheduledJob: ICancelScheduledJobResult;
+    ReturnScheduledToDraft: IReturnScheduledToDraftResult;
     FeedbackMessage: IFeedbackMessageResult;
     PreviousSpamFeedback: IPreviousSpamFeedbackResult;
     TrainSpamToken: ITrainSpamTokenResult;

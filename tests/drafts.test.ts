@@ -155,7 +155,7 @@ const sentSchema = z.object({
 	to: z.array(z.string()),
 	cc: z.array(z.string()).optional(),
 	bcc: z.array(z.string()).optional(),
-	headers: z.record(z.string(), z.string()),
+	headers: z.record(z.string(), z.string()).default({}),
 	attachments: z.array(z.object({ filename: z.string(), content: z.string() })),
 	text: z.string(),
 	html: z.string(),

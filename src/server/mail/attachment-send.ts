@@ -22,7 +22,7 @@ export async function prepareAttachments(
 ) {
 	const rows = await withDatabase(
 		(sql) =>
-			sql.SendingAttachments`SELECT id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL ORDER BY created_at,id`,
+			sql.SendingAttachments`SELECT id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL ORDER BY rowid`,
 	);
 	if (provider !== "cloudflare") {
 		const attachments: OutboundAttachment[] = [];
