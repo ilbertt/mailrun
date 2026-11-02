@@ -119,11 +119,11 @@ and health requests, with no live mailbox/message mutation, real email,
 credential/provider change, restore or reset. The approved private recovery
 export remains retained without a new download.
 
-This compares deletion's immediate persisted state. Native queued delivery still
-rechecks current sender rights; original scheduled-worker authorization and
-post-deletion/revocation outcomes need a separate temporal comparison before
-claiming queue/permission parity. No change to those delivery guards is included
-here. The existing owner-only draft protection likewise remains pending the
+This checkpoint compared deletion's immediate persisted state and retained its
+then-current delivery guards. The later [queued-delivery audit](queued-delivery-2026-11-02.md)
+compares 51 original-worker outcomes and aligns original-format queued authority,
+including post-deletion/revocation behavior. Older Bun-only envelopes remain on
+their compatibility path pending producer/protocol migration. The existing owner-only draft protection likewise remains pending the
 owner's explicit permission decision.
 
 Source framework error framing, malformed JSON/cookie/origin combinations,

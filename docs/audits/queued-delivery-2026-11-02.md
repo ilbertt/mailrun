@@ -115,6 +115,33 @@ one account/five messages with migration 0070 absent. SQLite query-only checking
 used local read/write access solely to initialize WAL bookkeeping; the archive
 remains unchanged. No credentials or message contents were displayed.
 
+
+[Ubuntu CI 41531390753](https://github.com/ilbertt/mailrun/actions/runs/41531390753)
+and independent PR run 41531401902 pass all 1,826 tests, generated SQL/coverage,
+TypeScript and every compiled rehearsal. The 51 queued outcomes, concurrent
+cron/replay, original send/cancel, first-start source-schema upgrade and record
+restore all pass. The selected one-CPU/256-MiB/no-swap rule workload still passes
+with 114,733,056-byte cgroup peak and zero OOM kills. This does not establish
+whole-guest cold/concurrent capacity.
+
+Source `0614ddb` was deployed on November 2 through the nibrun CLI's verified
+archive fetch. The archive digest was checked during deployment; the separately
+downloaded executable also matches its CI checksum. Executable SHA-256:
+`ed8fd549ec089c7eedd758bc941836325c9e56375f86c55f7a2ddd26d75f456b`;
+119,392,224 bytes. Archive artifact 13181129623 has SHA-256
+`c19756bd4ea81aa9a1e367e6b7b113eea7a8815098fc9b534298a8f1bdcd3cba`.
+Deployment `01a19e41-d494-7abf-9226-60005b6a437b` is running.
+
+Pre-upgrade checks found no active send/domain operation or queued job with a
+missing message link. Post-upgrade checks verify migration 0070 applied once,
+zero linked jobs without a transport snapshot, ready installation, one account
+and five messages retained, active ilbert.dev routing/sending, login/setup HTTP
+200, email relay HTTP 200 with successful signed callback, and all three UTC
+cron registrations. A memory sample reports 44,994,560 bytes in use; it is not a
+peak measurement. Release checks used read-only queries and health requests,
+with no live email, mailbox/message mutation, credential/provider edit or data
+restore/reset. The only live schema change is the tested additive migration.
+
 Original worker platform framing and transport timing, other provider/protocol
 producer matrices, successful external interoperability, historical missing
 transport metadata, full original-data cutover, paired rendered/mobile/keyboard
