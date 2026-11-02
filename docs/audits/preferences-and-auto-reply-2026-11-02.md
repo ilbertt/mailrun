@@ -113,7 +113,31 @@ the real automatic-reply intake exception boundary described above.
 
 All 1,631 host tests, generated SQL/coverage and TypeScript pass. The production
 build, compiled settings/reply rehearsals and isolated avatar background-job
-checks pass. Final native Linux and preview deployment results follow below. Broader
+checks pass. [Native Ubuntu CI 41492133570](https://github.com/ilbertt/mailrun/actions/runs/41492133570)
+and independent PR CI 41492144677 both pass all 1,631 tests, SQL/type checks and
+every compiled HTTP/WebSocket/parity rehearsal. This includes the 171 settings
+cases, 45 signed intake/reply outcomes and all restart/provider/cron journeys.
+The selected one-CPU/256-MiB/no-swap rule workload still passes with a
+115,724,288-byte cgroup peak and zero OOM kills. It does not establish full
+nibrun guest cold/concurrent resource bounds.
+
+Source `aab028f` was deployed on November 2 through the nibrun CLI's
+checksum-verified archive fetch to the existing preview. The exact CI binary
+was also downloaded privately and verified against its checksum before release.
+Executable SHA-256:
+`003d5d15ce4a9a67a532d837502e213c402c0adf341a340ce4ebe4681f23aaa0`;
+119,363,552 bytes. Archive artifact 13164752823 has digest
+`b8acf1a74bc30d7c5ed468db2e6aa0807512e40ff5179d8e7bd6988421028c43`.
+Deployment `01a19d58-d80d-75db-845b-1ebeed7d42ba` is running.
+
+Post-release checks confirm public login/setup HTTP 200, one account and five
+messages retained, ready installation, active ilbert.dev routing/sending,
+email-relay HTTP 200 with a successful signed callback, and all three UTC cron
+registrations against this deployment. A status sample reports 46,874,624 bytes
+in use; it is not a peak measurement. Release checks used read-only queries and
+health requests, with no live email, preference/mailbox mutation, credential
+change, restore or reset. The existing approved private recovery export remains
+available without another download. Broader
 source/provider/client wire and permission matrices, rendered/mobile/keyboard
 states, full original-data cutover, successful external interoperability and
 whole-guest cold/concurrent resource verification remain open. Existing native
