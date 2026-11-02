@@ -1,7 +1,7 @@
+import { personalMailboxAddresses } from "./identity-addresses";
 import { enqueueContactAvatar, cancelContactAvatar } from "../avatars/jobs";
 import { wakeAvatarDispatcher } from "../avatars/dispatcher";
-import { z } from "zod";
-import { withDatabase, seconds } from "../db";
+import { withDatabase, seconds, type AppSQL } from "../db";
 import {
 	normalizeEmailAddress,
 	getFirstEmailAddressEntry,
@@ -73,40 +73,44 @@ export async function syncPersonalIdentity(
 	userId: string,
 	name: string,
 	avatarKey: string | null,
+	context?: AppSQL,
 ) {
-	const [account] = await withDatabase(
-		(sql) =>
-			sql.NativeIdentityAccount`SELECT email FROM users WHERE id=${userId}`,
-	);
-	if (!account) throw new Response("Account not found", { status: 404 });
-	await withDatabase((sql) =>
-		sql.begin(async (tx) => {
-			await tx.NativeSyncAccountIdentity`UPDATE users SET name=${name},avatar_key=${avatarKey} WHERE id=${userId}`;
-			await tx.NativeSyncIdentityMailbox`UPDATE mailboxes SET display_name=${name},avatar_key=${avatarKey} WHERE user_id=${userId} AND type='personal' AND EXISTS(SELECT 1 FROM domains d WHERE d.id=mailboxes.domain_id AND lower(mailboxes.local_part||'@'||d.hostname)=lower(${account.email}))`;
-			const addresses =
-				await tx.NativeIdentityAddresses`/* @notNull email */ SELECT b.local_part||'@'||d.hostname AS email,b.display_name,b.avatar_key FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE b.user_id=${userId} AND b.type='personal' UNION SELECT a.local_part||'@'||d.hostname,b.display_name,b.avatar_key FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id JOIN mailboxes b ON b.id=a.mailbox_id WHERE b.user_id=${userId} AND b.type='personal' UNION SELECT b.local_part||'@'||d.hostname,b.display_name,b.avatar_key FROM mailboxes b JOIN domains origin ON origin.id=b.domain_id JOIN domains d ON d.user_id=origin.user_id WHERE b.user_id=${userId} AND b.type='personal' AND b.use_all_domains=1 AND d.status='active' AND NOT EXISTS(SELECT 1 FROM mailboxes other WHERE other.domain_id=d.id AND other.local_part=b.local_part AND other.id<>b.id)`;
-			for (const address of addresses) {
-				await tx.NativeSyncIdentityContact`INSERT INTO contacts (id,user_id,email,display_name,avatar_key,source,last_seen_at,created_at) VALUES (${getContactId(userId, z.string().parse(address.email))},${userId},${address.email},${address.display_name ?? name},${address.avatar_key},'manual',${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=excluded.display_name,avatar_key=excluded.avatar_key,source='manual'`;
-				await cancelContactAvatar(
-					tx,
-					getContactId(userId, z.string().parse(address.email)),
-				);
+	const run = async (tx: AppSQL) => {
+		await tx.NativeSyncIdentityFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+		const [account] =
+			await tx.NativeIdentityAccount`SELECT email FROM users WHERE id=${userId}`;
+		if (!account) throw new Response("Account not found", { status: 404 });
+		await tx.NativeSyncAccountIdentity`UPDATE users SET name=${name},avatar_key=${avatarKey} WHERE id=${userId}`;
+		for (const box of await personalMailboxAddresses(tx, userId)) {
+			const primary =
+				`${box.local_part}@${box.hostname}`.trim().toLowerCase() ===
+				account.email.trim().toLowerCase();
+			if (primary)
+				await tx.NativeSyncIdentityMailbox`UPDATE mailboxes SET display_name=${name},avatar_key=${avatarKey} WHERE id=${box.id}`;
+			const displayName = primary ? name : (box.display_name ?? name),
+				key = primary ? avatarKey : box.avatar_key;
+			for (const email of box.addresses) {
+				const contactId = getContactId(userId, email);
+				await tx.NativeSyncIdentityContact`INSERT INTO contacts (id,user_id,email,display_name,avatar_key,source,created_at) VALUES (${contactId},${userId},${email},${displayName},${key},'manual',${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=excluded.display_name,avatar_key=excluded.avatar_key,source='manual'`;
+				await cancelContactAvatar(tx, contactId);
 			}
-		}),
-	);
+		}
+	};
+	if (context) await run(context);
+	else await withDatabase((sql) => sql.begin(run));
 }
-export async function personalIdentity(userId: string, email: string) {
-	const [row] = await withDatabase(
-		(sql) =>
-			sql.NativePersonalAddress`SELECT u.id,u.name,u.avatar_key FROM users u WHERE u.id=${userId} AND EXISTS(SELECT 1 FROM mailboxes b JOIN domains origin ON origin.id=b.domain_id WHERE b.user_id=u.id AND b.type='personal' AND (lower(b.local_part||'@'||origin.hostname)=${email} OR EXISTS(SELECT 1 FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id=b.id AND lower(a.local_part||'@'||d.hostname)=${email}) OR (b.use_all_domains=1 AND EXISTS(SELECT 1 FROM domains d WHERE d.user_id=origin.user_id AND d.status='active' AND lower(b.local_part||'@'||d.hostname)=${email})))) LIMIT 1`,
-	);
-	return row
-		? z
-				.object({
-					id: z.string(),
-					name: z.string(),
-					avatar_key: z.string().nullable(),
-				})
-				.parse(row)
-		: null;
+export async function personalIdentity(
+	userId: string,
+	email: string,
+	context?: AppSQL,
+) {
+	const run = async (sql: AppSQL) => {
+		const [account] =
+			await sql.NativePersonalIdentityAccount`SELECT id,name,avatar_key FROM users WHERE id=${userId}`;
+		if (!account) return null;
+		for (const box of await personalMailboxAddresses(sql, userId))
+			if (box.addresses.includes(email)) return account;
+		return null;
+	};
+	return context ? run(context) : withDatabase(run);
 }

@@ -1,7 +1,7 @@
 import { formatEmailAddress } from "../../lib/email/address";
 import { resolveMailboxDisplayName } from "../../lib/profile/identity-utils";
 import { z } from "zod";
-import { withDatabase, seconds, id } from "../db";
+import { withDatabase, seconds, id, type AppSQL } from "../db";
 import { mailboxAccess } from "./access";
 import { draftSchema } from "../../shared/mail-contracts";
 import type { User } from "../../shared/contracts";
@@ -35,12 +35,15 @@ export async function senderAddress(
 	user: User,
 	mailboxId: string,
 	requested?: string,
+	context?: AppSQL,
 ) {
-	const mailbox = await mailboxAccess(user, mailboxId, "send");
+	const read = <T>(run: (sql: AppSQL) => Promise<T>) =>
+		context ? run(context) : withDatabase(run);
+	const mailbox = await mailboxAccess(user, mailboxId, "send", context);
 	const primary = `${mailbox.local_part}@${mailbox.hostname}`;
 	const address = getEmailAddress(requested ?? primary).toLowerCase();
 	if (address === primary.toLowerCase()) return primary;
-	const aliases = await withDatabase(
+	const aliases = await read(
 		(sql) =>
 			sql.SenderAliases`SELECT a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id=${mailboxId}`,
 	);
@@ -49,7 +52,7 @@ export async function senderAddress(
 	)
 		return address;
 	if (mailbox.use_all_domains) {
-		const [domain] = await withDatabase(
+		const [domain] = await read(
 			(sql) =>
 				sql.SenderDomainAlias`SELECT id FROM domains WHERE hostname=${address.split("@")[1] ?? ""} AND user_id=${mailbox.domain_owner} AND status='active'`,
 		);
@@ -59,7 +62,7 @@ export async function senderAddress(
 				normalizeLocalPart(mailbox.local_part)
 		) {
 			const local = normalizeLocalPart(mailbox.local_part);
-			const occupied = await withDatabase(
+			const occupied = await read(
 				(sql) => sql.SenderAddressOccupied`
 				SELECT id FROM mailboxes WHERE domain_id=${domain.id} AND id!=${mailboxId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${local}
 				UNION ALL SELECT id FROM mailbox_aliases WHERE domain_id=${domain.id} AND mailbox_id!=${mailboxId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${local} LIMIT 1`,
@@ -73,9 +76,10 @@ export async function formattedSender(
 	user: User,
 	mailboxId: string,
 	requested?: string,
+	context?: AppSQL,
 ) {
-	const address = await senderAddress(user, mailboxId, requested),
-		mailbox = await mailboxAccess(user, mailboxId, "send");
+	const address = await senderAddress(user, mailboxId, requested, context),
+		mailbox = await mailboxAccess(user, mailboxId, "send", context);
 	const name = resolveMailboxDisplayName(
 		{
 			localPart: mailbox.local_part,

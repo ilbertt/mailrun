@@ -1024,8 +1024,8 @@ export interface INativeContactAvatarResult {
 export interface INativeSetContactAvatarResult {
 }
 
-/** Result of query `NativeBlockContactFence`. */
-export interface INativeBlockContactFenceResult {
+/** Result of query `NativeContactMutationFence`. */
+export interface INativeContactMutationFenceResult {
 }
 
 /** Result of query `NativePriorBlockedContact`. */
@@ -1035,6 +1035,11 @@ export interface INativePriorBlockedContactResult {
 
 /** Result of query `NativeBlockContact`. */
 export interface INativeBlockContactResult {
+}
+
+/** Result of query `NativeEquivalentBlockRule`. */
+export interface INativeEquivalentBlockRuleResult {
+    id: IRoutingRulesColumns["id"];
 }
 
 /** Result of query `NativeBlockContactRule`. */
@@ -1047,12 +1052,15 @@ export interface INativeSaveManualContactResult {
 
 /** Result of query `NativeContactDetail`. */
 export interface INativeContactDetailResult {
+    id: IContactsColumns["id"];
+    user_id: IContactsColumns["user_id"];
     email: IContactsColumns["email"];
     display_name: IContactsColumns["display_name"];
     avatar_key: IContactsColumns["avatar_key"];
     source: IContactsColumns["source"];
     blocked: IContactsColumns["blocked"];
     last_seen_at: IContactsColumns["last_seen_at"];
+    created_at: IContactsColumns["created_at"];
 }
 
 /** Result of query `SourceDraftAgent`. */
@@ -1563,13 +1571,30 @@ export interface INativeListTemplatesResult {
     text_body: IMessagesColumns["text_body"];
 }
 
+/** Result of query `NativeTemplateWriteFence`. */
+export interface INativeTemplateWriteFenceResult {
+}
+
 /** Result of query `NativeCreateTemplate`. */
 export interface INativeCreateTemplateResult {
 }
 
+/** Result of query `NativeTemplateDeleteFence`. */
+export interface INativeTemplateDeleteFenceResult {
+}
+
+/** Result of query `NativeTemplateObjects`. */
+export interface INativeTemplateObjectsResult {
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+}
+
+/** Result of query `NativeTemplateAttachments`. */
+export interface INativeTemplateAttachmentsResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
 /** Result of query `NativeDeleteTemplate`. */
 export interface INativeDeleteTemplateResult {
-    id: IMessagesColumns["id"];
 }
 
 /** Result of query `NativeRecordAuthActivity`. */
@@ -3616,6 +3641,10 @@ export interface INativeMessageContactNamesResult {
     avatar_key: IContactsColumns["avatar_key"];
 }
 
+/** Result of query `NativeSyncIdentityFence`. */
+export interface INativeSyncIdentityFenceResult {
+}
+
 /** Result of query `NativeIdentityAccount`. */
 export interface INativeIdentityAccountResult {
     email: IUsersColumns["email"];
@@ -3629,22 +3658,15 @@ export interface INativeSyncAccountIdentityResult {
 export interface INativeSyncIdentityMailboxResult {
 }
 
-/** Result of query `NativeIdentityAddresses`. */
-export interface INativeIdentityAddressesResult {
-    email: unknown;
-    display_name: IMailboxesColumns["display_name"];
-    avatar_key: IMailboxesColumns["avatar_key"];
-}
-
 /** Result of query `NativeSyncIdentityContact`. */
 export interface INativeSyncIdentityContactResult {
 }
 
-/** Result of query `NativePersonalAddress`. */
-export interface INativePersonalAddressResult {
-    id: string | null;
+/** Result of query `NativePersonalIdentityAccount`. */
+export interface INativePersonalIdentityAccountResult {
+    id: IUsersColumns["id"];
     name: IUsersColumns["name"];
-    avatar_key: string | null;
+    avatar_key: IUsersColumns["avatar_key"];
 }
 
 /** Result of query `SourceMessageCounts`. */
@@ -3810,6 +3832,41 @@ export interface IDraftDiscardObjectsResult {
 
 /** Result of query `DeleteOwnedDraft`. */
 export interface IDeleteOwnedDraftResult {
+}
+
+/** Result of query `NativeIdentityMailboxes`. */
+export interface INativeIdentityMailboxesResult {
+    id: string | null;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    display_name: IMailboxesColumns["display_name"];
+    avatar_key: IMailboxesColumns["avatar_key"];
+    hostname: IDomainsColumns["hostname"];
+    domain_owner: string | null;
+}
+
+/** Result of query `NativeIdentityDomains`. */
+export interface INativeIdentityDomainsResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+    status: IDomainsColumns["status"];
+}
+
+/** Result of query `NativeIdentityAliases`. */
+export interface INativeIdentityAliasesResult {
+    mailbox_id: IMailboxAliasesColumns["mailbox_id"];
+    domain_id: IMailboxAliasesColumns["domain_id"];
+    local_part: IMailboxAliasesColumns["local_part"];
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `NativeIdentityClaims`. */
+export interface INativeIdentityClaimsResult {
+    id: IMailboxesColumns["id"];
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
 }
 
 /** Result of query `InboundForwarding`. */
@@ -5242,9 +5299,10 @@ export interface Queries {
     NativeSetMailboxAvatar: INativeSetMailboxAvatarResult;
     NativeContactAvatar: INativeContactAvatarResult;
     NativeSetContactAvatar: INativeSetContactAvatarResult;
-    NativeBlockContactFence: INativeBlockContactFenceResult;
+    NativeContactMutationFence: INativeContactMutationFenceResult;
     NativePriorBlockedContact: INativePriorBlockedContactResult;
     NativeBlockContact: INativeBlockContactResult;
+    NativeEquivalentBlockRule: INativeEquivalentBlockRuleResult;
     NativeBlockContactRule: INativeBlockContactRuleResult;
     NativeSaveManualContact: INativeSaveManualContactResult;
     NativeContactDetail: INativeContactDetailResult;
@@ -5323,7 +5381,11 @@ export interface Queries {
     NativeRevokePasswordResets: INativeRevokePasswordResetsResult;
     NativeRevokePasswordChallenges: INativeRevokePasswordChallengesResult;
     NativeListTemplates: INativeListTemplatesResult;
+    NativeTemplateWriteFence: INativeTemplateWriteFenceResult;
     NativeCreateTemplate: INativeCreateTemplateResult;
+    NativeTemplateDeleteFence: INativeTemplateDeleteFenceResult;
+    NativeTemplateObjects: INativeTemplateObjectsResult;
+    NativeTemplateAttachments: INativeTemplateAttachmentsResult;
     NativeDeleteTemplate: INativeDeleteTemplateResult;
     NativeRecordAuthActivity: INativeRecordAuthActivityResult;
     NativeApiKeyCandidates: INativeApiKeyCandidatesResult;
@@ -5609,12 +5671,12 @@ export interface Queries {
     NativePriorContact: INativePriorContactResult;
     NativeUpsertContact: INativeUpsertContactResult;
     NativeMessageContactNames: INativeMessageContactNamesResult;
+    NativeSyncIdentityFence: INativeSyncIdentityFenceResult;
     NativeIdentityAccount: INativeIdentityAccountResult;
     NativeSyncAccountIdentity: INativeSyncAccountIdentityResult;
     NativeSyncIdentityMailbox: INativeSyncIdentityMailboxResult;
-    NativeIdentityAddresses: INativeIdentityAddressesResult;
     NativeSyncIdentityContact: INativeSyncIdentityContactResult;
-    NativePersonalAddress: INativePersonalAddressResult;
+    NativePersonalIdentityAccount: INativePersonalIdentityAccountResult;
     SourceMessageCounts: ISourceMessageCountsResult;
     SourceScheduledCount: ISourceScheduledCountResult;
     ClaimDraftLock: IClaimDraftLockResult;
@@ -5640,6 +5702,10 @@ export interface Queries {
     NativeHumanAgentAttachmentRemove: INativeHumanAgentAttachmentRemoveResult;
     DraftDiscardObjects: IDraftDiscardObjectsResult;
     DeleteOwnedDraft: IDeleteOwnedDraftResult;
+    NativeIdentityMailboxes: INativeIdentityMailboxesResult;
+    NativeIdentityDomains: INativeIdentityDomainsResult;
+    NativeIdentityAliases: INativeIdentityAliasesResult;
+    NativeIdentityClaims: INativeIdentityClaimsResult;
     InboundForwarding: IInboundForwardingResult;
     InboundExists: IInboundExistsResult;
     NativeInboundOwnAddress: INativeInboundOwnAddressResult;

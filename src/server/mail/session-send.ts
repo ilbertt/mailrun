@@ -8,7 +8,7 @@ import {
 	parseMessageIdList,
 } from "../../lib/email/threading";
 import { buildSnippet } from "../../lib/email/parse";
-import { withDatabase, id, seconds } from "../db";
+import { withDatabase, id, seconds, type AppSQL } from "../db";
 import { mailboxAccess, MailboxAccessError } from "./access";
 import {
 	getDraft,
@@ -43,13 +43,16 @@ export async function sourceSendSender(
 	user: User,
 	mailboxId: string,
 	from: string,
+	context?: AppSQL,
 ) {
-	const [box] = await withDatabase(
+	const read = <T>(run: (sql: AppSQL) => Promise<T>) =>
+		context ? run(context) : withDatabase(run);
+	const [box] = await read(
 		(sql) =>
 			sql.SourceSendMailboxExists`SELECT b.id FROM mailboxes b JOIN domains d ON d.id=b.domain_id JOIN users u ON u.id=b.user_id WHERE b.id=${mailboxId}`,
 	);
 	if (!box) throw new Response("Mailbox not found", { status: 403 });
-	const [actor] = await withDatabase(
+	const [actor] = await read(
 		(sql) =>
 			sql.SourceSendActor`SELECT id,email,name,role,is_primary_admin FROM users WHERE id=${user.id} AND disabled=0`,
 	);
@@ -59,7 +62,7 @@ export async function sourceSendSender(
 		isPrimaryAdmin: !!actor.is_primary_admin,
 	});
 	try {
-		return await formattedSender(current, mailboxId, from);
+		return await formattedSender(current, mailboxId, from, context);
 	} catch (error) {
 		if (error instanceof MailboxAccessError)
 			throw new Response(

@@ -151,6 +151,7 @@ test("templates stay outside mail lists and retain the original save/apply contr
 			method: "POST",
 			body: JSON.stringify({
 				mailboxId: "mailbox",
+				from: "hello@example.com",
 				title: "Welcome template",
 				html: "<p>Hello</p>",
 				text: "Hello",

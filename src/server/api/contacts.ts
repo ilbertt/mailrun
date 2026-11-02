@@ -2,7 +2,7 @@ import { enqueueContactAvatar } from "../avatars/jobs";
 import { wakeAvatarDispatcher } from "../avatars/dispatcher";
 import { z } from "zod";
 import { withDatabase, seconds } from "../db";
-import { mailboxAccess } from "../mail/access";
+import { mailboxAccess, MailboxAccessError } from "../mail/access";
 import { personalIdentity, syncPersonalIdentity } from "../mail/contacts";
 import { normalizeEmailAddress } from "../../lib/email/address";
 import {
@@ -17,88 +17,131 @@ export async function contactsApi(
 	user: User,
 ): Promise<Response | null> {
 	const url = new URL(request.url),
-		path = url.pathname,
-		method = request.method;
-	if (path !== "/api/contacts" && path !== "/api/contacts/block") return null;
+		method = request.method,
+		block = url.pathname === "/api/contacts/block";
+	if (
+		!(block
+			? method === "POST"
+			: url.pathname === "/api/contacts" && ["GET", "PATCH"].includes(method))
+	)
+		return null;
 	const body: unknown =
 		method === "GET"
-			? Object.fromEntries(url.searchParams)
+			? {
+					mailboxId: url.searchParams.get("mailboxId"),
+					address: url.searchParams.get("address"),
+				}
 			: JSON.parse(
 					new TextDecoder().decode(await readLimitedBody(request, 16 * 1024)),
 				);
 	const input = z
-			.object({
-				mailboxId: z.string().min(1),
-				address: z.string().max(500),
-				displayName: z.string().trim().min(1).max(100).optional(),
-			})
-			.parse(body),
-		email = normalizeEmailAddress(input.address);
-	if (!z.email().safeParse(email).success)
-		throw new Response("A valid contact email is required", { status: 400 });
-	const box = await mailboxAccess(
-		user,
-		input.mailboxId,
-		method === "GET" ? "read" : "manage",
-	);
-	const identity = await personalIdentity(box.user_id, email);
-	if (path === "/api/contacts/block" && method === "POST") {
-		await withDatabase((sql) =>
+		.object({
+			mailboxId: z.string().nullish(),
+			address: z.string().nullish(),
+			displayName: z.string().nullish(),
+		})
+		.parse(body);
+	const email = normalizeEmailAddress(input.address ?? ""),
+		displayName = input.displayName?.trim();
+	if (
+		method === "PATCH" &&
+		(!input.mailboxId || !email || !displayName || displayName.length > 100)
+	)
+		throw new Response("A valid contact name is required", { status: 400 });
+	if (!input.mailboxId || !email)
+		throw new Response("Mailbox and contact are required", { status: 400 });
+	const mailboxId = input.mailboxId;
+	const run = async () =>
+		withDatabase((sql) =>
 			sql.begin(async (tx) => {
-				await tx.NativeBlockContactFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
-				const [existing] =
-					await tx.NativePriorBlockedContact`SELECT id FROM contacts WHERE user_id=${box.user_id} AND email=${email}`;
-				await tx.NativeBlockContact`INSERT INTO contacts (id,user_id,email,display_name,source,blocked,last_seen_at,created_at) VALUES (${getContactId(box.user_id, email)},${box.user_id},${email},${getContactNameFromAddress(input.address)},'inbound',1,${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET blocked=1`;
-				await enqueueContactAvatar(
+				if (method !== "GET")
+					await tx.NativeContactMutationFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+				const box = await mailboxAccess(
+					user,
+					mailboxId,
+					method === "GET" ? "read" : "manage",
 					tx,
-					getContactId(box.user_id, email),
-					box.user_id,
-					box.id,
-					!existing,
 				);
-				await tx.NativeBlockContactRule`INSERT INTO routing_rules (id,user_id,domain_id,scope,pattern,match_field,match_operator,match_value,action,mailbox_id,priority,created_at) VALUES (${"block:" + box.id + ":" + email},${box.user_id},${box.domain_id},'mailbox',${email},'email','exact',${email},'trash',${box.id},100,${seconds()}) ON CONFLICT(id) DO NOTHING`;
+				if (block) {
+					const [existing] =
+						await tx.NativePriorBlockedContact`SELECT id FROM contacts WHERE user_id=${box.user_id} AND email=${email}`;
+					const contactId = getContactId(box.user_id, email);
+					await tx.NativeBlockContact`INSERT INTO contacts (id,user_id,email,display_name,source,blocked,last_seen_at,created_at) VALUES (${contactId},${box.user_id},${email},${getContactNameFromAddress(input.address ?? "")},'inbound',1,${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET blocked=1`;
+					await enqueueContactAvatar(
+						tx,
+						contactId,
+						box.user_id,
+						box.id,
+						!existing,
+					);
+					const [rule] =
+						await tx.NativeEquivalentBlockRule`SELECT id FROM routing_rules WHERE mailbox_id=${box.id} AND match_field='email' AND match_operator='exact' AND match_value=${email} AND action='trash' LIMIT 1`;
+					if (!rule)
+						await tx.NativeBlockContactRule`INSERT INTO routing_rules (id,user_id,domain_id,scope,pattern,match_field,match_operator,match_value,action,mailbox_id,priority,created_at) VALUES (${"block:" + box.id + ":" + email},${box.user_id},${box.domain_id},'mailbox',${email},'email','exact',${email},'trash',${box.id},100,${seconds()})`;
+					return Response.json({ contact: { email, blocked: true } });
+				}
+				const identity = await personalIdentity(box.user_id, email, tx);
+				if (method === "PATCH" && displayName) {
+					if (identity) {
+						if (identity.id !== user.id)
+							throw new Response(
+								"Only the account owner can change this contact",
+								{ status: 403 },
+							);
+						await syncPersonalIdentity(
+							identity.id,
+							displayName,
+							identity.avatar_key,
+							tx,
+						);
+					}
+					await tx.NativeSaveManualContact`INSERT INTO contacts (id,user_id,email,display_name,source,created_at) VALUES (${getContactId(box.user_id, email)},${box.user_id},${email},${displayName},'manual',${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=excluded.display_name,source='manual'`;
+				}
+				const [row] =
+					await tx.NativeContactDetail`SELECT id,user_id,email,display_name,avatar_key,source,blocked,last_seen_at,created_at FROM contacts WHERE user_id=${box.user_id} AND email=${email}`;
+				const contact = row
+					? {
+							id: row.id,
+							userId: row.user_id,
+							email: row.email,
+							displayName: row.display_name,
+							source: row.source,
+							blocked: !!row.blocked,
+							lastSeenAt: iso(row.last_seen_at),
+							createdAt: iso(row.created_at),
+							hasAvatar: !!row.avatar_key,
+						}
+					: null;
+				return Response.json({
+					contact:
+						method === "GET" && identity
+							? {
+									...contact,
+									email,
+									displayName: identity.name,
+									hasAvatar: !!identity.avatar_key,
+									source: "manual",
+									blocked: contact?.blocked ?? false,
+									lastSeenAt: contact?.lastSeenAt ?? null,
+								}
+							: (contact ?? {
+									email,
+									displayName: null,
+									hasAvatar: false,
+									source: null,
+									blocked: false,
+									lastSeenAt: null,
+								}),
+				});
 			}),
 		);
-		wakeAvatarDispatcher();
-		return Response.json({ contact: { email, blocked: true } });
+	try {
+		const response = await run();
+		if (block) wakeAvatarDispatcher();
+		return response;
+	} catch (error) {
+		if (error instanceof MailboxAccessError)
+			throw new Response("Mailbox not found", { status: 404 });
+		throw error;
 	}
-	if (method === "PATCH") {
-		if (!input.displayName)
-			throw new Response("A valid contact name is required", { status: 400 });
-		if (identity) {
-			if (identity.id !== user.id)
-				throw new Response("Only the account owner can change this contact", {
-					status: 403,
-				});
-			await syncPersonalIdentity(
-				identity.id,
-				input.displayName,
-				identity.avatar_key,
-			);
-		}
-		await withDatabase(
-			(sql) =>
-				sql.NativeSaveManualContact`INSERT INTO contacts (id,user_id,email,display_name,source,last_seen_at,created_at) VALUES (${getContactId(box.user_id, email)},${box.user_id},${email},${input.displayName},'manual',${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=excluded.display_name,source='manual',last_seen_at=excluded.last_seen_at`,
-		);
-	} else if (method !== "GET") return null;
-	const [contact] = await withDatabase(
-		(sql) =>
-			sql.NativeContactDetail`SELECT email,display_name,avatar_key,source,blocked,last_seen_at FROM contacts WHERE user_id=${box.user_id} AND email=${email}`,
-	);
-	return Response.json({
-		contact: {
-			email,
-			displayName:
-				method === "GET" && identity
-					? identity.name
-					: (contact?.display_name ?? null),
-			hasAvatar:
-				method === "GET" && identity
-					? !!identity.avatar_key
-					: !!contact?.avatar_key,
-			source: identity ? "manual" : (contact?.source ?? null),
-			blocked: !!contact?.blocked,
-			lastSeenAt: iso(contact?.last_seen_at),
-		},
-	});
 }
