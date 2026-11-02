@@ -14,6 +14,9 @@ const state = await fixture(),
 	binary = resolve(process.argv[2] ?? "dist/mailrun-local"),
 	publicBase = "https://draft-fixture.example";
 const tokens = { owner: crypto.randomUUID(), stranger: crypto.randomUUID() };
+// This controller writes alongside the standalone server's background leases.
+// A transient writer must finish before fixture preparation proceeds.
+state.db.exec("PRAGMA busy_timeout=5000");
 for (const [actor, token] of Object.entries(tokens))
 	state.db
 		.query(
