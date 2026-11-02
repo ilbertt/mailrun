@@ -350,6 +350,7 @@ test("MX conflicts are confirmed before creating an account; sending preference 
 		sending_provider: "cloudflare",
 	});
 });
+// Includes the real bounded relay-health retry/backoff and account cleanup.
 test("failed Worker verification removes the partial account and retry reuses its Worker identity and secret", async () => {
 	const p = provider();
 	p.setHealthy(false);
@@ -368,7 +369,7 @@ test("failed Worker verification removes the partial account and retry reuses it
 	const after = await getInstallation();
 	expect(after?.worker_name).toBe(before?.worker_name);
 	expect(after?.relay_secret).toBe(before?.relay_secret);
-});
+}, 15_000);
 test("initial registration is serialized, and header-only setup authentication works", async () => {
 	const p = provider(),
 		{ setupToken: ignored, ...body } = input();

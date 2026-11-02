@@ -102,6 +102,16 @@ assertions and the multiple-version assertion. Twelve repetitions pass on the
 host and in a network-isolated Linux Bun container; this changes test
 coordination only.
 
+Push CI 41467456024 passes all 1,410 tests, SQL/types and every compiled
+rehearsal, including the 115 HTTP contact/template cases. Its independent PR
+run timed out the existing setup retry/cleanup fixture at the default five
+seconds; the unfinished registration then interfered with the next fixture.
+That test deliberately exercises the real bounded relay-health retry/backoff.
+Its test budget is now 15 seconds, matching other provisioning tests, with
+all behavior assertions and production retry timing unchanged. Retry cleanup
+and the following serialized registration pass together on host and isolated
+Linux. Final release verification follows below.
+
 Broader source/provider/client and cookie/origin/malformed-input matrices,
 rendered/mobile/keyboard workflows, full data cutover, and whole-guest
 cold/concurrent memory/capacity verification remain open. Native author-only
