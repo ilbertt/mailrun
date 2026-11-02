@@ -1,3 +1,4 @@
+import { collectMailboxAddresses } from "./identity-addresses";
 import {
 	resolveMailboxDisplayName,
 	resolveMailboxAvatarKey,
@@ -18,7 +19,7 @@ export class MessageReadError extends Error {
 	}
 }
 
-export async function listMailboxes(user: User) {
+async function mailboxList(user: User, metadata: boolean) {
 	return withDatabase(async (sql) => {
 		const rows = await sql.ListMailboxes`
  /* @notNull id */
@@ -26,40 +27,10 @@ export async function listMailboxes(user: User) {
  /* @notNull domain_owner */
  SELECT m.id,m.local_part,m.display_name,d.hostname,m.user_id,m.domain_id,d.user_id AS domain_owner,m.use_all_domains,m.signature,m.type,m.avatar_key,m.disabled,m.created_at,m.auto_reply_enabled,m.auto_reply_subject,m.auto_reply_body,u.email AS owner_email,u.name AS owner_name,u.avatar_key AS owner_avatar,
  CASE WHEN m.user_id=${user.id} THEN 'full_access' ELSE (SELECT permission FROM mailbox_access WHERE mailbox_id=m.id AND user_id=${user.id} LIMIT 1) END AS permission
- FROM mailboxes m JOIN domains d ON d.id=m.domain_id JOIN users u ON u.id=m.user_id WHERE m.disabled=0 AND (m.user_id=${user.id} OR (m.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id}))) ORDER BY m.created_at,m.id`;
+ FROM mailboxes m JOIN domains d ON d.id=m.domain_id JOIN users u ON u.id=m.user_id WHERE m.disabled=0 AND (m.user_id=${user.id} OR (m.type='shared' AND EXISTS(SELECT 1 FROM license_settings l WHERE l.id='default' AND l.plan='team' AND l.state='active') AND EXISTS(SELECT 1 FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id} AND (${metadata ? 1 : 0}=1 OR a.permission IN('read_only','send_as','send_on_behalf','full_access'))))) ORDER BY CASE WHEN m.user_id=${user.id} THEN 0 ELSE 1 END,CASE WHEN m.user_id=${user.id} THEN m.rowid ELSE (SELECT a.rowid FROM mailbox_access a WHERE a.mailbox_id=m.id AND a.user_id=${user.id} LIMIT 1) END`;
 		if (!rows.length) return [];
-		const owners = JSON.stringify([
-				...new Set(rows.map((row) => row.domain_owner)),
-			]),
-			ids = JSON.stringify(rows.map((row) => row.id));
-		const [domains, aliases, occupied] = await Promise.all([
-			sql.MailboxSenderDomains`SELECT id,hostname,user_id FROM domains WHERE status='active' AND user_id IN(SELECT value FROM json_each(${owners})) ORDER BY hostname,id`,
-			sql.MailboxSenderAliases`SELECT a.mailbox_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id IN(SELECT value FROM json_each(${ids})) ORDER BY a.created_at,a.id`,
-			sql.MailboxSenderOccupied`/* @notNull local_part */ SELECT b.id AS mailbox_id,b.local_part,b.domain_id FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners})) UNION ALL SELECT a.mailbox_id,a.local_part,a.domain_id FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners}))`,
-		]);
-		const normalize = (value: string) =>
-			(value.split("+")[0] ?? "").replaceAll(".", "").toLowerCase();
-		return rows.map((row) => {
-			const senders = new Set([
-				`${row.local_part}@${row.hostname}`,
-				...aliases
-					.filter((alias) => alias.mailbox_id === row.id)
-					.map((alias) => `${alias.local_part}@${alias.hostname}`),
-			]);
-			if (row.use_all_domains)
-				for (const domain of domains) {
-					if (domain.user_id !== row.domain_owner) continue;
-					if (
-						occupied.some(
-							(address) =>
-								address.domain_id === domain.id &&
-								address.mailbox_id !== row.id &&
-								normalize(address.local_part) === normalize(row.local_part),
-						)
-					)
-						continue;
-					senders.add(`${row.local_part}@${domain.hostname}`);
-				}
+		const addressed = await collectMailboxAddresses(sql, rows);
+		return addressed.map(({ addresses, ...row }) => {
 			const identity = {
 				localPart: row.local_part,
 				hostname: row.hostname,
@@ -71,8 +42,8 @@ export async function listMailboxes(user: User) {
 			return {
 				...mailbox,
 				isPrimary:
-					`${row.local_part}@${row.hostname}`.toLowerCase() ===
-					user.email.toLowerCase(),
+					row.user_id === user.id &&
+					`${row.local_part}@${row.hostname}` === user.email,
 				display_name: resolveMailboxDisplayName(
 					identity,
 					owner_email,
@@ -83,13 +54,24 @@ export async function listMailboxes(user: User) {
 					owner_email,
 					owner_avatar,
 				),
-				permission: z
-					.enum(["full_access", "send_as", "send_on_behalf", "read_only"])
-					.parse(row.permission),
-				senderAddresses: [...senders],
+				permission: z.string().parse(row.permission),
+				senderAddresses: addresses,
 			};
 		});
 	});
+}
+// Collection metadata retains legacy permission strings; readers use only
+// recognized grants, so an invalid stored grant never authorizes mail access.
+export async function listMailboxMetadata(user: User) {
+	return mailboxList(user, true);
+}
+export async function listMailboxes(user: User) {
+	return (await mailboxList(user, false)).map((row) => ({
+		...row,
+		permission: z
+			.enum(["read_only", "send_on_behalf", "send_as", "full_access"])
+			.parse(row.permission),
+	}));
 }
 export async function mailCounts(user: User, mailboxId: string) {
 	await requireMailbox(user, mailboxId);

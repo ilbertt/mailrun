@@ -1,9 +1,17 @@
+import {
+	createMailbox,
+	deleteMailbox,
+	sharingAdmin,
+	sharedMailboxMembers,
+	grantMailbox,
+	revokeMailbox,
+} from "../mail/mailbox-management";
 import { syncPersonalIdentity } from "../mail/contacts";
 import { z } from "zod";
 import { withDatabase, id, seconds, type AppSQL } from "../db";
 import type { User } from "../../shared/contracts";
 import { mailboxAccess, MailboxAccessError } from "../mail/access";
-import { listMailboxes } from "../mail/repository";
+import { listMailboxMetadata } from "../mail/repository";
 import { addAlias, removeAlias } from "../mail/management";
 import { licenseEntitlements } from "../licenses";
 import {
@@ -12,8 +20,6 @@ import {
 	mailboxAccessSchema,
 	createMailboxAliasSchema,
 } from "../../lib/validators";
-import { localPartSchema } from "../../shared/mail-contracts";
-import { currentProfile } from "./settings";
 import { readLimitedBody } from "../mail/inbound";
 import { iso } from "../mail/message-query";
 async function sourceMailboxAliases(mailboxId: string) {
@@ -32,7 +38,7 @@ async function sourceMailboxAliases(mailboxId: string) {
 // The original inbox list repairs accounts lacking any enabled owned personal box.
 // The relay already forwards this domain; address resolution stays local here.
 export async function ensurePersonalMailbox(user: User) {
-	const current = await listMailboxes(user);
+	const current = await listMailboxMetadata(user);
 	if (current.some((box) => box.user_id === user.id && box.type === "personal"))
 		return current;
 	const [localPart, hostname] = user.email.toLowerCase().split("@");
@@ -47,7 +53,7 @@ export async function ensurePersonalMailbox(user: User) {
  AND NOT EXISTS(SELECT 1 FROM mailboxes b WHERE b.domain_id=d.id AND b.local_part=${localPart})
  LIMIT 1 RETURNING id`,
 		);
-		return created.length ? listMailboxes(user) : current;
+		return created.length ? listMailboxMetadata(user) : current;
 	} catch {
 		return current;
 	}
@@ -108,6 +114,7 @@ export async function mailboxesApi(
 	if (!match) {
 		if (method === "GET") {
 			const rows = await ensurePersonalMailbox(user);
+			const entitlements = await licenseEntitlements();
 			return json({
 				mailboxes: rows.map((row) => ({
 					id: row.id,
@@ -126,59 +133,17 @@ export async function mailboxesApi(
 					useAllDomains: !!row.use_all_domains,
 					disabled: !!row.disabled,
 					createdAt: iso(row.created_at),
-					isPrimary:
-						`${row.local_part}@${row.hostname}`.toLowerCase() ===
-						user.email.toLowerCase(),
+					isPrimary: row.isPrimary,
 					senderAddresses: row.senderAddresses,
 				})),
 				canCreateShared:
-					user.role === "admin" &&
-					(await licenseEntitlements()).canShareMailboxes,
+					user.role === "admin" && entitlements.canShareMailboxes,
 			});
 		}
 		if (method === "POST") {
-			const data = mailboxSchema.parse(await read()),
-				localPart = localPartSchema.parse(data.localPart),
-				type = data.type ?? "personal";
-			if (
-				type === "shared" &&
-				(user.role !== "admin" ||
-					!(await licenseEntitlements()).canShareMailboxes)
-			)
-				throw new Response(
-					"A Team license is required to create shared inboxes",
-					{ status: 403 },
-				);
-			const owner = type === "shared" ? user.id : (data.ownerUserId ?? user.id),
-				profile = await currentProfile(user);
-			if (owner !== user.id) {
-				if (user.role !== "admin")
-					throw new Response("Forbidden", { status: 403 });
-				const [child] = await withDatabase(
-					(sql) =>
-						sql.NativeMailboxOwner`SELECT id FROM users WHERE id=${owner} AND created_by_user_id=${user.id} AND disabled=0`,
-				);
-				if (!child) throw new Response("Account not found", { status: 404 });
-			}
-			const [domain] = await withDatabase(
-				(sql) =>
-					sql.NativeMailboxDomain`SELECT d.id,d.hostname FROM domains d JOIN users u ON u.id=${user.id} WHERE d.id=${data.domainId} AND (d.user_id=${user.id} OR (${profile.can_manage_mailboxes}=1 AND d.user_id=u.created_by_user_id))`,
-			);
-			if (!domain) throw new Response("Domain not found", { status: 404 });
-			const mailboxId = id("mbx"),
-				normalized = localPart.split("+")[0]?.replaceAll(".", "") ?? "";
-			const rows = await withDatabase(
-				(sql) =>
-					sql.NativeCreateMailbox`INSERT INTO mailboxes (id,user_id,domain_id,local_part,display_name,type,created_at) SELECT ${mailboxId},${owner},${data.domainId},${localPart},${data.displayName ?? null},${type},${seconds()} WHERE NOT EXISTS(SELECT 1 FROM mailboxes WHERE domain_id=${domain.id} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${normalized}) AND NOT EXISTS(SELECT 1 FROM mailbox_aliases WHERE domain_id=${domain.id} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${normalized}) RETURNING id`,
-			);
-			if (!rows.length)
-				throw new Response("This address is already assigned", { status: 409 });
-			// The setup relay forwards the domain to this server; aliases and cross-domain addresses resolve locally.
-			return json({
-				id: mailboxId,
-				address: `${localPart}@${domain.hostname}`,
-				type,
-			});
+			const parsed = mailboxSchema.safeParse(await read());
+			if (!parsed.success) return json({ error: parsed.error.flatten() }, 400);
+			return json(await createMailbox(user, parsed.data));
 		}
 		return null;
 	}
@@ -241,32 +206,7 @@ export async function mailboxesApi(
 			}
 		}
 		if (method === "DELETE") {
-			const [row] = await withDatabase(
-				(sql) =>
-					sql.NativeDeleteMailboxOwner`SELECT b.user_id,u.created_by_user_id FROM mailboxes b JOIN users u ON u.id=b.user_id WHERE b.id=${mailboxId}`,
-			);
-			if (!row) throw new Response("Mailbox not found", { status: 404 });
-			const profile = await currentProfile(user);
-			if (
-				!(
-					row.user_id === user.id &&
-					(!!profile.can_manage_mailboxes || user.role === "admin")
-				) &&
-				!(user.role === "admin" && row.created_by_user_id === user.id)
-			)
-				throw new Response("Forbidden", { status: 403 });
-			await withDatabase((sql) =>
-				sql.begin(async (tx) => {
-					const [sending] =
-						await tx.NativeMailboxSending`SELECT j.id FROM outbound_jobs j JOIN messages m ON m.id=j.message_id WHERE m.mailbox_id=${mailboxId} AND j.status='sending' LIMIT 1`;
-					if (sending)
-						throw new Response("A message is being sent. Try again shortly.", {
-							status: 409,
-						});
-					await tx.NativeCancelMailboxJobs`UPDATE outbound_jobs SET status='cancelled',updated_at=${seconds()} WHERE message_id IN(SELECT id FROM messages WHERE mailbox_id=${mailboxId}) AND status='queued'`;
-					await tx.NativeDeleteMailbox`DELETE FROM mailboxes WHERE id=${mailboxId}`;
-				}),
-			);
+			await deleteMailbox(user, mailboxId);
 			return json({ ok: true });
 		}
 	}
@@ -316,55 +256,40 @@ export async function mailboxesApi(
 		}
 	}
 	if (action === "access") {
-		if (
-			user.role !== "admin" ||
-			!(await licenseEntitlements()).canShareMailboxes
-		)
-			throw new Response("A Team license is required for mailbox sharing", {
-				status: 403,
-			});
-		const box = await mailboxAccess(user, mailboxId, "manage");
-		if (box.user_id !== user.id || box.type !== "shared")
-			throw new Response("Shared inbox not found", { status: 404 });
 		if (method === "GET") {
-			const [members, availableUsers] = await withDatabase((sql) =>
-				Promise.all([
-					sql.NativeSharedMembers`SELECT a.id,a.user_id,u.email,u.name,a.permission,a.created_at FROM mailbox_access a JOIN users u ON u.id=a.user_id WHERE a.mailbox_id=${mailboxId}`,
-					sql.NativeShareUsers`SELECT id,email,name,role FROM users WHERE created_by_user_id=${user.id} AND disabled=0`,
-				]),
+			const { members, availableUsers } = await sharedMailboxMembers(
+				user,
+				mailboxId,
 			);
 			return json({
-				members: members.map((a) => ({
-					id: a.id,
-					userId: a.user_id,
-					userEmail: a.email,
-					userName: a.name,
-					permission: a.permission,
-					createdAt: iso(a.created_at),
+				members: members.map((row) => ({
+					id: row.id,
+					userId: row.user_id,
+					userEmail: row.email,
+					userName: row.name,
+					permission: row.permission,
+					createdAt: iso(row.created_at),
 				})),
 				availableUsers,
 			});
 		}
+		await sharingAdmin(user);
 		if (method === "POST") {
-			const input = mailboxAccessSchema.parse(await read());
-			const [child] = await withDatabase(
-				(sql) =>
-					sql.NativeShareTarget`SELECT id FROM users WHERE id=${input.userId} AND created_by_user_id=${user.id} AND disabled=0`,
-			);
-			if (!child) throw new Response("Account not found", { status: 404 });
-			await withDatabase(
-				(sql) =>
-					sql.NativeGrantShare`INSERT INTO mailbox_access (id,mailbox_id,user_id,permission,created_by_user_id,created_at) VALUES (${id("mac")},${mailboxId},${input.userId},${input.permission},${user.id},${seconds()}) ON CONFLICT(mailbox_id,user_id) DO UPDATE SET permission=excluded.permission,created_by_user_id=excluded.created_by_user_id`,
+			const parsed = mailboxAccessSchema.safeParse(await read());
+			if (!parsed.success)
+				return json({ error: "Choose a valid account" }, 400);
+			await grantMailbox(
+				user,
+				mailboxId,
+				parsed.data.userId,
+				parsed.data.permission,
 			);
 			return json({ ok: true });
 		}
 		if (method === "DELETE") {
 			const userId = url.searchParams.get("userId");
 			if (!userId) throw new Response("Account is required", { status: 400 });
-			await withDatabase(
-				(sql) =>
-					sql.NativeRevokeShare`DELETE FROM mailbox_access WHERE mailbox_id=${mailboxId} AND user_id=${userId}`,
-			);
+			await revokeMailbox(user, mailboxId, userId);
 			return json({ ok: true });
 		}
 	}

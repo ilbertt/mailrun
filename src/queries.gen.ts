@@ -1183,22 +1183,6 @@ export interface INativeMailboxDetailResult {
     owner_avatar: string | null;
 }
 
-/** Result of query `NativeMailboxOwner`. */
-export interface INativeMailboxOwnerResult {
-    id: IUsersColumns["id"];
-}
-
-/** Result of query `NativeMailboxDomain`. */
-export interface INativeMailboxDomainResult {
-    id: string | null;
-    hostname: IDomainsColumns["hostname"];
-}
-
-/** Result of query `NativeCreateMailbox`. */
-export interface INativeCreateMailboxResult {
-    id: string | null;
-}
-
 /** Result of query `NativeMailboxSettingsFence`. */
 export interface INativeMailboxSettingsFenceResult {
 }
@@ -1217,25 +1201,6 @@ export interface INativeMailboxSettingsOwnerResult {
 export interface INativeUpdateMailboxResult {
 }
 
-/** Result of query `NativeDeleteMailboxOwner`. */
-export interface INativeDeleteMailboxOwnerResult {
-    user_id: IMailboxesColumns["user_id"];
-    created_by_user_id: IUsersColumns["created_by_user_id"];
-}
-
-/** Result of query `NativeMailboxSending`. */
-export interface INativeMailboxSendingResult {
-    id: string | null;
-}
-
-/** Result of query `NativeCancelMailboxJobs`. */
-export interface INativeCancelMailboxJobsResult {
-}
-
-/** Result of query `NativeDeleteMailbox`. */
-export interface INativeDeleteMailboxResult {
-}
-
 /** Result of query `NativeAliasDomains`. */
 export interface INativeAliasDomainsResult {
     id: IDomainsColumns["id"];
@@ -1245,37 +1210,6 @@ export interface INativeAliasDomainsResult {
 /** Result of query `NativeAliasDeleteGuard`. */
 export interface INativeAliasDeleteGuardResult {
     id: IMailboxAliasesColumns["id"];
-}
-
-/** Result of query `NativeSharedMembers`. */
-export interface INativeSharedMembersResult {
-    id: string | null;
-    user_id: IMailboxAccessColumns["user_id"];
-    email: IUsersColumns["email"];
-    name: IUsersColumns["name"];
-    permission: IMailboxAccessColumns["permission"];
-    created_at: number | null;
-}
-
-/** Result of query `NativeShareUsers`. */
-export interface INativeShareUsersResult {
-    id: IUsersColumns["id"];
-    email: IUsersColumns["email"];
-    name: IUsersColumns["name"];
-    role: IUsersColumns["role"];
-}
-
-/** Result of query `NativeShareTarget`. */
-export interface INativeShareTargetResult {
-    id: IUsersColumns["id"];
-}
-
-/** Result of query `NativeGrantShare`. */
-export interface INativeGrantShareResult {
-}
-
-/** Result of query `NativeRevokeShare`. */
-export interface INativeRevokeShareResult {
 }
 
 /** Result of query `NativeDeletePush`. */
@@ -3908,7 +3842,7 @@ export interface INativeExplicitIdentityAliasesResult {
 
 /** Result of query `NativeIdentityClaims`. */
 export interface INativeIdentityClaimsResult {
-    id: IMailboxesColumns["id"];
+    id: string;
     domain_id: IMailboxesColumns["domain_id"];
     local_part: IMailboxesColumns["local_part"];
 }
@@ -3954,6 +3888,125 @@ export interface IInsertInboundResult {
 
 /** Result of query `InsertInboundAttachment`. */
 export interface IInsertInboundAttachmentResult {
+}
+
+/** Result of query `MailboxManagementActor`. */
+export interface IMailboxManagementActorResult {
+    id: IUsersColumns["id"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
+    can_manage_mailboxes: IUsersColumns["can_manage_mailboxes"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+}
+
+/** Result of query `CreateMailboxFence`. */
+export interface ICreateMailboxFenceResult {
+}
+
+/** Result of query `CreateSharedMailboxLicense`. */
+export interface ICreateSharedMailboxLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
+}
+
+/** Result of query `CreateMailboxChild`. */
+export interface ICreateMailboxChildResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `CreateMailboxDomain`. */
+export interface ICreateMailboxDomainResult {
+    id: IDomainsColumns["id"];
+    user_id: IDomainsColumns["user_id"];
+    hostname: IDomainsColumns["hostname"];
+}
+
+/** Result of query `CreateMailboxDuplicate`. */
+export interface ICreateMailboxDuplicateResult {
+    id: IMailboxesColumns["id"];
+}
+
+/** Result of query `CreateMailboxAliasDuplicate`. */
+export interface ICreateMailboxAliasDuplicateResult {
+    id: IMailboxAliasesColumns["id"];
+}
+
+/** Result of query `CreateManagedMailbox`. */
+export interface ICreateManagedMailboxResult {
+}
+
+/** Result of query `DeleteMailboxFence`. */
+export interface IDeleteMailboxFenceResult {
+}
+
+/** Result of query `DeleteManagedMailboxOwner`. */
+export interface IDeleteManagedMailboxOwnerResult {
+    user_id: IMailboxesColumns["user_id"];
+    created_by_user_id: IUsersColumns["created_by_user_id"];
+}
+
+/** Result of query `DeleteManagedMailbox`. */
+export interface IDeleteManagedMailboxResult {
+}
+
+/** Result of query `MailboxSharingActor`. */
+export interface IMailboxSharingActorResult {
+    id: IUsersColumns["id"];
+    role: IUsersColumns["role"];
+}
+
+/** Result of query `MailboxSharingLicense`. */
+export interface IMailboxSharingLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
+}
+
+/** Result of query `MailboxSharingInitialize`. */
+export interface IMailboxSharingInitializeResult {
+}
+
+/** Result of query `MailboxSharingBox`. */
+export interface IMailboxSharingBoxResult {
+    id: IMailboxesColumns["id"];
+}
+
+/** Result of query `NativeSharedMembers`. */
+export interface INativeSharedMembersResult {
+    id: string | null;
+    user_id: IMailboxAccessColumns["user_id"];
+    email: IUsersColumns["email"];
+    name: IUsersColumns["name"];
+    permission: IMailboxAccessColumns["permission"];
+    created_at: number | null;
+}
+
+/** Result of query `NativeShareUsers`. */
+export interface INativeShareUsersResult {
+    id: IUsersColumns["id"];
+    email: IUsersColumns["email"];
+    name: IUsersColumns["name"];
+    role: IUsersColumns["role"];
+}
+
+/** Result of query `GrantMailboxFence`. */
+export interface IGrantMailboxFenceResult {
+}
+
+/** Result of query `NativeShareTarget`. */
+export interface INativeShareTargetResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeGrantShare`. */
+export interface INativeGrantShareResult {
+}
+
+/** Result of query `RevokeMailboxFence`. */
+export interface IRevokeMailboxFenceResult {
+}
+
+/** Result of query `NativeRevokeShare`. */
+export interface INativeRevokeShareResult {
 }
 
 /** Result of query `SettingsDomains`. */
@@ -4007,6 +4060,10 @@ export interface ISettingsFoldersResult {
     name: IFoldersColumns["name"];
     color: IFoldersColumns["color"];
     mailbox_id: IFoldersColumns["mailbox_id"];
+}
+
+/** Result of query `AliasAddressWriteFence`. */
+export interface IAliasAddressWriteFenceResult {
 }
 
 /** Result of query `NativeManagedAliasDomain`. */
@@ -4322,27 +4379,6 @@ export interface IListMailboxesResult {
     owner_name: string | null;
     owner_avatar: string | null;
     permission: unknown | null;
-}
-
-/** Result of query `MailboxSenderDomains`. */
-export interface IMailboxSenderDomainsResult {
-    id: IDomainsColumns["id"];
-    hostname: IDomainsColumns["hostname"];
-    user_id: IDomainsColumns["user_id"];
-}
-
-/** Result of query `MailboxSenderAliases`. */
-export interface IMailboxSenderAliasesResult {
-    mailbox_id: IMailboxAliasesColumns["mailbox_id"];
-    local_part: IMailboxAliasesColumns["local_part"];
-    hostname: IDomainsColumns["hostname"];
-}
-
-/** Result of query `MailboxSenderOccupied`. */
-export interface IMailboxSenderOccupiedResult {
-    mailbox_id: IMailboxAliasesColumns["mailbox_id"];
-    local_part: string;
-    domain_id: string | null;
 }
 
 /** Result of query `MailboxCounts`. */
@@ -5373,24 +5409,12 @@ export interface Queries {
     NativeMailboxAliases: INativeMailboxAliasesResult;
     NativeEnsurePersonalMailbox: INativeEnsurePersonalMailboxResult;
     NativeMailboxDetail: INativeMailboxDetailResult;
-    NativeMailboxOwner: INativeMailboxOwnerResult;
-    NativeMailboxDomain: INativeMailboxDomainResult;
-    NativeCreateMailbox: INativeCreateMailboxResult;
     NativeMailboxSettingsFence: INativeMailboxSettingsFenceResult;
     NativeMailboxSettingsActor: INativeMailboxSettingsActorResult;
     NativeMailboxSettingsOwner: INativeMailboxSettingsOwnerResult;
     NativeUpdateMailbox: INativeUpdateMailboxResult;
-    NativeDeleteMailboxOwner: INativeDeleteMailboxOwnerResult;
-    NativeMailboxSending: INativeMailboxSendingResult;
-    NativeCancelMailboxJobs: INativeCancelMailboxJobsResult;
-    NativeDeleteMailbox: INativeDeleteMailboxResult;
     NativeAliasDomains: INativeAliasDomainsResult;
     NativeAliasDeleteGuard: INativeAliasDeleteGuardResult;
-    NativeSharedMembers: INativeSharedMembersResult;
-    NativeShareUsers: INativeShareUsersResult;
-    NativeShareTarget: INativeShareTargetResult;
-    NativeGrantShare: INativeGrantShareResult;
-    NativeRevokeShare: INativeRevokeShareResult;
     NativeDeletePush: INativeDeletePushResult;
     NativePushSession: INativePushSessionResult;
     NativeSavePush: INativeSavePushResult;
@@ -5778,11 +5802,34 @@ export interface Queries {
     NativeInboundThread: INativeInboundThreadResult;
     InsertInbound: IInsertInboundResult;
     InsertInboundAttachment: IInsertInboundAttachmentResult;
+    MailboxManagementActor: IMailboxManagementActorResult;
+    CreateMailboxFence: ICreateMailboxFenceResult;
+    CreateSharedMailboxLicense: ICreateSharedMailboxLicenseResult;
+    CreateMailboxChild: ICreateMailboxChildResult;
+    CreateMailboxDomain: ICreateMailboxDomainResult;
+    CreateMailboxDuplicate: ICreateMailboxDuplicateResult;
+    CreateMailboxAliasDuplicate: ICreateMailboxAliasDuplicateResult;
+    CreateManagedMailbox: ICreateManagedMailboxResult;
+    DeleteMailboxFence: IDeleteMailboxFenceResult;
+    DeleteManagedMailboxOwner: IDeleteManagedMailboxOwnerResult;
+    DeleteManagedMailbox: IDeleteManagedMailboxResult;
+    MailboxSharingActor: IMailboxSharingActorResult;
+    MailboxSharingLicense: IMailboxSharingLicenseResult;
+    MailboxSharingInitialize: IMailboxSharingInitializeResult;
+    MailboxSharingBox: IMailboxSharingBoxResult;
+    NativeSharedMembers: INativeSharedMembersResult;
+    NativeShareUsers: INativeShareUsersResult;
+    GrantMailboxFence: IGrantMailboxFenceResult;
+    NativeShareTarget: INativeShareTargetResult;
+    NativeGrantShare: INativeGrantShareResult;
+    RevokeMailboxFence: IRevokeMailboxFenceResult;
+    NativeRevokeShare: INativeRevokeShareResult;
     SettingsDomains: ISettingsDomainsResult;
     SettingsAliases: ISettingsAliasesResult;
     SettingsRules: ISettingsRulesResult;
     SettingsForwarding: ISettingsForwardingResult;
     SettingsFolders: ISettingsFoldersResult;
+    AliasAddressWriteFence: IAliasAddressWriteFenceResult;
     NativeManagedAliasDomain: INativeManagedAliasDomainResult;
     SourceAliasMailboxCollision: ISourceAliasMailboxCollisionResult;
     CreateAlias: ICreateAliasResult;
@@ -5825,9 +5872,6 @@ export interface Queries {
     NativeOutboundProvider: INativeOutboundProviderResult;
     SourceReadMailboxes: ISourceReadMailboxesResult;
     ListMailboxes: IListMailboxesResult;
-    MailboxSenderDomains: IMailboxSenderDomainsResult;
-    MailboxSenderAliases: IMailboxSenderAliasesResult;
-    MailboxSenderOccupied: IMailboxSenderOccupiedResult;
     MailboxCounts: IMailboxCountsResult;
     InboxMessages: IInboxMessagesResult;
     ListMessages: IListMessagesResult;

@@ -25,6 +25,7 @@ jobs:
       - run: bun scripts/smoke-send.ts dist/mailrun
       - run: bun scripts/smoke-contacts-templates.ts dist/mailrun
       - run: bun scripts/smoke-preferences.ts dist/mailrun
+      - run: bun scripts/smoke-mailbox-management.ts dist/mailrun
       - run: bun scripts/smoke-auto-reply.ts dist/mailrun
       - run: bun scripts/smoke-rules.ts dist/mailrun
       - run: MAILRUN_RULE_CONTAINER=1 bun scripts/smoke-rules.ts dist/mailrun

@@ -43,6 +43,7 @@ export async function addAlias(user: User, input: z.infer<typeof aliasSchema>) {
 	const data = aliasSchema.parse(input);
 	return withDatabase((sql) =>
 		sql.begin(async (sql) => {
+			await sql.AliasAddressWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
 			const mailbox = await mailboxAccess(user, data.mailboxId, "manage", sql);
 			const [domain] =
 				await sql.NativeManagedAliasDomain`SELECT id,hostname,user_id FROM domains WHERE id=${data.domainId} AND user_id=${mailbox.domain_owner} AND status='active'`;

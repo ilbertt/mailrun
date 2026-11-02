@@ -11,20 +11,24 @@ type AddressMailbox = {
 };
 // Address claims use the same normalized ownership rules for identity sync and
 // sender authorization, including disabled mailbox/alias reservations.
-async function collectAddresses<Box extends AddressMailbox>(
+export async function collectMailboxAddresses<Box extends AddressMailbox>(
 	sql: AppSQL,
 	boxes: Box[],
 ) {
 	if (!boxes.length) return [];
 	const wide = boxes.some((box) => !!box.use_all_domains);
+	const owners = JSON.stringify([
+		...new Set(boxes.map((box) => box.domain_owner)),
+	]);
+	const ids = JSON.stringify(boxes.map((box) => box.id));
 	const domains = wide
-		? await sql.NativeIdentityDomains`SELECT id,user_id,hostname,status FROM domains`
+		? await sql.NativeIdentityDomains`SELECT id,user_id,hostname,status FROM domains WHERE user_id IN(SELECT value FROM json_each(${owners})) ORDER BY rowid`
 		: [];
 	const aliases = wide
-		? await sql.NativeIdentityAliases`SELECT a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id`
-		: await sql.NativeExplicitIdentityAliases`SELECT a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id IN(SELECT value FROM json_each(${JSON.stringify(boxes.map((box) => box.id))}))`;
+		? await sql.NativeIdentityAliases`SELECT a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners})) OR a.mailbox_id IN(SELECT value FROM json_each(${ids})) ORDER BY a.rowid`
+		: await sql.NativeExplicitIdentityAliases`SELECT a.mailbox_id,a.domain_id,a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id IN(SELECT value FROM json_each(${ids})) ORDER BY a.rowid`;
 	const claims = wide
-		? await sql.NativeIdentityClaims`SELECT id,domain_id,local_part FROM mailboxes`
+		? await sql.NativeIdentityClaims`/* @notNull id */ SELECT b.id,b.domain_id,b.local_part FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE d.user_id IN(SELECT value FROM json_each(${owners}))`
 		: [];
 	return boxes.map((box) => {
 		const local = normalizeLocalPart(box.local_part);
@@ -70,8 +74,8 @@ async function collectAddresses<Box extends AddressMailbox>(
 export async function personalMailboxAddresses(sql: AppSQL, userId: string) {
 	const boxes =
 		await sql.NativeIdentityMailboxes`/* @notNull id */ /* @notNull domain_owner */ SELECT b.id,b.domain_id,b.local_part,b.use_all_domains,b.display_name,b.avatar_key,d.hostname,d.user_id AS domain_owner FROM mailboxes b JOIN domains d ON d.id=b.domain_id WHERE b.user_id=${userId} AND b.type='personal'`;
-	return collectAddresses(sql, boxes);
+	return collectMailboxAddresses(sql, boxes);
 }
 export async function mailboxDomainAddresses(sql: AppSQL, box: AddressMailbox) {
-	return (await collectAddresses(sql, [box]))[0]?.addresses ?? [];
+	return (await collectMailboxAddresses(sql, [box]))[0]?.addresses ?? [];
 }
