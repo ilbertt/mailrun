@@ -1,3 +1,4 @@
+import { normalizeTrashRetentionDays } from "../../lib/email/trash-retention-utils";
 import { syncPersonalIdentity } from "../mail/contacts";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -10,7 +11,11 @@ import {
 	updateTrashRetentionSettingsSchema,
 } from "../../lib/validators";
 import { licenseEntitlements } from "../licenses";
-import { isValidTimeZone, normalizeTimeZone } from "../../lib/time/utils";
+import {
+	isValidTimeZone,
+	normalizeTimeZone,
+	getRequestTimeZone,
+} from "../../lib/time/utils";
 import { hash, rateLimit } from "../auth/service";
 import { readLimitedBody } from "../mail/inbound";
 import { mfaApi } from "./settings-mfa";
@@ -33,12 +38,27 @@ export async function settingsApi(
 	if (!path.startsWith("/api/settings/")) return null;
 	const mfa = await mfaApi(request, user);
 	if (mfa) return mfa;
-	const json = (value: unknown) =>
-		Response.json(value, { headers: { "Cache-Control": "no-store" } });
+	const json = (value: unknown, status = 200) =>
+		Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
 	const read = async () =>
 		JSON.parse(
 			new TextDecoder().decode(await readLimitedBody(request, 16 * 1024)),
 		);
+	// These source handlers return flattened validation errors inside `error`.
+	const readSetting = async <Schema extends z.ZodType>(
+		schema: Schema,
+		errorMessage?: string,
+	): Promise<z.output<Schema> | Response> => {
+		try {
+			return schema.parse(await read());
+		} catch (error) {
+			if (error instanceof z.ZodError)
+				return json({ error: errorMessage ?? error.flatten() }, 400);
+			if (error instanceof SyntaxError)
+				return json({ error: errorMessage ?? "Invalid request" }, 400);
+			throw error;
+		}
+	};
 	const row = await currentProfile(user);
 	const preference =
 		path === "/api/settings/spam"
@@ -58,9 +78,9 @@ export async function settingsApi(
 						: row.keyboard_shortcuts_enabled),
 			});
 		if (method === "PATCH") {
-			const { enabled } = z
-				.object({ enabled: z.boolean() })
-				.parse(await read());
+			const parsed = await readSetting(z.object({ enabled: z.boolean() }));
+			if (parsed instanceof Response) return parsed;
+			const { enabled } = parsed;
 			if (preference === "spam")
 				await withDatabase(
 					(sql) =>
@@ -80,9 +100,14 @@ export async function settingsApi(
 		}
 	}
 	if (path === "/api/settings/trash-retention") {
-		if (method === "GET") return json({ days: row.trash_retention_days });
+		if (method === "GET")
+			return json({
+				days: normalizeTrashRetentionDays(row.trash_retention_days),
+			});
 		if (method === "PATCH") {
-			const { days } = updateTrashRetentionSettingsSchema.parse(await read());
+			const parsed = await readSetting(updateTrashRetentionSettingsSchema);
+			if (parsed instanceof Response) return parsed;
+			const { days } = parsed;
 			await withDatabase(
 				(sql) =>
 					sql.NativeSetRetention`UPDATE users SET trash_retention_days=${days} WHERE id=${user.id}`,
@@ -91,8 +116,8 @@ export async function settingsApi(
 		}
 	}
 	if (path === "/api/settings/time-zone" && method === "PATCH") {
-		const { timeZone } = z
-			.object({
+		const parsed = await readSetting(
+			z.object({
 				timeZone: z
 					.string()
 					.trim()
@@ -100,59 +125,95 @@ export async function settingsApi(
 					.max(80)
 					.refine(isValidTimeZone, "Choose a valid IANA timezone")
 					.nullable(),
-			})
-			.parse(await read());
-		const value = timeZone ? normalizeTimeZone(timeZone) : null;
-		await withDatabase(
-			(sql) =>
-				sql.NativeSetTimeZone`UPDATE users SET time_zone=${value} WHERE id=${user.id}`,
+			}),
+			"Choose a valid timezone",
+		);
+		if (parsed instanceof Response) return parsed;
+		const value = parsed.timeZone ? normalizeTimeZone(parsed.timeZone) : null;
+		await withDatabase((sql) =>
+			sql.begin(async (tx) => {
+				await tx.NativeTimeZoneWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+				const [current] =
+					await tx.NativeTimeZoneCurrent`SELECT time_zone FROM users WHERE id=${user.id} AND disabled=0`;
+				if (!current) throw new Response("Unauthorized", { status: 401 });
+				const previous = getRequestTimeZone(request, current.time_zone);
+				await tx.NativeFreezeLegacyCalendarZones`UPDATE calendar_events SET time_zone=${previous} WHERE user_id=${user.id} AND time_zone IS NULL AND repeat<>'none'`;
+				await tx.NativeSetTimeZone`UPDATE users SET time_zone=${value} WHERE id=${user.id}`;
+			}),
 		);
 		return json({ timeZone: value });
 	}
 	if (path === "/api/settings/forwarding" && method === "PATCH") {
-		const { forwardingEmail } = updateForwardingEmailSchema.parse(await read());
-		if (!(await licenseEntitlements()).canForwardEmail)
-			throw new Response(
-				"A Pro or Team license is required for email forwarding",
-				{ status: 403 },
-			);
-		await withDatabase(
-			(sql) =>
-				sql.NativeProfileForwarding`UPDATE users SET forwarding_email=${forwardingEmail} WHERE id=${user.id}`,
+		const parsed = await readSetting(updateForwardingEmailSchema);
+		if (parsed instanceof Response) return parsed;
+		const { forwardingEmail } = parsed;
+		await licenseEntitlements();
+		await withDatabase((sql) =>
+			sql.begin(async (tx) => {
+				await tx.NativeForwardingWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+				const [actor] =
+					await tx.NativeForwardingActor`SELECT id FROM users WHERE id=${user.id} AND disabled=0`;
+				if (!actor) throw new Response("Unauthorized", { status: 401 });
+				const [license] =
+					await tx.NativeForwardingLicense`SELECT plan,state FROM license_settings WHERE id='default'`;
+				if (
+					license?.state !== "active" ||
+					!["pro", "team"].includes(license.plan)
+				)
+					throw new Response(
+						"A Pro or Team license is required for email forwarding",
+						{ status: 403 },
+					);
+				await tx.NativeProfileForwarding`UPDATE users SET forwarding_email=${forwardingEmail} WHERE id=${user.id}`;
+			}),
 		);
 		return json({ forwardingEmail });
 	}
 	if (path === "/api/settings/profile" && method === "PATCH") {
-		const input = updateProfileSchema.parse(await read()),
-			canForwardEmail = (await licenseEntitlements()).canForwardEmail;
-		if (
-			!canForwardEmail &&
-			input.forwardingEmail &&
-			input.forwardingEmail !== row.forwarding_email
-		)
-			throw new Response(
-				"A Pro or Team license is required for email forwarding",
-				{ status: 403 },
-			);
-		const forwardingEmail =
-			input.forwardingEmail === undefined
-				? row.forwarding_email
-				: input.forwardingEmail;
-		await withDatabase((sql) =>
+		const input = await readSetting(updateProfileSchema);
+		if (input instanceof Response) return input;
+		await licenseEntitlements();
+		const profile = await withDatabase((sql) =>
 			sql.begin(async (tx) => {
-				await tx.NativeSetProfile`UPDATE users SET name=${input.name},reset_email=${input.resetEmail},forwarding_email=${forwardingEmail} WHERE id=${user.id}`;
-				await tx.NativeSyncPrimaryMailbox`UPDATE mailboxes SET display_name=${input.name},avatar_key=${row.avatar_key} WHERE user_id=${user.id} AND type='personal' AND EXISTS(SELECT 1 FROM domains d WHERE d.id=mailboxes.domain_id AND lower(mailboxes.local_part||'@'||d.hostname)=lower(${row.email}))`;
+				await tx.NativeProfileWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+				const [current] =
+					await tx.NativeProfileCurrent`SELECT email,avatar_key,forwarding_email FROM users WHERE id=${user.id} AND disabled=0`;
+				if (!current) throw new Response("Unauthorized", { status: 401 });
+				const [license] =
+					await tx.NativeProfileLicense`SELECT plan,state FROM license_settings WHERE id='default'`;
+				const entitled =
+					license?.state === "active" &&
+					(license.plan === "pro" || license.plan === "team");
+				if (
+					!entitled &&
+					input.forwardingEmail &&
+					input.forwardingEmail !== current.forwarding_email
+				)
+					throw new Response(
+						"A Pro or Team license is required for email forwarding",
+						{ status: 403 },
+					);
+				const forwardingEmail =
+					input.forwardingEmail === undefined
+						? current.forwarding_email
+						: input.forwardingEmail;
+				await syncPersonalIdentity(user.id, input.name, current.avatar_key, tx);
+				await tx.NativeSetProfile`UPDATE users SET reset_email=${input.resetEmail},forwarding_email=${forwardingEmail} WHERE id=${user.id}`;
+				return {
+					email: current.email,
+					forwardingEmail,
+					canForwardEmail: entitled,
+				};
 			}),
 		);
-		await syncPersonalIdentity(user.id, input.name, row.avatar_key);
 		return json({
 			user: {
 				id: user.id,
-				email: row.email,
+				email: profile.email,
 				name: input.name,
 				resetEmail: input.resetEmail,
-				forwardingEmail,
-				canForwardEmail,
+				forwardingEmail: profile.forwardingEmail,
+				canForwardEmail: profile.canForwardEmail,
 			},
 		});
 	}

@@ -242,7 +242,7 @@ test("mailbox and rule forms persist the source contracts and cannot cross owner
 	});
 	await expect(
 		dispatchMailApi(request(`/api/mailboxes/${created.id}`), stranger),
-	).rejects.toThrow("permission");
+	).rejects.toMatchObject({ status: 404 });
 	const rule = await (
 		await dispatchMailApi(
 			request("/api/routing-rules", {

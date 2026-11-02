@@ -1,5 +1,6 @@
+import { syncPersonalIdentity } from "../mail/contacts";
 import { z } from "zod";
-import { withDatabase, id, seconds } from "../db";
+import { withDatabase, id, seconds, type AppSQL } from "../db";
 import type { User } from "../../shared/contracts";
 import { mailboxAccess, MailboxAccessError } from "../mail/access";
 import { listMailboxes } from "../mail/repository";
@@ -51,9 +52,15 @@ export async function ensurePersonalMailbox(user: User) {
 		return current;
 	}
 }
-export async function mailboxDetail(user: User, mailboxId: string) {
-	const access = await mailboxAccess(user, mailboxId);
-	const [row] = await withDatabase(
+export async function mailboxDetail(
+	user: User,
+	mailboxId: string,
+	context?: AppSQL,
+) {
+	const read = <T>(run: (sql: AppSQL) => Promise<T>) =>
+		context ? run(context) : withDatabase(run);
+	const access = await mailboxAccess(user, mailboxId, "read", context);
+	const [row] = await read(
 		(sql) =>
 			sql.NativeMailboxDetail`SELECT b.*,d.hostname,u.name AS owner_name,u.email AS owner_email,u.avatar_key AS owner_avatar FROM mailboxes b JOIN domains d ON d.id=b.domain_id JOIN users u ON u.id=b.user_id WHERE b.id=${mailboxId}`,
 	);
@@ -178,29 +185,60 @@ export async function mailboxesApi(
 	const mailboxId = decodeURIComponent(match[1] ?? ""),
 		action = match[2];
 	if (!action) {
-		if (method === "GET")
-			return json({ mailbox: await mailboxDetail(user, mailboxId) });
+		if (method === "GET") {
+			try {
+				return json({ mailbox: await mailboxDetail(user, mailboxId) });
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					throw new Response("Mailbox not found", { status: 404 });
+				throw error;
+			}
+		}
 		if (method === "PATCH") {
-			const access = await mailboxAccess(user, mailboxId, "manage"),
-				input = updateMailboxSchema.parse(await read());
-			await withDatabase((sql) =>
-				sql.begin(async (tx) => {
-					const primary =
-						access.type === "personal" &&
-						`${access.local_part}@${access.hostname}`.toLowerCase() ===
-							access.owner_email?.toLowerCase();
-					if (primary && input.displayName !== undefined) {
-						const name = input.displayName?.trim();
-						if (!name)
-							throw new Response("A valid account name is required", {
-								status: 400,
-							});
-						await tx.NativeRenameMailboxOwner`UPDATE users SET name=${name} WHERE id=${access.user_id}`;
-					}
-					await tx.NativeUpdateMailbox`UPDATE mailboxes SET display_name=CASE WHEN ${input.displayName !== undefined ? 1 : 0}=1 THEN ${input.displayName ?? null} ELSE display_name END,signature=CASE WHEN ${input.signature !== undefined ? 1 : 0}=1 THEN ${input.signature ?? null} ELSE signature END,use_all_domains=COALESCE(${input.useAllDomains === undefined ? null : input.useAllDomains ? 1 : 0},use_all_domains),auto_reply_enabled=COALESCE(${input.autoReplyEnabled === undefined ? null : input.autoReplyEnabled ? 1 : 0},auto_reply_enabled),auto_reply_subject=COALESCE(${input.autoReplySubject ?? null},auto_reply_subject),auto_reply_body=COALESCE(${input.autoReplyBody ?? null},auto_reply_body) WHERE id=${mailboxId}`;
-				}),
-			);
-			return json({ mailbox: await mailboxDetail(user, mailboxId) });
+			const parsed = updateMailboxSchema.safeParse(await read());
+			if (!parsed.success) return json({ error: parsed.error.flatten() }, 400);
+			const input = parsed.data;
+			try {
+				const mailbox = await withDatabase((sql) =>
+					sql.begin(async (tx) => {
+						await tx.NativeMailboxSettingsFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+						const access = await mailboxAccess(user, mailboxId, "manage", tx);
+						const [account] =
+							await tx.NativeMailboxSettingsActor`SELECT email FROM users WHERE id=${user.id} AND disabled=0`;
+						if (!account) throw new Response("Unauthorized", { status: 401 });
+						const primary =
+							access.type === "personal" &&
+							`${access.local_part}@${access.hostname}`.trim().toLowerCase() ===
+								account.email.trim().toLowerCase();
+						if (primary && "displayName" in input) {
+							const name = input.displayName?.trim();
+							if (!name)
+								throw new Response("A valid account name is required", {
+									status: 400,
+								});
+							const [owner] =
+								await tx.NativeMailboxSettingsOwner`SELECT avatar_key FROM users WHERE id=${access.user_id}`;
+							await syncPersonalIdentity(
+								access.user_id,
+								name,
+								owner?.avatar_key ?? null,
+								tx,
+							);
+						}
+						const displayName = input.displayName?.trim() || null,
+							signature = input.signature?.trim() || null,
+							subject = input.autoReplySubject?.trim() || "Out of office",
+							body = input.autoReplyBody?.trim() || "";
+						await tx.NativeUpdateMailbox`UPDATE mailboxes SET display_name=CASE WHEN ${!primary && "displayName" in input ? 1 : 0}=1 THEN ${displayName} ELSE display_name END,signature=CASE WHEN ${"signature" in input ? 1 : 0}=1 THEN ${signature} ELSE signature END,use_all_domains=COALESCE(${input.useAllDomains === undefined ? null : input.useAllDomains ? 1 : 0},use_all_domains),auto_reply_enabled=COALESCE(${input.autoReplyEnabled === undefined ? null : input.autoReplyEnabled ? 1 : 0},auto_reply_enabled),auto_reply_subject=CASE WHEN ${"autoReplySubject" in input ? 1 : 0}=1 THEN ${subject} ELSE auto_reply_subject END,auto_reply_body=CASE WHEN ${"autoReplyBody" in input ? 1 : 0}=1 THEN ${body} ELSE auto_reply_body END WHERE id=${mailboxId}`;
+						return mailboxDetail(user, mailboxId, tx);
+					}),
+				);
+				return json({ mailbox });
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					throw new Response("Mailbox not found", { status: 404 });
+				throw error;
+			}
 		}
 		if (method === "DELETE") {
 			const [row] = await withDatabase(

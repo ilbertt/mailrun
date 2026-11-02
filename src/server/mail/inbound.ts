@@ -363,19 +363,20 @@ export async function storeInbound(
 				subject: message.subject,
 			});
 		if (status === "received") {
-			const jobId = await queueAutoReply({
-				mailboxId: mailbox.id,
-				userId: mailbox.user_id,
-				deliveredAddress: to,
-				fromAddress: fromAddr,
-				incomingMessageId: message.messageId,
-				threadId,
-				headers,
-			});
-			if (jobId)
-				await deliverJob(jobId).catch((error) =>
-					console.error("Auto-reply delivery failed", error),
-				);
+			try {
+				const jobId = await queueAutoReply({
+					mailboxId: mailbox.id,
+					userId: mailbox.user_id,
+					deliveredAddress: to,
+					fromAddress: fromAddr,
+					incomingMessageId: message.messageId,
+					threadId,
+					headers,
+				});
+				if (jobId) await deliverJob(jobId);
+			} catch (error) {
+				console.error("Auto-reply delivery failed", error);
+			}
 		}
 	}
 	return options.legacy && forwardTo

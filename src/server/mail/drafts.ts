@@ -7,7 +7,7 @@ import { draftSchema } from "../../shared/mail-contracts";
 import type { User } from "../../shared/contracts";
 import { deleteUnreferencedObjects, LocalStorage } from "../storage";
 import { getThread } from "./repository";
-import { normalizeLocalPart } from "./routing";
+import { mailboxDomainAddresses } from "./identity-addresses";
 import { getEmailAddress } from "../../lib/email/address";
 import { buildSnippet } from "../../lib/email/parse";
 
@@ -42,34 +42,9 @@ export async function senderAddress(
 	const mailbox = await mailboxAccess(user, mailboxId, "send", context);
 	const primary = `${mailbox.local_part}@${mailbox.hostname}`;
 	const address = getEmailAddress(requested ?? primary).toLowerCase();
-	if (address === primary.toLowerCase()) return primary;
-	const aliases = await read(
-		(sql) =>
-			sql.SenderAliases`SELECT a.local_part,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id=${mailboxId}`,
-	);
-	if (
-		aliases.some((alias) => `${alias.local_part}@${alias.hostname}` === address)
-	)
-		return address;
-	if (mailbox.use_all_domains) {
-		const [domain] = await read(
-			(sql) =>
-				sql.SenderDomainAlias`SELECT id FROM domains WHERE hostname=${address.split("@")[1] ?? ""} AND user_id=${mailbox.domain_owner} AND status='active'`,
-		);
-		if (
-			domain &&
-			normalizeLocalPart(address.split("@")[0] ?? "") ===
-				normalizeLocalPart(mailbox.local_part)
-		) {
-			const local = normalizeLocalPart(mailbox.local_part);
-			const occupied = await read(
-				(sql) => sql.SenderAddressOccupied`
-				SELECT id FROM mailboxes WHERE domain_id=${domain.id} AND id!=${mailboxId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${local}
-				UNION ALL SELECT id FROM mailbox_aliases WHERE domain_id=${domain.id} AND mailbox_id!=${mailboxId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${local} LIMIT 1`,
-			);
-			if (!occupied.length) return address;
-		}
-	}
+	if (address === primary.toLowerCase()) return address;
+	const addresses = await read((sql) => mailboxDomainAddresses(sql, mailbox));
+	if (addresses.includes(address)) return address;
 	throw new Error("Sender address is not assigned to this mailbox");
 }
 export async function formattedSender(

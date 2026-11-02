@@ -1,0 +1,3208 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/lib/email/auto-reply.ts": "140b03cd9bcb0fedb6280e75cd347599e8c6c44a1fdaae5b995f370348029679",
+    "src/lib/email/inbound.ts": "439e062630492afddfdc1e5a1ffe51e34e45b23bf41c40eb3589b7438c5cc501",
+    "src/lib/email/send.ts": "380f25f360f45480c681668c66aab057bd3b84c7cb00831a3e3c5863d7c59ff3",
+    "src/lib/email/sender.ts": "a3fcc66a9d50a03ab31726c9dfad5de4ac126fa79e2d33c4b66c511873cfd755",
+    "src/lib/email/routing.ts": "a5e51c90be687a5a18de7df4a71381188164361b281194c3f509616fde3b18f7",
+    "src/lib/email/outbound-provider.ts": "addd4846bb65ecaa5c231097945aa00fa2c8426f3ac23a5ea6092ec73a21c392",
+    "src/lib/contacts/service.ts": "c7451c045b6851669b52b8b69d11a52d8f5feb37e04e19334c83048e26cb7dec",
+    "src/lib/email/threading.ts": "a13ad17abc92499e5f8c6dc24207d269701497c1dd903008461c92fa71bb07a1",
+    "server/runtime/sqlite-database.ts": "81802be9ce61e63f215874c7b9e42d18bb17bdf4c520d14f30a6d4f02c275046",
+    "server/runtime/file-bucket.ts": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2"
+  },
+  "cases": [
+    {
+      "name": "ordinary",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-message-id",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "inner-address-space",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delivered-address-space",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "bare-message-id",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "incoming@example.net",
+                  "References": "incoming@example.net"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "incoming@example.net",
+                "References": "incoming@example.net"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delivered-cross-domain",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@second.example>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@second.example>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@second.example>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delivered-cross-domain-dot",
+      "snapshot": {
+        "snapshot": {
+          "status": 500,
+          "body": {
+            "error": "Sender address does not match the selected mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "delivered-cross-domain-plus",
+      "snapshot": {
+        "snapshot": {
+          "status": 500,
+          "body": {
+            "error": "Sender address does not match the selected mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "delivered-own-alias",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <named@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <named@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <named@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "sender-sender@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "sender@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "sender@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:sender@example.net",
+              "user_id": "owner",
+              "email": "sender@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "sender@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "sender@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "sender@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "sender-Maya <MAYA@example.net>",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "sender-not an address",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-hello@example.com",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-h.e.l.l.o+tag@example.com",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-mailer-daemon@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-postmaster@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-noreply@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-no-reply@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-do-not-reply@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "sender-noreply+tag@example.net",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "noreply+tag@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "noreply+tag@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:noreply+tag@example.net",
+              "user_id": "owner",
+              "email": "noreply+tag@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "noreply+tag@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "noreply+tag@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "noreply+tag@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "header-submitted",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-submitted-caps",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-submitted-no",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "header-bulk",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-bulk-caps",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-junk",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-list",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-personal",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "header-list-id",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-list-id-caps",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-empty-list",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "header-autoreply",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-autorespond",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "header-suppress",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "disabled-reply",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "empty-body",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "blank-subject",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Out of office",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Out of office",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Out of office"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Out of office",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "trim-body",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Line 1 Line 2",
+              "text_body": "Line 1\n\n Line 2",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Line 1\n\n Line 2",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Line 1\n\n Line 2",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "recent",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "existing-delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$recent"
+          }
+        ]
+      }
+    },
+    {
+      "name": "old",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "existing-delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "manual-contact",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "manual",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "personal",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Account identity\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Account identity\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Away"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Account identity\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": [
+          {
+            "id": "$delivery",
+            "mailbox_id": "mailbox",
+            "recipient": "maya@example.net",
+            "sent_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "own-alias",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "own-domain-alias",
+      "snapshot": {
+        "snapshot": {
+          "status": 200,
+          "body": {
+            "ok": true
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    },
+    {
+      "name": "provider-failure",
+      "snapshot": {
+        "snapshot": {
+          "status": 500,
+          "body": {
+            "error": "Synthetic provider failure"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": null,
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Away",
+              "snippet": "Back tomorrow",
+              "text_body": "Back tomorrow",
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "failed",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": null,
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "failed",
+              "payload": {
+                "userId": "owner",
+                "mailboxId": "mailbox",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Away",
+                "text": "Back tomorrow",
+                "headers": {
+                  "Auto-Submitted": "auto-replied",
+                  "X-Auto-Response-Suppress": "All",
+                  "In-Reply-To": "<incoming@example.net>",
+                  "References": "<incoming@example.net>"
+                },
+                "cc": [],
+                "bcc": [],
+                "attachments": []
+              },
+              "error": "Synthetic provider failure",
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Away",
+              "headers": {
+                "Auto-Submitted": "auto-replied",
+                "X-Auto-Response-Suppress": "All",
+                "In-Reply-To": "<incoming@example.net>",
+                "References": "<incoming@example.net>"
+              },
+              "text": "Back tomorrow",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "records": []
+      }
+    }
+  ]
+}

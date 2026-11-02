@@ -16,22 +16,24 @@ export async function upsertContact(
 	address: string,
 	source: "inbound" | "outbound" | "manual",
 	mailboxId?: string,
+	context?: AppSQL,
 ) {
 	const email = normalizeEmailAddress(address);
 	if (!email) return null;
 	const displayName = getContactNameFromAddress(address);
-	const row = await withDatabase((sql) =>
-		sql.begin(async (sql) => {
-			await sql.NativeContactWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
-			const [existing] =
-				await sql.NativePriorContact`SELECT id FROM contacts WHERE user_id=${userId} AND email=${email}`;
-			const [row] =
-				await sql.NativeUpsertContact`INSERT INTO contacts (id,user_id,email,display_name,source,last_seen_at,created_at) VALUES (${getContactId(userId, email)},${userId},${email},${displayName},${source},${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=CASE WHEN contacts.source='manual' THEN contacts.display_name ELSE COALESCE(excluded.display_name,contacts.display_name) END,source=CASE WHEN contacts.source='manual' OR (contacts.source='outbound' AND excluded.source='inbound') THEN contacts.source ELSE excluded.source END,last_seen_at=excluded.last_seen_at RETURNING id,email,display_name,source,avatar_key,blocked,last_seen_at`;
-			if (row)
-				await enqueueContactAvatar(sql, row.id, userId, mailboxId, !existing);
-			return row;
-		}),
-	);
+	const run = async (sql: AppSQL) => {
+		await sql.NativeContactWriteFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+		const [existing] =
+			await sql.NativePriorContact`SELECT id FROM contacts WHERE user_id=${userId} AND email=${email}`;
+		const [row] =
+			await sql.NativeUpsertContact`INSERT INTO contacts (id,user_id,email,display_name,source,last_seen_at,created_at) VALUES (${getContactId(userId, email)},${userId},${email},${displayName},${source},${seconds()},${seconds()}) ON CONFLICT(user_id,email) DO UPDATE SET display_name=CASE WHEN contacts.source='manual' THEN contacts.display_name ELSE COALESCE(excluded.display_name,contacts.display_name) END,source=CASE WHEN contacts.source='manual' OR (contacts.source='outbound' AND excluded.source='inbound') THEN contacts.source ELSE excluded.source END,last_seen_at=excluded.last_seen_at RETURNING id,email,display_name,source,avatar_key,blocked,last_seen_at`;
+		if (row)
+			await enqueueContactAvatar(sql, row.id, userId, mailboxId, !existing);
+		return row;
+	};
+	const row = context
+		? await run(context)
+		: await withDatabase((sql) => sql.begin(run));
 	if (row) wakeAvatarDispatcher();
 	return row ?? null;
 }

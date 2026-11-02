@@ -1199,8 +1199,18 @@ export interface INativeCreateMailboxResult {
     id: string | null;
 }
 
-/** Result of query `NativeRenameMailboxOwner`. */
-export interface INativeRenameMailboxOwnerResult {
+/** Result of query `NativeMailboxSettingsFence`. */
+export interface INativeMailboxSettingsFenceResult {
+}
+
+/** Result of query `NativeMailboxSettingsActor`. */
+export interface INativeMailboxSettingsActorResult {
+    email: IUsersColumns["email"];
+}
+
+/** Result of query `NativeMailboxSettingsOwner`. */
+export interface INativeMailboxSettingsOwnerResult {
+    avatar_key: IUsersColumns["avatar_key"];
 }
 
 /** Result of query `NativeUpdateMailbox`. */
@@ -1525,20 +1535,61 @@ export interface INativeSetShortcutsResult {
 export interface INativeSetRetentionResult {
 }
 
+/** Result of query `NativeTimeZoneWriteFence`. */
+export interface INativeTimeZoneWriteFenceResult {
+}
+
+/** Result of query `NativeTimeZoneCurrent`. */
+export interface INativeTimeZoneCurrentResult {
+    time_zone: IUsersColumns["time_zone"];
+}
+
+/** Result of query `NativeFreezeLegacyCalendarZones`. */
+export interface INativeFreezeLegacyCalendarZonesResult {
+}
+
 /** Result of query `NativeSetTimeZone`. */
 export interface INativeSetTimeZoneResult {
+}
+
+/** Result of query `NativeForwardingWriteFence`. */
+export interface INativeForwardingWriteFenceResult {
+}
+
+/** Result of query `NativeForwardingActor`. */
+export interface INativeForwardingActorResult {
+    id: IUsersColumns["id"];
+}
+
+/** Result of query `NativeForwardingLicense`. */
+export interface INativeForwardingLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
 }
 
 /** Result of query `NativeProfileForwarding`. */
 export interface INativeProfileForwardingResult {
 }
 
-/** Result of query `NativeSetProfile`. */
-export interface INativeSetProfileResult {
+/** Result of query `NativeProfileWriteFence`. */
+export interface INativeProfileWriteFenceResult {
 }
 
-/** Result of query `NativeSyncPrimaryMailbox`. */
-export interface INativeSyncPrimaryMailboxResult {
+/** Result of query `NativeProfileCurrent`. */
+export interface INativeProfileCurrentResult {
+    email: IUsersColumns["email"];
+    avatar_key: IUsersColumns["avatar_key"];
+    forwarding_email: IUsersColumns["forwarding_email"];
+}
+
+/** Result of query `NativeProfileLicense`. */
+export interface INativeProfileLicenseResult {
+    plan: ILicenseSettingsColumns["plan"];
+    state: ILicenseSettingsColumns["state"];
+}
+
+/** Result of query `NativeSetProfile`. */
+export interface INativeSetProfileResult {
 }
 
 /** Result of query `NativePasswordHash`. */
@@ -3545,7 +3596,7 @@ export interface IMailboxPermissionResult {
     display_name: IMailboxesColumns["display_name"];
     type: IMailboxesColumns["type"];
     hostname: IDomainsColumns["hostname"];
-    domain_owner: string | null;
+    domain_owner: string;
     owner_name: string | null;
     owner_email: string | null;
     permission: unknown | null;
@@ -3589,6 +3640,10 @@ export interface IPublicAttachmentResult {
     content_type: IMessageAttachmentsColumns["content_type"];
 }
 
+/** Result of query `NativeAutoReplyWriteFence`. */
+export interface INativeAutoReplyWriteFenceResult {
+}
+
 /** Result of query `NativeAutoReplySettings`. */
 export interface INativeAutoReplySettingsResult {
     auto_reply_enabled: IMailboxesColumns["auto_reply_enabled"];
@@ -3604,6 +3659,15 @@ export interface INativeRecentAutoReplyResult {
 /** Result of query `NativePendingAutoReply`. */
 export interface INativePendingAutoReplyResult {
     id: IOutboundJobsColumns["id"];
+}
+
+/** Result of query `NativeAutoReplyAccount`. */
+export interface INativeAutoReplyAccountResult {
+    id: IUsersColumns["id"];
+    name: IUsersColumns["name"];
+    email: IUsersColumns["email"];
+    role: IUsersColumns["role"];
+    is_primary_admin: IUsersColumns["is_primary_admin"];
 }
 
 /** Result of query `NativeAutoReplyMessage`. */
@@ -3693,22 +3757,6 @@ export interface IClaimDraftLockResult {
 
 /** Result of query `ReleaseDraftLock`. */
 export interface IReleaseDraftLockResult {
-}
-
-/** Result of query `SenderAliases`. */
-export interface ISenderAliasesResult {
-    local_part: IMailboxAliasesColumns["local_part"];
-    hostname: IDomainsColumns["hostname"];
-}
-
-/** Result of query `SenderDomainAlias`. */
-export interface ISenderDomainAliasResult {
-    id: IDomainsColumns["id"];
-}
-
-/** Result of query `SenderAddressOccupied`. */
-export interface ISenderAddressOccupiedResult {
-    id: string | null;
 }
 
 /** Result of query `OwnDraft`. */
@@ -3834,18 +3882,6 @@ export interface IDraftDiscardObjectsResult {
 export interface IDeleteOwnedDraftResult {
 }
 
-/** Result of query `NativeIdentityMailboxes`. */
-export interface INativeIdentityMailboxesResult {
-    id: string | null;
-    domain_id: IMailboxesColumns["domain_id"];
-    local_part: IMailboxesColumns["local_part"];
-    use_all_domains: IMailboxesColumns["use_all_domains"];
-    display_name: IMailboxesColumns["display_name"];
-    avatar_key: IMailboxesColumns["avatar_key"];
-    hostname: IDomainsColumns["hostname"];
-    domain_owner: string | null;
-}
-
 /** Result of query `NativeIdentityDomains`. */
 export interface INativeIdentityDomainsResult {
     id: IDomainsColumns["id"];
@@ -3862,11 +3898,31 @@ export interface INativeIdentityAliasesResult {
     hostname: IDomainsColumns["hostname"];
 }
 
+/** Result of query `NativeExplicitIdentityAliases`. */
+export interface INativeExplicitIdentityAliasesResult {
+    mailbox_id: IMailboxAliasesColumns["mailbox_id"];
+    domain_id: IMailboxAliasesColumns["domain_id"];
+    local_part: IMailboxAliasesColumns["local_part"];
+    hostname: IDomainsColumns["hostname"];
+}
+
 /** Result of query `NativeIdentityClaims`. */
 export interface INativeIdentityClaimsResult {
     id: IMailboxesColumns["id"];
     domain_id: IMailboxesColumns["domain_id"];
     local_part: IMailboxesColumns["local_part"];
+}
+
+/** Result of query `NativeIdentityMailboxes`. */
+export interface INativeIdentityMailboxesResult {
+    id: string;
+    domain_id: IMailboxesColumns["domain_id"];
+    local_part: IMailboxesColumns["local_part"];
+    use_all_domains: IMailboxesColumns["use_all_domains"];
+    display_name: IMailboxesColumns["display_name"];
+    avatar_key: IMailboxesColumns["avatar_key"];
+    hostname: IDomainsColumns["hostname"];
+    domain_owner: string;
 }
 
 /** Result of query `InboundForwarding`. */
@@ -5320,7 +5376,9 @@ export interface Queries {
     NativeMailboxOwner: INativeMailboxOwnerResult;
     NativeMailboxDomain: INativeMailboxDomainResult;
     NativeCreateMailbox: INativeCreateMailboxResult;
-    NativeRenameMailboxOwner: INativeRenameMailboxOwnerResult;
+    NativeMailboxSettingsFence: INativeMailboxSettingsFenceResult;
+    NativeMailboxSettingsActor: INativeMailboxSettingsActorResult;
+    NativeMailboxSettingsOwner: INativeMailboxSettingsOwnerResult;
     NativeUpdateMailbox: INativeUpdateMailboxResult;
     NativeDeleteMailboxOwner: INativeDeleteMailboxOwnerResult;
     NativeMailboxSending: INativeMailboxSendingResult;
@@ -5371,10 +5429,18 @@ export interface Queries {
     NativeSetRecipientAddresses: INativeSetRecipientAddressesResult;
     NativeSetShortcuts: INativeSetShortcutsResult;
     NativeSetRetention: INativeSetRetentionResult;
+    NativeTimeZoneWriteFence: INativeTimeZoneWriteFenceResult;
+    NativeTimeZoneCurrent: INativeTimeZoneCurrentResult;
+    NativeFreezeLegacyCalendarZones: INativeFreezeLegacyCalendarZonesResult;
     NativeSetTimeZone: INativeSetTimeZoneResult;
+    NativeForwardingWriteFence: INativeForwardingWriteFenceResult;
+    NativeForwardingActor: INativeForwardingActorResult;
+    NativeForwardingLicense: INativeForwardingLicenseResult;
     NativeProfileForwarding: INativeProfileForwardingResult;
+    NativeProfileWriteFence: INativeProfileWriteFenceResult;
+    NativeProfileCurrent: INativeProfileCurrentResult;
+    NativeProfileLicense: INativeProfileLicenseResult;
     NativeSetProfile: INativeSetProfileResult;
-    NativeSyncPrimaryMailbox: INativeSyncPrimaryMailboxResult;
     NativePasswordHash: INativePasswordHashResult;
     NativeChangePassword: INativeChangePasswordResult;
     NativeRevokePasswordSessions: INativeRevokePasswordSessionsResult;
@@ -5662,9 +5728,11 @@ export interface Queries {
     CreateAttachmentLink: ICreateAttachmentLinkResult;
     GetAttachmentLink: IGetAttachmentLinkResult;
     PublicAttachment: IPublicAttachmentResult;
+    NativeAutoReplyWriteFence: INativeAutoReplyWriteFenceResult;
     NativeAutoReplySettings: INativeAutoReplySettingsResult;
     NativeRecentAutoReply: INativeRecentAutoReplyResult;
     NativePendingAutoReply: INativePendingAutoReplyResult;
+    NativeAutoReplyAccount: INativeAutoReplyAccountResult;
     NativeAutoReplyMessage: INativeAutoReplyMessageResult;
     NativeAutoReplyJob: INativeAutoReplyJobResult;
     NativeContactWriteFence: INativeContactWriteFenceResult;
@@ -5681,9 +5749,6 @@ export interface Queries {
     SourceScheduledCount: ISourceScheduledCountResult;
     ClaimDraftLock: IClaimDraftLockResult;
     ReleaseDraftLock: IReleaseDraftLockResult;
-    SenderAliases: ISenderAliasesResult;
-    SenderDomainAlias: ISenderDomainAliasResult;
-    SenderAddressOccupied: ISenderAddressOccupiedResult;
     OwnDraft: IOwnDraftResult;
     DraftAttachments: IDraftAttachmentsResult;
     OutgoingAttachmentLimit: IOutgoingAttachmentLimitResult;
@@ -5702,10 +5767,11 @@ export interface Queries {
     NativeHumanAgentAttachmentRemove: INativeHumanAgentAttachmentRemoveResult;
     DraftDiscardObjects: IDraftDiscardObjectsResult;
     DeleteOwnedDraft: IDeleteOwnedDraftResult;
-    NativeIdentityMailboxes: INativeIdentityMailboxesResult;
     NativeIdentityDomains: INativeIdentityDomainsResult;
     NativeIdentityAliases: INativeIdentityAliasesResult;
+    NativeExplicitIdentityAliases: INativeExplicitIdentityAliasesResult;
     NativeIdentityClaims: INativeIdentityClaimsResult;
+    NativeIdentityMailboxes: INativeIdentityMailboxesResult;
     InboundForwarding: IInboundForwardingResult;
     InboundExists: IInboundExistsResult;
     NativeInboundOwnAddress: INativeInboundOwnAddressResult;
