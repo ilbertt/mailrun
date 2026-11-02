@@ -17,13 +17,32 @@ export async function prepareAttachments(
 		text?: string;
 		html?: string;
 		headers: Record<string, string>;
+		publicOrigin?: string;
 	},
 	provider: "cloudflare" | "resend" | "ses" = "cloudflare",
+	sourceSnapshot = false,
 ) {
-	const rows = await withDatabase(
+	let rows = await withDatabase(
 		(sql) =>
 			sql.SendingAttachments`SELECT id,filename,content_type,size,r2_key,disposition,content_id FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL ORDER BY rowid`,
 	);
+	if (sourceSnapshot) {
+		const present = [];
+		for (const row of rows) {
+			const file = new LocalStorage().file(row.r2_key);
+			if (await file.exists())
+				present.push({
+					...row,
+					size: file.size,
+					disposition:
+						row.disposition === "inline" && row.content_id
+							? "inline"
+							: "attachment",
+					content_id: row.disposition === "inline" ? row.content_id : null,
+				});
+		}
+		rows = present;
+	}
 	if (provider !== "cloudflare") {
 		const attachments: OutboundAttachment[] = [];
 		for (const row of rows) {
@@ -82,7 +101,9 @@ export async function prepareAttachments(
 			linked.push({
 				filename: row.filename,
 				size: row.size,
-				url: `${publicOrigin()}/api/shared-files/${encodeURIComponent(link.id)}`,
+				url: sourceSnapshot
+					? sourceAttachmentUrl(link.id, message.publicOrigin)
+					: `${publicOrigin()}/api/shared-files/${encodeURIComponent(link.id)}`,
 			});
 		}
 	}
@@ -119,6 +140,25 @@ export async function prepareAttachments(
 				: "Message exceeds Cloudflare's 5 MiB email size limit",
 		);
 	return { attachments, text, html };
+}
+function sourceAttachmentUrl(id: string, origin?: string) {
+	const configured = process.env.APP_URL?.trim() || origin;
+	if (!configured)
+		throw new Error(
+			"Set APP_URL before sending large attachments as download links",
+		);
+	const url = new URL(configured);
+	if (
+		url.protocol !== "https:" &&
+		!(
+			url.protocol === "http:" &&
+			["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+		)
+	)
+		throw new Error(
+			"A public HTTPS APP_URL is required for large attachment links",
+		);
+	return new URL("/api/shared-files/" + encodeURIComponent(id), url).toString();
 }
 export async function sharedFile(token: string) {
 	const [row] = await withDatabase(

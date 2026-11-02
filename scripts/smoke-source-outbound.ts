@@ -40,6 +40,12 @@ for (const [name, file] of getMigrations()) {
 // before it reads jobs; importing into an already current DB alone misses that.
 process.env.DATA_DIR = legacyDirectory;
 const preload = await writeSetupFixturePreload(state.directory, provider.url);
+await Bun.write(
+	preload.path,
+	(await Bun.file(preload.path).text()) +
+		`\nif(process.env.MAILRUN_FIXTURE_CLOCK!==undefined){const now=Number(process.env.MAILRUN_FIXTURE_CLOCK),RealDate=Date;globalThis.Date=class extends RealDate{constructor(...args){super(...(args.length?args:[now]));}static now(){return now;}};}`,
+);
+let deliveryClock: string | undefined;
 const binary = resolve(process.argv[2] ?? "dist/mailrun-local");
 const deliveries: ReturnType<typeof capturedMailSchema.parse>[] = [];
 const originalFetch = provider.cf.fetch;
@@ -79,7 +85,10 @@ const env = {
 };
 async function cron() {
 	const child = Bun.spawn([binary, "jobs", "scheduled"], {
-		env,
+		env: {
+			...env,
+			...(deliveryClock ? { MAILRUN_FIXTURE_CLOCK: deliveryClock } : {}),
+		},
 		cwd: state.directory,
 		stdout: "pipe",
 		stderr: "pipe",
@@ -114,10 +123,14 @@ try {
 	assert.deepEqual(
 		sourceDb
 			.query(
-				"SELECT name FROM d1_migrations WHERE name IN ('0068_domain_relay_binding.sql','0069_cloudflare_global_key.sql') ORDER BY name",
+				"SELECT name FROM d1_migrations WHERE name IN ('0068_domain_relay_binding.sql','0069_cloudflare_global_key.sql','0070_outbound_transport_snapshots.sql') ORDER BY name",
 			)
 			.all(),
-		[{ name: "0068_domain_relay_binding.sql" }, { name: "0069_cloudflare_global_key.sql" }],
+		[
+			{ name: "0068_domain_relay_binding.sql" },
+			{ name: "0069_cloudflare_global_key.sql" },
+			{ name: "0070_outbound_transport_snapshots.sql" },
+		],
 		"Compiled startup did not upgrade the source schema",
 	);
 	assert.equal(deliveries.length, 0, "An imported future job sent early");
@@ -129,7 +142,7 @@ try {
 		sourceDb.query("SELECT id,payload FROM outbound_jobs ORDER BY id").all(),
 		payloads,
 	);
-	sourceDb.exec("UPDATE outbound_jobs SET scheduled_at=0");
+	deliveryClock = String(Date.parse("2100-01-02T00:00:00Z"));
 	await Promise.all([cron(), cron()]);
 	assert.deepEqual(
 		deliveries,

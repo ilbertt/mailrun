@@ -18,6 +18,8 @@ export const BACKUP_TABLES: DatabaseBackupTable[] = [
 	"message_attachments",
 	"shared_attachment_links",
 	"outbound_jobs",
+	// Transport identity survives deletion of the message link and must be backed up.
+	"mailrun_outbound_snapshots",
 	"routing_rules",
 	"webhooks",
 	"webhook_deliveries",
@@ -276,6 +278,13 @@ export function restoreBackup(
 		for (const table of [...tables].reverse())
 			db.exec(`DELETE FROM ${identifier(table)}`);
 		for (const table of tables) {
+			// Job insertion captures transport metadata for older documents. An explicit
+			// native snapshot table, including an empty one, remains authoritative.
+			if (
+				table === "mailrun_outbound_snapshots" &&
+				document.tables[table] !== undefined
+			)
+				db.exec("DELETE FROM mailrun_outbound_snapshots");
 			const columns = new Set(
 				nameRows
 					.parse(db.query(`PRAGMA table_info(${identifier(table)})`).all())

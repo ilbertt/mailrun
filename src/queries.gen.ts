@@ -4614,12 +4614,19 @@ export interface IQueueDraftResult {
 export interface IInsertOutboundJobResult {
 }
 
+/** Result of query `OutboundCandidate`. */
+export interface IOutboundCandidateResult {
+    id: IOutboundJobsColumns["id"];
+    user_id: IOutboundJobsColumns["user_id"];
+    message_id: string | null;
+    payload: IOutboundJobsColumns["payload"];
+    scheduled_at: IOutboundJobsColumns["scheduled_at"];
+    transport_message_id: string | null;
+}
+
 /** Result of query `ClaimOutbound`. */
 export interface IClaimOutboundResult {
     id: string | null;
-    user_id: string | null;
-    message_id: IOutboundJobsColumns["message_id"];
-    payload: IOutboundJobsColumns["payload"];
 }
 
 /** Result of query `SendingAccount`. */
@@ -4636,6 +4643,18 @@ export interface ISendingMessageResult {
     mailbox_id: IMessagesColumns["mailbox_id"];
 }
 
+/** Result of query `SourcePreparedQueueBodies`. */
+export interface ISourcePreparedQueueBodiesResult {
+}
+
+/** Result of query `SourceQueueAcknowledgedMessage`. */
+export interface ISourceQueueAcknowledgedMessageResult {
+}
+
+/** Result of query `SourceQueueAcknowledgedJob`. */
+export interface ISourceQueueAcknowledgedJobResult {
+}
+
 /** Result of query `NativeRecordAutoReply`. */
 export interface INativeRecordAutoReplyResult {
 }
@@ -4646,6 +4665,10 @@ export interface ICompleteOutboundResult {
 
 /** Result of query `CompleteSentMessage`. */
 export interface ICompleteSentMessageResult {
+}
+
+/** Result of query `SourceRecordAutoReply`. */
+export interface ISourceRecordAutoReplyResult {
 }
 
 /** Result of query `NativeCompleteAgentApproval`. */
@@ -5895,12 +5918,17 @@ export interface Queries {
     RuleFolder: IRuleFolderResult;
     QueueDraft: IQueueDraftResult;
     InsertOutboundJob: IInsertOutboundJobResult;
+    OutboundCandidate: IOutboundCandidateResult;
     ClaimOutbound: IClaimOutboundResult;
     SendingAccount: ISendingAccountResult;
     SendingMessage: ISendingMessageResult;
+    SourcePreparedQueueBodies: ISourcePreparedQueueBodiesResult;
+    SourceQueueAcknowledgedMessage: ISourceQueueAcknowledgedMessageResult;
+    SourceQueueAcknowledgedJob: ISourceQueueAcknowledgedJobResult;
     NativeRecordAutoReply: INativeRecordAutoReplyResult;
     CompleteOutbound: ICompleteOutboundResult;
     CompleteSentMessage: ICompleteSentMessageResult;
+    SourceRecordAutoReply: ISourceRecordAutoReplyResult;
     NativeCompleteAgentApproval: INativeCompleteAgentApprovalResult;
     NativeCompleteSubmittedDraft: INativeCompleteSubmittedDraftResult;
     NativeTrashApprovedDraft: INativeTrashApprovedDraftResult;
@@ -6680,6 +6708,20 @@ export interface IMailrunJobLeasesTable {
     relationType: (typeof schema)["mailrun_job_leases"]["_relationType"];
     indexes: keyof (typeof schema)["mailrun_job_leases"]["_indexes"];
     constraints: keyof (typeof schema)["mailrun_job_leases"]["_constraints"];
+}
+
+/** Columns of `mailrun_outbound_snapshots`. */
+export interface IMailrunOutboundSnapshotsColumns {
+    job_id: string;
+    message_id: string;
+}
+
+/** Schema of `mailrun_outbound_snapshots`. */
+export interface IMailrunOutboundSnapshotsTable {
+    columns: IMailrunOutboundSnapshotsColumns;
+    relationType: (typeof schema)["mailrun_outbound_snapshots"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_outbound_snapshots"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_outbound_snapshots"]["_constraints"];
 }
 
 /** Columns of `mailrun_ses_receipts`. */
@@ -7794,6 +7836,18 @@ export const schema = {
         },
         _constraints: {}
     },
+    mailrun_outbound_snapshots: {
+        _relationName: "mailrun_outbound_snapshots",
+        _relationType: "table",
+        _columns: {
+            job_id: { _columnName: "job_id", _foreignKeys: {} },
+            message_id: { _columnName: "message_id", _foreignKeys: {} }
+        },
+        _indexes: {
+            sqlite_autoindex_mailrun_outbound_snapshots_1: { _indexName: "sqlite_autoindex_mailrun_outbound_snapshots_1" }
+        },
+        _constraints: {}
+    },
     mailrun_ses_receipts: {
         _relationName: "mailrun_ses_receipts",
         _relationType: "table",
@@ -8263,6 +8317,7 @@ export interface Tables {
     mailrun_installation: IMailrunInstallationTable;
     mailrun_jmap_uploads: IMailrunJmapUploadsTable;
     mailrun_job_leases: IMailrunJobLeasesTable;
+    mailrun_outbound_snapshots: IMailrunOutboundSnapshotsTable;
     mailrun_ses_receipts: IMailrunSesReceiptsTable;
     mcp_key_mailboxes: IMcpKeyMailboxesTable;
     message_attachments: IMessageAttachmentsTable;

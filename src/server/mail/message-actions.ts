@@ -38,7 +38,7 @@ export async function messageRecord(
 }
 export async function audit(
 	sql: AppSQL,
-	user: User,
+	user: Pick<User, "id">,
 	mailboxId: string | null,
 	messageId: string | null,
 	action: string,

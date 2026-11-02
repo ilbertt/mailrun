@@ -23,6 +23,7 @@ jobs:
       - run: bun scripts/smoke-drafts.ts dist/mailrun
       - run: bun scripts/smoke-aliases.ts dist/mailrun
       - run: bun scripts/smoke-send.ts dist/mailrun
+      - run: bun scripts/smoke-queued-delivery.ts dist/mailrun
       - run: bun scripts/smoke-contacts-templates.ts dist/mailrun
       - run: bun scripts/smoke-preferences.ts dist/mailrun
       - run: bun scripts/smoke-mailbox-management.ts dist/mailrun

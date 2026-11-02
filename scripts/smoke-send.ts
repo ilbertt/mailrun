@@ -99,7 +99,10 @@ async function stop() {
 async function cron() {
 	const command = Bun.spawn([binary, "jobs", "scheduled"], {
 		cwd: state.directory,
-		env: environment,
+		env: {
+			...environment,
+			MAILRUN_FIXTURE_CLOCK: String(Date.parse("2099-01-01T00:00:01Z")),
+		},
 		stdout: "pipe",
 		stderr: "pipe",
 	});

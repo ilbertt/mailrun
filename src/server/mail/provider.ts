@@ -34,7 +34,10 @@ export type OutboundMail = {
 	headers?: Record<string, string>;
 	attachments?: OutboundAttachment[];
 };
-export async function outboundConfig(address: string): Promise<OutboundConfig> {
+export async function outboundConfig(
+	address: string,
+	sourceSnapshot = false,
+): Promise<OutboundConfig> {
 	const hostname = getEmailAddress(address).split("@")[1]?.toLowerCase() ?? "";
 	const [row] = await withDatabase(
 		(sql) =>
@@ -54,7 +57,7 @@ export async function outboundConfig(address: string): Promise<OutboundConfig> {
 	const { auth, accountId } = cloudflareCredentials(await getInstallation());
 	if (!auth || !accountId)
 		throw new OutboundProviderError("Cloudflare email is not configured");
-	if (!row.sending_enabled || row.status !== "active")
+	if (!sourceSnapshot && (!row.sending_enabled || row.status !== "active"))
 		throw new OutboundProviderError(
 			"Cloudflare sending is not enabled for this domain",
 		);

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test, setSystemTime } from "bun:test";
 import { fixture } from "./fixtures";
 import {
 	capturedMailSchema,
@@ -32,6 +32,7 @@ beforeEach(async () => {
 	await setInstallationPhase("ready");
 });
 afterEach(async () => {
+	setSystemTime();
 	await state.close();
 });
 
@@ -55,7 +56,7 @@ test("original exporter jobs retain recipients, array/string references, custom 
 	expect(
 		state.db.query("SELECT id,payload FROM outbound_jobs ORDER BY id").all(),
 	).toEqual(payloads);
-	state.db.exec("UPDATE outbound_jobs SET scheduled_at=0");
+	setSystemTime(new Date("2100-01-02T00:00:00Z"));
 	for (const item of sourceOutboundCapture.queue) {
 		await deliverJob(item.jobId, send);
 		await deliverJob(item.jobId, send);
@@ -100,33 +101,34 @@ test("imported sent and in-flight jobs are never retried automatically", async (
 	).toEqual([{ status: "sent" }, { status: "sending" }, { status: "queued" }]);
 });
 
-test("restored source jobs recheck sender permissions and require their migrated attachment bytes", async () => {
-	state.db.exec(
-		"UPDATE outbound_jobs SET scheduled_at=0; DELETE FROM mailbox_aliases",
-	);
-	let calls = 0;
-	await expect(
-		deliverJob(sourceOutboundCapture.queue[0]!.jobId, async () => {
-			calls++;
-			throw new Error("Unexpected send");
-		}),
-	).rejects.toThrow("not assigned");
-	expect(calls).toBe(0);
-	state.db.exec(
-		"INSERT INTO mailbox_aliases(id,mailbox_id,domain_id,local_part,created_at) VALUES('restored-alias','mailbox','domain','support',1)",
-	);
+test("restored source jobs retain queued sender authority and skip unavailable attachment objects", async () => {
+	setSystemTime(new Date("2100-01-02T00:00:00Z"));
+	state.db.exec("DELETE FROM mailbox_aliases");
+	const deliveries: unknown[] = [];
+	const send = async (_input: string | URL | Request, init?: RequestInit) => {
+		deliveries.push(JSON.parse(String(init?.body)));
+		return Response.json({
+			success: true,
+			result: { message_id: "<restored-snapshot@example.net>" },
+		});
+	};
+	await deliverJob(sourceOutboundCapture.queue[0]!.jobId, send);
+	expect(deliveries).toHaveLength(1);
 	await new (await import("../src/server/storage")).LocalStorage().delete(
 		sourceOutboundCapture.objects.find((file) =>
 			file.key.includes(sourceOutboundCapture.queue[1]!.messageId),
 		)!.key,
 	);
-	await expect(
-		deliverJob(sourceOutboundCapture.queue[1]!.jobId, async () => {
-			calls++;
-			throw new Error("Unexpected send");
-		}),
-	).rejects.toThrow();
-	expect(calls).toBe(0);
+	await deliverJob(sourceOutboundCapture.queue[1]!.jobId, send);
+	expect(deliveries).toHaveLength(2);
+	expect(
+		state.db
+			.query("SELECT status FROM outbound_jobs WHERE id IN(?,?)")
+			.all(
+				sourceOutboundCapture.queue[0]!.jobId,
+				sourceOutboundCapture.queue[1]!.jobId,
+			),
+	).toEqual([{ status: "sent" }, { status: "sent" }]);
 });
 
 test("source-compatible headers reject injection and oversize chains instead of dropping threading", () => {

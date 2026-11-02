@@ -16,7 +16,7 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 		if (name === "scheduled") {
 			const jobs = await withDatabase(
 				(sql) =>
-					sql.DueOutboundJobs`/* @notNull id */ SELECT id FROM outbound_jobs WHERE status='queued' AND EXISTS (SELECT 1 FROM messages WHERE messages.id=outbound_jobs.message_id AND messages.status='queued') AND (scheduled_at IS NULL OR scheduled_at<=${seconds()}) ORDER BY scheduled_at LIMIT 10`,
+					sql.DueOutboundJobs`/* @notNull id */ SELECT id FROM outbound_jobs WHERE status='queued' AND (EXISTS(SELECT 1 FROM mailrun_outbound_snapshots s WHERE s.job_id=outbound_jobs.id) AND json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.userId')=user_id AND json_type(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.mailboxId')='text' OR EXISTS(SELECT 1 FROM messages WHERE messages.id=outbound_jobs.message_id AND messages.status='queued')) AND (scheduled_at IS NULL OR scheduled_at<=${seconds()}) ORDER BY scheduled_at LIMIT 10`,
 			);
 
 			for (const job of jobs) {
