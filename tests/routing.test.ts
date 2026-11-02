@@ -95,12 +95,12 @@ test("cross-domain aliases stay within a domain owner and explicit assignments t
 		}),
 	).rejects.toThrow("permission");
 });
-test("normalized alias collisions cannot be created concurrently", async () => {
+test("literal alias collisions are atomic while source dot variants remain distinct", async () => {
 	const results = await Promise.allSettled([
 		addAlias(owner, {
 			mailboxId: "mailbox",
 			domainId: "domain",
-			localPart: "s.ales",
+			localPart: "sales",
 		}),
 		addAlias(owner, {
 			mailboxId: "mailbox",
@@ -111,13 +111,17 @@ test("normalized alias collisions cannot be created concurrently", async () => {
 	expect(
 		results.filter((result) => result.status === "fulfilled"),
 	).toHaveLength(1);
-	await expect(
-		addAlias(owner, {
-			mailboxId: "mailbox",
-			domainId: "domain",
-			localPart: "h.ello",
-		}),
-	).rejects.toThrow("assigned");
+	await addAlias(owner, {
+		mailboxId: "mailbox",
+		domainId: "domain",
+		localPart: "h.ello",
+	});
+	expect((await resolveRouting("h.ello+tag@example.com"))?.mailbox?.id).toBe(
+		"mailbox",
+	);
+	expect(
+		state.db.query("SELECT count(*) AS count FROM mailbox_aliases").get(),
+	).toEqual({ count: 2 });
 });
 test("mailbox rules place matching content in Spam or a valid custom folder", async () => {
 	state.db.exec(

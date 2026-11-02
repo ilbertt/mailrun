@@ -108,7 +108,7 @@ export async function resolveRouting(
 			/* @notNull id */
 			/* @notNull user_id */
 			SELECT b.id,b.user_id,b.domain_id,b.local_part,a.local_part AS alias_local_part FROM mailbox_aliases a JOIN mailboxes b ON b.id=a.mailbox_id
-			WHERE a.domain_id=${domain.id} AND b.disabled=0 ORDER BY a.created_at,a.id`;
+			WHERE a.domain_id=${domain.id} AND b.disabled=0 ORDER BY a.local_part,a.rowid`;
 		const alias = aliases.find(
 			(alias) =>
 				normalizeLocalPart(alias.alias_local_part ?? "") === normalized,

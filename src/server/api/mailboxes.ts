@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withDatabase, id, seconds } from "../db";
 import type { User } from "../../shared/contracts";
-import { mailboxAccess } from "../mail/access";
+import { mailboxAccess, MailboxAccessError } from "../mail/access";
 import { listMailboxes } from "../mail/repository";
 import { addAlias, removeAlias } from "../mail/management";
 import { licenseEntitlements } from "../licenses";
@@ -9,11 +9,25 @@ import {
 	updateMailboxSchema,
 	mailboxSchema,
 	mailboxAccessSchema,
+	createMailboxAliasSchema,
 } from "../../lib/validators";
 import { localPartSchema } from "../../shared/mail-contracts";
 import { currentProfile } from "./settings";
 import { readLimitedBody } from "../mail/inbound";
 import { iso } from "../mail/message-query";
+async function sourceMailboxAliases(mailboxId: string) {
+	const aliases = await withDatabase(
+		(sql) =>
+			sql.NativeMailboxAliases`SELECT a.id,a.domain_id,a.local_part,a.created_at,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id=${mailboxId} ORDER BY a.rowid`,
+	);
+	return aliases.map((a) => ({
+		id: a.id,
+		domainId: a.domain_id,
+		localPart: a.local_part,
+		hostname: a.hostname,
+		createdAt: iso(a.created_at),
+	}));
+}
 // The original inbox list repairs accounts lacking any enabled owned personal box.
 // The relay already forwards this domain; address resolution stays local here.
 export async function ensurePersonalMailbox(user: User) {
@@ -219,33 +233,40 @@ export async function mailboxesApi(
 		}
 	}
 	if (action === "aliases") {
-		const box = await mailboxAccess(user, mailboxId, "manage");
+		const input =
+			method === "POST"
+				? createMailboxAliasSchema.safeParse(await read())
+				: undefined;
+		if (input && !input.success)
+			return json({ error: "Enter a valid alias username and domain" }, 400);
+		const aliasId = url.searchParams.get("aliasId");
+		if (method === "DELETE" && !aliasId)
+			return json({ error: "Alias is required" }, 400);
+		const box = await mailboxAccess(user, mailboxId, "manage").catch(
+			(error) => {
+				if (error instanceof MailboxAccessError)
+					throw new Response("Mailbox not found", { status: 404 });
+				throw error;
+			},
+		);
 		if (method === "GET") {
-			const [aliases, domains] = await withDatabase((sql) =>
-				Promise.all([
-					sql.NativeMailboxAliases`SELECT a.id,a.domain_id,a.local_part,a.created_at,d.hostname FROM mailbox_aliases a JOIN domains d ON d.id=a.domain_id WHERE a.mailbox_id=${mailboxId} ORDER BY a.created_at,a.id`,
-					sql.NativeAliasDomains`SELECT id,hostname FROM domains WHERE user_id=${box.domain_owner} AND status='active' ORDER BY hostname`,
-				]),
-			);
+			const [aliases, domains] = await Promise.all([
+				sourceMailboxAliases(mailboxId),
+				withDatabase(
+					(sql) =>
+						sql.NativeAliasDomains`SELECT id,hostname FROM domains WHERE user_id=${box.domain_owner} AND status='active' ORDER BY rowid`,
+				),
+			]);
 			return json({
-				aliases: aliases.map((a) => ({
-					id: a.id,
-					domainId: a.domain_id,
-					localPart: a.local_part,
-					hostname: a.hostname,
-					createdAt: iso(a.created_at),
-				})),
+				aliases,
 				availableDomains: domains,
 			});
 		}
-		if (method === "POST") {
-			const input = z
-				.object({ domainId: z.string(), localPart: localPartSchema })
-				.parse(await read());
-			return json(await addAlias(user, { ...input, mailboxId }));
+		if (method === "POST" && input?.success) {
+			await addAlias(user, { ...input.data, mailboxId });
+			return json({ aliases: await sourceMailboxAliases(mailboxId) });
 		}
 		if (method === "DELETE") {
-			const aliasId = url.searchParams.get("aliasId");
 			if (!aliasId) throw new Response("Alias is required", { status: 400 });
 			const [alias] = await withDatabase(
 				(sql) =>
@@ -253,7 +274,7 @@ export async function mailboxesApi(
 			);
 			if (!alias) throw new Response("Alias not found", { status: 404 });
 			await removeAlias(user, aliasId);
-			return json({ ok: true });
+			return json({ aliases: await sourceMailboxAliases(mailboxId) });
 		}
 	}
 	if (action === "access") {

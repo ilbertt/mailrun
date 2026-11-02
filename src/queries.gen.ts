@@ -1158,6 +1158,15 @@ export interface ISourceDetailAttachmentsResult {
     content_type: IMessageAttachmentsColumns["content_type"];
 }
 
+/** Result of query `NativeMailboxAliases`. */
+export interface INativeMailboxAliasesResult {
+    id: string | null;
+    domain_id: IMailboxAliasesColumns["domain_id"];
+    local_part: IMailboxAliasesColumns["local_part"];
+    created_at: number | null;
+    hostname: IDomainsColumns["hostname"];
+}
+
 /** Result of query `NativeEnsurePersonalMailbox`. */
 export interface INativeEnsurePersonalMailboxResult {
     id: string | null;
@@ -1226,15 +1235,6 @@ export interface INativeCancelMailboxJobsResult {
 
 /** Result of query `NativeDeleteMailbox`. */
 export interface INativeDeleteMailboxResult {
-}
-
-/** Result of query `NativeMailboxAliases`. */
-export interface INativeMailboxAliasesResult {
-    id: string | null;
-    domain_id: IMailboxAliasesColumns["domain_id"];
-    local_part: IMailboxAliasesColumns["local_part"];
-    created_at: number | null;
-    hostname: IDomainsColumns["hostname"];
 }
 
 /** Result of query `NativeAliasDomains`. */
@@ -3854,6 +3854,11 @@ export interface INativeManagedAliasDomainResult {
     user_id: IDomainsColumns["user_id"];
 }
 
+/** Result of query `SourceAliasMailboxCollision`. */
+export interface ISourceAliasMailboxCollisionResult {
+    id: IMailboxesColumns["id"];
+}
+
 /** Result of query `CreateAlias`. */
 export interface ICreateAliasResult {
     id: string | null;
@@ -5132,6 +5137,7 @@ export interface Queries {
     NativeSetupMetadata: INativeSetupMetadataResult;
     NativeFolderList: INativeFolderListResult;
     SourceDetailAttachments: ISourceDetailAttachmentsResult;
+    NativeMailboxAliases: INativeMailboxAliasesResult;
     NativeEnsurePersonalMailbox: INativeEnsurePersonalMailboxResult;
     NativeMailboxDetail: INativeMailboxDetailResult;
     NativeMailboxOwner: INativeMailboxOwnerResult;
@@ -5143,7 +5149,6 @@ export interface Queries {
     NativeMailboxSending: INativeMailboxSendingResult;
     NativeCancelMailboxJobs: INativeCancelMailboxJobsResult;
     NativeDeleteMailbox: INativeDeleteMailboxResult;
-    NativeMailboxAliases: INativeMailboxAliasesResult;
     NativeAliasDomains: INativeAliasDomainsResult;
     NativeAliasDeleteGuard: INativeAliasDeleteGuardResult;
     NativeSharedMembers: INativeSharedMembersResult;
@@ -5518,6 +5523,7 @@ export interface Queries {
     SettingsForwarding: ISettingsForwardingResult;
     SettingsFolders: ISettingsFoldersResult;
     NativeManagedAliasDomain: INativeManagedAliasDomainResult;
+    SourceAliasMailboxCollision: ISourceAliasMailboxCollisionResult;
     CreateAlias: ICreateAliasResult;
     FindAlias: IFindAliasResult;
     RemoveAlias: IRemoveAliasResult;

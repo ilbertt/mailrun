@@ -6,7 +6,6 @@ import { withDatabase, id, seconds } from "../db";
 import type { User } from "../../shared/contracts";
 import { aliasSchema, ruleSchema } from "../../shared/mail-contracts";
 import { mailboxAccess, managedDomain } from "./access";
-import { normalizeLocalPart } from "./routing";
 import { folderSchema } from "../../lib/validators";
 
 export async function mailSettings(user: User) {
@@ -43,25 +42,31 @@ SELECT f.id,f.name,f.color,f.mailbox_id FROM folders f JOIN mailboxes b ON b.id=
 }
 export async function addAlias(user: User, input: z.infer<typeof aliasSchema>) {
 	const data = aliasSchema.parse(input);
-	const mailbox = await mailboxAccess(user, data.mailboxId, "manage");
-	const [domain] = await withDatabase(
-		(sql) =>
-			sql.NativeManagedAliasDomain`SELECT id,hostname,user_id FROM domains WHERE id=${data.domainId} AND user_id=${mailbox.domain_owner} AND status='active'`,
-	);
-	if (!domain) throw new Response("Domain not found", { status: 404 });
-	if (mailbox.domain_owner !== domain.user_id)
-		throw new Error("Aliases must stay within the same domain owner");
-	const normalized = normalizeLocalPart(data.localPart);
-	if (!normalized) throw new Error("Enter a valid alias");
-	const rows = await withDatabase(
-		(sql) => sql.CreateAlias`
+	return withDatabase((sql) =>
+		sql.begin(async (sql) => {
+			const mailbox = await mailboxAccess(user, data.mailboxId, "manage", sql);
+			const [domain] =
+				await sql.NativeManagedAliasDomain`SELECT id,hostname,user_id FROM domains WHERE id=${data.domainId} AND user_id=${mailbox.domain_owner} AND status='active'`;
+			if (!domain) throw new Response("Domain not found", { status: 404 });
+			const [occupied] =
+				await sql.SourceAliasMailboxCollision`SELECT id FROM mailboxes WHERE domain_id=${data.domainId} AND local_part=${data.localPart} LIMIT 1`;
+			if (occupied)
+				throw new Response("A mailbox already uses this address", {
+					status: 409,
+				});
+			const rows = await sql.CreateAlias`
 		INSERT INTO mailbox_aliases (id,mailbox_id,domain_id,local_part,created_at)
-		SELECT ${id("alias")},${data.mailboxId},${data.domainId},${data.localPart},${seconds()}
-		WHERE NOT EXISTS (SELECT 1 FROM mailboxes WHERE domain_id=${data.domainId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${normalized})
-		AND NOT EXISTS (SELECT 1 FROM mailbox_aliases WHERE domain_id=${data.domainId} AND replace(lower(substr(local_part,1,instr(local_part||'+','+')-1)),'.','')=${normalized}) RETURNING id`,
+		SELECT ${id("als")},${data.mailboxId},${data.domainId},${data.localPart},${seconds()}
+		WHERE NOT EXISTS (SELECT 1 FROM mailboxes WHERE domain_id=${data.domainId} AND local_part=${data.localPart})
+		ON CONFLICT DO NOTHING RETURNING id`;
+			const created = rows[0];
+			if (!created)
+				throw new Response("An alias already uses this address", {
+					status: 409,
+				});
+			return { id: created.id };
+		}),
 	);
-	if (!rows.length) throw new Error("This address is already assigned");
-	return { id: rows[0]?.id };
 }
 export async function removeAlias(user: User, aliasId: string) {
 	const [alias] = await withDatabase(
