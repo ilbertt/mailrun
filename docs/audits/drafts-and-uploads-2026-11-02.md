@@ -83,10 +83,26 @@ including 24,000,003-byte attachments, provider failure and cron recovery. Those
 rehearsals now obtain revisions from headers instead of native-only response
 fields and supply the original `from` input.
 
-The expanded 76-case focused suite and standalone comparison pass. The new
-compiled draft comparison runs in Ubuntu CI before artifact retention.
-Native Linux verification of the cleanup addition
-and preview deployment are pending for this checkpoint.
+The expanded 76-case focused suite and standalone comparison pass.
+[Ubuntu CI 41421004298](https://github.com/ilbertt/mailrun/actions/runs/41421004298)
+passes all 870 tests, SQL generation/coverage, strict TypeScript and the compiled
+HTTP/WebSocket, mailbox-read, message-detail, draft, upload, populated-feature and
+original-record restore rehearsals. Its draft comparison passes all 60 contracts,
+including complete remaining object inventory.
+
+On November 2 the exact CI-tested source `2bf9743` executable was checksum-verified
+and deployed through the nibrun CLI's server-side archive download path to the
+existing preview. Executable SHA-256:
+`7410849a3a187f55956819a27ca74bb4061022dcfd86a808004f672ca789ed49`.
+The published archive digest
+`fb6547cfe357773a28350aba72bb421b7991f87676c2952a6677d9e4a981734c`
+was supplied to nibrun; its extracted artifact digest matches the verified
+executable. Deployment `01a19b9c-48cb-73ce-bfb8-37c9ea1e563b` is running.
+Public login/setup return 200; read-only checks retain one account and five
+messages, ready installation and active ilbert.dev routing/sending. The relay
+returns 200 with a successful signed callback. All three native UTC cron jobs
+are registered against this deployment. No live draft/mail mutation, restore,
+email send, data reset or credential change was used for these release checks.
 
 The original browser composer displayed the first synthetic file as saved. The
 second file chooser lost its backend node and did not complete, so no paired
