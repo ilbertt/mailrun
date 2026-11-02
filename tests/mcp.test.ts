@@ -1093,23 +1093,55 @@ test("get_email returns a coherent body and assistant revision while another pro
   const body=db.query('UPDATE messages SET text_body=?,draft_revision=? WHERE id=?');
   const revision=db.query('UPDATE agent_draft_metadata SET revision=? WHERE draft_id=?');
   const change=db.transaction((n:number)=>{body.run(String(n),n,process.argv[3]!);revision.run(n,process.argv[3]!)});
+  let checkpoint=false;process.stdin.on('data',()=>{checkpoint=true});
   console.log('ready');
-  try{for(let n=2;n<1000;n++){change(n);await Bun.sleep(1)}}finally{db.close()}
+  try{for(let n=2;;n++){change(n);if(checkpoint){checkpoint=false;console.log('advanced')}await Bun.sleep(1)}}finally{db.close()}
  `,
 	);
 	const writer = Bun.spawn([process.execPath, script, state.path, id], {
+			stdin: "pipe",
 			stdout: "pipe",
 			stderr: "pipe",
 		}),
 		errors = new Response(writer.stderr).text();
+	const reader = writer.stdout.getReader();
+	let output = "";
+	async function waitFor(marker: string) {
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		try {
+			await Promise.race([
+				(async () => {
+					while (!output.includes(marker + "\n")) {
+						const part = await reader.read();
+						if (part.done) throw new Error("Concurrent writer exited");
+						output += new TextDecoder().decode(part.value);
+					}
+					output = output.slice(
+						output.indexOf(marker + "\n") + marker.length + 1,
+					);
+				})(),
+				new Promise<never>((_, reject) => {
+					timer = setTimeout(
+						() => reject(new Error("Concurrent writer checkpoint timed out")),
+						3000,
+					);
+				}),
+			]);
+		} finally {
+			clearTimeout(timer);
+		}
+	}
 	try {
-		const reader = writer.stdout.getReader();
-		expect(new TextDecoder().decode((await reader.read()).value)).toContain(
-			"ready",
-		);
-		reader.releaseLock();
+		await waitFor("ready");
 		const versions = new Set<number>();
 		for (let index = 0; index < 60; index++) {
+			// Keep the writer active throughout the reads, and require a committed
+			// change after the first batch. Scheduler speed alone must not decide
+			// whether this test actually observes multiple revisions.
+			if (index === 30) {
+				writer.stdin.write("advance\n");
+				await waitFor("advanced");
+			}
 			const result = z
 				.object({ text: z.string(), revision: z.number() })
 				.parse(
@@ -1126,6 +1158,8 @@ test("get_email returns a coherent body and assistant revision while another pro
 	} finally {
 		writer.kill();
 		await writer.exited;
+		await reader.cancel().catch(() => {});
+		reader.releaseLock();
 		await errors;
 	}
 });

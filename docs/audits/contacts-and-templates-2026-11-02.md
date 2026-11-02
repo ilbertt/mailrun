@@ -92,6 +92,16 @@ preview/conditional responses, shared access, live refresh, private-contact
 isolation and maintenance recovery against isolated providers. Native Linux
 and deployment results follow when available.
 
+The first push CI run (41465985204) passed 1,409 tests, including every new
+contact/template comparison, but failed the existing MCP concurrent-draft
+fixture's multiple-observed-revisions assertion. Its timing-dependent read loop
+observed only one revision; the independent PR run passed. The
+fixture now keeps the independent writer active and acknowledges a committed
+checkpoint between read batches. It retains all 60 body/revision coherence
+assertions and the multiple-version assertion. Twelve repetitions pass on the
+host and in a network-isolated Linux Bun container; this changes test
+coordination only.
+
 Broader source/provider/client and cookie/origin/malformed-input matrices,
 rendered/mobile/keyboard workflows, full data cutover, and whole-guest
 cold/concurrent memory/capacity verification remain open. Native author-only
