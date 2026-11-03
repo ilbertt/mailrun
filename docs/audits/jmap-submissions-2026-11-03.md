@@ -116,8 +116,50 @@ comparisons also pass, along with original source-job upgrade/cron/replay and
 original full-record restore, relay preservation, JMAP downloads and Drive
 completion across restart. One new guard initially expected a plain-text 401;
 the existing JMAP controller returns JSON. Its expected response was corrected,
-retaining every publication, object and original-draft assertion. Final Linux
-and release evidence follows after verification.
+retaining every publication, object and original-draft assertion.
+
+[Native Ubuntu CI 41625247338](https://github.com/ilbertt/mailrun/actions/runs/41625247338)
+and independent PR run 41625255487 pass all 1,995 tests, generated SQL/coverage,
+TypeScript and every configured compiled rehearsal. The 80-case JMAP HTTP and
+restart/recovery checks, original source-schema upgrade through 0071, record
+restore and existing public/session/worker contracts pass natively on Linux.
+The selected one-CPU/256-MiB/no-swap rule workload reports 114,823,168-byte cgroup
+peak and zero OOM kills; it does not prove whole-guest cold/concurrent capacity.
+
+A fresh pre-0071 full recovery export was saved in the previously approved private
+folder as `before-jmap-submission-0071.tar.gz` (53,597,904 bytes, mode 0600,
+directory 0700). Its private database copy passes integrity and foreign-key
+checks and contains one account/five messages with 0071 and the ledger absent.
+Query-only validation used local read/write access for WAL bookkeeping; the
+archive remains unchanged. The archived executable also matches the previously
+verified source `391d6c3` binary, and the environment is present without secret
+values being displayed. A later post-interruption check found this temporary
+directory absent; that local archive is no longer available. A fresh current
+export, `before-identifier-parity.tar.gz` (53,609,521 bytes, mode 0600), now
+exists in the same approved private location. Its executable matches this
+release, environment is included privately, and its query-only database copy
+passes integrity/foreign-key checks with one account/five messages, 0071 applied
+and an empty ledger. This current copy is after the JMAP upgrade; it does not
+replace the missing pre-upgrade snapshot.
+
+Source `51b0a91` was deployed on November 3 through the nibrun CLI to the existing
+preview, deployment `01a1a129-4227-72d3-9d7f-bcb3029c6dbe`. The complete local
+Linux ELF download matches its CI manifest: 119,424,992 bytes, SHA-256
+`bd9a291066afaf1b4363a28ace6135822ef7bc6eaf55c7b581e55a94e907b462`.
+Artifact 13225966299 has archive SHA-256
+`75418c69d312462f602090c521d1861fba88d2afc5acc5a99cd1dda84be72102`;
+the CLI uses that digest for verified server-side archive fetch. Deployment
+started after local download/checksum verification completed.
+
+Pre-release checks found zero queued/sending jobs and active domain operations,
+with one account/five messages. Post-release checks verify those data totals,
+ready installation, 0071 applied once, an empty submission ledger, complete
+linked transport snapshots and active ilbert.dev routing/sending. Login/setup
+return HTTP 200, the existing Cloudflare Worker returns HTTP 200 with a successful
+signed callback, and all three UTC cron registrations belong to the new
+deployment. These release checks used no live email, mailbox/message mutation,
+credential/provider edit or restore/reset. The only live schema change is the
+additive, tested ledger migration.
 
 Generated identifier format is a known app-wide gap: the original common ID
 helper uses NanoID, while the native helper currently uses UUIDs and some
