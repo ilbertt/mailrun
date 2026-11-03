@@ -1,0 +1,71 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceHashes": {
+    "src/lib/email/routing.ts": "a5e51c90be687a5a18de7df4a71381188164361b281194c3f509616fde3b18f7",
+    "src/lib/email/recipient-address.ts": "f38761e861d76e8474518d95734ee6a3ab2796e263d84025647929bb4a2c9414",
+    "src/lib/mailboxes/domain-addresses.ts": "2815e7f41686361b37b7afac8666de69b2871d9d5d515997852d18334928c2af",
+    "server/runtime/sqlite-database.ts": "81802be9ce61e63f215874c7b9e42d18bb17bdf4c520d14f30a6d4f02c275046"
+  },
+  "cases": [
+    {
+      "name": "explicit",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox"
+      }
+    },
+    {
+      "name": "plus-dot",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox"
+      }
+    },
+    {
+      "name": "other-domain",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox"
+      }
+    },
+    {
+      "name": "normalized-alias-order",
+      "result": {
+        "action": "store",
+        "mailboxId": "routing-second"
+      }
+    },
+    {
+      "name": "normalized-alias-newer",
+      "result": {
+        "action": "store",
+        "mailboxId": "routing-second"
+      }
+    },
+    {
+      "name": "primary-before-alias",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox"
+      }
+    },
+    {
+      "name": "disabled-first-alias",
+      "result": {
+        "action": "store",
+        "mailboxId": "routing-second"
+      }
+    },
+    {
+      "name": "cross-domain-fallback",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox"
+      }
+    },
+    {
+      "name": "unknown",
+      "result": null
+    }
+  ]
+}

@@ -1,0 +1,2221 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/app/api/mailboxes/[id]/aliases/route.ts": "cd2b72b5a24693839dc58c47b22261f7042e518080ee5b55672e1a338fff9012",
+    "src/lib/mailboxes/access.ts": "67c7585a38da84bb0dd97636294cb506dba3d6713ad808edcbc526822326a20d",
+    "src/lib/mailboxes/access-utils.ts": "f031a162eaec53795ed4ff55f19ce667f98939556131c01dc37c29ddeaa484d3",
+    "src/lib/validators.ts": "d31175b28afcbd8118e2ffd82ba7b1cf2deacd436f5cec59b064a7bcf49b5061",
+    "src/lib/cloudflare-api.ts": "e5da0138513564ba6c096312763e8cd46614a2b6ec2d359daaf90fe689a78cef",
+    "src/lib/email/recipient-address.ts": "f38761e861d76e8474518d95734ee6a3ab2796e263d84025647929bb4a2c9414",
+    "src/lib/email/routing.ts": "a5e51c90be687a5a18de7df4a71381188164361b281194c3f509616fde3b18f7"
+  },
+  "cases": [
+    {
+      "name": "GET-owner",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            }
+          ],
+          "availableDomains": [
+            {
+              "id": "domain",
+              "hostname": "example.com"
+            },
+            {
+              "id": "zebra-domain",
+              "hostname": "zebra.example"
+            },
+            {
+              "id": "alpha-domain",
+              "hostname": "alpha.example"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-owner",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "added",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "added",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-owner",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-read_only",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-read_only",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-read_only",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-send_on_behalf",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-send_on_behalf",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-send_on_behalf",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-send_as",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-send_as",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-send_as",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-full_access",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            }
+          ],
+          "availableDomains": [
+            {
+              "id": "domain",
+              "hostname": "example.com"
+            },
+            {
+              "id": "zebra-domain",
+              "hostname": "zebra.example"
+            },
+            {
+              "id": "alpha-domain",
+              "hostname": "alpha.example"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-full_access",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "added",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "added",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-full_access",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-unknown",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-unknown",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-unknown",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-unshared",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-unshared",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-unshared",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-simple",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "new-name",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "new-name",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-trim-case",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "new.name",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "new.name",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-plus",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "news+tag",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "news+tag",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-bare-plus",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "+",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "+",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-duplicate-mailbox",
+      "snapshot": {
+        "status": 409,
+        "body": {
+          "error": "A mailbox already uses this address"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-duplicate-alias",
+      "snapshot": {
+        "status": 409,
+        "body": {
+          "error": "An alias already uses this address"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-normalized-mailbox",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "h.ello+tag",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "h.ello+tag",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-normalized-alias",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "domain",
+              "localPart": "o.ld+tag",
+              "hostname": "example.com",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "o.ld+tag",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-foreign-domain",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Domain not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-pending-domain",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Domain not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-missing-domain",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Domain not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-cross-domain",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            },
+            {
+              "id": "$created-alias",
+              "domainId": "zebra-domain",
+              "localPart": "new",
+              "hostname": "zebra.example",
+              "createdAt": "$now"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          },
+          {
+            "id": "$created-alias",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "new",
+            "created_at": "$now"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-invalid-local",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-missing-local",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-missing-domain-id",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-blank-domain",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-long-local",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-number-local",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-array",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-null",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "list-owner-user",
+      "snapshot": {
+        "status": 200,
+        "body": {
+          "aliases": [
+            {
+              "id": "seed-a",
+              "domainId": "domain",
+              "localPart": "old",
+              "hostname": "example.com",
+              "createdAt": "1970-01-01T00:00:20.000Z"
+            },
+            {
+              "id": "seed-z",
+              "domainId": "zebra-domain",
+              "localPart": "zebra",
+              "hostname": "zebra.example",
+              "createdAt": "1970-01-01T00:00:01.000Z"
+            }
+          ],
+          "availableDomains": [
+            {
+              "id": "domain",
+              "hostname": "example.com"
+            },
+            {
+              "id": "zebra-domain",
+              "hostname": "zebra.example"
+            },
+            {
+              "id": "alpha-domain",
+              "hostname": "alpha.example"
+            }
+          ]
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "list-missing-box",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "create-missing-box",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-missing-alias",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Alias not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-foreign-alias",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Alias not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-missing-id",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Alias is required"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-before-permission",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Enter a valid alias username and domain"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete-id-before-permission",
+      "snapshot": {
+        "status": 400,
+        "body": {
+          "error": "Alias is required"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-disabled",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-disabled",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-disabled",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-personal",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-personal",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-personal",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "GET-no-team",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "POST-no-team",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "DELETE-no-team",
+      "snapshot": {
+        "status": 404,
+        "body": {
+          "error": "Mailbox not found"
+        },
+        "aliases": [
+          {
+            "id": "seed-a",
+            "mailbox_id": "mailbox",
+            "domain_id": "domain",
+            "local_part": "old",
+            "created_at": 20
+          },
+          {
+            "id": "seed-z",
+            "mailbox_id": "mailbox",
+            "domain_id": "zebra-domain",
+            "local_part": "zebra",
+            "created_at": 1
+          },
+          {
+            "id": "seed-foreign",
+            "mailbox_id": "foreign-box",
+            "domain_id": "foreign-domain",
+            "local_part": "other",
+            "created_at": 1
+          }
+        ]
+      }
+    }
+  ]
+}

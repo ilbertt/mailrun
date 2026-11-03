@@ -1,0 +1,6168 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/app/api/v1/send/route.ts": "d5ea8fa33c1d2acb1ebebb7a9432db1e7d7ae52419f020db5a4172649db6ca7d",
+    "src/lib/api/auth.ts": "41c3265fdd1730ada42445410302e525bf599fc89b4a5822ce79416686049456",
+    "src/lib/api/key-auth.ts": "a80e57d9ceb7d71e7233b63c83c7913deb49251dbf62b09251f3135a8cb7eb83",
+    "src/lib/api-keys.ts": "9a74a91ab2ed94fb6347c78765823b394c18a017a388988255052659a02575b8",
+    "src/lib/api/scopes.ts": "8f8f75fca9ec064a60d0d2a343c4d7dd37e0f580cb03ff4a1dacaf9879482cca",
+    "src/lib/validators.ts": "d31175b28afcbd8118e2ffd82ba7b1cf2deacd436f5cec59b064a7bcf49b5061",
+    "src/lib/email/send.ts": "380f25f360f45480c681668c66aab057bd3b84c7cb00831a3e3c5863d7c59ff3",
+    "src/lib/email/attachments.ts": "64952619a49258e34f682d2d860cec8365fd562ccc2e327104d70475371f5cbf",
+    "src/lib/email/sender.ts": "a3fcc66a9d50a03ab31726c9dfad5de4ac126fa79e2d33c4b66c511873cfd755",
+    "src/app/api/send/error-utils.ts": "4deea5d9728e9a374514d09871e182dadc7519739e0f018a5f9927e47b8d65d5",
+    "src/lib/http/request.ts": "57bb8d89631d476ae1edb80725f7d6f672682a18d9d06440f61b72aec48dc295",
+    "src/lib/http/errors.ts": "c9a3d1ff56b5be65f6caf5e0c245dc07dbecc58b4576d9ece3a7a99711b0dd24",
+    "server/runtime/sqlite-database.ts": "81802be9ce61e63f215874c7b9e42d18bb17bdf4c520d14f30a6d4f02c275046",
+    "server/runtime/file-bucket.ts": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2"
+  },
+  "cases": [
+    {
+      "name": "role-owner",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-read_only",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-send_on_behalf",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "stranger",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Stranger on behalf of Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "stranger",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "stranger",
+                "from": "\"Stranger on behalf of Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "stranger:maya@example.net",
+              "user_id": "stranger",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "stranger",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Stranger on behalf of Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-send_as",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "stranger",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "stranger",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "stranger",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "stranger:maya@example.net",
+              "user_id": "stranger",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "stranger",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-full_access",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "stranger",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "stranger",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "stranger",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "stranger:maya@example.net",
+              "user_id": "stranger",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "stranger",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-unknown",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "role-unshared",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled-box",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "personal-box",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-team",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "You do not have permission to send from this mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled-user",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "deleted-key",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": []
+      }
+    },
+    {
+      "name": "scopes-read",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-*",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-send",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-send,read",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-send,mailboxes",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-accounts",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scopes-",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "mailbox-scope-empty",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 404,
+          "body": {
+            "error": "Mailbox not found"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "mailbox-scope-other",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 404,
+          "body": {
+            "error": "Mailbox not found"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "mailbox-scope-all",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "auth-none",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "auth-basic",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "auth-invalid",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "auth-trimmed",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "mcp-unrestricted-legacy",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "ordinary",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scheduled",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1",
+            "scheduled": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": null,
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "queued",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": null,
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "queued",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "scheduledAt": "2099-01-01T00:00:00.123Z",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": 4070908800
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "past",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "scheduledAt": "2000-01-01T00:00:00Z",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "subject-only",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "maya@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Subject only",
+              "snippet": "",
+              "text_body": null,
+              "html_body": null,
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "maya@example.net"
+                ],
+                "subject": "Subject only",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": null,
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "maya@example.net",
+                "subject": "Subject only"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "maya@example.net"
+              ],
+              "subject": "Subject only",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-from",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "from": [
+                  "Invalid input: expected string, received undefined"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "wrong-from",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 403,
+          "body": {
+            "error": "Sender address does not match the selected mailbox"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-mailbox",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "mailboxId": [
+                  "Invalid input: expected string, received undefined"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown-mailbox",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 404,
+          "body": {
+            "error": "Mailbox not found"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty-subject",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "subject": [
+                  "Too small: expected string to have >=1 characters"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "long-subject",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "subject": [
+                  "Too big: expected string to have <=500 characters"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-recipient",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "to": [
+                  "Enter valid email addresses"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "single-label-recipient",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "recipient@internal",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "recipient@internal"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:recipient@internal",
+              "user_id": "owner",
+              "email": "recipient@internal",
+              "display_name": null,
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": "$now",
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "recipient@internal",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "recipient@internal"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-to",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "to": [
+                  "Invalid input"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "threading",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": "Copy <cc@example.net>",
+              "bcc_addr": "hidden@example.net",
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "submitted-thread",
+              "in_reply_to": "parent@example.net",
+              "references_header": "root@example.net parent@example.net",
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "cc": [
+                  "Copy <cc@example.net>"
+                ],
+                "bcc": [
+                  "hidden@example.net"
+                ],
+                "subject": "Public API message",
+                "inReplyTo": "parent@example.net",
+                "references": "<root@example.net> <parent@example.net>",
+                "threadId": "submitted-thread",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            },
+            {
+              "id": "owner:cc@example.net",
+              "user_id": "owner",
+              "email": "cc@example.net",
+              "display_name": "Copy",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            },
+            {
+              "id": "owner:hidden@example.net",
+              "user_id": "owner",
+              "email": "hidden@example.net",
+              "display_name": null,
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "cc": "Copy <cc@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "cc": [
+                "Copy <cc@example.net>"
+              ],
+              "bcc": [
+                "hidden@example.net"
+              ],
+              "subject": "Public API message",
+              "headers": {
+                "In-Reply-To": "<parent@example.net>",
+                "References": "<root@example.net> <parent@example.net>"
+              },
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicates",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>, cc@example.net",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>",
+                  "cc@example.net"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            },
+            {
+              "id": "owner:cc@example.net",
+              "user_id": "owner",
+              "email": "cc@example.net",
+              "display_name": null,
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>, cc@example.net",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>",
+                "cc@example.net"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "bad-schedule",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "scheduledAt": [
+                  "Invalid ISO datetime"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "too-many-total",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 500,
+          "body": {
+            "error": "A message can have at most 50 recipients"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "file",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "text/plain",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "default-type",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "default.bin",
+                    "type": "application/octet-stream",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "default.bin",
+              "content_type": "application/octet-stream",
+              "size": 4,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/default.bin",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "default.bin",
+                  "type": "application/octet-stream",
+                  "content": "RGF0YQ==",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/default.bin",
+              "sha256": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "upper-type",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "TEXT/PLAIN",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "TEXT/PLAIN",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "TEXT/PLAIN",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "padded-type",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": " text/plain ; charset=UTF-8 ",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": " text/plain ; charset=UTF-8 ",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": " text/plain ; charset=UTF-8 ",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "slash-name",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": " ../folder\\note.txt ",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": ".._folder_note.txt",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/.._folder_note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": " ../folder\\note.txt ",
+                  "type": "text/plain",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/.._folder_note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "nul-name",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "nul\u0000name.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "nul_name.txt",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/nul_name.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "nul\u0000name.txt",
+                  "type": "text/plain",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/nul_name.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "whitespace-name",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": " ",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "attachment",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/attachment",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": " ",
+                  "type": "text/plain",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/attachment",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "whitespace-base64",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 3,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "text/plain",
+                  "content": "QUJD",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "unpadded-base64",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 5,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "text/plain",
+                  "content": "aGVsbG8=",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty-decoded",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 0,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "text/plain",
+                  "content": "",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-base64",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 500,
+          "body": {
+            "error": "Invalid character"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "bad-padding",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 500,
+          "body": {
+            "error": "Invalid character"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty-base64",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "attachments": [
+                  "Too small: expected string to have >=1 characters"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scheduled-file",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1",
+            "scheduled": true
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": null,
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "queued",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": null,
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "queued",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "scheduledAt": "2099-01-01T00:00:00Z",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": 4070908800
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "two-files",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-2",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 200,
+          "body": {
+            "messageId": "$outbound-1"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": "<fixture-wire@example.net>",
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "sent",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": "fixture-wire@example.net",
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "sent",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [
+                  {
+                    "filename": "note.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-1"
+                  },
+                  {
+                    "filename": "second.txt",
+                    "type": "text/plain",
+                    "disposition": "attachment",
+                    "storageId": "$attachment-2"
+                  }
+                ],
+                "cc": [],
+                "bcc": []
+              },
+              "error": null,
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [
+            {
+              "id": "$attachment-1",
+              "message_id": "$outbound-1",
+              "filename": "note.txt",
+              "content_type": "text/plain",
+              "size": 14,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            },
+            {
+              "id": "$attachment-2",
+              "message_id": "$outbound-1",
+              "filename": "second.txt",
+              "content_type": "text/plain",
+              "size": 6,
+              "disposition": "attachment",
+              "content_id": null,
+              "r2_key": "attachments/$outbound-1/$attachment-2/second.txt",
+              "created_at": "$now",
+              "trashed_at": null
+            }
+          ],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [
+            {
+              "id": "$audit-1",
+              "actor_user_id": "owner",
+              "target_user_id": null,
+              "mailbox_id": "mailbox",
+              "message_id": "$outbound-1",
+              "action": "email.send",
+              "metadata": {
+                "to": "Maya <maya@example.net>",
+                "subject": "Public API message"
+              },
+              "created_at": "$now"
+            }
+          ],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": [
+                {
+                  "filename": "note.txt",
+                  "type": "text/plain",
+                  "content": "QVBJIGF0dGFjaG1lbnQ=",
+                  "disposition": "attachment"
+                },
+                {
+                  "filename": "second.txt",
+                  "type": "text/plain",
+                  "content": "U2Vjb25k",
+                  "disposition": "attachment"
+                }
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "key": "attachments/$outbound-1/$attachment-1/note.txt",
+              "sha256": "2197b801dfddce5f4474e438270c75b6e30e2ff39b3a11dbb253b477835b5bdb"
+            },
+            {
+              "key": "attachments/$outbound-1/$attachment-2/second.txt",
+              "sha256": "8b88a85089561b7978c4e52c3150112912125f3d34ec59b6ff1450fc1079979c"
+            },
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "file-limit",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": "Attachments exceed the administrator's 0.000001 MB outgoing limit"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "decode-before-sender",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 500,
+          "body": {
+            "error": "Invalid character"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "scope-before-decode",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 404,
+          "body": {
+            "error": "Mailbox not found"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "provider-failure",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
+          "status": 500,
+          "body": {
+            "error": "Synthetic provider failure"
+          },
+          "messages": [
+            {
+              "id": "$outbound-1",
+              "user_id": "owner",
+              "mailbox_id": "mailbox",
+              "direction": "outbound",
+              "provider_message_id": null,
+              "folder_id": null,
+              "from_addr": "\"Shared Inbox\" <hello@example.com>",
+              "to_addr": "Maya <maya@example.net>",
+              "cc_addr": null,
+              "bcc_addr": null,
+              "reply_to": null,
+              "subject": "Public API message",
+              "snippet": "API body",
+              "text_body": "API body",
+              "html_body": "<p>API body</p>",
+              "raw_r2_key": null,
+              "status": "failed",
+              "read": 1,
+              "starred": 0,
+              "snoozed_until": null,
+              "thread_id": null,
+              "in_reply_to": null,
+              "references_header": null,
+              "spam_score": null,
+              "spam_verdict": null,
+              "spam_signals": null,
+              "spam_analyzed_at": null,
+              "spam_analysis_error": null,
+              "trashed_at": null,
+              "created_at": "$now"
+            }
+          ],
+          "jobs": [
+            {
+              "id": "$job-1",
+              "user_id": "owner",
+              "message_id": "$outbound-1",
+              "status": "failed",
+              "payload": {
+                "userId": "owner",
+                "from": "\"Shared Inbox\" <hello@example.com>",
+                "to": [
+                  "Maya <maya@example.net>"
+                ],
+                "subject": "Public API message",
+                "html": "<p>API body</p>",
+                "text": "API body",
+                "mailboxId": "mailbox",
+                "publicOrigin": "$app-origin",
+                "attachments": [],
+                "cc": [],
+                "bcc": []
+              },
+              "error": "Synthetic provider failure",
+              "created_at": "$now",
+              "updated_at": "$now",
+              "scheduled_at": null
+            }
+          ],
+          "files": [],
+          "contacts": [
+            {
+              "id": "owner:maya@example.net",
+              "user_id": "owner",
+              "email": "maya@example.net",
+              "display_name": "Maya",
+              "source": "outbound",
+              "last_seen_at": "$now",
+              "created_at": 1,
+              "blocked": 0,
+              "avatar_key": null
+            }
+          ],
+          "audits": [],
+          "deliveries": [
+            {
+              "from": "\"Shared Inbox\" <hello@example.com>",
+              "to": [
+                "Maya <maya@example.net>"
+              ],
+              "subject": "Public API message",
+              "html": "<p>API body</p>",
+              "text": "API body",
+              "attachments": []
+            }
+          ],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "raw-\"{\"",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": "Invalid send request"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "raw-\"null\"",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [
+                "Invalid input: expected object, received null"
+              ],
+              "fieldErrors": {}
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "raw-\"[]\"",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [
+                "Invalid input: expected object, received array"
+              ],
+              "fieldErrors": {}
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "raw-\"{}\"",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "from": [
+                  "Invalid input: expected string, received undefined"
+                ],
+                "to": [
+                  "Invalid input"
+                ],
+                "subject": [
+                  "Invalid input: expected string, received undefined"
+                ],
+                "mailboxId": [
+                  "Invalid input: expected string, received undefined"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "raw-\"\"",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 400,
+          "body": {
+            "error": {
+              "formErrors": [],
+              "fieldErrors": {
+                "from": [
+                  "Invalid input: expected string, received undefined"
+                ],
+                "to": [
+                  "Invalid input"
+                ],
+                "subject": [
+                  "Invalid input: expected string, received undefined"
+                ],
+                "mailboxId": [
+                  "Invalid input: expected string, received undefined"
+                ]
+              }
+            }
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "declared-overflow",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 413,
+          "body": {
+            "error": "Invalid send request"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflow-without-key",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflow-invalid-key",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "overflow-read-key",
+      "snapshot": {
+        "snapshot": {
+          "identifiers": [],
+          "status": 401,
+          "body": {
+            "error": "Unauthorized"
+          },
+          "messages": [],
+          "jobs": [],
+          "files": [],
+          "contacts": [],
+          "audits": [],
+          "deliveries": [],
+          "objects": [
+            {
+              "key": "stored.txt",
+              "sha256": "87b04e58961f9a99d853d4046a0b5b793e7c3e4bbd21f5aca8fb17c20cdb1d8b"
+            }
+          ]
+        },
+        "key": [
+          {
+            "id": "v1-key",
+            "used": 1
+          }
+        ]
+      }
+    }
+  ]
+}

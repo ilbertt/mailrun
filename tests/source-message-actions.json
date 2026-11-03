@@ -1,0 +1,1205 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/app/api/messages/[messageId]/read/route.ts": "0e48cbe59f86986900232ca808d6b38289c1ad45a4f5fd5d35253e519ab37886",
+    "src/app/api/messages/[messageId]/star/route.ts": "e3c2802cec17010e582039fd80cb968e8ba0c666b2ec39111ee9ab03ea8fe506",
+    "src/app/api/messages/[messageId]/snooze/route.ts": "d6f73d6817db67cfc9fe73cb17af7a26eb2710868d47dca1853d59d68923a0f4",
+    "src/app/api/messages/[messageId]/snooze/utils.ts": "10239a63430191ce952cb7567032eaa2df19d13a7ed89d1c5a2623a8375b0d7c",
+    "src/lib/user.ts": "e038eae3bc9ae9e9030cd4308adb768c05ccdbb1a455f2d7a6feed3938ec0ca0",
+    "src/lib/mailboxes/access.ts": "67c7585a38da84bb0dd97636294cb506dba3d6713ad808edcbc526822326a20d",
+    "src/lib/mailboxes/audit.ts": "da1842844183a5968ac1ad5ab509373d3109ab062868d92140a6667c3a84d761"
+  },
+  "cases": [
+    {
+      "name": "owner-read",
+      "actor": "owner",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "owner-star",
+      "actor": "owner",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4070952000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-unsnooze",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": null,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "unshared-read",
+      "actor": "stranger",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "unshared-star",
+      "actor": "stranger",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "unshared-snooze",
+      "actor": "stranger",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "unshared-unsnooze",
+      "actor": "stranger",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "read_only-read",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "read_only-star",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "read_only-snooze",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "read_only-unsnooze",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_on_behalf-read",
+      "actor": "stranger",
+      "permission": "send_on_behalf",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "send_on_behalf-star",
+      "actor": "stranger",
+      "permission": "send_on_behalf",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_on_behalf-snooze",
+      "actor": "stranger",
+      "permission": "send_on_behalf",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_on_behalf-unsnooze",
+      "actor": "stranger",
+      "permission": "send_on_behalf",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_as-read",
+      "actor": "stranger",
+      "permission": "send_as",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "send_as-star",
+      "actor": "stranger",
+      "permission": "send_as",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_as-snooze",
+      "actor": "stranger",
+      "permission": "send_as",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "send_as-unsnooze",
+      "actor": "stranger",
+      "permission": "send_as",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "full_access-read",
+      "actor": "stranger",
+      "permission": "full_access",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "full_access-star",
+      "actor": "stranger",
+      "permission": "full_access",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "full_access-snooze",
+      "actor": "stranger",
+      "permission": "full_access",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4070952000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "full_access-unsnooze",
+      "actor": "stranger",
+      "permission": "full_access",
+      "action": "snooze",
+      "method": "DELETE",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": null,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-invalid",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "bad date",
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-empty",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "",
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-null",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": null,
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-number",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": 123,
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-past",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2000-01-01T00:00:00Z",
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-offset",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00+02:00",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4070944800,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-date-only",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-02",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4070995200,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-rfc-date",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "Thu, 01 Jan 2099 12:00:00 GMT",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4070952000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "invalid-grant-read",
+      "actor": "stranger",
+      "permission": "unknown",
+      "action": "read",
+      "method": "POST",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "invalid-grant-star",
+      "actor": "stranger",
+      "permission": "unknown",
+      "action": "star",
+      "method": "POST",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-read-again",
+      "actor": "owner",
+      "action": "read",
+      "method": "POST",
+      "read": 1,
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 1
+      },
+      "audit": [
+        {
+          "action": "email.read",
+          "metadata": null
+        }
+      ]
+    },
+    {
+      "name": "owner-star-again",
+      "actor": "owner",
+      "action": "star",
+      "method": "POST",
+      "starred": 1,
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": false
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-star-outbound",
+      "actor": "owner",
+      "action": "star",
+      "method": "POST",
+      "status": "sent",
+      "direction": "outbound",
+      "response": {
+        "status": 200,
+        "body": {
+          "starred": true
+        }
+      },
+      "message": {
+        "status": "sent",
+        "direction": "outbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 1,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-outbound",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "status": "sent",
+      "direction": "outbound",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "sent",
+        "direction": "outbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-unsnooze-outbound",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "DELETE",
+      "status": "sent",
+      "direction": "outbound",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "sent",
+        "direction": "outbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-snooze-archived",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "status": "archived",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "archived",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "owner-unsnooze-archived",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "DELETE",
+      "status": "archived",
+      "response": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "message": {
+        "status": "archived",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": null,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "missing-read",
+      "actor": "owner",
+      "action": "read",
+      "method": "POST",
+      "messageId": "missing",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "missing-star",
+      "actor": "owner",
+      "action": "star",
+      "method": "POST",
+      "messageId": "missing",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "missing-snooze-invalid",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "bad date",
+      "messageId": "missing",
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Choose a future snooze time"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "missing-snooze-valid",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "messageId": "missing",
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "sharing-disabled-star",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "star",
+      "method": "POST",
+      "team": false,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "personal-mailbox-star",
+      "actor": "stranger",
+      "permission": "read_only",
+      "action": "star",
+      "method": "POST",
+      "personal": true,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "disabled-mailbox-read",
+      "actor": "owner",
+      "action": "read",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "disabled": 1,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "disabled-mailbox-star",
+      "actor": "owner",
+      "action": "star",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "disabled": 1,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    },
+    {
+      "name": "disabled-mailbox-snooze",
+      "actor": "owner",
+      "action": "snooze",
+      "method": "POST",
+      "until": "2099-01-01T12:00:00.987Z",
+      "disabled": 1,
+      "response": {
+        "status": 404,
+        "body": {
+          "error": "Message not found"
+        }
+      },
+      "message": {
+        "status": "received",
+        "direction": "inbound",
+        "folder_id": "action-folder",
+        "snoozed_until": 4000000000,
+        "trashed_at": 123,
+        "starred": 0,
+        "read": 0
+      },
+      "audit": []
+    }
+  ]
+}

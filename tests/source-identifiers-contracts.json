@@ -1,0 +1,463 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "sourceHashes": {
+    "src/lib/ids.ts": "9d392c54d3d73fa186dce2cd8d73d99ede8e47833ee0fda9864850411b8cad6e",
+    "src/lib/api-keys.ts": "9a74a91ab2ed94fb6347c78765823b394c18a017a388988255052659a02575b8",
+    "src/lib/auth/session.ts": "dbb5dd4a860808f4764cd3506f906f677eba997ca1596a00fb4e2f3a3cad0b08",
+    "src/lib/auth/login-challenge.ts": "52dfada7ffddd26bd8705b6b5755f302f23f59cc8a1dcdd77e2cc98f7b90b9e5",
+    "src/lib/auth/password-reset.ts": "951d66aea3ee6c1b099c63e835b94910804d5331de3b996ce922f1d3eaddceb6",
+    "src/lib/mailboxes/audit.ts": "da1842844183a5968ac1ad5ab509373d3109ab062868d92140a6667c3a84d761",
+    "src/app/api/folders/route.ts": "173a41fdd9eab4a53f515c7a4088b577028616a36d5f9c8b736ec345ee5fb10c",
+    "src/app/api/auth/register/route.ts": "2c9177aae051db8af595921f1c5faf467bb27592d2e351e65e6e46614413619c",
+    "package-lock.json": "0ce104b0bc4a52808d93fb0c1fa412e24a6531df8899989387124fca1264a888"
+  },
+  "nanoidVersion": "5.1.16",
+  "prefixWriters": {
+    "ajob": [
+      "lib/agent/jobs/utils.ts"
+    ],
+    "als": [
+      "app/api/accounts/create.ts",
+      "app/api/mailboxes/[id]/aliases/route.ts"
+    ],
+    "approval": [
+      "lib/agent/approvals/utils.ts"
+    ],
+    "arp": [
+      "lib/email/auto-reply.ts"
+    ],
+    "att": [
+      "lib/email/attachments.ts"
+    ],
+    "aud": [
+      "lib/mailboxes/audit.ts"
+    ],
+    "bak": [
+      "lib/backups/service.ts"
+    ],
+    "book": [
+      "app/api/booking/route.ts"
+    ],
+    "chat": [
+      "lib/agent/chat.ts"
+    ],
+    "chk": [
+      "lib/storage/health.ts"
+    ],
+    "conv": [
+      "lib/agent/chat.ts"
+    ],
+    "dom": [
+      "lib/domains/service.ts",
+      "lib/seed-utils.ts"
+    ],
+    "drv": [
+      "app/api/drive/items/route.ts",
+      "app/api/drive/upload/route.ts"
+    ],
+    "dshr": [
+      "app/api/drive/items/[id]/shares/route.ts"
+    ],
+    "evt": [
+      "app/api/calendar/events/[eventId]/route.ts",
+      "app/api/calendar/events/route.ts",
+      "lib/booking/create.ts",
+      "lib/calendar/tools.ts"
+    ],
+    "fld": [
+      "app/api/folders/route.ts",
+      "lib/jmap/mailboxes.ts"
+    ],
+    "job": [
+      "lib/email/send.ts",
+      "lib/seed-utils.ts"
+    ],
+    "key": [
+      "app/api/admin/api-keys/utils.ts",
+      "app/api/agent/mcp-keys/route.ts",
+      "app/api/api-keys/route.ts"
+    ],
+    "mac": [
+      "app/api/mailboxes/[id]/access/route.ts"
+    ],
+    "mbx": [
+      "app/api/accounts/create.ts",
+      "app/api/auth/register/route.ts",
+      "app/api/mailboxes/route.ts",
+      "app/api/mailboxes/utils.ts",
+      "app/api/v1/mailboxes/utils.ts",
+      "lib/seed-utils.ts"
+    ],
+    "mfa": [
+      "lib/auth/login-challenge.ts"
+    ],
+    "msg": [
+      "app/api/drafts/route.ts",
+      "app/api/templates/route.ts",
+      "lib/agent/tools.ts",
+      "lib/email/send.ts",
+      "lib/import/service.ts",
+      "lib/jmap/emails.ts",
+      "lib/seed-utils.ts"
+    ],
+    "prt": [
+      "lib/auth/password-reset.ts"
+    ],
+    "rc": [
+      "lib/auth/recovery-codes.ts"
+    ],
+    "rule": [
+      "app/api/routing-rules/domain/route.ts",
+      "app/api/routing-rules/route.ts"
+    ],
+    "sess": [
+      "lib/auth/session.ts"
+    ],
+    "share": [
+      "lib/email/shared-attachments.ts"
+    ],
+    "thr": [
+      "lib/email/inbound.ts",
+      "lib/email/threading.ts"
+    ],
+    "ts": [
+      "lib/auth/turnstile.ts"
+    ],
+    "upl": [
+      "lib/jmap/blobs.ts"
+    ],
+    "usage": [
+      "lib/ai/usage.ts"
+    ],
+    "usr": [
+      "app/api/accounts/create.ts",
+      "app/api/auth/register/route.ts",
+      "lib/seed-utils.ts"
+    ],
+    "wh": [
+      "app/api/webhooks/route.ts"
+    ],
+    "whd": [
+      "lib/email/webhooks.ts"
+    ],
+    "whsec": [
+      "app/api/webhooks/[id]/route.ts",
+      "app/api/webhooks/route.ts"
+    ]
+  },
+  "result": {
+    "bare": {
+      "prefix": null,
+      "suffixLength": 21,
+      "urlSafe": true
+    },
+    "emptyPrefix": {
+      "prefix": null,
+      "suffixLength": 21,
+      "urlSafe": true
+    },
+    "prefixed": [
+      {
+        "input": "ajob",
+        "shape": {
+          "prefix": "ajob",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "als",
+        "shape": {
+          "prefix": "als",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "approval",
+        "shape": {
+          "prefix": "approval",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "arp",
+        "shape": {
+          "prefix": "arp",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "att",
+        "shape": {
+          "prefix": "att",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "aud",
+        "shape": {
+          "prefix": "aud",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "bak",
+        "shape": {
+          "prefix": "bak",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "book",
+        "shape": {
+          "prefix": "book",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "chat",
+        "shape": {
+          "prefix": "chat",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "chk",
+        "shape": {
+          "prefix": "chk",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "conv",
+        "shape": {
+          "prefix": "conv",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "dom",
+        "shape": {
+          "prefix": "dom",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "drv",
+        "shape": {
+          "prefix": "drv",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "dshr",
+        "shape": {
+          "prefix": "dshr",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "evt",
+        "shape": {
+          "prefix": "evt",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "fld",
+        "shape": {
+          "prefix": "fld",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "job",
+        "shape": {
+          "prefix": "job",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "key",
+        "shape": {
+          "prefix": "key",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "mac",
+        "shape": {
+          "prefix": "mac",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "mbx",
+        "shape": {
+          "prefix": "mbx",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "mfa",
+        "shape": {
+          "prefix": "mfa",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "msg",
+        "shape": {
+          "prefix": "msg",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "prt",
+        "shape": {
+          "prefix": "prt",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "rc",
+        "shape": {
+          "prefix": "rc",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "rule",
+        "shape": {
+          "prefix": "rule",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "sess",
+        "shape": {
+          "prefix": "sess",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "share",
+        "shape": {
+          "prefix": "share",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "thr",
+        "shape": {
+          "prefix": "thr",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "ts",
+        "shape": {
+          "prefix": "ts",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "upl",
+        "shape": {
+          "prefix": "upl",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "usage",
+        "shape": {
+          "prefix": "usage",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "usr",
+        "shape": {
+          "prefix": "usr",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "wh",
+        "shape": {
+          "prefix": "wh",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "whd",
+        "shape": {
+          "prefix": "whd",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      },
+      {
+        "input": "whsec",
+        "shape": {
+          "prefix": "whsec",
+          "suffixLength": 21,
+          "urlSafe": true
+        }
+      }
+    ],
+    "apiKey": {
+      "shape": {
+        "prefix": "ep",
+        "suffixLength": 21,
+        "urlSafe": true
+      },
+      "prefixLength": 12,
+      "prefixMatches": true,
+      "bcryptCost": 10,
+      "verifies": true
+    },
+    "session": {
+      "shape": {
+        "prefix": "sess",
+        "suffixLength": 21,
+        "urlSafe": true
+      },
+      "hashLength": 64,
+      "sampleHash": "f21d8dc79f1d91699a0f0d540a4959195aee2dbc05460b3d14f384c341097173"
+    }
+  }
+}

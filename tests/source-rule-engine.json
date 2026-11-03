@@ -1,0 +1,347 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceHashes": {
+    "src/lib/email/routing.ts": "a5e51c90be687a5a18de7df4a71381188164361b281194c3f509616fde3b18f7",
+    "src/lib/email/recipient-address.ts": "f38761e861d76e8474518d95734ee6a3ab2796e263d84025647929bb4a2c9414",
+    "src/lib/mailboxes/domain-addresses.ts": "2815e7f41686361b37b7afac8666de69b2871d9d5d515997852d18334928c2af",
+    "src/lib/email/address.ts": "24f35bebb53bea448ab4baed603b84dfcbdeab247f197f05c83c82aa61ee36ae",
+    "server/runtime/sqlite-database.ts": "81802be9ce61e63f215874c7b9e42d18bb17bdf4c520d14f30a6d4f02c275046"
+  },
+  "cases": [
+    {
+      "name": "match-email-contains",
+      "result": true
+    },
+    {
+      "name": "match-email-exact",
+      "result": false
+    },
+    {
+      "name": "match-email-starts_with",
+      "result": false
+    },
+    {
+      "name": "match-email-ends_with",
+      "result": true
+    },
+    {
+      "name": "match-email-regex",
+      "result": true
+    },
+    {
+      "name": "match-sender-contains",
+      "result": true
+    },
+    {
+      "name": "match-sender-exact",
+      "result": false
+    },
+    {
+      "name": "match-sender-starts_with",
+      "result": false
+    },
+    {
+      "name": "match-sender-ends_with",
+      "result": true
+    },
+    {
+      "name": "match-sender-regex",
+      "result": true
+    },
+    {
+      "name": "match-recipient-contains",
+      "result": true
+    },
+    {
+      "name": "match-recipient-exact",
+      "result": false
+    },
+    {
+      "name": "match-recipient-starts_with",
+      "result": false
+    },
+    {
+      "name": "match-recipient-ends_with",
+      "result": true
+    },
+    {
+      "name": "match-recipient-regex",
+      "result": true
+    },
+    {
+      "name": "match-title-contains",
+      "result": true
+    },
+    {
+      "name": "match-title-exact",
+      "result": false
+    },
+    {
+      "name": "match-title-starts_with",
+      "result": false
+    },
+    {
+      "name": "match-title-ends_with",
+      "result": false
+    },
+    {
+      "name": "match-title-regex",
+      "result": true
+    },
+    {
+      "name": "match-content-contains",
+      "result": true
+    },
+    {
+      "name": "match-content-exact",
+      "result": false
+    },
+    {
+      "name": "match-content-starts_with",
+      "result": false
+    },
+    {
+      "name": "match-content-ends_with",
+      "result": false
+    },
+    {
+      "name": "match-content-regex",
+      "result": true
+    },
+    {
+      "name": "match-normalized-pattern",
+      "result": true
+    },
+    {
+      "name": "match-empty-value",
+      "result": false
+    },
+    {
+      "name": "match-empty-input",
+      "result": true
+    },
+    {
+      "name": "match-fallback-pattern",
+      "result": true
+    },
+    {
+      "name": "match-star-empty-input",
+      "result": true
+    },
+    {
+      "name": "match-invalid-regex",
+      "result": false
+    },
+    {
+      "name": "match-nested-regex",
+      "result": true
+    },
+    {
+      "name": "match-backreference",
+      "result": true
+    },
+    {
+      "name": "match-long-regex",
+      "result": true
+    },
+    {
+      "name": "match-late-regex",
+      "result": true
+    },
+    {
+      "name": "match-unknown-operator",
+      "result": true
+    },
+    {
+      "name": "domain-reject",
+      "result": {
+        "action": "reject",
+        "mailboxId": null,
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": "blocked"
+      }
+    },
+    {
+      "name": "domain-empty-reason",
+      "result": {
+        "action": "reject",
+        "mailboxId": null,
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": "Message rejected by routing rule"
+      }
+    },
+    {
+      "name": "domain-title-before-exact",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox",
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-content-before-exact",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox",
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-store",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox",
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-foreign-stored-target",
+      "result": {
+        "action": "store",
+        "mailboxId": "foreign-box",
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-disabled-target",
+      "result": null
+    },
+    {
+      "name": "domain-forward-trim",
+      "result": {
+        "action": "forward",
+        "mailboxId": "mailbox",
+        "forwardTo": "next@example.net",
+        "keepCopy": true,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-forward-missing-copy-target",
+      "result": {
+        "action": "forward",
+        "mailboxId": null,
+        "forwardTo": "next@example.net",
+        "keepCopy": false,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-forward-disabled-copy-target",
+      "result": {
+        "action": "forward",
+        "mailboxId": null,
+        "forwardTo": "next@example.net",
+        "keepCopy": false,
+        "reason": null
+      }
+    },
+    {
+      "name": "domain-forward-blank",
+      "result": null
+    },
+    {
+      "name": "domain-nested-regex",
+      "result": {
+        "action": "reject",
+        "mailboxId": null,
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": "nested"
+      }
+    },
+    {
+      "name": "domain-tie-order",
+      "result": {
+        "action": "reject",
+        "mailboxId": null,
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": "later"
+      }
+    },
+    {
+      "name": "domain-store-tie",
+      "result": {
+        "action": "store",
+        "mailboxId": "mailbox",
+        "forwardTo": null,
+        "keepCopy": null,
+        "reason": null
+      }
+    },
+    {
+      "name": "inbox-folder",
+      "result": {
+        "status": "received",
+        "folderId": "target-folder"
+      }
+    },
+    {
+      "name": "inbox-trash",
+      "result": {
+        "status": "trash",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-invalid-folder",
+      "result": {
+        "status": "received",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-missing-folder",
+      "result": {
+        "status": "received",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-disabled",
+      "result": {
+        "status": "received",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-normalized-pattern",
+      "result": {
+        "status": "spam",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-legacy-nested-regex",
+      "result": {
+        "status": "spam",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-late-regex",
+      "result": {
+        "status": "spam",
+        "folderId": null
+      }
+    },
+    {
+      "name": "inbox-tie-order",
+      "result": {
+        "status": "trash",
+        "folderId": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1713 @@
+{
+  "provenance": {
+    "featureSeedSha256": "d79e82ca215d2b651d5d04d8dc70b539014d6ea688f3c7a75f7244c18f6c64a0",
+    "source": "71aa49b",
+    "version": "0.5.2",
+    "blobsModuleSha256": "e5edc4f987aa990e0219a6d79488b772a32be461ef7574a271631192b33d2269",
+    "bucketModuleSha256": "2286a3809e0d0f5a3ea8d58fee051b0a57d12c216f105bab453d469194a0bac2",
+    "backupModuleSha256": "aff55286a3c6c8b77750751cb9f4ea9c3b1b3649a6235f03d2d6154d3bf136d8"
+  },
+  "backup": {
+    "format": "mailflare-database-backup",
+    "version": 1,
+    "createdAt": "2026-10-30T17:04:04.338Z",
+    "includedTables": [
+      "users",
+      "domains",
+      "mailboxes",
+      "mailbox_access",
+      "contacts",
+      "folders",
+      "api_keys",
+      "messages",
+      "message_attachments",
+      "shared_attachment_links",
+      "outbound_jobs",
+      "routing_rules",
+      "webhooks",
+      "webhook_deliveries",
+      "sessions",
+      "push_subscriptions",
+      "audit_logs",
+      "backup_settings",
+      "backups",
+      "app_settings",
+      "license_settings",
+      "email_templates",
+      "calendar_events",
+      "booking_events",
+      "auto_reply_deliveries",
+      "spam_token_stats",
+      "spam_reputation",
+      "spam_feedback",
+      "mailbox_aliases",
+      "password_reset_tokens",
+      "mfa_recovery_codes",
+      "login_challenges",
+      "mailbox_agent_settings",
+      "agent_conversations",
+      "agent_chat_messages",
+      "agent_jobs",
+      "agent_draft_metadata",
+      "agent_send_approvals",
+      "mcp_key_mailboxes",
+      "ai_usage",
+      "drive_items",
+      "drive_shares",
+      "drive_upload_parts"
+    ],
+    "tables": {
+      "users": [
+        {
+          "id": "owner",
+          "email": "owner@example.com",
+          "password_hash": "$2b$04$UHGglxJpyx70O189bdVM6uN543iQ/Yzd4YMyA9Uru99aUufeKwahO",
+          "name": "Source Owner café",
+          "created_at": 1,
+          "reset_email": "recovery@example.org",
+          "role": "admin",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": "source-state/feature-avatar.png",
+          "can_manage_mailboxes": 0,
+          "forwarding_email": "archive@example.org",
+          "keyboard_shortcuts_enabled": 0,
+          "spam_protection_enabled": 1,
+          "totp_secret": "JBSWY3DPEHPK3PXP",
+          "totp_enabled": 1,
+          "totp_confirmed_at": 1700000000,
+          "time_zone": "Europe/Rome",
+          "booking_username": "source-owner",
+          "is_primary_admin": 1,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 1,
+          "trash_retention_days": 30
+        },
+        {
+          "id": "stranger",
+          "email": "stranger@example.com",
+          "password_hash": "$2b$04$UHGglxJpyx70O189bdVM6uN543iQ/Yzd4YMyA9Uru99aUufeKwahO",
+          "name": "Stranger",
+          "created_at": 1,
+          "reset_email": null,
+          "role": "user",
+          "created_by_user_id": null,
+          "disabled": 0,
+          "avatar_key": null,
+          "can_manage_mailboxes": 0,
+          "forwarding_email": null,
+          "keyboard_shortcuts_enabled": 1,
+          "spam_protection_enabled": 1,
+          "totp_secret": null,
+          "totp_enabled": 0,
+          "totp_confirmed_at": null,
+          "time_zone": null,
+          "booking_username": null,
+          "is_primary_admin": 0,
+          "can_manage_domains": 0,
+          "can_manage_users": 0,
+          "show_full_recipient_addresses": 0,
+          "trash_retention_days": null
+        }
+      ],
+      "domains": [
+        {
+          "id": "domain",
+          "user_id": "owner",
+          "hostname": "example.com",
+          "zone_id": "zone",
+          "status": "active",
+          "routing_status": null,
+          "sending_subdomain_tag": null,
+          "sending_enabled": 0,
+          "routing_enabled": 0,
+          "created_at": 1,
+          "sending_requested": 0,
+          "sending_provider": "none",
+          "receiving_provider": "cloudflare"
+        }
+      ],
+      "mailboxes": [
+        {
+          "id": "mailbox",
+          "user_id": "owner",
+          "domain_id": "domain",
+          "local_part": "hello",
+          "display_name": "Source shared inbox",
+          "created_at": 1,
+          "type": "shared",
+          "disabled": 0,
+          "avatar_key": "source-state/feature-avatar.png",
+          "use_all_domains": 1,
+          "signature": "<p>Source signature café</p>",
+          "auto_reply_enabled": 1,
+          "auto_reply_subject": "Away",
+          "auto_reply_body": "Back next week"
+        },
+        {
+          "id": "stranger-mailbox",
+          "user_id": "stranger",
+          "domain_id": "domain",
+          "local_part": "private",
+          "display_name": null,
+          "created_at": 1,
+          "type": "personal",
+          "disabled": 0,
+          "avatar_key": null,
+          "use_all_domains": 1,
+          "signature": null,
+          "auto_reply_enabled": 0,
+          "auto_reply_subject": "Out of office",
+          "auto_reply_body": ""
+        }
+      ],
+      "mailbox_access": [
+        {
+          "id": "source-access",
+          "mailbox_id": "mailbox",
+          "user_id": "stranger",
+          "permission": "read_only",
+          "created_by_user_id": "owner",
+          "created_at": 1700000000
+        }
+      ],
+      "contacts": [
+        {
+          "id": "source-contact",
+          "user_id": "owner",
+          "email": "sender@example.org",
+          "display_name": "Source Sender café",
+          "source": "manual",
+          "last_seen_at": 1700000002,
+          "created_at": 1700000000,
+          "blocked": 1,
+          "avatar_key": "source-state/feature-avatar.png"
+        }
+      ],
+      "folders": [
+        {
+          "id": "historical-folder",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "name": "Historical",
+          "created_at": 1,
+          "color": "#7c3aed"
+        }
+      ],
+      "api_keys": [
+        {
+          "id": "source-key",
+          "user_id": "owner",
+          "name": "Source scoped client",
+          "prefix": "ep_source_fe",
+          "key_hash": "$2b$04$Irr5k.XSpXXV1CFnrAZzTeCm0jHXqBzErb87mVQKY7i7OHMKSMKva",
+          "scopes": "[\"read\",\"calendar:read\",\"jmap\"]",
+          "created_at": 1700000000,
+          "last_used_at": 1700000001,
+          "kind": "legacy",
+          "mailbox_scope_enabled": 1
+        }
+      ],
+      "messages": [
+        {
+          "id": "retained-trash",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Retained original Trash",
+          "snippet": null,
+          "status": "trash",
+          "thread_id": null,
+          "created_at": 1,
+          "read": 0,
+          "folder_id": "historical-folder",
+          "snoozed_until": null,
+          "starred": 1,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-trash.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": 123,
+          "reply_to": null
+        },
+        {
+          "id": "retained-spam",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "sender@example.org",
+          "to_addr": "hello@example.com",
+          "subject": "Original unknown-age Spam",
+          "snippet": null,
+          "status": "spam",
+          "thread_id": null,
+          "created_at": 2,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Retained original body café",
+          "html_body": null,
+          "raw_r2_key": "source-state/retained-spam.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "source-inbox",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "inbound",
+          "provider_message_id": null,
+          "from_addr": "Sender <sender@example.org>",
+          "to_addr": "hello@example.com",
+          "subject": "Source Inbox café",
+          "snippet": "Source inbox preview",
+          "status": "received",
+          "thread_id": "source-thread",
+          "created_at": 1700000010,
+          "read": 0,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 1,
+          "text_body": "Source inbox body café",
+          "html_body": "<p>Source inbox body café</p>",
+          "raw_r2_key": "source-state/feature-message.eml",
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "source-draft",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "hello@example.com",
+          "to_addr": "recipient@example.org",
+          "subject": "Source assistant draft",
+          "snippet": "Source draft preview",
+          "status": "draft",
+          "thread_id": "source-thread",
+          "created_at": 1700000011,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Source draft body café",
+          "html_body": "<p>Source draft body café</p>",
+          "raw_r2_key": null,
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "source-scheduled",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "hello@example.com",
+          "to_addr": "recipient@example.org",
+          "subject": "Source scheduled",
+          "snippet": "Source scheduled preview",
+          "status": "queued",
+          "thread_id": "source-thread",
+          "created_at": 1700000012,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Source scheduled body",
+          "html_body": null,
+          "raw_r2_key": null,
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        },
+        {
+          "id": "source-template",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "direction": "outbound",
+          "provider_message_id": null,
+          "from_addr": "hello@example.com",
+          "to_addr": "",
+          "subject": "Source composer template",
+          "snippet": "Template preview",
+          "status": "template",
+          "thread_id": null,
+          "created_at": 1700000013,
+          "read": 1,
+          "folder_id": null,
+          "snoozed_until": null,
+          "starred": 0,
+          "text_body": "Source template body",
+          "html_body": "<p>Source template body</p>",
+          "raw_r2_key": null,
+          "cc_addr": null,
+          "bcc_addr": null,
+          "in_reply_to": null,
+          "references_header": null,
+          "spam_score": null,
+          "spam_verdict": null,
+          "spam_signals": null,
+          "spam_analyzed_at": null,
+          "spam_analysis_error": null,
+          "trashed_at": null,
+          "reply_to": null
+        }
+      ],
+      "message_attachments": [
+        {
+          "id": "retained-file",
+          "message_id": "retained-trash",
+          "filename": "retained.txt",
+          "content_type": "text/plain",
+          "size": 28,
+          "disposition": "attachment",
+          "content_id": null,
+          "r2_key": "source-state/retained.txt",
+          "created_at": 1,
+          "trashed_at": null
+        },
+        {
+          "id": "source-draft-file",
+          "message_id": "source-draft",
+          "filename": "retained.txt",
+          "content_type": "text/plain",
+          "size": 24,
+          "disposition": "attachment",
+          "content_id": null,
+          "r2_key": "source-state/feature-attachment.txt",
+          "created_at": 1700000011,
+          "trashed_at": null
+        }
+      ],
+      "shared_attachment_links": [
+        {
+          "id": "source-shared-link",
+          "attachment_id": "source-draft-file",
+          "expires_at": 4102444800,
+          "created_at": 1700000000
+        }
+      ],
+      "outbound_jobs": [
+        {
+          "id": "source-outbound",
+          "user_id": "owner",
+          "message_id": "source-scheduled",
+          "status": "queued",
+          "payload": "{\"userId\":\"owner\",\"mailboxId\":\"mailbox\",\"from\":\"hello@example.com\",\"to\":[\"recipient@example.org\"],\"cc\":[],\"bcc\":[],\"subject\":\"Source scheduled\",\"text\":\"Source scheduled body\",\"attachments\":[]}",
+          "error": null,
+          "created_at": 1700000012,
+          "updated_at": 1700000012,
+          "scheduled_at": 4102444800
+        }
+      ],
+      "routing_rules": [
+        {
+          "id": "source-rule",
+          "user_id": "owner",
+          "domain_id": "domain",
+          "pattern": "sender@example.org",
+          "mailbox_id": "mailbox",
+          "action": "store",
+          "forward_to": null,
+          "priority": 7,
+          "created_at": 1700000000,
+          "folder_id": "historical-folder",
+          "match_field": "email",
+          "match_operator": "exact",
+          "match_value": "sender@example.org",
+          "scope": "mailbox",
+          "name": "Source filing rule",
+          "enabled": 1,
+          "keep_copy": 1,
+          "reject_reason": null,
+          "last_matched_at": 1700000002,
+          "match_count": 3
+        }
+      ],
+      "webhooks": [
+        {
+          "id": "source-webhook",
+          "user_id": "owner",
+          "url": "https://webhook.example.org/mail",
+          "secret": "synthetic-webhook-secret",
+          "events": "[\"message.inbound\"]",
+          "enabled": 0,
+          "created_at": 1700000000,
+          "description": "Source saved hook",
+          "max_attempts": 4
+        }
+      ],
+      "webhook_deliveries": [
+        {
+          "id": "source-delivery",
+          "webhook_id": "source-webhook",
+          "event_type": "message.inbound",
+          "payload": "{\"messageId\":\"source-inbox\"}",
+          "status": "pending",
+          "attempts": 2,
+          "created_at": 1700000010,
+          "response_status": 503,
+          "error": "Fixture retry",
+          "duration_ms": 12,
+          "last_attempt_at": 1700000011,
+          "next_retry_at": 4102444800
+        }
+      ],
+      "sessions": [
+        {
+          "id": "source-session",
+          "user_id": "owner",
+          "token_hash": "993897618754332e109f6c9982808b32bf53aaf88ee9f14fb5a79b3e1a7efd4a",
+          "expires_at": 4102444800,
+          "created_at": 1700000000
+        }
+      ],
+      "push_subscriptions": [
+        {
+          "id": "source-push",
+          "user_id": "owner",
+          "session_id": "source-session",
+          "endpoint": "https://push.example.org/fixture",
+          "p256dh": "synthetic-public-key",
+          "auth": "synthetic-auth",
+          "created_at": 1700000000,
+          "updated_at": 1700000001
+        }
+      ],
+      "audit_logs": [
+        {
+          "id": "source-audit",
+          "actor_user_id": "owner",
+          "target_user_id": "stranger",
+          "mailbox_id": "mailbox",
+          "message_id": "source-inbox",
+          "action": "email.read",
+          "metadata": "{\"origin\":\"source-fixture\"}",
+          "created_at": 1700000012
+        }
+      ],
+      "backup_settings": [
+        {
+          "id": "default",
+          "enabled": 0,
+          "schedule_type": "daily",
+          "schedule_value": null,
+          "retention_enabled": 0,
+          "retention_days": 60,
+          "updated_at": 1700000001,
+          "excluded_table_groups": "[]"
+        }
+      ],
+      "backups": [
+        {
+          "id": "source-backup",
+          "status": "completed",
+          "trigger": "manual",
+          "r2_key": "source-state/feature-backup.json",
+          "filename": "source-backup.json",
+          "size": 17852,
+          "error": null,
+          "created_by_user_id": "owner",
+          "created_at": 1700000000,
+          "started_at": 1700000001,
+          "completed_at": 1700000002
+        }
+      ],
+      "app_settings": [
+        {
+          "id": "default",
+          "app_name": "Source Workspace café",
+          "icon_key": "source-state/feature-avatar.png",
+          "updated_at": 1700000001,
+          "agent_provider": "compatible",
+          "agent_preset": "custom",
+          "agent_base_url": "https://model.example.org/v1",
+          "agent_api_key": "synthetic-model-secret",
+          "agent_model": "source-model",
+          "agent_enabled": 1,
+          "agent_model_rates": "[]",
+          "outbound_attachment_max_mb": 12,
+          "resend_api_key": null,
+          "aws_config": null,
+          "ses_receiving": null,
+          "resend_webhook_id": null,
+          "resend_webhook_secret": null,
+          "drive_storage_limit_bytes": 104857600
+        }
+      ],
+      "license_settings": [
+        {
+          "id": "default",
+          "instance_id": "source-fixture",
+          "instance_url": "https://source.example.org",
+          "license_key_hash": null,
+          "plan": "team",
+          "state": "active",
+          "features": "[\"mailbox_sharing\",\"ai\"]",
+          "activated_at": 1700000000,
+          "validated_at": 1700000001,
+          "updated_at": 1700000002,
+          "seat_limit": 10
+        }
+      ],
+      "email_templates": [
+        {
+          "id": "source-legacy-template",
+          "user_id": "owner",
+          "name": "Legacy welcome",
+          "subject": "Welcome café",
+          "text_body": "Legacy body café",
+          "created_at": 1700000000,
+          "updated_at": 1700000001
+        }
+      ],
+      "calendar_events": [
+        {
+          "id": "source-calendar",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "title": "Source weekly meeting",
+          "description": "Imported recurrence café",
+          "location": "Source meeting room",
+          "attendees": "[\"guest@example.org\"]",
+          "starts_at": 1793516400,
+          "ends_at": 1793520000,
+          "created_at": 1700000000,
+          "updated_at": 1700000001,
+          "color": "blue",
+          "repeat": "weekly",
+          "repeat_until": 1796108400,
+          "repeat_days": "[1,3]",
+          "repeat_anchor_day": null,
+          "excluded_occurrences": "[\"2026-11-04T09:00:00.000Z\"]",
+          "time_zone": "Europe/Rome"
+        }
+      ],
+      "booking_events": [
+        {
+          "id": "source-booking",
+          "user_id": "owner",
+          "name": "Source consultation",
+          "slug": "source-consultation",
+          "description": "Imported availability café",
+          "color": "#2563eb",
+          "host_ids": "[\"owner\"]",
+          "duration_minutes": 30,
+          "location": "Video call",
+          "weekdays": "[1,2,3,4,5]",
+          "start_time": "09:00",
+          "end_time": "17:00",
+          "time_ranges": "[{\"startTime\":\"09:00\",\"endTime\":\"12:00\"},{\"startTime\":\"13:00\",\"endTime\":\"17:00\"}]",
+          "time_zone": "Europe/Rome",
+          "enabled": 1,
+          "created_at": 1700000000,
+          "updated_at": 1700000001
+        }
+      ],
+      "auto_reply_deliveries": [
+        {
+          "id": "source-auto-reply",
+          "mailbox_id": "mailbox",
+          "recipient": "sender@example.org",
+          "sent_at": 1700000002
+        }
+      ],
+      "spam_token_stats": [
+        {
+          "mailbox_id": "mailbox",
+          "token": "source",
+          "spam_count": 2,
+          "ham_count": 5,
+          "updated_at": 1700000002
+        }
+      ],
+      "spam_reputation": [
+        {
+          "mailbox_id": "mailbox",
+          "type": "sender",
+          "key": "sender@example.org",
+          "messages_seen": 7,
+          "spam_count": 2,
+          "ham_count": 5,
+          "first_seen_at": 1700000000,
+          "last_seen_at": 1700000002
+        }
+      ],
+      "spam_feedback": [
+        {
+          "message_id": "source-inbox",
+          "mailbox_id": "mailbox",
+          "actor_user_id": "owner",
+          "classification": "ham",
+          "training_tokens": "[\"source\"]",
+          "reputation_keys": "[{\"type\":\"sender\",\"key\":\"sender@example.org\"}]",
+          "tokenizer_version": 1,
+          "created_at": 1700000010,
+          "updated_at": 1700000011
+        }
+      ],
+      "mailbox_aliases": [
+        {
+          "id": "source-alias",
+          "mailbox_id": "mailbox",
+          "domain_id": "domain",
+          "local_part": "support",
+          "created_at": 1700000000
+        }
+      ],
+      "password_reset_tokens": [
+        {
+          "id": "source-reset",
+          "user_id": "owner",
+          "token_hash": "fixture-reset-hash",
+          "expires_at": 4102444800,
+          "used_at": null,
+          "created_at": 1700000000
+        }
+      ],
+      "mfa_recovery_codes": [
+        {
+          "id": "source-recovery",
+          "user_id": "owner",
+          "code_hash": "$2b$04$8f8SiAzoZKgS7z34Z6aUQ.jzekVxA8YJiWH4cW0NdbaXkMg0M.dtq",
+          "used_at": null,
+          "created_at": 1700000000
+        }
+      ],
+      "login_challenges": [
+        {
+          "id": "source-challenge",
+          "user_id": "owner",
+          "token_hash": "fixture-challenge-hash",
+          "expires_at": 4102444800,
+          "created_at": 1700000000
+        }
+      ],
+      "mailbox_agent_settings": [
+        {
+          "mailbox_id": "mailbox",
+          "enabled": 1,
+          "auto_draft_enabled": 1,
+          "reviewer_user_id": "owner",
+          "instructions": "Source instructions café",
+          "daily_limit": 7,
+          "updated_at": 1700000001,
+          "model_id": "source-model"
+        }
+      ],
+      "agent_conversations": [
+        {
+          "id": "source-conversation",
+          "user_id": "owner",
+          "mailbox_id": "mailbox",
+          "title": "Source saved conversation café",
+          "created_at": 1700000000,
+          "updated_at": 1700000001
+        }
+      ],
+      "agent_chat_messages": [
+        {
+          "id": "source-user-turn",
+          "conversation_id": "source-conversation",
+          "role": "user",
+          "content": "Source question café",
+          "tool_name": null,
+          "created_at": 1700000000
+        },
+        {
+          "id": "source-assistant-turn",
+          "conversation_id": "source-conversation",
+          "role": "assistant",
+          "content": "Source answer café",
+          "tool_name": null,
+          "created_at": 1700000001
+        }
+      ],
+      "agent_jobs": [
+        {
+          "id": "source-agent-job",
+          "mailbox_id": "mailbox",
+          "source_message_id": "source-inbox",
+          "reviewer_user_id": "owner",
+          "status": "pending",
+          "attempts": 1,
+          "next_attempt_at": 4102444800,
+          "lease_until": null,
+          "draft_id": "source-draft",
+          "reason": "Fixture deferred job",
+          "created_at": 1700000011
+        }
+      ],
+      "agent_draft_metadata": [
+        {
+          "draft_id": "source-draft",
+          "mailbox_id": "mailbox",
+          "origin": "auto",
+          "source_message_id": "source-inbox",
+          "revision": 3,
+          "human_edited_at": 1700000012,
+          "created_at": 1700000011,
+          "scheduled_at": 4102444800
+        }
+      ],
+      "agent_send_approvals": [
+        {
+          "id": "source-approval",
+          "draft_id": "source-draft",
+          "mailbox_id": "mailbox",
+          "user_id": "owner",
+          "request_key_id": "source-key",
+          "revision": 3,
+          "payload_hash": "cd19820cdd88c6172dee25fc7bdff82dd9518f6203adef5a3cef60af364e5e8c",
+          "status": "pending",
+          "claimed_at": null,
+          "message_id": null,
+          "expires_at": 4102444800,
+          "created_at": 1700000012
+        }
+      ],
+      "mcp_key_mailboxes": [
+        {
+          "key_id": "source-key",
+          "mailbox_id": "mailbox"
+        }
+      ],
+      "ai_usage": [
+        {
+          "id": "source-usage",
+          "created_at": 1700000012,
+          "provider": "compatible",
+          "model": "source-model",
+          "source": "chat",
+          "input_tokens": 120,
+          "output_tokens": 30,
+          "cost_usd_micros": 240
+        }
+      ],
+      "drive_items": [
+        {
+          "id": "pending",
+          "owner_id": "owner",
+          "parent_id": null,
+          "kind": "file",
+          "name": "pending.txt",
+          "r2_key": "drive/owner/pending",
+          "size": 3,
+          "content_type": "text/plain",
+          "link_token": null,
+          "trashed_at": null,
+          "created_at": 1793379844,
+          "updated_at": 1793379844,
+          "upload_id": "20cf4f5a-4743-41e5-bde4-458b06932315",
+          "upload_part_size": 67108864,
+          "upload_fingerprint": "source-fingerprint"
+        },
+        {
+          "id": "source-drive-folder",
+          "owner_id": "owner",
+          "parent_id": null,
+          "kind": "folder",
+          "name": "Source documents",
+          "r2_key": null,
+          "size": 0,
+          "content_type": "application/octet-stream",
+          "link_token": null,
+          "trashed_at": null,
+          "created_at": 1700000000,
+          "updated_at": 1700000001,
+          "upload_id": null,
+          "upload_part_size": null,
+          "upload_fingerprint": null
+        },
+        {
+          "id": "source-drive-file",
+          "owner_id": "owner",
+          "parent_id": "source-drive-folder",
+          "kind": "file",
+          "name": "source.txt",
+          "r2_key": "source-state/feature-drive.txt",
+          "size": 24,
+          "content_type": "text/plain",
+          "link_token": "synthetic-drive-link",
+          "trashed_at": null,
+          "created_at": 1700000000,
+          "updated_at": 1700000001,
+          "upload_id": null,
+          "upload_part_size": null,
+          "upload_fingerprint": null
+        }
+      ],
+      "drive_shares": [
+        {
+          "id": "source-drive-share",
+          "item_id": "source-drive-file",
+          "user_id": "stranger",
+          "role": "view",
+          "created_at": 1700000002
+        }
+      ],
+      "drive_upload_parts": [
+        {
+          "item_id": "pending",
+          "part_number": 1,
+          "etag": "1-3"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "uploads": [
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_S5vF57_KJRuXDMvYM1yMv",
+        "userId": "owner",
+        "type": "message/rfc822",
+        "size": 213,
+        "name": "Original café.eml",
+        "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+      },
+      {
+        "accountId": "owner",
+        "blobId": "up~upl_A-LI3tULFjjaQIzm-0gnj",
+        "userId": "owner",
+        "type": "text/plain",
+        "size": 25,
+        "name": "loose.txt",
+        "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+      },
+      {
+        "accountId": "stranger",
+        "blobId": "up~upl_3zS-nLM812fD6yDbjw3a0",
+        "userId": "stranger",
+        "type": "application/octet-stream",
+        "size": 21,
+        "name": null,
+        "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+      }
+    ],
+    "mime": "From: hello@example.com\r\nTo: recipient@example.org\r\nSubject: Captured source upload\r\nMessage-ID: <captured-upload@example.com>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nOriginal upload café\r\n",
+    "drive": {
+      "id": "pending",
+      "uploadId": "20cf4f5a-4743-41e5-bde4-458b06932315",
+      "part": {
+        "partNumber": 1,
+        "etag": "1-3"
+      }
+    },
+    "externalRequests": 0
+  },
+  "files": [
+    {
+      "key": ".multipart/20cf4f5a-4743-41e5-bde4-458b06932315/meta.json",
+      "base64": "eyJjb250ZW50VHlwZSI6InRleHQvcGxhaW4ifQ==",
+      "sha256": "6580bcf1a2ff78e9228fe8f3431bbec6c8c5b2afa2847734bd4dcbc309e309cc"
+    },
+    {
+      "key": ".multipart/20cf4f5a-4743-41e5-bde4-458b06932315/part-1",
+      "base64": "YWJj",
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "key": "avatars/source-preview.png",
+      "base64": "T3JpZ2luYWwgcHJldmlldyBieXRlcw==",
+      "sha256": "004046c490d458f88d6390d6b6f2ba92a40d21836eb8a04081149b16c05f0e2c"
+    },
+    {
+      "key": "avatars/source-preview.png.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6MjIsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzBaIiwiZXRhZyI6IjFhMThkYzRjMGVhLTE2In0=",
+      "sha256": "9ae4e94061ea42d30f783cf91356970f5eb56b9aefc74fc4e51d7f3d349a6143"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_A-LI3tULFjjaQIzm-0gnj",
+      "base64": "T3JpZ2luYWwgbG9vc2UgYXR0YWNobWVudA==",
+      "sha256": "42b2b4e6a3c6f52f0d52ec978873342ec4dd39f8720c2d36119800a8ac1324aa"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_A-LI3tULFjjaQIzm-0gnj.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sImN1c3RvbU1ldGFkYXRhIjp7InVzZXJJZCI6Im93bmVyIiwibmFtZSI6Imxvb3NlLnR4dCJ9LCJzaXplIjoyNSwidXBsb2FkZWQiOiIyMDI2LTEwLTMwVDE3OjA0OjA0LjMyN1oiLCJldGFnIjoiMWExOGRjNGMwZTctMTkifQ==",
+      "sha256": "ea1640bf2b80fce6e27bd925c1f3aad38a34d0660c9a94d72db8f5201cfe20f3"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_S5vF57_KJRuXDMvYM1yMv",
+      "base64": "RnJvbTogaGVsbG9AZXhhbXBsZS5jb20NClRvOiByZWNpcGllbnRAZXhhbXBsZS5vcmcNClN1YmplY3Q6IENhcHR1cmVkIHNvdXJjZSB1cGxvYWQNCk1lc3NhZ2UtSUQ6IDxjYXB0dXJlZC11cGxvYWRAZXhhbXBsZS5jb20+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNCk9yaWdpbmFsIHVwbG9hZCBjYWbDqQ0K",
+      "sha256": "a24e8b0007e8c7c33c9e708ccb6d2fd781fbbcdaaf3a0b889cf46cbe2338b55c"
+    },
+    {
+      "key": "jmap-uploads/owner/upl_S5vF57_KJRuXDMvYM1yMv.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJjdXN0b21NZXRhZGF0YSI6eyJ1c2VySWQiOiJvd25lciIsIm5hbWUiOiJPcmlnaW5hbCBjYWbDqS5lbWwifSwic2l6ZSI6MjEzLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MDQ6MDQuMzI2WiIsImV0YWciOiIxYTE4ZGM0YzBlNi1kNSJ9",
+      "sha256": "6e9b2e4996583df161a629ff13369bd3a991d227ed2daf9409a1955e31deb1d9"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_3zS-nLM812fD6yDbjw3a0",
+      "base64": "UHJpdmF0ZSBzb3VyY2UgdXBsb2Fk",
+      "sha256": "270d9bc3ba5ff8cbd22337c662482e33e3c2067aa9e32ba2270d3aa9aa1fd91f"
+    },
+    {
+      "key": "jmap-uploads/stranger/upl_3zS-nLM812fD6yDbjw3a0.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0ifSwiY3VzdG9tTWV0YWRhdGEiOnsidXNlcklkIjoic3RyYW5nZXIifSwic2l6ZSI6MjEsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMjhaIiwiZXRhZyI6IjFhMThkYzRjMGU4LTE1In0=",
+      "sha256": "1d2976e87dc7f17c9c32057aba45b04b9a028e8f234055bd657f7e22b0ddc3e7"
+    },
+    {
+      "key": "source-state/feature-attachment.txt",
+      "base64": "RmVhdHVyZSBhdHRhY2htZW50IGNhZsOp",
+      "sha256": "6c7ca5c95f4267a2661f336a80dc4e7d00a8facbca5b50d6b3fea5459065829c"
+    },
+    {
+      "key": "source-state/feature-attachment.txt.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sInNpemUiOjI0LCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MDQ6MDQuMzM1WiIsImV0YWciOiIxYTE4ZGM0YzBlZi0xOCJ9",
+      "sha256": "2896b86b7f51be582e587e8e84be6a35b59cc0de589e3320ec7e30c0a00672bf"
+    },
+    {
+      "key": "source-state/feature-avatar.png",
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460"
+    },
+    {
+      "key": "source-state/feature-avatar.png.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJpbWFnZS9wbmcifSwic2l6ZSI6NjgsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzVaIiwiZXRhZyI6IjFhMThkYzRjMGVmLTQ0In0=",
+      "sha256": "e6132f9b899b4f21b557319c67c147c09e29231b6479637521aebc1ba809c46f"
+    },
+    {
+      "key": "source-state/feature-backup.json",
+      "base64": "eyJmb3JtYXQiOiJtYWlsZmxhcmUtZGF0YWJhc2UtYmFja3VwIiwidmVyc2lvbiI6MSwiY3JlYXRlZEF0IjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzhaIiwiaW5jbHVkZWRUYWJsZXMiOlsidXNlcnMiLCJkb21haW5zIiwibWFpbGJveGVzIiwibWFpbGJveF9hY2Nlc3MiLCJjb250YWN0cyIsImZvbGRlcnMiLCJhcGlfa2V5cyIsIm1lc3NhZ2VzIiwibWVzc2FnZV9hdHRhY2htZW50cyIsInNoYXJlZF9hdHRhY2htZW50X2xpbmtzIiwib3V0Ym91bmRfam9icyIsInJvdXRpbmdfcnVsZXMiLCJ3ZWJob29rcyIsIndlYmhvb2tfZGVsaXZlcmllcyIsInNlc3Npb25zIiwicHVzaF9zdWJzY3JpcHRpb25zIiwiYXVkaXRfbG9ncyIsImJhY2t1cF9zZXR0aW5ncyIsImJhY2t1cHMiLCJhcHBfc2V0dGluZ3MiLCJsaWNlbnNlX3NldHRpbmdzIiwiZW1haWxfdGVtcGxhdGVzIiwiY2FsZW5kYXJfZXZlbnRzIiwiYm9va2luZ19ldmVudHMiLCJhdXRvX3JlcGx5X2RlbGl2ZXJpZXMiLCJzcGFtX3Rva2VuX3N0YXRzIiwic3BhbV9yZXB1dGF0aW9uIiwic3BhbV9mZWVkYmFjayIsIm1haWxib3hfYWxpYXNlcyIsInBhc3N3b3JkX3Jlc2V0X3Rva2VucyIsIm1mYV9yZWNvdmVyeV9jb2RlcyIsImxvZ2luX2NoYWxsZW5nZXMiLCJtYWlsYm94X2FnZW50X3NldHRpbmdzIiwiYWdlbnRfY29udmVyc2F0aW9ucyIsImFnZW50X2NoYXRfbWVzc2FnZXMiLCJhZ2VudF9qb2JzIiwiYWdlbnRfZHJhZnRfbWV0YWRhdGEiLCJhZ2VudF9zZW5kX2FwcHJvdmFscyIsIm1jcF9rZXlfbWFpbGJveGVzIiwiYWlfdXNhZ2UiLCJkcml2ZV9pdGVtcyIsImRyaXZlX3NoYXJlcyIsImRyaXZlX3VwbG9hZF9wYXJ0cyJdLCJ0YWJsZXMiOnsidXNlcnMiOlt7ImlkIjoib3duZXIiLCJlbWFpbCI6Im93bmVyQGV4YW1wbGUuY29tIiwicGFzc3dvcmRfaGFzaCI6IiQyYiQwNCRVSEdnbHhKcHl4NzBPMTg5YmRWTTZ1TjU0M2lRL1l6ZDRZTXlBOVVydTk5YVV1ZmVLd2FoTyIsIm5hbWUiOiJTb3VyY2UgT3duZXIgY2Fmw6kiLCJjcmVhdGVkX2F0IjoxLCJyZXNldF9lbWFpbCI6InJlY292ZXJ5QGV4YW1wbGUub3JnIiwicm9sZSI6ImFkbWluIiwiY3JlYXRlZF9ieV91c2VyX2lkIjpudWxsLCJkaXNhYmxlZCI6MCwiYXZhdGFyX2tleSI6InNvdXJjZS1zdGF0ZS9mZWF0dXJlLWF2YXRhci5wbmciLCJjYW5fbWFuYWdlX21haWxib3hlcyI6MCwiZm9yd2FyZGluZ19lbWFpbCI6ImFyY2hpdmVAZXhhbXBsZS5vcmciLCJrZXlib2FyZF9zaG9ydGN1dHNfZW5hYmxlZCI6MCwic3BhbV9wcm90ZWN0aW9uX2VuYWJsZWQiOjEsInRvdHBfc2VjcmV0IjoiSkJTV1kzRFBFSFBLM1BYUCIsInRvdHBfZW5hYmxlZCI6MSwidG90cF9jb25maXJtZWRfYXQiOjE3MDAwMDAwMDAsInRpbWVfem9uZSI6IkV1cm9wZS9Sb21lIiwiYm9va2luZ191c2VybmFtZSI6InNvdXJjZS1vd25lciIsImlzX3ByaW1hcnlfYWRtaW4iOjEsImNhbl9tYW5hZ2VfZG9tYWlucyI6MCwiY2FuX21hbmFnZV91c2VycyI6MCwic2hvd19mdWxsX3JlY2lwaWVudF9hZGRyZXNzZXMiOjEsInRyYXNoX3JldGVudGlvbl9kYXlzIjozMH0seyJpZCI6InN0cmFuZ2VyIiwiZW1haWwiOiJzdHJhbmdlckBleGFtcGxlLmNvbSIsInBhc3N3b3JkX2hhc2giOiIkMmIkMDQkVUhHZ2x4SnB5eDcwTzE4OWJkVk02dU41NDNpUS9ZemQ0WU15QTlVcnU5OWFVdWZlS3dhaE8iLCJuYW1lIjoiU3RyYW5nZXIiLCJjcmVhdGVkX2F0IjoxLCJyZXNldF9lbWFpbCI6bnVsbCwicm9sZSI6InVzZXIiLCJjcmVhdGVkX2J5X3VzZXJfaWQiOm51bGwsImRpc2FibGVkIjowLCJhdmF0YXJfa2V5IjpudWxsLCJjYW5fbWFuYWdlX21haWxib3hlcyI6MCwiZm9yd2FyZGluZ19lbWFpbCI6bnVsbCwia2V5Ym9hcmRfc2hvcnRjdXRzX2VuYWJsZWQiOjEsInNwYW1fcHJvdGVjdGlvbl9lbmFibGVkIjoxLCJ0b3RwX3NlY3JldCI6bnVsbCwidG90cF9lbmFibGVkIjowLCJ0b3RwX2NvbmZpcm1lZF9hdCI6bnVsbCwidGltZV96b25lIjpudWxsLCJib29raW5nX3VzZXJuYW1lIjpudWxsLCJpc19wcmltYXJ5X2FkbWluIjowLCJjYW5fbWFuYWdlX2RvbWFpbnMiOjAsImNhbl9tYW5hZ2VfdXNlcnMiOjAsInNob3dfZnVsbF9yZWNpcGllbnRfYWRkcmVzc2VzIjowLCJ0cmFzaF9yZXRlbnRpb25fZGF5cyI6bnVsbH1dLCJkb21haW5zIjpbeyJpZCI6ImRvbWFpbiIsInVzZXJfaWQiOiJvd25lciIsImhvc3RuYW1lIjoiZXhhbXBsZS5jb20iLCJ6b25lX2lkIjoiem9uZSIsInN0YXR1cyI6ImFjdGl2ZSIsInJvdXRpbmdfc3RhdHVzIjpudWxsLCJzZW5kaW5nX3N1YmRvbWFpbl90YWciOm51bGwsInNlbmRpbmdfZW5hYmxlZCI6MCwicm91dGluZ19lbmFibGVkIjowLCJjcmVhdGVkX2F0IjoxLCJzZW5kaW5nX3JlcXVlc3RlZCI6MCwic2VuZGluZ19wcm92aWRlciI6Im5vbmUiLCJyZWNlaXZpbmdfcHJvdmlkZXIiOiJjbG91ZGZsYXJlIn1dLCJtYWlsYm94ZXMiOlt7ImlkIjoibWFpbGJveCIsInVzZXJfaWQiOiJvd25lciIsImRvbWFpbl9pZCI6ImRvbWFpbiIsImxvY2FsX3BhcnQiOiJoZWxsbyIsImRpc3BsYXlfbmFtZSI6IlNvdXJjZSBzaGFyZWQgaW5ib3giLCJjcmVhdGVkX2F0IjoxLCJ0eXBlIjoic2hhcmVkIiwiZGlzYWJsZWQiOjAsImF2YXRhcl9rZXkiOiJzb3VyY2Utc3RhdGUvZmVhdHVyZS1hdmF0YXIucG5nIiwidXNlX2FsbF9kb21haW5zIjoxLCJzaWduYXR1cmUiOiI8cD5Tb3VyY2Ugc2lnbmF0dXJlIGNhZsOpPC9wPiIsImF1dG9fcmVwbHlfZW5hYmxlZCI6MSwiYXV0b19yZXBseV9zdWJqZWN0IjoiQXdheSIsImF1dG9fcmVwbHlfYm9keSI6IkJhY2sgbmV4dCB3ZWVrIn0seyJpZCI6InN0cmFuZ2VyLW1haWxib3giLCJ1c2VyX2lkIjoic3RyYW5nZXIiLCJkb21haW5faWQiOiJkb21haW4iLCJsb2NhbF9wYXJ0IjoicHJpdmF0ZSIsImRpc3BsYXlfbmFtZSI6bnVsbCwiY3JlYXRlZF9hdCI6MSwidHlwZSI6InBlcnNvbmFsIiwiZGlzYWJsZWQiOjAsImF2YXRhcl9rZXkiOm51bGwsInVzZV9hbGxfZG9tYWlucyI6MSwic2lnbmF0dXJlIjpudWxsLCJhdXRvX3JlcGx5X2VuYWJsZWQiOjAsImF1dG9fcmVwbHlfc3ViamVjdCI6Ik91dCBvZiBvZmZpY2UiLCJhdXRvX3JlcGx5X2JvZHkiOiIifV0sIm1haWxib3hfYWNjZXNzIjpbeyJpZCI6InNvdXJjZS1hY2Nlc3MiLCJtYWlsYm94X2lkIjoibWFpbGJveCIsInVzZXJfaWQiOiJzdHJhbmdlciIsInBlcm1pc3Npb24iOiJyZWFkX29ubHkiLCJjcmVhdGVkX2J5X3VzZXJfaWQiOiJvd25lciIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDB9XSwiY29udGFjdHMiOlt7ImlkIjoic291cmNlLWNvbnRhY3QiLCJ1c2VyX2lkIjoib3duZXIiLCJlbWFpbCI6InNlbmRlckBleGFtcGxlLm9yZyIsImRpc3BsYXlfbmFtZSI6IlNvdXJjZSBTZW5kZXIgY2Fmw6kiLCJzb3VyY2UiOiJtYW51YWwiLCJsYXN0X3NlZW5fYXQiOjE3MDAwMDAwMDIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsImJsb2NrZWQiOjEsImF2YXRhcl9rZXkiOiJzb3VyY2Utc3RhdGUvZmVhdHVyZS1hdmF0YXIucG5nIn1dLCJmb2xkZXJzIjpbeyJpZCI6Imhpc3RvcmljYWwtZm9sZGVyIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJuYW1lIjoiSGlzdG9yaWNhbCIsImNyZWF0ZWRfYXQiOjEsImNvbG9yIjoiIzdjM2FlZCJ9XSwiYXBpX2tleXMiOlt7ImlkIjoic291cmNlLWtleSIsInVzZXJfaWQiOiJvd25lciIsIm5hbWUiOiJTb3VyY2Ugc2NvcGVkIGNsaWVudCIsInByZWZpeCI6ImVwX3NvdXJjZV9mZSIsImtleV9oYXNoIjoiJDJiJDA0JElycjVrLlhTcFhYVjFDRm5yQVp6VGVDbTBqSFhxQnpFcmI4N21WUUtZN2k3T0hNS1NNS3ZhIiwic2NvcGVzIjoiW1wicmVhZFwiLFwiY2FsZW5kYXI6cmVhZFwiLFwiam1hcFwiXSIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsImxhc3RfdXNlZF9hdCI6MTcwMDAwMDAwMSwia2luZCI6ImxlZ2FjeSIsIm1haWxib3hfc2NvcGVfZW5hYmxlZCI6MX1dLCJtZXNzYWdlcyI6W3siaWQiOiJyZXRhaW5lZC10cmFzaCIsInVzZXJfaWQiOiJvd25lciIsIm1haWxib3hfaWQiOiJtYWlsYm94IiwiZGlyZWN0aW9uIjoiaW5ib3VuZCIsInByb3ZpZGVyX21lc3NhZ2VfaWQiOm51bGwsImZyb21fYWRkciI6InNlbmRlckBleGFtcGxlLm9yZyIsInRvX2FkZHIiOiJoZWxsb0BleGFtcGxlLmNvbSIsInN1YmplY3QiOiJSZXRhaW5lZCBvcmlnaW5hbCBUcmFzaCIsInNuaXBwZXQiOm51bGwsInN0YXR1cyI6InRyYXNoIiwidGhyZWFkX2lkIjpudWxsLCJjcmVhdGVkX2F0IjoxLCJyZWFkIjowLCJmb2xkZXJfaWQiOiJoaXN0b3JpY2FsLWZvbGRlciIsInNub296ZWRfdW50aWwiOm51bGwsInN0YXJyZWQiOjEsInRleHRfYm9keSI6IlJldGFpbmVkIG9yaWdpbmFsIGJvZHkgY2Fmw6kiLCJodG1sX2JvZHkiOm51bGwsInJhd19yMl9rZXkiOiJzb3VyY2Utc3RhdGUvcmV0YWluZWQtdHJhc2guZW1sIiwiY2NfYWRkciI6bnVsbCwiYmNjX2FkZHIiOm51bGwsImluX3JlcGx5X3RvIjpudWxsLCJyZWZlcmVuY2VzX2hlYWRlciI6bnVsbCwic3BhbV9zY29yZSI6bnVsbCwic3BhbV92ZXJkaWN0IjpudWxsLCJzcGFtX3NpZ25hbHMiOm51bGwsInNwYW1fYW5hbHl6ZWRfYXQiOm51bGwsInNwYW1fYW5hbHlzaXNfZXJyb3IiOm51bGwsInRyYXNoZWRfYXQiOjEyMywicmVwbHlfdG8iOm51bGx9LHsiaWQiOiJyZXRhaW5lZC1zcGFtIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJkaXJlY3Rpb24iOiJpbmJvdW5kIiwicHJvdmlkZXJfbWVzc2FnZV9pZCI6bnVsbCwiZnJvbV9hZGRyIjoic2VuZGVyQGV4YW1wbGUub3JnIiwidG9fYWRkciI6ImhlbGxvQGV4YW1wbGUuY29tIiwic3ViamVjdCI6Ik9yaWdpbmFsIHVua25vd24tYWdlIFNwYW0iLCJzbmlwcGV0IjpudWxsLCJzdGF0dXMiOiJzcGFtIiwidGhyZWFkX2lkIjpudWxsLCJjcmVhdGVkX2F0IjoyLCJyZWFkIjoxLCJmb2xkZXJfaWQiOm51bGwsInNub296ZWRfdW50aWwiOm51bGwsInN0YXJyZWQiOjAsInRleHRfYm9keSI6IlJldGFpbmVkIG9yaWdpbmFsIGJvZHkgY2Fmw6kiLCJodG1sX2JvZHkiOm51bGwsInJhd19yMl9rZXkiOiJzb3VyY2Utc3RhdGUvcmV0YWluZWQtc3BhbS5lbWwiLCJjY19hZGRyIjpudWxsLCJiY2NfYWRkciI6bnVsbCwiaW5fcmVwbHlfdG8iOm51bGwsInJlZmVyZW5jZXNfaGVhZGVyIjpudWxsLCJzcGFtX3Njb3JlIjpudWxsLCJzcGFtX3ZlcmRpY3QiOm51bGwsInNwYW1fc2lnbmFscyI6bnVsbCwic3BhbV9hbmFseXplZF9hdCI6bnVsbCwic3BhbV9hbmFseXNpc19lcnJvciI6bnVsbCwidHJhc2hlZF9hdCI6bnVsbCwicmVwbHlfdG8iOm51bGx9LHsiaWQiOiJzb3VyY2UtaW5ib3giLCJ1c2VyX2lkIjoib3duZXIiLCJtYWlsYm94X2lkIjoibWFpbGJveCIsImRpcmVjdGlvbiI6ImluYm91bmQiLCJwcm92aWRlcl9tZXNzYWdlX2lkIjpudWxsLCJmcm9tX2FkZHIiOiJTZW5kZXIgPHNlbmRlckBleGFtcGxlLm9yZz4iLCJ0b19hZGRyIjoiaGVsbG9AZXhhbXBsZS5jb20iLCJzdWJqZWN0IjoiU291cmNlIEluYm94IGNhZsOpIiwic25pcHBldCI6IlNvdXJjZSBpbmJveCBwcmV2aWV3Iiwic3RhdHVzIjoicmVjZWl2ZWQiLCJ0aHJlYWRfaWQiOiJzb3VyY2UtdGhyZWFkIiwiY3JlYXRlZF9hdCI6MTcwMDAwMDAxMCwicmVhZCI6MCwiZm9sZGVyX2lkIjpudWxsLCJzbm9vemVkX3VudGlsIjpudWxsLCJzdGFycmVkIjoxLCJ0ZXh0X2JvZHkiOiJTb3VyY2UgaW5ib3ggYm9keSBjYWbDqSIsImh0bWxfYm9keSI6IjxwPlNvdXJjZSBpbmJveCBib2R5IGNhZsOpPC9wPiIsInJhd19yMl9rZXkiOiJzb3VyY2Utc3RhdGUvZmVhdHVyZS1tZXNzYWdlLmVtbCIsImNjX2FkZHIiOm51bGwsImJjY19hZGRyIjpudWxsLCJpbl9yZXBseV90byI6bnVsbCwicmVmZXJlbmNlc19oZWFkZXIiOm51bGwsInNwYW1fc2NvcmUiOm51bGwsInNwYW1fdmVyZGljdCI6bnVsbCwic3BhbV9zaWduYWxzIjpudWxsLCJzcGFtX2FuYWx5emVkX2F0IjpudWxsLCJzcGFtX2FuYWx5c2lzX2Vycm9yIjpudWxsLCJ0cmFzaGVkX2F0IjpudWxsLCJyZXBseV90byI6bnVsbH0seyJpZCI6InNvdXJjZS1kcmFmdCIsInVzZXJfaWQiOiJvd25lciIsIm1haWxib3hfaWQiOiJtYWlsYm94IiwiZGlyZWN0aW9uIjoib3V0Ym91bmQiLCJwcm92aWRlcl9tZXNzYWdlX2lkIjpudWxsLCJmcm9tX2FkZHIiOiJoZWxsb0BleGFtcGxlLmNvbSIsInRvX2FkZHIiOiJyZWNpcGllbnRAZXhhbXBsZS5vcmciLCJzdWJqZWN0IjoiU291cmNlIGFzc2lzdGFudCBkcmFmdCIsInNuaXBwZXQiOiJTb3VyY2UgZHJhZnQgcHJldmlldyIsInN0YXR1cyI6ImRyYWZ0IiwidGhyZWFkX2lkIjoic291cmNlLXRocmVhZCIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMTEsInJlYWQiOjEsImZvbGRlcl9pZCI6bnVsbCwic25vb3plZF91bnRpbCI6bnVsbCwic3RhcnJlZCI6MCwidGV4dF9ib2R5IjoiU291cmNlIGRyYWZ0IGJvZHkgY2Fmw6kiLCJodG1sX2JvZHkiOiI8cD5Tb3VyY2UgZHJhZnQgYm9keSBjYWbDqTwvcD4iLCJyYXdfcjJfa2V5IjpudWxsLCJjY19hZGRyIjpudWxsLCJiY2NfYWRkciI6bnVsbCwiaW5fcmVwbHlfdG8iOm51bGwsInJlZmVyZW5jZXNfaGVhZGVyIjpudWxsLCJzcGFtX3Njb3JlIjpudWxsLCJzcGFtX3ZlcmRpY3QiOm51bGwsInNwYW1fc2lnbmFscyI6bnVsbCwic3BhbV9hbmFseXplZF9hdCI6bnVsbCwic3BhbV9hbmFseXNpc19lcnJvciI6bnVsbCwidHJhc2hlZF9hdCI6bnVsbCwicmVwbHlfdG8iOm51bGx9LHsiaWQiOiJzb3VyY2Utc2NoZWR1bGVkIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJkaXJlY3Rpb24iOiJvdXRib3VuZCIsInByb3ZpZGVyX21lc3NhZ2VfaWQiOm51bGwsImZyb21fYWRkciI6ImhlbGxvQGV4YW1wbGUuY29tIiwidG9fYWRkciI6InJlY2lwaWVudEBleGFtcGxlLm9yZyIsInN1YmplY3QiOiJTb3VyY2Ugc2NoZWR1bGVkIiwic25pcHBldCI6IlNvdXJjZSBzY2hlZHVsZWQgcHJldmlldyIsInN0YXR1cyI6InF1ZXVlZCIsInRocmVhZF9pZCI6InNvdXJjZS10aHJlYWQiLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDEyLCJyZWFkIjoxLCJmb2xkZXJfaWQiOm51bGwsInNub296ZWRfdW50aWwiOm51bGwsInN0YXJyZWQiOjAsInRleHRfYm9keSI6IlNvdXJjZSBzY2hlZHVsZWQgYm9keSIsImh0bWxfYm9keSI6bnVsbCwicmF3X3IyX2tleSI6bnVsbCwiY2NfYWRkciI6bnVsbCwiYmNjX2FkZHIiOm51bGwsImluX3JlcGx5X3RvIjpudWxsLCJyZWZlcmVuY2VzX2hlYWRlciI6bnVsbCwic3BhbV9zY29yZSI6bnVsbCwic3BhbV92ZXJkaWN0IjpudWxsLCJzcGFtX3NpZ25hbHMiOm51bGwsInNwYW1fYW5hbHl6ZWRfYXQiOm51bGwsInNwYW1fYW5hbHlzaXNfZXJyb3IiOm51bGwsInRyYXNoZWRfYXQiOm51bGwsInJlcGx5X3RvIjpudWxsfSx7ImlkIjoic291cmNlLXRlbXBsYXRlIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJkaXJlY3Rpb24iOiJvdXRib3VuZCIsInByb3ZpZGVyX21lc3NhZ2VfaWQiOm51bGwsImZyb21fYWRkciI6ImhlbGxvQGV4YW1wbGUuY29tIiwidG9fYWRkciI6IiIsInN1YmplY3QiOiJTb3VyY2UgY29tcG9zZXIgdGVtcGxhdGUiLCJzbmlwcGV0IjoiVGVtcGxhdGUgcHJldmlldyIsInN0YXR1cyI6InRlbXBsYXRlIiwidGhyZWFkX2lkIjpudWxsLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDEzLCJyZWFkIjoxLCJmb2xkZXJfaWQiOm51bGwsInNub296ZWRfdW50aWwiOm51bGwsInN0YXJyZWQiOjAsInRleHRfYm9keSI6IlNvdXJjZSB0ZW1wbGF0ZSBib2R5IiwiaHRtbF9ib2R5IjoiPHA+U291cmNlIHRlbXBsYXRlIGJvZHk8L3A+IiwicmF3X3IyX2tleSI6bnVsbCwiY2NfYWRkciI6bnVsbCwiYmNjX2FkZHIiOm51bGwsImluX3JlcGx5X3RvIjpudWxsLCJyZWZlcmVuY2VzX2hlYWRlciI6bnVsbCwic3BhbV9zY29yZSI6bnVsbCwic3BhbV92ZXJkaWN0IjpudWxsLCJzcGFtX3NpZ25hbHMiOm51bGwsInNwYW1fYW5hbHl6ZWRfYXQiOm51bGwsInNwYW1fYW5hbHlzaXNfZXJyb3IiOm51bGwsInRyYXNoZWRfYXQiOm51bGwsInJlcGx5X3RvIjpudWxsfV0sIm1lc3NhZ2VfYXR0YWNobWVudHMiOlt7ImlkIjoicmV0YWluZWQtZmlsZSIsIm1lc3NhZ2VfaWQiOiJyZXRhaW5lZC10cmFzaCIsImZpbGVuYW1lIjoicmV0YWluZWQudHh0IiwiY29udGVudF90eXBlIjoidGV4dC9wbGFpbiIsInNpemUiOjI4LCJkaXNwb3NpdGlvbiI6ImF0dGFjaG1lbnQiLCJjb250ZW50X2lkIjpudWxsLCJyMl9rZXkiOiJzb3VyY2Utc3RhdGUvcmV0YWluZWQudHh0IiwiY3JlYXRlZF9hdCI6MSwidHJhc2hlZF9hdCI6bnVsbH0seyJpZCI6InNvdXJjZS1kcmFmdC1maWxlIiwibWVzc2FnZV9pZCI6InNvdXJjZS1kcmFmdCIsImZpbGVuYW1lIjoicmV0YWluZWQudHh0IiwiY29udGVudF90eXBlIjoidGV4dC9wbGFpbiIsInNpemUiOjI0LCJkaXNwb3NpdGlvbiI6ImF0dGFjaG1lbnQiLCJjb250ZW50X2lkIjpudWxsLCJyMl9rZXkiOiJzb3VyY2Utc3RhdGUvZmVhdHVyZS1hdHRhY2htZW50LnR4dCIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMTEsInRyYXNoZWRfYXQiOm51bGx9XSwic2hhcmVkX2F0dGFjaG1lbnRfbGlua3MiOlt7ImlkIjoic291cmNlLXNoYXJlZC1saW5rIiwiYXR0YWNobWVudF9pZCI6InNvdXJjZS1kcmFmdC1maWxlIiwiZXhwaXJlc19hdCI6NDEwMjQ0NDgwMCwiY3JlYXRlZF9hdCI6MTcwMDAwMDAwMH1dLCJvdXRib3VuZF9qb2JzIjpbeyJpZCI6InNvdXJjZS1vdXRib3VuZCIsInVzZXJfaWQiOiJvd25lciIsIm1lc3NhZ2VfaWQiOiJzb3VyY2Utc2NoZWR1bGVkIiwic3RhdHVzIjoicXVldWVkIiwicGF5bG9hZCI6IntcInVzZXJJZFwiOlwib3duZXJcIixcIm1haWxib3hJZFwiOlwibWFpbGJveFwiLFwiZnJvbVwiOlwiaGVsbG9AZXhhbXBsZS5jb21cIixcInRvXCI6W1wicmVjaXBpZW50QGV4YW1wbGUub3JnXCJdLFwiY2NcIjpbXSxcImJjY1wiOltdLFwic3ViamVjdFwiOlwiU291cmNlIHNjaGVkdWxlZFwiLFwidGV4dFwiOlwiU291cmNlIHNjaGVkdWxlZCBib2R5XCIsXCJhdHRhY2htZW50c1wiOltdfSIsImVycm9yIjpudWxsLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDEyLCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDEyLCJzY2hlZHVsZWRfYXQiOjQxMDI0NDQ4MDB9XSwicm91dGluZ19ydWxlcyI6W3siaWQiOiJzb3VyY2UtcnVsZSIsInVzZXJfaWQiOiJvd25lciIsImRvbWFpbl9pZCI6ImRvbWFpbiIsInBhdHRlcm4iOiJzZW5kZXJAZXhhbXBsZS5vcmciLCJtYWlsYm94X2lkIjoibWFpbGJveCIsImFjdGlvbiI6InN0b3JlIiwiZm9yd2FyZF90byI6bnVsbCwicHJpb3JpdHkiOjcsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsImZvbGRlcl9pZCI6Imhpc3RvcmljYWwtZm9sZGVyIiwibWF0Y2hfZmllbGQiOiJlbWFpbCIsIm1hdGNoX29wZXJhdG9yIjoiZXhhY3QiLCJtYXRjaF92YWx1ZSI6InNlbmRlckBleGFtcGxlLm9yZyIsInNjb3BlIjoibWFpbGJveCIsIm5hbWUiOiJTb3VyY2UgZmlsaW5nIHJ1bGUiLCJlbmFibGVkIjoxLCJrZWVwX2NvcHkiOjEsInJlamVjdF9yZWFzb24iOm51bGwsImxhc3RfbWF0Y2hlZF9hdCI6MTcwMDAwMDAwMiwibWF0Y2hfY291bnQiOjN9XSwid2ViaG9va3MiOlt7ImlkIjoic291cmNlLXdlYmhvb2siLCJ1c2VyX2lkIjoib3duZXIiLCJ1cmwiOiJodHRwczovL3dlYmhvb2suZXhhbXBsZS5vcmcvbWFpbCIsInNlY3JldCI6InN5bnRoZXRpYy13ZWJob29rLXNlY3JldCIsImV2ZW50cyI6IltcIm1lc3NhZ2UuaW5ib3VuZFwiXSIsImVuYWJsZWQiOjAsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsImRlc2NyaXB0aW9uIjoiU291cmNlIHNhdmVkIGhvb2siLCJtYXhfYXR0ZW1wdHMiOjR9XSwid2ViaG9va19kZWxpdmVyaWVzIjpbeyJpZCI6InNvdXJjZS1kZWxpdmVyeSIsIndlYmhvb2tfaWQiOiJzb3VyY2Utd2ViaG9vayIsImV2ZW50X3R5cGUiOiJtZXNzYWdlLmluYm91bmQiLCJwYXlsb2FkIjoie1wibWVzc2FnZUlkXCI6XCJzb3VyY2UtaW5ib3hcIn0iLCJzdGF0dXMiOiJwZW5kaW5nIiwiYXR0ZW1wdHMiOjIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMTAsInJlc3BvbnNlX3N0YXR1cyI6NTAzLCJlcnJvciI6IkZpeHR1cmUgcmV0cnkiLCJkdXJhdGlvbl9tcyI6MTIsImxhc3RfYXR0ZW1wdF9hdCI6MTcwMDAwMDAxMSwibmV4dF9yZXRyeV9hdCI6NDEwMjQ0NDgwMH1dLCJzZXNzaW9ucyI6W3siaWQiOiJzb3VyY2Utc2Vzc2lvbiIsInVzZXJfaWQiOiJvd25lciIsInRva2VuX2hhc2giOiI5OTM4OTc2MTg3NTQzMzJlMTA5ZjZjOTk4MjgwOGIzMmJmNTNhYWY4OGVlOWYxNGZiNWE3OWIzZTFhN2VmZDRhIiwiZXhwaXJlc19hdCI6NDEwMjQ0NDgwMCwiY3JlYXRlZF9hdCI6MTcwMDAwMDAwMH1dLCJwdXNoX3N1YnNjcmlwdGlvbnMiOlt7ImlkIjoic291cmNlLXB1c2giLCJ1c2VyX2lkIjoib3duZXIiLCJzZXNzaW9uX2lkIjoic291cmNlLXNlc3Npb24iLCJlbmRwb2ludCI6Imh0dHBzOi8vcHVzaC5leGFtcGxlLm9yZy9maXh0dXJlIiwicDI1NmRoIjoic3ludGhldGljLXB1YmxpYy1rZXkiLCJhdXRoIjoic3ludGhldGljLWF1dGgiLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwLCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAxfV0sImF1ZGl0X2xvZ3MiOlt7ImlkIjoic291cmNlLWF1ZGl0IiwiYWN0b3JfdXNlcl9pZCI6Im93bmVyIiwidGFyZ2V0X3VzZXJfaWQiOiJzdHJhbmdlciIsIm1haWxib3hfaWQiOiJtYWlsYm94IiwibWVzc2FnZV9pZCI6InNvdXJjZS1pbmJveCIsImFjdGlvbiI6ImVtYWlsLnJlYWQiLCJtZXRhZGF0YSI6IntcIm9yaWdpblwiOlwic291cmNlLWZpeHR1cmVcIn0iLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDEyfV0sImJhY2t1cF9zZXR0aW5ncyI6W3siaWQiOiJkZWZhdWx0IiwiZW5hYmxlZCI6MCwic2NoZWR1bGVfdHlwZSI6ImRhaWx5Iiwic2NoZWR1bGVfdmFsdWUiOm51bGwsInJldGVudGlvbl9lbmFibGVkIjowLCJyZXRlbnRpb25fZGF5cyI6NjAsInVwZGF0ZWRfYXQiOjE3MDAwMDAwMDEsImV4Y2x1ZGVkX3RhYmxlX2dyb3VwcyI6IltdIn1dLCJiYWNrdXBzIjpbeyJpZCI6InNvdXJjZS1iYWNrdXAiLCJzdGF0dXMiOiJjb21wbGV0ZWQiLCJ0cmlnZ2VyIjoibWFudWFsIiwicjJfa2V5Ijoic291cmNlLXN0YXRlL2ZlYXR1cmUtYmFja3VwLmpzb24iLCJmaWxlbmFtZSI6InNvdXJjZS1iYWNrdXAuanNvbiIsInNpemUiOm51bGwsImVycm9yIjpudWxsLCJjcmVhdGVkX2J5X3VzZXJfaWQiOiJvd25lciIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsInN0YXJ0ZWRfYXQiOjE3MDAwMDAwMDEsImNvbXBsZXRlZF9hdCI6MTcwMDAwMDAwMn1dLCJhcHBfc2V0dGluZ3MiOlt7ImlkIjoiZGVmYXVsdCIsImFwcF9uYW1lIjoiU291cmNlIFdvcmtzcGFjZSBjYWbDqSIsImljb25fa2V5Ijoic291cmNlLXN0YXRlL2ZlYXR1cmUtYXZhdGFyLnBuZyIsInVwZGF0ZWRfYXQiOjE3MDAwMDAwMDEsImFnZW50X3Byb3ZpZGVyIjoiY29tcGF0aWJsZSIsImFnZW50X3ByZXNldCI6ImN1c3RvbSIsImFnZW50X2Jhc2VfdXJsIjoiaHR0cHM6Ly9tb2RlbC5leGFtcGxlLm9yZy92MSIsImFnZW50X2FwaV9rZXkiOiJzeW50aGV0aWMtbW9kZWwtc2VjcmV0IiwiYWdlbnRfbW9kZWwiOiJzb3VyY2UtbW9kZWwiLCJhZ2VudF9lbmFibGVkIjoxLCJhZ2VudF9tb2RlbF9yYXRlcyI6IltdIiwib3V0Ym91bmRfYXR0YWNobWVudF9tYXhfbWIiOjEyLCJyZXNlbmRfYXBpX2tleSI6bnVsbCwiYXdzX2NvbmZpZyI6bnVsbCwic2VzX3JlY2VpdmluZyI6bnVsbCwicmVzZW5kX3dlYmhvb2tfaWQiOm51bGwsInJlc2VuZF93ZWJob29rX3NlY3JldCI6bnVsbCwiZHJpdmVfc3RvcmFnZV9saW1pdF9ieXRlcyI6MTA0ODU3NjAwfV0sImxpY2Vuc2Vfc2V0dGluZ3MiOlt7ImlkIjoiZGVmYXVsdCIsImluc3RhbmNlX2lkIjoic291cmNlLWZpeHR1cmUiLCJpbnN0YW5jZV91cmwiOiJodHRwczovL3NvdXJjZS5leGFtcGxlLm9yZyIsImxpY2Vuc2Vfa2V5X2hhc2giOm51bGwsInBsYW4iOiJ0ZWFtIiwic3RhdGUiOiJhY3RpdmUiLCJmZWF0dXJlcyI6IltcIm1haWxib3hfc2hhcmluZ1wiLFwiYWlcIl0iLCJhY3RpdmF0ZWRfYXQiOjE3MDAwMDAwMDAsInZhbGlkYXRlZF9hdCI6MTcwMDAwMDAwMSwidXBkYXRlZF9hdCI6MTcwMDAwMDAwMiwic2VhdF9saW1pdCI6MTB9XSwiZW1haWxfdGVtcGxhdGVzIjpbeyJpZCI6InNvdXJjZS1sZWdhY3ktdGVtcGxhdGUiLCJ1c2VyX2lkIjoib3duZXIiLCJuYW1lIjoiTGVnYWN5IHdlbGNvbWUiLCJzdWJqZWN0IjoiV2VsY29tZSBjYWbDqSIsInRleHRfYm9keSI6IkxlZ2FjeSBib2R5IGNhZsOpIiwiY3JlYXRlZF9hdCI6MTcwMDAwMDAwMCwidXBkYXRlZF9hdCI6MTcwMDAwMDAwMX1dLCJjYWxlbmRhcl9ldmVudHMiOlt7ImlkIjoic291cmNlLWNhbGVuZGFyIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJ0aXRsZSI6IlNvdXJjZSB3ZWVrbHkgbWVldGluZyIsImRlc2NyaXB0aW9uIjoiSW1wb3J0ZWQgcmVjdXJyZW5jZSBjYWbDqSIsImxvY2F0aW9uIjoiU291cmNlIG1lZXRpbmcgcm9vbSIsImF0dGVuZGVlcyI6IltcImd1ZXN0QGV4YW1wbGUub3JnXCJdIiwic3RhcnRzX2F0IjoxNzkzNTE2NDAwLCJlbmRzX2F0IjoxNzkzNTIwMDAwLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwLCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAxLCJjb2xvciI6ImJsdWUiLCJyZXBlYXQiOiJ3ZWVrbHkiLCJyZXBlYXRfdW50aWwiOjE3OTYxMDg0MDAsInJlcGVhdF9kYXlzIjoiWzEsM10iLCJyZXBlYXRfYW5jaG9yX2RheSI6bnVsbCwiZXhjbHVkZWRfb2NjdXJyZW5jZXMiOiJbXCIyMDI2LTExLTA0VDA5OjAwOjAwLjAwMFpcIl0iLCJ0aW1lX3pvbmUiOiJFdXJvcGUvUm9tZSJ9XSwiYm9va2luZ19ldmVudHMiOlt7ImlkIjoic291cmNlLWJvb2tpbmciLCJ1c2VyX2lkIjoib3duZXIiLCJuYW1lIjoiU291cmNlIGNvbnN1bHRhdGlvbiIsInNsdWciOiJzb3VyY2UtY29uc3VsdGF0aW9uIiwiZGVzY3JpcHRpb24iOiJJbXBvcnRlZCBhdmFpbGFiaWxpdHkgY2Fmw6kiLCJjb2xvciI6IiMyNTYzZWIiLCJob3N0X2lkcyI6IltcIm93bmVyXCJdIiwiZHVyYXRpb25fbWludXRlcyI6MzAsImxvY2F0aW9uIjoiVmlkZW8gY2FsbCIsIndlZWtkYXlzIjoiWzEsMiwzLDQsNV0iLCJzdGFydF90aW1lIjoiMDk6MDAiLCJlbmRfdGltZSI6IjE3OjAwIiwidGltZV9yYW5nZXMiOiJbe1wic3RhcnRUaW1lXCI6XCIwOTowMFwiLFwiZW5kVGltZVwiOlwiMTI6MDBcIn0se1wic3RhcnRUaW1lXCI6XCIxMzowMFwiLFwiZW5kVGltZVwiOlwiMTc6MDBcIn1dIiwidGltZV96b25lIjoiRXVyb3BlL1JvbWUiLCJlbmFibGVkIjoxLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwLCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAxfV0sImF1dG9fcmVwbHlfZGVsaXZlcmllcyI6W3siaWQiOiJzb3VyY2UtYXV0by1yZXBseSIsIm1haWxib3hfaWQiOiJtYWlsYm94IiwicmVjaXBpZW50Ijoic2VuZGVyQGV4YW1wbGUub3JnIiwic2VudF9hdCI6MTcwMDAwMDAwMn1dLCJzcGFtX3Rva2VuX3N0YXRzIjpbeyJtYWlsYm94X2lkIjoibWFpbGJveCIsInRva2VuIjoic291cmNlIiwic3BhbV9jb3VudCI6MiwiaGFtX2NvdW50Ijo1LCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAyfV0sInNwYW1fcmVwdXRhdGlvbiI6W3sibWFpbGJveF9pZCI6Im1haWxib3giLCJ0eXBlIjoic2VuZGVyIiwia2V5Ijoic2VuZGVyQGV4YW1wbGUub3JnIiwibWVzc2FnZXNfc2VlbiI6Nywic3BhbV9jb3VudCI6MiwiaGFtX2NvdW50Ijo1LCJmaXJzdF9zZWVuX2F0IjoxNzAwMDAwMDAwLCJsYXN0X3NlZW5fYXQiOjE3MDAwMDAwMDJ9XSwic3BhbV9mZWVkYmFjayI6W3sibWVzc2FnZV9pZCI6InNvdXJjZS1pbmJveCIsIm1haWxib3hfaWQiOiJtYWlsYm94IiwiYWN0b3JfdXNlcl9pZCI6Im93bmVyIiwiY2xhc3NpZmljYXRpb24iOiJoYW0iLCJ0cmFpbmluZ190b2tlbnMiOiJbXCJzb3VyY2VcIl0iLCJyZXB1dGF0aW9uX2tleXMiOiJbe1widHlwZVwiOlwic2VuZGVyXCIsXCJrZXlcIjpcInNlbmRlckBleGFtcGxlLm9yZ1wifV0iLCJ0b2tlbml6ZXJfdmVyc2lvbiI6MSwiY3JlYXRlZF9hdCI6MTcwMDAwMDAxMCwidXBkYXRlZF9hdCI6MTcwMDAwMDAxMX1dLCJtYWlsYm94X2FsaWFzZXMiOlt7ImlkIjoic291cmNlLWFsaWFzIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJkb21haW5faWQiOiJkb21haW4iLCJsb2NhbF9wYXJ0Ijoic3VwcG9ydCIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDB9XSwicGFzc3dvcmRfcmVzZXRfdG9rZW5zIjpbeyJpZCI6InNvdXJjZS1yZXNldCIsInVzZXJfaWQiOiJvd25lciIsInRva2VuX2hhc2giOiJmaXh0dXJlLXJlc2V0LWhhc2giLCJleHBpcmVzX2F0Ijo0MTAyNDQ0ODAwLCJ1c2VkX2F0IjpudWxsLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwfV0sIm1mYV9yZWNvdmVyeV9jb2RlcyI6W3siaWQiOiJzb3VyY2UtcmVjb3ZlcnkiLCJ1c2VyX2lkIjoib3duZXIiLCJjb2RlX2hhc2giOiIkMmIkMDQkOGY4U2lBem9aS2dTN3ozNFo2YVVRLmp6ZWtWeEE4WUppV0g0Y1cwTmRiYVhrTWcwTS5kdHEiLCJ1c2VkX2F0IjpudWxsLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwfV0sImxvZ2luX2NoYWxsZW5nZXMiOlt7ImlkIjoic291cmNlLWNoYWxsZW5nZSIsInVzZXJfaWQiOiJvd25lciIsInRva2VuX2hhc2giOiJmaXh0dXJlLWNoYWxsZW5nZS1oYXNoIiwiZXhwaXJlc19hdCI6NDEwMjQ0NDgwMCwiY3JlYXRlZF9hdCI6MTcwMDAwMDAwMH1dLCJtYWlsYm94X2FnZW50X3NldHRpbmdzIjpbeyJtYWlsYm94X2lkIjoibWFpbGJveCIsImVuYWJsZWQiOjEsImF1dG9fZHJhZnRfZW5hYmxlZCI6MSwicmV2aWV3ZXJfdXNlcl9pZCI6Im93bmVyIiwiaW5zdHJ1Y3Rpb25zIjoiU291cmNlIGluc3RydWN0aW9ucyBjYWbDqSIsImRhaWx5X2xpbWl0Ijo3LCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAxLCJtb2RlbF9pZCI6InNvdXJjZS1tb2RlbCJ9XSwiYWdlbnRfY29udmVyc2F0aW9ucyI6W3siaWQiOiJzb3VyY2UtY29udmVyc2F0aW9uIiwidXNlcl9pZCI6Im93bmVyIiwibWFpbGJveF9pZCI6Im1haWxib3giLCJ0aXRsZSI6IlNvdXJjZSBzYXZlZCBjb252ZXJzYXRpb24gY2Fmw6kiLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAwLCJ1cGRhdGVkX2F0IjoxNzAwMDAwMDAxfV0sImFnZW50X2NoYXRfbWVzc2FnZXMiOlt7ImlkIjoic291cmNlLXVzZXItdHVybiIsImNvbnZlcnNhdGlvbl9pZCI6InNvdXJjZS1jb252ZXJzYXRpb24iLCJyb2xlIjoidXNlciIsImNvbnRlbnQiOiJTb3VyY2UgcXVlc3Rpb24gY2Fmw6kiLCJ0b29sX25hbWUiOm51bGwsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDB9LHsiaWQiOiJzb3VyY2UtYXNzaXN0YW50LXR1cm4iLCJjb252ZXJzYXRpb25faWQiOiJzb3VyY2UtY29udmVyc2F0aW9uIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOiJTb3VyY2UgYW5zd2VyIGNhZsOpIiwidG9vbF9uYW1lIjpudWxsLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDAxfV0sImFnZW50X2pvYnMiOlt7ImlkIjoic291cmNlLWFnZW50LWpvYiIsIm1haWxib3hfaWQiOiJtYWlsYm94Iiwic291cmNlX21lc3NhZ2VfaWQiOiJzb3VyY2UtaW5ib3giLCJyZXZpZXdlcl91c2VyX2lkIjoib3duZXIiLCJzdGF0dXMiOiJwZW5kaW5nIiwiYXR0ZW1wdHMiOjEsIm5leHRfYXR0ZW1wdF9hdCI6NDEwMjQ0NDgwMCwibGVhc2VfdW50aWwiOm51bGwsImRyYWZ0X2lkIjoic291cmNlLWRyYWZ0IiwicmVhc29uIjoiRml4dHVyZSBkZWZlcnJlZCBqb2IiLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDExfV0sImFnZW50X2RyYWZ0X21ldGFkYXRhIjpbeyJkcmFmdF9pZCI6InNvdXJjZS1kcmFmdCIsIm1haWxib3hfaWQiOiJtYWlsYm94Iiwib3JpZ2luIjoiYXV0byIsInNvdXJjZV9tZXNzYWdlX2lkIjoic291cmNlLWluYm94IiwicmV2aXNpb24iOjMsImh1bWFuX2VkaXRlZF9hdCI6MTcwMDAwMDAxMiwiY3JlYXRlZF9hdCI6MTcwMDAwMDAxMSwic2NoZWR1bGVkX2F0Ijo0MTAyNDQ0ODAwfV0sImFnZW50X3NlbmRfYXBwcm92YWxzIjpbeyJpZCI6InNvdXJjZS1hcHByb3ZhbCIsImRyYWZ0X2lkIjoic291cmNlLWRyYWZ0IiwibWFpbGJveF9pZCI6Im1haWxib3giLCJ1c2VyX2lkIjoib3duZXIiLCJyZXF1ZXN0X2tleV9pZCI6InNvdXJjZS1rZXkiLCJyZXZpc2lvbiI6MywicGF5bG9hZF9oYXNoIjoiY2QxOTgyMGNkZDg4YzYxNzJkZWUyNWZjN2JkZmY4MmRkOTUxOGY2MjAzYWRlZjVhM2NlZjYwYWYzNjRlNWU4YyIsInN0YXR1cyI6InBlbmRpbmciLCJjbGFpbWVkX2F0IjpudWxsLCJtZXNzYWdlX2lkIjpudWxsLCJleHBpcmVzX2F0Ijo0MTAyNDQ0ODAwLCJjcmVhdGVkX2F0IjoxNzAwMDAwMDEyfV0sIm1jcF9rZXlfbWFpbGJveGVzIjpbeyJrZXlfaWQiOiJzb3VyY2Uta2V5IiwibWFpbGJveF9pZCI6Im1haWxib3gifV0sImFpX3VzYWdlIjpbeyJpZCI6InNvdXJjZS11c2FnZSIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMTIsInByb3ZpZGVyIjoiY29tcGF0aWJsZSIsIm1vZGVsIjoic291cmNlLW1vZGVsIiwic291cmNlIjoiY2hhdCIsImlucHV0X3Rva2VucyI6MTIwLCJvdXRwdXRfdG9rZW5zIjozMCwiY29zdF91c2RfbWljcm9zIjoyNDB9XSwiZHJpdmVfaXRlbXMiOlt7ImlkIjoicGVuZGluZyIsIm93bmVyX2lkIjoib3duZXIiLCJwYXJlbnRfaWQiOm51bGwsImtpbmQiOiJmaWxlIiwibmFtZSI6InBlbmRpbmcudHh0IiwicjJfa2V5IjoiZHJpdmUvb3duZXIvcGVuZGluZyIsInNpemUiOjMsImNvbnRlbnRfdHlwZSI6InRleHQvcGxhaW4iLCJsaW5rX3Rva2VuIjpudWxsLCJ0cmFzaGVkX2F0IjpudWxsLCJjcmVhdGVkX2F0IjoxNzkzMzc5ODQ0LCJ1cGRhdGVkX2F0IjoxNzkzMzc5ODQ0LCJ1cGxvYWRfaWQiOiIyMGNmNGY1YS00NzQzLTQxZTUtYmRlNC00NThiMDY5MzIzMTUiLCJ1cGxvYWRfcGFydF9zaXplIjo2NzEwODg2NCwidXBsb2FkX2ZpbmdlcnByaW50Ijoic291cmNlLWZpbmdlcnByaW50In0seyJpZCI6InNvdXJjZS1kcml2ZS1mb2xkZXIiLCJvd25lcl9pZCI6Im93bmVyIiwicGFyZW50X2lkIjpudWxsLCJraW5kIjoiZm9sZGVyIiwibmFtZSI6IlNvdXJjZSBkb2N1bWVudHMiLCJyMl9rZXkiOm51bGwsInNpemUiOjAsImNvbnRlbnRfdHlwZSI6ImFwcGxpY2F0aW9uL29jdGV0LXN0cmVhbSIsImxpbmtfdG9rZW4iOm51bGwsInRyYXNoZWRfYXQiOm51bGwsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsInVwZGF0ZWRfYXQiOjE3MDAwMDAwMDEsInVwbG9hZF9pZCI6bnVsbCwidXBsb2FkX3BhcnRfc2l6ZSI6bnVsbCwidXBsb2FkX2ZpbmdlcnByaW50IjpudWxsfSx7ImlkIjoic291cmNlLWRyaXZlLWZpbGUiLCJvd25lcl9pZCI6Im93bmVyIiwicGFyZW50X2lkIjoic291cmNlLWRyaXZlLWZvbGRlciIsImtpbmQiOiJmaWxlIiwibmFtZSI6InNvdXJjZS50eHQiLCJyMl9rZXkiOiJzb3VyY2Utc3RhdGUvZmVhdHVyZS1kcml2ZS50eHQiLCJzaXplIjoyNCwiY29udGVudF90eXBlIjoidGV4dC9wbGFpbiIsImxpbmtfdG9rZW4iOiJzeW50aGV0aWMtZHJpdmUtbGluayIsInRyYXNoZWRfYXQiOm51bGwsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDAsInVwZGF0ZWRfYXQiOjE3MDAwMDAwMDEsInVwbG9hZF9pZCI6bnVsbCwidXBsb2FkX3BhcnRfc2l6ZSI6bnVsbCwidXBsb2FkX2ZpbmdlcnByaW50IjpudWxsfV0sImRyaXZlX3NoYXJlcyI6W3siaWQiOiJzb3VyY2UtZHJpdmUtc2hhcmUiLCJpdGVtX2lkIjoic291cmNlLWRyaXZlLWZpbGUiLCJ1c2VyX2lkIjoic3RyYW5nZXIiLCJyb2xlIjoidmlldyIsImNyZWF0ZWRfYXQiOjE3MDAwMDAwMDJ9XSwiZHJpdmVfdXBsb2FkX3BhcnRzIjpbeyJpdGVtX2lkIjoicGVuZGluZyIsInBhcnRfbnVtYmVyIjoxLCJldGFnIjoiMS0zIn1dfX0=",
+      "sha256": "52e0a703711876eb0aff46099505ef8eb8769580cbdfe9f181412b7fe06e27e0"
+    },
+    {
+      "key": "source-state/feature-backup.json.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9qc29uIn0sInNpemUiOjE3ODUyLCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MDQ6MDQuMzM4WiIsImV0YWciOiIxYTE4ZGM0YzBmMi00NWJjIn0=",
+      "sha256": "f97ab09fc237fefefcc25616f0326bfd4c83d1f13952f831e23e1a3df0563c22"
+    },
+    {
+      "key": "source-state/feature-drive.txt",
+      "base64": "RmVhdHVyZSBkcml2ZSBib2R5IGNhZsOp",
+      "sha256": "56e37e3a6308f862c9cd68ddfcfa602e600f1f4c9706a1c84c3dbd19ef52642c"
+    },
+    {
+      "key": "source-state/feature-drive.txt.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sInNpemUiOjI0LCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MDQ6MDQuMzM2WiIsImV0YWciOiIxYTE4ZGM0YzBmMC0xOCJ9",
+      "sha256": "6849567e3c2a3948891a87323dcf857ef27bef18bdc84c7c56e36aaa8af2cb3b"
+    },
+    {
+      "key": "source-state/feature-message.eml",
+      "base64": "RnJvbTogU2VuZGVyIDxzZW5kZXJAZXhhbXBsZS5vcmc+DQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IFNvdXJjZSBJbmJveCBjYWbDqQ0KTWVzc2FnZS1JRDogPHNvdXJjZS1mZWF0dXJlQGV4YW1wbGUub3JnPg0KTGlzdC1VbnN1YnNjcmliZTogPGh0dHBzOi8vZXhhbXBsZS5vcmcvbGVhdmU+DQoNClNvdXJjZSBpbmJveCBib2R5IGNhZsOpDQo=",
+      "sha256": "0e6e6f98be8a00383e21eca013327b0725c1b3b4681a9ef9d306f8eae22274d1"
+    },
+    {
+      "key": "source-state/feature-message.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjoyMDMsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzVaIiwiZXRhZyI6IjFhMThkYzRjMGVmLWNiIn0=",
+      "sha256": "3dbcbd99a6418f2bfd1e6f1f79d138f535473b56989580f23e839f8bcc69259c"
+    },
+    {
+      "key": "source-state/retained-spam.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IE9yaWdpbmFsIHVua25vd24tYWdlIFNwYW0NCk1lc3NhZ2UtSUQ6IDxyZXRhaW5lZC1zcGFtQGV4YW1wbGUub3JnPg0KQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04DQoNClJldGFpbmVkIG9yaWdpbmFsIGJvZHkgY2Fmw6kNCg==",
+      "sha256": "ca8888be45c01aa7b442909c0d2116a33625ab346c2d60f3f690189fe182cfa3"
+    },
+    {
+      "key": "source-state/retained-spam.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjoxOTksInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzFaIiwiZXRhZyI6IjFhMThkYzRjMGViLWM3In0=",
+      "sha256": "322a2081f8d8b4d3e6ea6f09ad91bc14565f21c3e6f859e9c5b9c6204687c75f"
+    },
+    {
+      "key": "source-state/retained-trash.eml",
+      "base64": "RnJvbTogc2VuZGVyQGV4YW1wbGUub3JnDQpUbzogaGVsbG9AZXhhbXBsZS5jb20NClN1YmplY3Q6IFJldGFpbmVkIG9yaWdpbmFsIFRyYXNoDQpNZXNzYWdlLUlEOiA8cmV0YWluZWQtdHJhc2hAZXhhbXBsZS5vcmc+DQpNSU1FLVZlcnNpb246IDEuMA0KQ29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSJzb3VyY2UtcmV0ZW50aW9uLWJvdW5kYXJ5Ig0KDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD11dGYtOA0KDQpSZXRhaW5lZCBvcmlnaW5hbCBib2R5IGNhZsOpDQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnkNCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbg0KQ29udGVudC1EaXNwb3NpdGlvbjogYXR0YWNobWVudDsgZmlsZW5hbWU9InJldGFpbmVkLnR4dCINCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IGJhc2U2NA0KDQpVbVYwWVdsdVpXUWdiM0pwWjJsdVlXd2dZWFIwWVdOb2JXVnVkQT09DQotLXNvdXJjZS1yZXRlbnRpb24tYm91bmRhcnktLQ0K",
+      "sha256": "b14d01037f13ceffbca356d89583396bcd6c3a3e80e0e0bbb7213f7ffc7ac4f7"
+    },
+    {
+      "key": "source-state/retained-trash.eml.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJtZXNzYWdlL3JmYzgyMiJ9LCJzaXplIjo1NDAsInVwbG9hZGVkIjoiMjAyNi0xMC0zMFQxNzowNDowNC4zMzFaIiwiZXRhZyI6IjFhMThkYzRjMGViLTIxYyJ9",
+      "sha256": "099e2452215b05e3f5c0757e6d16aa8f5af9156cc000818036de6a65b72c3127"
+    },
+    {
+      "key": "source-state/retained.txt",
+      "base64": "UmV0YWluZWQgb3JpZ2luYWwgYXR0YWNobWVudA==",
+      "sha256": "06c5d8f7780b0de9761fc7a501bd37c9c0b86afa756215221d2fe6d110025797"
+    },
+    {
+      "key": "source-state/retained.txt.meta.json",
+      "base64": "eyJodHRwTWV0YWRhdGEiOnsiY29udGVudFR5cGUiOiJ0ZXh0L3BsYWluIn0sInNpemUiOjI4LCJ1cGxvYWRlZCI6IjIwMjYtMTAtMzBUMTc6MDQ6MDQuMzMxWiIsImV0YWciOiIxYTE4ZGM0YzBlYi0xYyJ9",
+      "sha256": "d2c4196748e9d421166257c526951df9e66d18d7f721a5bda00c9d7958d3c943"
+    }
+  ],
+  "featureResponses": [
+    {
+      "path": "/api/auth/me",
+      "status": 200,
+      "body": {
+        "user": {
+          "id": "owner",
+          "email": "owner@example.com",
+          "name": "Source Owner café",
+          "timeZone": "Europe/Rome",
+          "resetEmail": "recovery@example.org",
+          "forwardingEmail": "archive@example.org",
+          "canForwardEmail": true,
+          "role": "admin",
+          "isPrimaryAdmin": true,
+          "canManageMailboxes": false,
+          "canManageDomains": false,
+          "canManageUsers": false,
+          "keyboardShortcutsEnabled": false,
+          "spamProtectionEnabled": true,
+          "showFullRecipientAddresses": true,
+          "hasAvatar": true,
+          "mfaEnabled": true
+        },
+        "runtime": "node",
+        "managesDns": false,
+        "hasMailboxes": true,
+        "isSetup": true
+      }
+    },
+    {
+      "path": "/api/branding",
+      "status": 200,
+      "body": {
+        "appName": "Source Workspace café",
+        "hasCustomIcon": true,
+        "canCustomizeBranding": true
+      }
+    },
+    {
+      "path": "/api/mailboxes",
+      "status": 200,
+      "body": {
+        "mailboxes": [
+          {
+            "id": "mailbox",
+            "userId": "owner",
+            "domainId": "domain",
+            "localPart": "hello",
+            "displayName": "Source shared inbox",
+            "signature": "<p>Source signature café</p>",
+            "autoReplyEnabled": true,
+            "autoReplySubject": "Away",
+            "autoReplyBody": "Back next week",
+            "useAllDomains": true,
+            "type": "shared",
+            "disabled": false,
+            "createdAt": "1970-01-01T00:00:01.000Z",
+            "hostname": "example.com",
+            "hasAvatar": true,
+            "permission": "full_access",
+            "isPrimary": false,
+            "senderAddresses": [
+              "hello@example.com",
+              "support@example.com"
+            ]
+          },
+          {
+            "id": "mbx_n71y_OYLOI7rl5Igo2ZBm",
+            "userId": "owner",
+            "domainId": "domain",
+            "localPart": "owner",
+            "displayName": "Source Owner café",
+            "signature": null,
+            "autoReplyEnabled": false,
+            "autoReplySubject": "Out of office",
+            "autoReplyBody": "",
+            "useAllDomains": true,
+            "type": "personal",
+            "disabled": false,
+            "createdAt": "2026-10-30T17:04:05.000Z",
+            "hostname": "example.com",
+            "hasAvatar": true,
+            "permission": "full_access",
+            "isPrimary": true,
+            "senderAddresses": [
+              "owner@example.com"
+            ]
+          }
+        ],
+        "canCreateShared": true
+      }
+    },
+    {
+      "path": "/api/mailboxes/mailbox/aliases",
+      "status": 200,
+      "body": {
+        "aliases": [
+          {
+            "id": "source-alias",
+            "domainId": "domain",
+            "localPart": "support",
+            "hostname": "example.com",
+            "createdAt": "2023-11-14T22:13:20.000Z"
+          }
+        ],
+        "availableDomains": [
+          {
+            "id": "domain",
+            "hostname": "example.com"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/routing-rules?mailboxId=mailbox",
+      "status": 200,
+      "body": {
+        "rules": [
+          {
+            "id": "source-rule",
+            "userId": "owner",
+            "domainId": "domain",
+            "scope": "mailbox",
+            "name": "Source filing rule",
+            "enabled": true,
+            "pattern": "sender@example.org",
+            "matchField": "email",
+            "matchOperator": "exact",
+            "matchValue": "sender@example.org",
+            "mailboxId": "mailbox",
+            "folderId": "historical-folder",
+            "action": "store",
+            "forwardTo": null,
+            "keepCopy": true,
+            "rejectReason": null,
+            "priority": 7,
+            "lastMatchedAt": "2023-11-14T22:13:22.000Z",
+            "matchCount": 3,
+            "createdAt": "2023-11-14T22:13:20.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/webhooks",
+      "status": 200,
+      "body": {
+        "webhooks": [
+          {
+            "id": "source-webhook",
+            "url": "https://webhook.example.org/mail",
+            "description": "Source saved hook",
+            "events": [
+              "message.inbound"
+            ],
+            "enabled": false,
+            "maxAttempts": 4,
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "stats": {
+              "total": 1,
+              "delivered": 0,
+              "failing": 0,
+              "pending": 1,
+              "lastAttemptAt": 1700000011000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/webhooks/source-webhook/deliveries",
+      "status": 200,
+      "body": {
+        "deliveries": [
+          {
+            "id": "source-delivery",
+            "eventType": "message.inbound",
+            "status": "pending",
+            "attempts": 2,
+            "maxAttempts": 4,
+            "responseStatus": 503,
+            "error": "Fixture retry",
+            "durationMs": 12,
+            "lastAttemptAt": "2023-11-14T22:13:31.000Z",
+            "nextRetryAt": "2100-01-01T00:00:00.000Z",
+            "createdAt": "2023-11-14T22:13:30.000Z",
+            "payload": "{\"messageId\":\"source-inbox\"}"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/backups",
+      "status": 200,
+      "body": {
+        "settings": {
+          "id": "default",
+          "enabled": false,
+          "scheduleType": "daily",
+          "scheduleValue": null,
+          "retentionEnabled": false,
+          "retentionDays": 60,
+          "excludedTableGroups": [],
+          "updatedAt": "2023-11-14T22:13:21.000Z"
+        },
+        "backups": [
+          {
+            "id": "source-backup",
+            "status": "completed",
+            "trigger": "manual",
+            "r2Key": "source-state/feature-backup.json",
+            "filename": "source-backup.json",
+            "size": 17852,
+            "error": null,
+            "createdByUserId": "owner",
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "startedAt": "2023-11-14T22:13:21.000Z",
+            "completedAt": "2023-11-14T22:13:22.000Z"
+          }
+        ],
+        "configuration": {
+          "configured": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "path": "/api/templates",
+      "status": 200,
+      "body": {
+        "templates": [
+          {
+            "id": "source-template",
+            "subject": "Source composer template",
+            "htmlBody": "<p>Source template body</p>",
+            "textBody": "Source template body"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/calendar/events?start=2026-11-01T00%3A00%3A00Z&end=2026-12-01T00%3A00%3A00Z",
+      "status": 200,
+      "body": {
+        "events": [
+          {
+            "id": "source-calendar",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "title": "Source weekly meeting",
+            "description": "Imported recurrence café",
+            "location": "Source meeting room",
+            "attendees": "[\"guest@example.org\"]",
+            "color": "blue",
+            "repeat": "weekly",
+            "repeatDays": "[1,3]",
+            "repeatAnchorDay": null,
+            "repeatUntil": "2026-12-01T07:00:00.000Z",
+            "excludedOccurrences": "[\"2026-11-04T09:00:00.000Z\"]",
+            "timeZone": "Europe/Rome",
+            "startsAt": "2026-11-01T07:00:00.000Z",
+            "endsAt": "2026-11-01T08:00:00.000Z",
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "updatedAt": "2023-11-14T22:13:21.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/booking",
+      "status": 200,
+      "body": {
+        "events": [
+          {
+            "id": "source-booking",
+            "userId": "owner",
+            "name": "Source consultation",
+            "slug": "source-consultation",
+            "description": "Imported availability café",
+            "color": "#2563eb",
+            "hostIds": "[\"owner\"]",
+            "durationMinutes": 30,
+            "location": "Video call",
+            "weekdays": "[1,2,3,4,5]",
+            "startTime": "09:00",
+            "endTime": "17:00",
+            "timeRanges": "[{\"startTime\":\"09:00\",\"endTime\":\"12:00\"},{\"startTime\":\"13:00\",\"endTime\":\"17:00\"}]",
+            "timeZone": "Europe/Rome",
+            "enabled": true,
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "updatedAt": "2023-11-14T22:13:21.000Z"
+          }
+        ],
+        "username": "source-owner",
+        "currentUser": {
+          "id": "owner",
+          "name": "Source Owner café",
+          "email": "owner@example.com",
+          "hasAvatar": true
+        },
+        "canManageHosts": true
+      }
+    },
+    {
+      "path": "/api/agent/settings?mailboxId=mailbox",
+      "status": 200,
+      "body": {
+        "settings": {
+          "mailboxId": "mailbox",
+          "enabled": true,
+          "modelId": "source-model",
+          "autoDraftEnabled": true,
+          "reviewerUserId": "owner",
+          "instructions": "Source instructions café",
+          "dailyLimit": 7,
+          "updatedAt": "2023-11-14T22:13:21.000Z"
+        },
+        "models": [
+          "source-model"
+        ],
+        "canManage": true,
+        "canConfigureProvider": true,
+        "providerConfigured": true,
+        "provider": {
+          "kind": "OpenAI-compatible API",
+          "model": "source-model"
+        },
+        "autoReplyEnabled": true,
+        "reviewers": [
+          {
+            "id": "owner",
+            "name": "Source Owner café",
+            "email": "owner@example.com"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/agent/conversations?mailboxId=mailbox",
+      "status": 200,
+      "body": {
+        "conversations": [
+          {
+            "id": "source-conversation",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "title": "Source saved conversation café",
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "updatedAt": "2023-11-14T22:13:21.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/agent/conversations/source-conversation?mailboxId=mailbox",
+      "status": 200,
+      "body": {
+        "messages": [
+          {
+            "id": "source-user-turn",
+            "conversationId": "source-conversation",
+            "role": "user",
+            "content": "Source question café",
+            "toolName": null,
+            "createdAt": "2023-11-14T22:13:20.000Z"
+          },
+          {
+            "id": "source-assistant-turn",
+            "conversationId": "source-conversation",
+            "role": "assistant",
+            "content": "Source answer café",
+            "toolName": null,
+            "createdAt": "2023-11-14T22:13:21.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/drive/items",
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "source-drive-folder",
+            "kind": "folder",
+            "name": "Source documents",
+            "size": 0,
+            "contentType": "application/octet-stream",
+            "parentId": null,
+            "ownerId": "owner",
+            "ownerName": "Source Owner café",
+            "ownerHasAvatar": true,
+            "role": "owner",
+            "shared": false,
+            "linkToken": null,
+            "trashedAt": null,
+            "updatedAt": "2023-11-14T22:13:21.000Z"
+          }
+        ],
+        "path": [],
+        "role": "owner",
+        "storageUsed": 27,
+        "storageLimit": 104857600
+      }
+    },
+    {
+      "path": "/api/drive/items?parent=source-drive-folder",
+      "status": 200,
+      "body": {
+        "items": [
+          {
+            "id": "source-drive-file",
+            "kind": "file",
+            "name": "source.txt",
+            "size": 24,
+            "contentType": "text/plain",
+            "parentId": "source-drive-folder",
+            "ownerId": "owner",
+            "ownerName": "Source Owner café",
+            "ownerHasAvatar": true,
+            "role": "owner",
+            "shared": true,
+            "linkToken": "synthetic-drive-link",
+            "trashedAt": null,
+            "updatedAt": "2023-11-14T22:13:21.000Z"
+          }
+        ],
+        "path": [
+          {
+            "id": "source-drive-folder",
+            "name": "Source documents"
+          }
+        ],
+        "role": "owner",
+        "storageUsed": 27,
+        "storageLimit": 104857600
+      }
+    },
+    {
+      "path": "/api/drive/items/source-drive-file/shares",
+      "status": 200,
+      "body": {
+        "shares": [
+          {
+            "id": "source-drive-share",
+            "userId": "stranger",
+            "name": "Stranger",
+            "email": "stranger@example.com",
+            "role": "view"
+          }
+        ],
+        "linkToken": "synthetic-drive-link"
+      }
+    },
+    {
+      "path": "/api/api-keys",
+      "status": 200,
+      "body": {
+        "apiKeys": [
+          {
+            "id": "source-key",
+            "name": "Source scoped client",
+            "prefix": "ep_source_fe",
+            "kind": "legacy",
+            "mailboxScopeEnabled": true,
+            "scopes": "[\"read\",\"calendar:read\",\"jmap\"]",
+            "createdAt": "2023-11-14T22:13:20.000Z",
+            "lastUsedAt": "2023-11-14T22:13:21.000Z",
+            "mailboxIds": [
+              "mailbox"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/messages?mailboxId=mailbox&status=draft",
+      "status": 200,
+      "body": {
+        "messages": [
+          {
+            "id": "source-draft",
+            "userId": "owner",
+            "mailboxId": "mailbox",
+            "direction": "outbound",
+            "providerMessageId": null,
+            "folderId": null,
+            "fromAddr": "hello@example.com",
+            "toAddr": "recipient@example.org",
+            "ccAddr": null,
+            "bccAddr": null,
+            "replyTo": null,
+            "subject": "Source assistant draft",
+            "snippet": "Source draft preview",
+            "status": "draft",
+            "read": true,
+            "starred": false,
+            "snoozedUntil": null,
+            "threadId": "source-thread",
+            "inReplyTo": null,
+            "references": null,
+            "spamScore": null,
+            "spamVerdict": null,
+            "spamSignals": null,
+            "spamAnalyzedAt": null,
+            "spamAnalysisError": null,
+            "trashedAt": null,
+            "createdAt": "2023-11-14T22:13:31.000Z",
+            "fromContactName": "Source shared inbox",
+            "toContactName": null,
+            "threadCount": 2,
+            "threadUnread": 1
+          }
+        ],
+        "total": 1,
+        "limit": 50,
+        "offset": 0,
+        "grouped": false
+      }
+    },
+    {
+      "path": "/api/drafts/source-draft",
+      "status": 200,
+      "body": {
+        "draft": {
+          "id": "source-draft",
+          "userId": "owner",
+          "mailboxId": "mailbox",
+          "fromAddr": "hello@example.com",
+          "toAddr": "recipient@example.org",
+          "ccAddr": null,
+          "bccAddr": null,
+          "subject": "Source assistant draft",
+          "inReplyTo": null,
+          "references": null,
+          "threadId": "source-thread",
+          "status": "draft",
+          "textBody": "Source draft body café",
+          "htmlBody": "<p>Source draft body café</p>",
+          "attachments": [
+            {
+              "id": "source-draft-file",
+              "messageId": "source-draft",
+              "filename": "retained.txt",
+              "type": "text/plain",
+              "size": 24,
+              "disposition": "attachment",
+              "contentId": null
+            }
+          ],
+          "agent": {
+            "revision": 3,
+            "origin": "auto",
+            "scheduledAt": "2100-01-01T00:00:00.000Z"
+          }
+        }
+      }
+    },
+    {
+      "path": "/api/agent/jobs?mailboxId=mailbox",
+      "status": 200,
+      "body": {
+        "jobs": [
+          {
+            "id": "source-agent-job",
+            "status": "pending",
+            "reason": "Fixture deferred job",
+            "draftId": "source-draft",
+            "sourceMessageId": "source-inbox",
+            "createdAt": "2023-11-14T22:13:31.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/agent/approvals/source-approval",
+      "status": 200,
+      "body": {
+        "approvalId": "source-approval",
+        "status": "pending",
+        "draftId": "source-draft",
+        "messageId": null,
+        "expiresAt": "2100-01-01T00:00:00.000Z",
+        "snapshot": {
+          "from": "hello@example.com",
+          "to": "recipient@example.org",
+          "cc": null,
+          "bcc": null,
+          "subject": "Source assistant draft",
+          "text": "Source draft body café",
+          "html": "<p>Source draft body café</p>",
+          "inReplyTo": null,
+          "references": null,
+          "threadId": "source-thread",
+          "mailboxId": "mailbox",
+          "scheduledAt": "2100-01-01T00:00:00.000Z",
+          "attachments": [
+            {
+              "id": "source-draft-file",
+              "filename": "retained.txt",
+              "size": 24,
+              "digest": "6c7ca5c95f4267a2661f336a80dc4e7d00a8facbca5b50d6b3fea5459065829c"
+            }
+          ]
+        },
+        "stale": false
+      }
+    },
+    {
+      "path": "/api/drive/items/source-drive-file/content",
+      "status": 200,
+      "body": {
+        "$file": {
+          "contentType": "text/plain",
+          "byteLength": 24,
+          "sha256": "56e37e3a6308f862c9cd68ddfcfa602e600f1f4c9706a1c84c3dbd19ef52642c"
+        }
+      }
+    },
+    {
+      "path": "/api/backups/source-backup/download",
+      "status": 200,
+      "body": {
+        "$file": {
+          "contentType": "application/sql",
+          "byteLength": 17852,
+          "sha256": "52e0a703711876eb0aff46099505ef8eb8769580cbdfe9f181412b7fe06e27e0"
+        }
+      }
+    }
+  ]
+}

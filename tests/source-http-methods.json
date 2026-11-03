@@ -1,0 +1,177 @@
+{
+  "sourceRevision": "71aa49b",
+  "capturedAt": "2026-10-28",
+  "cases": [
+    {
+      "method": "OPTIONS",
+      "path": "/api/messages",
+      "status": 204,
+      "allow": "GET, HEAD, OPTIONS",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/auth/login",
+      "status": 204,
+      "allow": "OPTIONS, POST",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/domains/fixture/sending",
+      "status": 204,
+      "allow": "DELETE, GET, HEAD, OPTIONS, PUT",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/admin/agent",
+      "status": 204,
+      "allow": "GET, HEAD, OPTIONS, PUT",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/api/messages/fixture/original",
+      "status": 204,
+      "allow": "GET, HEAD, OPTIONS",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/.well-known/jmap",
+      "status": 204,
+      "allow": "GET, HEAD, OPTIONS",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/mcp",
+      "status": 204,
+      "allow": "DELETE, GET, HEAD, OPTIONS, POST",
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/jmap/session",
+      "status": 204,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "PUT",
+      "path": "/api/messages",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/login",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "POST",
+      "path": "/.well-known/jmap",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/mcp",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/admin/agent",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/auth/login",
+      "status": 405,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/auth/me",
+      "status": 401,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/messages",
+      "status": 401,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/admin/migrations",
+      "status": 401,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/messages/fixture/original",
+      "status": 401,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "refresh": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/messages/?mailboxId=fixture",
+      "status": 308,
+      "allow": null,
+      "location": "/api/messages?mailboxId=fixture",
+      "bytes": 31,
+      "refresh": "0;url=/api/messages?mailboxId=fixture"
+    }
+  ]
+}

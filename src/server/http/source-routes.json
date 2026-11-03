@@ -1,0 +1,590 @@
+{
+  "sourceRevision": "71aa49b",
+  "sourceVersion": "0.5.2",
+  "routes": {
+    "/.well-known/jmap": [
+      "GET"
+    ],
+    "/api/accounts": [
+      "GET",
+      "POST"
+    ],
+    "/api/accounts/[id]": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/accounts/[id]/avatar": [
+      "GET",
+      "POST"
+    ],
+    "/api/accounts/[id]/mailbox-access": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/accounts/[id]/mailboxes": [
+      "GET"
+    ],
+    "/api/accounts/[id]/transfer-primary": [
+      "POST"
+    ],
+    "/api/activity": [
+      "GET"
+    ],
+    "/api/admin/agent": [
+      "GET",
+      "PUT"
+    ],
+    "/api/admin/agent/models": [
+      "POST"
+    ],
+    "/api/admin/ai-usage": [
+      "GET"
+    ],
+    "/api/admin/api-keys": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/admin/aws": [
+      "DELETE",
+      "GET",
+      "POST",
+      "PUT"
+    ],
+    "/api/admin/general": [
+      "GET",
+      "PUT"
+    ],
+    "/api/admin/migrations": [
+      "GET",
+      "POST"
+    ],
+    "/api/admin/resend-key": [
+      "DELETE",
+      "GET",
+      "PUT"
+    ],
+    "/api/admin/search-index": [
+      "GET",
+      "POST"
+    ],
+    "/api/admin/update": [
+      "GET",
+      "POST"
+    ],
+    "/api/agent/actions/confirm": [
+      "POST"
+    ],
+    "/api/agent/approvals": [
+      "POST"
+    ],
+    "/api/agent/approvals/[id]": [
+      "GET"
+    ],
+    "/api/agent/approvals/[id]/confirm": [
+      "POST"
+    ],
+    "/api/agent/availability": [
+      "GET"
+    ],
+    "/api/agent/chat": [
+      "POST"
+    ],
+    "/api/agent/conversations": [
+      "GET"
+    ],
+    "/api/agent/conversations/[id]": [
+      "DELETE",
+      "GET"
+    ],
+    "/api/agent/jobs": [
+      "GET"
+    ],
+    "/api/agent/jobs/[id]/retry": [
+      "POST"
+    ],
+    "/api/agent/mcp-keys": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/agent/settings": [
+      "GET",
+      "PUT"
+    ],
+    "/api/api-keys": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/attachment-policy": [
+      "GET"
+    ],
+    "/api/audit-logs": [
+      "GET"
+    ],
+    "/api/auth/accounts": [
+      "GET"
+    ],
+    "/api/auth/accounts/[userId]/avatar": [
+      "GET"
+    ],
+    "/api/auth/login": [
+      "POST"
+    ],
+    "/api/auth/logout": [
+      "POST"
+    ],
+    "/api/auth/me": [
+      "GET"
+    ],
+    "/api/auth/mfa/verify": [
+      "POST"
+    ],
+    "/api/auth/password-reset/confirm": [
+      "POST"
+    ],
+    "/api/auth/password-reset/request": [
+      "POST"
+    ],
+    "/api/auth/register": [
+      "POST"
+    ],
+    "/api/auth/switch": [
+      "POST"
+    ],
+    "/api/backups": [
+      "GET",
+      "POST",
+      "PUT"
+    ],
+    "/api/backups/[id]": [
+      "DELETE"
+    ],
+    "/api/backups/[id]/download": [
+      "GET"
+    ],
+    "/api/backups/restore": [
+      "POST"
+    ],
+    "/api/booking": [
+      "GET",
+      "POST"
+    ],
+    "/api/booking/[eventId]": [
+      "DELETE",
+      "PATCH"
+    ],
+    "/api/booking/settings": [
+      "PATCH"
+    ],
+    "/api/branding": [
+      "GET",
+      "PUT"
+    ],
+    "/api/branding/icon": [
+      "GET"
+    ],
+    "/api/calendar/events": [
+      "GET",
+      "POST"
+    ],
+    "/api/calendar/events/[eventId]": [
+      "DELETE",
+      "PATCH"
+    ],
+    "/api/contacts": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/contacts/avatar": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/contacts/block": [
+      "POST"
+    ],
+    "/api/domains": [
+      "GET",
+      "POST"
+    ],
+    "/api/domains/[id]": [
+      "DELETE",
+      "GET"
+    ],
+    "/api/domains/[id]/dns": [
+      "GET"
+    ],
+    "/api/domains/[id]/dns/setup": [
+      "POST"
+    ],
+    "/api/domains/[id]/receiving": [
+      "DELETE",
+      "GET",
+      "PUT"
+    ],
+    "/api/domains/[id]/receiving/[provider]": [
+      "GET",
+      "POST"
+    ],
+    "/api/domains/[id]/resend": [
+      "GET",
+      "POST"
+    ],
+    "/api/domains/[id]/sending": [
+      "DELETE",
+      "GET",
+      "PUT"
+    ],
+    "/api/domains/[id]/ses": [
+      "GET",
+      "POST"
+    ],
+    "/api/domains/check": [
+      "POST"
+    ],
+    "/api/drafts": [
+      "GET",
+      "POST"
+    ],
+    "/api/drafts/[id]": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "/api/drafts/[id]/attachments": [
+      "POST"
+    ],
+    "/api/drafts/[id]/attachments/[attachmentId]": [
+      "DELETE"
+    ],
+    "/api/drive/attachments": [
+      "POST"
+    ],
+    "/api/drive/attachments/[id]/content": [
+      "GET"
+    ],
+    "/api/drive/folders": [
+      "GET"
+    ],
+    "/api/drive/items": [
+      "GET",
+      "POST"
+    ],
+    "/api/drive/items/[id]": [
+      "DELETE",
+      "PATCH"
+    ],
+    "/api/drive/items/[id]/content": [
+      "GET"
+    ],
+    "/api/drive/items/[id]/link": [
+      "POST"
+    ],
+    "/api/drive/items/[id]/shares": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/drive/items/bulk": [
+      "POST"
+    ],
+    "/api/drive/owners/[id]/avatar": [
+      "GET"
+    ],
+    "/api/drive/public/[token]": [
+      "GET"
+    ],
+    "/api/drive/upload": [
+      "POST"
+    ],
+    "/api/drive/upload/[id]": [
+      "DELETE",
+      "POST",
+      "PUT"
+    ],
+    "/api/export/messages": [
+      "GET"
+    ],
+    "/api/folders": [
+      "GET",
+      "POST"
+    ],
+    "/api/import/imap": [
+      "POST"
+    ],
+    "/api/import/imap/folders": [
+      "POST"
+    ],
+    "/api/import/messages": [
+      "POST"
+    ],
+    "/api/inbound": [
+      "POST"
+    ],
+    "/api/inbound/resend": [
+      "POST"
+    ],
+    "/api/inbound/ses": [
+      "POST"
+    ],
+    "/api/licenses": [
+      "GET"
+    ],
+    "/api/licenses/activate": [
+      "POST"
+    ],
+    "/api/licenses/deactivate": [
+      "POST"
+    ],
+    "/api/licenses/validate": [
+      "POST"
+    ],
+    "/api/mailboxes": [
+      "GET",
+      "POST"
+    ],
+    "/api/mailboxes/[id]": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "/api/mailboxes/[id]/access": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/mailboxes/[id]/aliases": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/mailboxes/[id]/avatar": [
+      "GET",
+      "POST"
+    ],
+    "/api/messages": [
+      "GET"
+    ],
+    "/api/messages/[messageId]": [
+      "GET"
+    ],
+    "/api/messages/[messageId]/attachments/[attachmentId]": [
+      "GET"
+    ],
+    "/api/messages/[messageId]/cancel-schedule": [
+      "POST"
+    ],
+    "/api/messages/[messageId]/metadata": [
+      "GET"
+    ],
+    "/api/messages/[messageId]/original": [
+      "GET"
+    ],
+    "/api/messages/[messageId]/read": [
+      "POST"
+    ],
+    "/api/messages/[messageId]/snooze": [
+      "DELETE",
+      "POST"
+    ],
+    "/api/messages/[messageId]/star": [
+      "POST"
+    ],
+    "/api/messages/[messageId]/status": [
+      "POST"
+    ],
+    "/api/messages/[messageId]/thread": [
+      "GET"
+    ],
+    "/api/messages/bulk": [
+      "POST"
+    ],
+    "/api/messages/counts": [
+      "GET"
+    ],
+    "/api/messages/empty": [
+      "POST"
+    ],
+    "/api/messages/navigation": [
+      "GET"
+    ],
+    "/api/profile/avatar": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "/api/public/booking": [
+      "GET"
+    ],
+    "/api/public/booking/[eventId]": [
+      "GET",
+      "POST"
+    ],
+    "/api/push/config": [
+      "GET"
+    ],
+    "/api/push/subscriptions": [
+      "DELETE",
+      "POST"
+    ],
+    "/api/routing-rules": [
+      "GET",
+      "POST"
+    ],
+    "/api/routing-rules/[id]": [
+      "DELETE",
+      "PATCH"
+    ],
+    "/api/routing-rules/domain": [
+      "GET",
+      "POST"
+    ],
+    "/api/routing-rules/domain/[id]": [
+      "DELETE",
+      "PATCH"
+    ],
+    "/api/seed": [
+      "POST"
+    ],
+    "/api/send": [
+      "POST"
+    ],
+    "/api/settings/forwarding": [
+      "PATCH"
+    ],
+    "/api/settings/mfa": [
+      "GET"
+    ],
+    "/api/settings/mfa/confirm": [
+      "POST"
+    ],
+    "/api/settings/mfa/disable": [
+      "POST"
+    ],
+    "/api/settings/mfa/enroll": [
+      "POST"
+    ],
+    "/api/settings/mfa/recovery-codes": [
+      "POST"
+    ],
+    "/api/settings/password": [
+      "PATCH"
+    ],
+    "/api/settings/profile": [
+      "PATCH"
+    ],
+    "/api/settings/recipient-addresses": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/settings/shortcuts": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/settings/spam": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/settings/time-zone": [
+      "PATCH"
+    ],
+    "/api/settings/trash-retention": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/setup/domain": [
+      "POST"
+    ],
+    "/api/setup/domain/mx": [
+      "POST"
+    ],
+    "/api/setup/prepare": [
+      "POST"
+    ],
+    "/api/setup/status": [
+      "GET"
+    ],
+    "/api/shared-files/[id]": [
+      "GET"
+    ],
+    "/api/templates": [
+      "GET",
+      "POST"
+    ],
+    "/api/templates/[id]": [
+      "DELETE"
+    ],
+    "/api/v1/accounts": [
+      "GET",
+      "POST"
+    ],
+    "/api/v1/accounts/[id]": [
+      "GET",
+      "PATCH"
+    ],
+    "/api/v1/domains": [
+      "GET",
+      "POST"
+    ],
+    "/api/v1/domains/[id]": [
+      "DELETE",
+      "GET"
+    ],
+    "/api/v1/domains/[id]/dns": [
+      "GET"
+    ],
+    "/api/v1/domains/[id]/dns/setup": [
+      "POST"
+    ],
+    "/api/v1/mailboxes": [
+      "GET",
+      "POST"
+    ],
+    "/api/v1/mailboxes/[id]": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "/api/v1/messages": [
+      "GET"
+    ],
+    "/api/v1/send": [
+      "POST"
+    ],
+    "/api/v1/storage": [
+      "GET",
+      "POST"
+    ],
+    "/api/webhooks": [
+      "GET",
+      "POST"
+    ],
+    "/api/webhooks/[id]": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "/api/webhooks/[id]/deliveries": [
+      "GET"
+    ],
+    "/api/webhooks/[id]/deliveries/[deliveryId]/retry": [
+      "POST"
+    ],
+    "/api/webhooks/[id]/test": [
+      "POST"
+    ],
+    "/jmap/[[...segments]]": [
+      "GET",
+      "OPTIONS",
+      "POST"
+    ],
+    "/mcp": [
+      "DELETE",
+      "GET",
+      "POST"
+    ]
+  }
+}

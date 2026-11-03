@@ -1,0 +1,461 @@
+import { setupApi } from "./setup";
+import { awsApi } from "./aws";
+import { adminMaintenanceApi } from "./admin-maintenance";
+import { resendKeyApi } from "./resend-key";
+import { aiUsageApi } from "./ai-usage";
+import { agentApi } from "./agent";
+import { agentApprovalsApi } from "./agent-approvals";
+import { adminSettingsApi } from "./admin-settings";
+import { keysApi } from "./keys";
+import { domainsApi } from "./domains";
+import { cloudflareAccess } from "../domains/cloudflare";
+import { apiErrorResponse } from "./errors";
+import { accountsApi } from "./accounts";
+import { driveApi } from "./drive";
+import { publicDriveApi } from "../drive/sharing";
+import { calendarApi, isCalendarPath } from "./calendar";
+import { bookingApi, publicBookingApi } from "./booking";
+import { authenticateApiKey } from "../auth/api-key";
+import { getRequestTimeZone } from "../../lib/time/utils";
+import { licensesApi } from "./licenses";
+import { pushApi } from "./push";
+import { templatesApi } from "./templates";
+import { avatarsApi } from "./avatars";
+import { contactsApi } from "./contacts";
+import { messageContacts } from "../mail/contacts";
+import { rulesApi } from "./rules";
+import { mailboxesApi } from "./mailboxes";
+import { settingsApi, currentProfile } from "./settings";
+import { brandingApi } from "../branding";
+import { licenseEntitlements } from "../licenses";
+import { sourceCounts } from "../mail/counts";
+import { LocalStorage } from "../storage";
+import { extractUnsubscribeUrlFromRaw } from "../../lib/email/unsubscribe";
+import { draftsApi } from "./drafts";
+import { authApi } from "./auth";
+import { getCookie } from "@tanstack/react-start/server";
+import { getUser } from "../auth/service";
+import { z } from "zod";
+import { backupsApi } from "./backups";
+import { webhooksApi } from "./webhooks";
+import { mailTransferApi } from "./mail-transfer";
+import { isV1Path, serveV1Api } from "./v1";
+import { publicOrigin } from "../config";
+import { requireUser } from "../auth/request";
+import { withDatabase, seconds } from "../db";
+import type { User } from "../../shared/contracts";
+import {
+	queryMessages,
+	toMessage,
+	toStoredSourceMessage,
+	iso,
+	messageQuerySchema,
+} from "../mail/message-query";
+import {
+	bulkAction,
+	bulkActionSchema,
+	emptyFolder,
+	messageRecord,
+	snooze,
+	toggleStar,
+	markRead,
+	messageStatusSchema,
+	updateMessageStatus,
+} from "../mail/message-actions";
+import { createFolder } from "../mail/management";
+import {
+	listMailboxes,
+	getThreadWithRecord,
+	messageReference,
+	MessageReadError,
+} from "../mail/repository";
+import { navigationCounts, sourceMessageNavigation } from "../mail/navigation";
+import { mailboxAccess, MailboxAccessError } from "../mail/access";
+import { folderSchema as createFolderSchema } from "../../lib/validators";
+
+export async function dispatchMailApi(
+	request: Request,
+	user: User,
+): Promise<Response> {
+	const url = new URL(request.url),
+		path = url.pathname,
+		method = request.method,
+		params = url.searchParams;
+	const maintenance = await adminMaintenanceApi(request, user);
+	if (maintenance) return maintenance;
+	const resendKey = await resendKeyApi(request, user);
+	if (resendKey) return resendKey;
+	const aws = await awsApi(request, user);
+	if (aws) return aws;
+	const usage = await aiUsageApi(request, user);
+	if (usage) return usage;
+	const assistant = await agentApi(request, user);
+	if (assistant) return assistant;
+	const agentApprovals = await agentApprovalsApi(request, user);
+	if (agentApprovals) return agentApprovals;
+	const adminSettings = await adminSettingsApi(request, user);
+	if (adminSettings) return adminSettings;
+	const backups = await backupsApi(request, user);
+	if (backups) return backups;
+	const hooks = await webhooksApi(request, user);
+	if (hooks) return hooks;
+	const transfer = await mailTransferApi(request, user);
+	if (transfer) return transfer;
+	const keys = await keysApi(request, user);
+	if (keys) return keys;
+	const domains = await domainsApi(request, user);
+	if (domains) return domains;
+	const accounts = await accountsApi(request, user);
+	if (accounts) return accounts;
+	const drive = await driveApi(request, user);
+	if (drive) return drive;
+	const calendar = await calendarApi(request, user);
+	if (calendar) return calendar;
+	const booking = await bookingApi(request, user);
+	if (booking) return booking;
+	const brand = await brandingApi(
+		request,
+		user.role === "admin" && user.isPrimaryAdmin,
+	);
+	if (brand) return brand;
+	const settings = await settingsApi(request, user);
+	if (settings) return settings;
+	const boxes = await mailboxesApi(request, user);
+	if (boxes) return boxes;
+	const rules = await rulesApi(request, user);
+	if (rules) return rules;
+	const contacts = await contactsApi(request, user);
+	if (contacts) return contacts;
+	const avatars = await avatarsApi(request, user);
+	if (avatars) return avatars;
+	const push = await pushApi(request, user);
+	if (push) return push;
+	const templates = await templatesApi(request, user);
+	if (templates) return templates;
+	const licenses = await licensesApi(request, user);
+	if (licenses) return licenses;
+	const drafts = await draftsApi(request, user);
+	if (drafts) return drafts;
+	const json = (value: unknown, status = 200) =>
+		Response.json(value, { status });
+	if (method === "GET" && path === "/api/auth/me") {
+		const profile = await currentProfile(user);
+		const [setup] = await withDatabase(
+			(sql) => sql.NativeSetupMetadata`SELECT id FROM domains LIMIT 1`,
+		);
+		const boxes = await listMailboxes(user);
+		return json({
+			user: {
+				id: profile.id,
+				name: profile.name,
+				email: profile.email,
+				role: profile.role,
+				timeZone: profile.time_zone,
+				resetEmail: profile.reset_email,
+				forwardingEmail: profile.forwarding_email,
+				hasAvatar: !!profile.avatar_key,
+				keyboardShortcutsEnabled: !!profile.keyboard_shortcuts_enabled,
+				isPrimaryAdmin: !!profile.is_primary_admin,
+				canManageMailboxes: !!profile.can_manage_mailboxes,
+				canManageDomains: !!profile.can_manage_domains,
+				canManageUsers: !!profile.can_manage_users,
+				spamProtectionEnabled: !!profile.spam_protection_enabled,
+				showFullRecipientAddresses: !!profile.show_full_recipient_addresses,
+				mfaEnabled: !!profile.totp_enabled,
+				canForwardEmail: (await licenseEntitlements()).canForwardEmail,
+			},
+			runtime: "node",
+			managesDns: !!(await cloudflareAccess()),
+			hasMailboxes: boxes.length > 0,
+			isSetup: !!setup,
+		});
+	}
+	if (path === "/api/folders") {
+		if (method === "GET") {
+			const mailboxId = params.get("mailboxId");
+			if (!mailboxId) return json({ folders: [] });
+			try {
+				await mailboxAccess(user, mailboxId);
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					return json({ error: "Mailbox not found" }, 404);
+				throw error;
+			}
+			const folders = await withDatabase(
+				(sql) =>
+					sql.NativeFolderList`SELECT id,user_id,mailbox_id,name,color,created_at FROM folders WHERE mailbox_id=${mailboxId} ORDER BY name`,
+			);
+			return json({
+				folders: folders.map((folder) => ({
+					id: folder.id,
+					userId: folder.user_id,
+					name: folder.name,
+					color: folder.color,
+					mailboxId: folder.mailbox_id,
+					createdAt: iso(folder.created_at),
+				})),
+			});
+		}
+		if (method === "POST") {
+			const input = createFolderSchema.safeParse(await request.json());
+			if (!input.success) return json({ error: input.error.flatten() }, 400);
+			try {
+				return json(await createFolder(user, input.data));
+			} catch (error) {
+				if (error instanceof MailboxAccessError)
+					return json({ error: "Mailbox not found" }, 404);
+				throw error;
+			}
+		}
+	}
+	if (method === "GET" && path === "/api/messages") {
+		const profile = await currentProfile(user);
+		return json(
+			await queryMessages(
+				user,
+				messageQuerySchema.parse({
+					...Object.fromEntries(
+						[...new Set(params.keys())].map((key) => [key, params.get(key)]),
+					),
+					timeZone: getRequestTimeZone(request, profile.time_zone),
+				}),
+			),
+		);
+	}
+	if (method === "GET" && path === "/api/messages/counts")
+		return json({
+			counts: await sourceCounts(user, params.get("mailboxId") ?? undefined),
+		});
+	if (method === "GET" && path === "/api/messages/navigation")
+		return json(await sourceMessageNavigation(user, params));
+	if (method === "POST" && path === "/api/messages/bulk") {
+		const payload = z
+			.object({
+				messageIds: z.array(z.unknown()).optional().default([]),
+				action: z.unknown(),
+				folderId: z.unknown().optional(),
+			})
+			.safeParse(await request.json());
+		if (!payload.success)
+			return json({ error: "Invalid bulk message action" }, 400);
+		const ids = payload.data.messageIds.filter(Boolean);
+		if (
+			ids.length &&
+			payload.data.action === "folder" &&
+			!payload.data.folderId
+		)
+			return json({ error: "Folder is required" }, 400);
+		const data = bulkActionSchema.safeParse({
+			messageIds: ids,
+			action: payload.data.action,
+			...(payload.data.action === "folder"
+				? { folderId: payload.data.folderId }
+				: {}),
+		});
+		if (!data.success)
+			return json({ error: "Invalid bulk message action" }, 400);
+		return json(await bulkAction(user, data.data));
+	}
+	if (method === "POST" && path === "/api/messages/empty") {
+		const data = z
+			.object({
+				mailboxId: z.string().min(1),
+				folder: z.enum(["trash", "spam"]),
+			})
+			.safeParse(await request.json().catch(() => ({})));
+		if (!data.success)
+			return json(
+				{ error: "A mailbox and a Trash or Spam folder are required" },
+				400,
+			);
+		try {
+			return json(
+				await emptyFolder(user, data.data.mailboxId, data.data.folder),
+			);
+		} catch (error) {
+			if (error instanceof MailboxAccessError)
+				return json({ error: "Mailbox not found" }, 404);
+			throw error;
+		}
+	}
+	const match =
+		/^\/api\/messages\/([^/]+)(?:\/(thread|snooze|star|read|metadata|status))?$/.exec(
+			path,
+		);
+	if (match) {
+		const messageId = decodeURIComponent(match[1] ?? ""),
+			action = match[2];
+		if (method === "GET" && (!action || action === "metadata")) {
+			let message:
+				| Awaited<ReturnType<typeof messageRecord>>
+				| Awaited<ReturnType<typeof messageReference>>;
+			try {
+				message =
+					action === "metadata"
+						? await messageReference(user, messageId)
+						: await messageRecord(user, messageId);
+			} catch (error) {
+				if (
+					error instanceof MailboxAccessError ||
+					error instanceof MessageReadError ||
+					(error instanceof Response && error.status === 404)
+				)
+					return json({ error: "Not found" }, 404);
+				throw error;
+			}
+			const attachments = await withDatabase(
+				(sql) =>
+					sql.SourceDetailAttachments`SELECT id,message_id,filename,size,content_id,disposition,content_type FROM message_attachments WHERE message_id=${messageId} AND trashed_at IS NULL`,
+			);
+			const raw = message.raw_r2_key
+				? new LocalStorage().file(message.raw_r2_key)
+				: null;
+			const unsubscribeUrl =
+				raw && (await raw.exists())
+					? extractUnsubscribeUrlFromRaw(
+							await raw.slice(0, 64 * 1024).arrayBuffer(),
+						)
+					: null;
+			const files = attachments.map((file) => ({
+				id: file.id,
+				messageId: file.message_id,
+				filename: file.filename,
+				size: file.size,
+				contentId: file.content_id,
+				disposition: file.disposition,
+				type: file.content_type,
+			}));
+			if (action === "metadata")
+				return json({ attachments: files, unsubscribeUrl });
+			const body = toStoredSourceMessage(message);
+			const [enriched] = await messageContacts(message.user_id, [body], false);
+			return json({
+				unsubscribeUrl,
+				message: enriched,
+				body,
+				attachments: files,
+			});
+		}
+		if (method === "GET" && action === "thread") {
+			let data: Awaited<ReturnType<typeof getThreadWithRecord>>;
+			try {
+				data = await getThreadWithRecord(user, messageId);
+			} catch (error) {
+				if (error instanceof MessageReadError)
+					return json({ error: "Not found" }, 404);
+				throw error;
+			}
+			return json({
+				threadId: data.record.thread_id,
+				messages: await messageContacts(
+					data.record.user_id,
+					data.messages.map((message) => ({
+						...toMessage(message),
+						textBody: message.text_body,
+						htmlBody: message.html_body,
+						attachments: message.attachments.map((file) => ({
+							id: file.id,
+							messageId: file.message_id,
+							filename: file.filename,
+							size: file.size,
+							contentId: file.content_id,
+							disposition: file.disposition,
+							type: file.content_type,
+						})),
+					})),
+				),
+			});
+		}
+
+		if (action === "star" && method === "POST")
+			return json(await toggleStar(user, messageId));
+		if (action === "status" && method === "POST") {
+			const body: unknown = await request.json();
+			const parsed = z.object({ status: messageStatusSchema }).safeParse(body);
+			if (!parsed.success)
+				return json({ error: "Invalid message status" }, 400);
+			if (!(await updateMessageStatus(user, messageId, parsed.data.status)))
+				return json({ error: "Message not found" }, 404);
+			return json({ success: true });
+		}
+		if (action === "snooze" && method === "POST") {
+			const data: unknown = await request.json();
+			const until =
+				data && typeof data === "object" && "snoozedUntil" in data
+					? data.snoozedUntil
+					: undefined;
+			if (typeof until !== "string")
+				return json({ error: "Choose a future snooze time" }, 400);
+			return json(await snooze(user, messageId, until));
+		}
+		if (action === "snooze" && method === "DELETE")
+			return json(await snooze(user, messageId, null));
+		if (action === "read" && method === "POST")
+			return json(await markRead(user, messageId));
+	}
+	return json({ error: "Not found" }, 404);
+}
+export async function serveMailApi(request: Request) {
+	try {
+		if (
+			process.env.NODE_ENV === "production" &&
+			new URL(request.url).pathname === "/api/seed" &&
+			request.method === "POST"
+		)
+			return Response.json(
+				{ error: "Not available in production" },
+				{ status: 403 },
+			);
+		if (new URL(request.url).pathname === "/api/agent/chat") {
+			const { serveAgentChat } = await import("./agent-chat");
+			return serveAgentChat(request);
+		}
+		if (isV1Path(new URL(request.url).pathname)) return serveV1Api(request);
+		const publicDrive = await publicDriveApi(request);
+		if (publicDrive) return publicDrive;
+		const publicBooking = await publicBookingApi(request);
+		if (publicBooking) return publicBooking;
+		const authorization = request.headers.get("authorization") ?? "";
+		if (
+			isCalendarPath(new URL(request.url).pathname) &&
+			(authorization.startsWith("Bearer ep_") ||
+				authorization.startsWith("Basic "))
+		) {
+			const key = await authenticateApiKey(request);
+			if (!key) throw new Response("Unauthorized", { status: 401 });
+			const response = await calendarApi(request, key.user, key);
+			return response ?? Response.json({ error: "Not found" }, { status: 404 });
+		}
+		const bearer = request.headers
+			.get("authorization")
+			?.match(/^Bearer (.+)$/)?.[1];
+		const origin = request.headers.get("origin");
+		if (
+			!["GET", "HEAD", "OPTIONS"].includes(request.method) &&
+			origin !== publicOrigin() &&
+			(origin !== null || !bearer)
+		)
+			return Response.json({ error: "Invalid origin" }, { status: 403 });
+		if (request.method === "GET") {
+			const brand = await brandingApi(request);
+			if (brand) return brand;
+		}
+		const bearerUser = bearer ? await getUser(bearer) : null;
+		if (
+			origin === null &&
+			!["GET", "HEAD", "OPTIONS"].includes(request.method) &&
+			bearer &&
+			!bearerUser
+		)
+			throw new Response("Unauthorized", { status: 401 });
+		const setupResponse = await setupApi(request);
+		if (setupResponse) return setupResponse;
+		const authResponse = await authApi(request);
+		if (authResponse) return authResponse;
+		const user = bearer ? bearerUser : await requireUser();
+		if (!user) throw new Response("Unauthorized", { status: 401 });
+		return await dispatchMailApi(request, user);
+	} catch (error) {
+		return apiErrorResponse(error);
+	}
+}
