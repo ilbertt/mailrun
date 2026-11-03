@@ -89,8 +89,38 @@ API/key/MCP run. The production host build and compiled 72-case public API,
 run could not bind several loopback fixtures; rerunning with socket access
 passes. Two old assertions were corrected against direct source evidence:
 zero-byte bodies decode as `{}`, and public API scope flags are separate from
-MCP's mandatory explicit grants. No permission assertion was discarded.
-Final native Linux CI and release evidence follows after verification.
+MCP's mandatory explicit grants; that assertion now exercises the MCP
+authenticator directly.
+
+[Native Ubuntu CI 41616965845](https://github.com/ilbertt/mailrun/actions/runs/41616965845)
+and independent PR run 41616977223 pass all 1,904 tests, SQL generation/coverage,
+TypeScript and every compiled HTTP/WebSocket/parity rehearsal. These include
+all 72 public-send comparisons and the revoked-key/restart/attachment journey,
+the 83 session-send/cancel and 51 original queue outcomes, source record restore,
+and existing preferences, mailbox/sharing, routing, upload and feature checks.
+The selected one-CPU/256-MiB/no-swap rule workload passes with 116,191,232-byte
+cgroup peak and zero OOM kills. This is not whole-guest cold/concurrent capacity
+or a capacity test of maximum-sized public sends.
+
+Source `391d6c3` was deployed on November 3 through the nibrun CLI to the existing
+preview, deployment `01a1a0ef-7a3b-7612-a14b-30a7916f278f`. The downloaded Linux
+ELF executable matches its CI manifest: 119,396,320 bytes, SHA-256
+`69cdd7c27f443d8c4b2011fb587e6b2128e40196c827ae86967c0388712057ea`.
+Artifact 13221723489 has archive SHA-256
+`6f41eb00d2e0a68d0a1eb6e91043c6cd9eb4d965dd5c64437f9d4ddfa25375f3`;
+the CLI used that digest for the server's verified archive fetch. Deployment
+started only after the local artifact download and executable check completed.
+
+Immediately before release, no send/domain operation was active, with one
+account and five messages present. After release, login/setup return HTTP 200,
+the installation is ready, the same account/message totals remain, migration
+0070 is applied once and all linked jobs have transport snapshots. ilbert.dev
+remains active with routing/sending enabled. The existing Cloudflare Worker
+returns HTTP 200 after a successful signed callback, and all three UTC cron
+jobs are registered for the new deployment. The relay check uses credentials
+from the previously approved private recovery copy without displaying them.
+No live email, account/message mutation, provider/credential edit, schema
+migration or restore/reset was performed for these release checks.
 
 This closes the selected public-send producer matrix. JMAP, assistant/calendar
 and other protocol producers, broader wire/MIME/provider and temporal cases,
