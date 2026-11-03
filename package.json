@@ -57,6 +57,7 @@
 		"css-tree": "3.2.1",
 		"dompurify": "3.4.17",
 		"lucide-react": "1.61.0",
+		"nanoid": "5.1.16",
 		"parse-srcset": "1.0.2",
 		"parse5": "8.0.1",
 		"postal-mime": "4.0.11",

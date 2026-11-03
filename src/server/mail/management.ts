@@ -175,7 +175,7 @@ export async function createFolder(
 		name = data.name,
 		color = data.color;
 	const mailbox = await mailboxAccess(user, data.mailboxId, "manage");
-	const folderId = id("folder");
+	const folderId = id("fld");
 	const created = await withDatabase(
 		(sql) => sql.CreateCustomFolder`
  INSERT INTO folders (id,user_id,mailbox_id,name,color,created_at)

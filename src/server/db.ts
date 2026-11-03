@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { Database } from "bun:sqlite";
 import { existsSync } from "node:fs";
 import { z } from "zod";
@@ -241,8 +242,9 @@ async function databaseOperation<T>(
 export function seconds() {
 	return Math.floor(Date.now() / 1000);
 }
-export function id(prefix = "id") {
-	return `${prefix}_${crypto.randomUUID()}`;
+export function id(prefix?: string) {
+	const value = nanoid();
+	return prefix ? `${prefix}_${value}` : value;
 }
 
 /** A WAL read snapshot can stream exports without holding the request write queue. */

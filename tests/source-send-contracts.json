@@ -21,6 +21,26 @@
     {
       "name": "send-owner",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -233,6 +253,7 @@
     {
       "name": "send-read_only",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -351,6 +372,26 @@
     {
       "name": "send-send_on_behalf",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -563,6 +604,26 @@
     {
       "name": "send-send_as",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -775,6 +836,26 @@
     {
       "name": "send-full_access",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -987,6 +1068,7 @@
     {
       "name": "send-unknown",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -1105,6 +1187,7 @@
     {
       "name": "send-unshared",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -1223,6 +1306,7 @@
     {
       "name": "cancel-owner",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true
@@ -1322,6 +1406,7 @@
     {
       "name": "cancel-read_only",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You cannot cancel sends from this mailbox"
@@ -1440,6 +1525,7 @@
     {
       "name": "cancel-send_on_behalf",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true
@@ -1539,6 +1625,7 @@
     {
       "name": "cancel-send_as",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true
@@ -1638,6 +1725,7 @@
     {
       "name": "cancel-full_access",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true
@@ -1737,6 +1825,7 @@
     {
       "name": "cancel-unknown",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -1855,6 +1944,7 @@
     {
       "name": "cancel-unshared",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -1973,6 +2063,7 @@
     {
       "name": "send-disabled",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -2091,6 +2182,7 @@
     {
       "name": "cancel-disabled",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -2209,6 +2301,7 @@
     {
       "name": "send-personal",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -2327,6 +2420,7 @@
     {
       "name": "cancel-personal",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -2445,6 +2539,7 @@
     {
       "name": "send-no-team",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "You do not have permission to send from this mailbox"
@@ -2563,6 +2658,7 @@
     {
       "name": "cancel-no-team",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -2681,6 +2777,26 @@
     {
       "name": "json-immediate",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -2893,6 +3009,20 @@
     {
       "name": "json-scheduled",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -3082,6 +3212,20 @@
     {
       "name": "json-subject-only",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -3269,6 +3413,7 @@
     {
       "name": "json-blank-subject",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -3394,6 +3539,7 @@
     {
       "name": "json-long-subject",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -3519,6 +3665,7 @@
     {
       "name": "json-missing-to",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -3644,6 +3791,7 @@
     {
       "name": "json-bad-to",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -3769,6 +3917,7 @@
     {
       "name": "json-bad-from",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "Sender address does not match the selected mailbox"
@@ -3887,6 +4036,7 @@
     {
       "name": "json-no-from",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -4012,6 +4162,7 @@
     {
       "name": "json-no-mailbox",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -4137,6 +4288,7 @@
     {
       "name": "json-missing-mailbox",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "Mailbox not found"
@@ -4255,6 +4407,7 @@
     {
       "name": "json-past",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": "Scheduled time has already passed"
@@ -4373,6 +4526,7 @@
     {
       "name": "json-bad-schedule",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -4498,6 +4652,7 @@
     {
       "name": "json-offset-schedule",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -4623,6 +4778,32 @@
     {
       "name": "json-draft",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -4867,6 +5048,26 @@
     {
       "name": "json-scheduled-draft",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -5080,6 +5281,7 @@
     {
       "name": "json-missing-draft",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Draft not found"
@@ -5198,6 +5400,26 @@
     {
       "name": "json-threading",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -5450,6 +5672,20 @@
     {
       "name": "json-duplicates",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -5639,6 +5875,7 @@
     {
       "name": "json-foreign-draft",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Draft not found"
@@ -5757,6 +5994,7 @@
     {
       "name": "json-agent",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "Review and confirm this AI draft before sending"
@@ -5875,6 +6113,26 @@
     {
       "name": "json-missing-file",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -6082,6 +6340,20 @@
     {
       "name": "json-provider-failure",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 500,
         "body": {
           "error": "Synthetic provider failure"
@@ -6280,6 +6552,26 @@
     {
       "name": "form-immediate",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -6492,6 +6784,20 @@
     {
       "name": "form-scheduled",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -6681,6 +6987,20 @@
     {
       "name": "form-subject-only",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -6868,6 +7188,7 @@
     {
       "name": "form-blank-subject",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -6993,6 +7314,7 @@
     {
       "name": "form-long-subject",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -7118,6 +7440,7 @@
     {
       "name": "form-missing-to",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -7243,6 +7566,7 @@
     {
       "name": "form-bad-to",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -7368,6 +7692,7 @@
     {
       "name": "form-bad-from",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "Sender address does not match the selected mailbox"
@@ -7486,6 +7811,7 @@
     {
       "name": "form-no-from",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -7611,6 +7937,7 @@
     {
       "name": "form-no-mailbox",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -7736,6 +8063,7 @@
     {
       "name": "form-missing-mailbox",
       "snapshot": {
+        "identifiers": [],
         "status": 403,
         "body": {
           "error": "Mailbox not found"
@@ -7854,6 +8182,7 @@
     {
       "name": "form-past",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": "Scheduled time has already passed"
@@ -7972,6 +8301,7 @@
     {
       "name": "form-bad-schedule",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -8097,6 +8427,7 @@
     {
       "name": "form-offset-schedule",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": {
@@ -8222,6 +8553,32 @@
     {
       "name": "form-draft",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -8466,6 +8823,26 @@
     {
       "name": "form-scheduled-draft",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -8679,6 +9056,7 @@
     {
       "name": "form-missing-draft",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Draft not found"
@@ -8797,6 +9175,26 @@
     {
       "name": "form-threading",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -9049,6 +9447,20 @@
     {
       "name": "form-duplicates",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -9238,6 +9650,7 @@
     {
       "name": "form-foreign-draft",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Draft not found"
@@ -9356,6 +9769,7 @@
     {
       "name": "form-agent",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "Review and confirm this AI draft before sending"
@@ -9474,6 +9888,26 @@
     {
       "name": "form-missing-file",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -9681,6 +10115,20 @@
     {
       "name": "form-provider-failure",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 500,
         "body": {
           "error": "Synthetic provider failure"
@@ -9879,6 +10327,38 @@
     {
       "name": "form-new-and-stored-immediate",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-2",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -10151,6 +10631,7 @@
     {
       "name": "json-header-budget",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": "Headers exceed Cloudflare's 16 KB limit"
@@ -10281,6 +10762,7 @@
     {
       "name": "json-combined-recipient-limit",
       "snapshot": {
+        "identifiers": [],
         "status": 500,
         "body": {
           "error": "A message can have at most 50 recipients"
@@ -10399,6 +10881,20 @@
     {
       "name": "json-recipient-arrays",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -10614,6 +11110,7 @@
     {
       "name": "json-invalid",
       "snapshot": {
+        "identifiers": [],
         "status": 400,
         "body": {
           "error": "Invalid send request"
@@ -10732,6 +11229,32 @@
     {
       "name": "form-new-and-stored-files",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-2",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1",
@@ -10967,6 +11490,32 @@
     {
       "name": "form-new-files",
       "snapshot": {
+        "identifiers": [
+          {
+            "id": "$outbound-1",
+            "prefix": "msg",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$job-1",
+            "prefix": "job",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$attachment-1",
+            "prefix": "att",
+            "suffixLength": 21,
+            "urlSafe": true
+          },
+          {
+            "id": "$audit-1",
+            "prefix": "aud",
+            "suffixLength": 21,
+            "urlSafe": true
+          }
+        ],
         "status": 200,
         "body": {
           "messageId": "$outbound-1"
@@ -11209,6 +11758,7 @@
     {
       "name": "cancel-missing",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -11327,6 +11877,7 @@
     {
       "name": "cancel-foreign-author",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true
@@ -11426,6 +11977,7 @@
     {
       "name": "cancel-no-job",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -11525,6 +12077,7 @@
     {
       "name": "cancel-sending",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -11643,6 +12196,7 @@
     {
       "name": "cancel-failed",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -11761,6 +12315,7 @@
     {
       "name": "cancel-immediate-job",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -11879,6 +12434,7 @@
     {
       "name": "cancel-sent",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -11997,6 +12553,7 @@
     {
       "name": "cancel-inbound",
       "snapshot": {
+        "identifiers": [],
         "status": 409,
         "body": {
           "error": "This message is not scheduled"
@@ -12115,6 +12672,7 @@
     {
       "name": "cancel-orphan",
       "snapshot": {
+        "identifiers": [],
         "status": 404,
         "body": {
           "error": "Message not found"
@@ -12233,6 +12791,7 @@
     {
       "name": "cancel-two-jobs",
       "snapshot": {
+        "identifiers": [],
         "status": 200,
         "body": {
           "ok": true

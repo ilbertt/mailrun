@@ -44,7 +44,7 @@ export async function audit(
 	action: string,
 	metadata: Record<string, unknown> | null = null,
 ) {
-	await sql.MailAudit`INSERT INTO audit_logs (id,actor_user_id,mailbox_id,message_id,action,metadata,created_at) VALUES (${id("audit")},${user.id},${mailboxId},${messageId},${action},${metadata === null ? null : JSON.stringify(metadata)},${seconds()})`;
+	await sql.MailAudit`INSERT INTO audit_logs (id,actor_user_id,mailbox_id,message_id,action,metadata,created_at) VALUES (${id("aud")},${user.id},${mailboxId},${messageId},${action},${metadata === null ? null : JSON.stringify(metadata)},${seconds()})`;
 }
 async function actionMessage(
 	sql: AppSQL,

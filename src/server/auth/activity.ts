@@ -40,7 +40,7 @@ export async function recordAuthActivity(
 	try {
 		await withDatabase(
 			(sql) =>
-				sql.NativeRecordAuthActivity`INSERT INTO audit_logs(id,actor_user_id,target_user_id,action,metadata,created_at) VALUES(${id("audit")},${userId},${userId},${action},${JSON.stringify(activityMetadata(request))},${seconds()})`,
+				sql.NativeRecordAuthActivity`INSERT INTO audit_logs(id,actor_user_id,target_user_id,action,metadata,created_at) VALUES(${id("aud")},${userId},${userId},${action},${JSON.stringify(activityMetadata(request))},${seconds()})`,
 		);
 	} catch {
 		/* Activity logging must not break authentication. */

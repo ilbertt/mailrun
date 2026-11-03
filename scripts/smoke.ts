@@ -1,3 +1,6 @@
+import { deepStrictEqual } from "node:assert";
+import { identifierShape } from "../tests/identifier-shape";
+import sourceIdentifiers from "../tests/source-identifiers-contracts.json";
 import { writeAvatarFixturePreload } from "../tests/avatar-provider";
 import { open, truncate } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -13,6 +16,13 @@ import { sourceRouteContracts } from "../src/server/http/route-contract";
 import sourceHttpMethods from "../tests/source-http-methods.json";
 import sourcePages from "../tests/source-pages.json";
 
+function originalShape(prefix: string) {
+	const value = sourceIdentifiers.result.prefixed.find(
+		(row) => row.input === prefix,
+	);
+	if (!value) throw new Error("Missing original identifier class");
+	return value.shape;
+}
 const state = await fixture();
 const token = crypto.randomUUID();
 const password = crypto.randomUUID();
@@ -280,6 +290,31 @@ try {
 	if (!login.ok || !cookie?.toLowerCase().includes("httponly"))
 		throw new Error(`HTTP login failed: ${login.status}`);
 	const sessionCookie = cookie.split(";")[0] ?? "";
+	deepStrictEqual(
+		identifierShape(
+			decodeURIComponent(sessionCookie.slice("ep_session=".length)),
+		),
+		sourceIdentifiers.result.session.shape,
+	);
+	const sessionRows = z
+		.array(z.object({ id: z.string() }))
+		.parse(state.db.query("SELECT id FROM sessions WHERE id!='smoke'").all());
+	deepStrictEqual(sessionRows.length, 1);
+	deepStrictEqual(
+		identifierShape(sessionRows[0]!.id, null),
+		sourceIdentifiers.result.bare,
+	);
+	const loginAudits = z
+		.array(z.object({ id: z.string() }))
+		.parse(
+			state.db
+				.query("SELECT id FROM audit_logs WHERE action='auth.login'")
+				.all(),
+		);
+	deepStrictEqual(
+		loginAudits.map((row) => identifierShape(row.id)),
+		[originalShape("aud")],
+	);
 	const protectedDocument = await fetch(base + "/inbox", {
 		headers: { Cookie: sessionCookie },
 	});
@@ -788,6 +823,11 @@ try {
 		.parse(await publicMailKeyResponse.json());
 	if (!publicMailKeyResponse.ok)
 		throw new Error("Public mail key creation failed");
+	deepStrictEqual(identifierShape(publicMailKey.id), originalShape("key"));
+	deepStrictEqual(
+		identifierShape(publicMailKey.key),
+		sourceIdentifiers.result.apiKey.shape,
+	);
 	const jmapKeyResponse = await fetch(`${base}/api/api-keys`, {
 		method: "POST",
 		headers: calendarHeaders,
@@ -2126,6 +2166,29 @@ try {
 		)
 	)
 		throw new Error("Bun cron argument dispatch failed");
+	const identifierFolder = await fetch(base + "/api/folders", {
+		method: "POST",
+		headers: calendarHeaders,
+		body: JSON.stringify({ mailboxId: "mailbox", name: "Identifier format" }),
+	});
+	if (!identifierFolder.ok)
+		throw new Error(
+			"Compiled folder identifier check could not create a folder",
+		);
+	const newFolder = z
+		.object({ id: z.string() })
+		.parse(await identifierFolder.json());
+	deepStrictEqual(identifierShape(newFolder.id), originalShape("fld"));
+	const folderList = await fetch(base + "/api/folders?mailboxId=mailbox", {
+		headers: calendarHeaders,
+	});
+	const folderRows = z
+		.object({ folders: z.array(z.object({ id: z.string() })) })
+		.parse(await folderList.json());
+	deepStrictEqual(
+		folderRows.folders.some((row) => row.id === newFolder.id),
+		true,
+	);
 	const rssProcess = Bun.spawn(["ps", "-o", "rss=", "-p", String(child.pid)], {
 		stdout: "pipe",
 	});
@@ -2137,6 +2200,7 @@ try {
 				health: "passed",
 				csrfProtection: "passed",
 				originalRestLogin: "passed",
+				originalIdentifierFormats: "passed",
 				originalMessageApi: "passed",
 				calendarEvents: "passed",
 				managedAccountCreation: "passed",

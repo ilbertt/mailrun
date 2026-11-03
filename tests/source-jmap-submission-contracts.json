@@ -31,6 +31,32 @@
       "name": "role-owner",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -239,6 +265,7 @@
       "name": "role-read_only",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -338,6 +365,32 @@
       "name": "role-send_on_behalf",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -546,6 +599,32 @@
       "name": "role-send_as",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -754,6 +833,32 @@
       "name": "role-full_access",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -962,6 +1067,7 @@
       "name": "role-unknown",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1059,6 +1165,7 @@
       "name": "role-unshared",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1158,6 +1265,7 @@
       "name": "disabled-box",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1257,6 +1365,7 @@
       "name": "personal-box",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1356,6 +1465,7 @@
       "name": "no-team",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1455,6 +1565,7 @@
       "name": "disabled-user",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1530,6 +1641,7 @@
       "name": "deleted-key",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1600,6 +1712,7 @@
       "name": "auth-none",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1675,6 +1788,32 @@
       "name": "auth-basic",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -1883,6 +2022,7 @@
       "name": "auth-invalid",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1958,6 +2098,32 @@
       "name": "auth-trimmed",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -2166,6 +2332,7 @@
       "name": "scopes-read",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "This API key does not have the jmap scope"
@@ -2241,6 +2408,32 @@
       "name": "scopes-*",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -2449,6 +2642,32 @@
       "name": "scopes-jmap",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -2657,6 +2876,32 @@
       "name": "scopes-jmap,send",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -2865,6 +3110,7 @@
       "name": "scopes-jmap,mailboxes",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "This API key does not have the jmap scope"
@@ -2940,6 +3186,7 @@
       "name": "scopes-",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "This API key does not have the jmap scope"
@@ -3015,6 +3262,7 @@
       "name": "mailbox-scope-empty",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3114,6 +3362,7 @@
       "name": "mailbox-scope-other",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3213,6 +3462,32 @@
       "name": "mailbox-scope-all",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3421,6 +3696,32 @@
       "name": "mcp-legacy-unrestricted",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3629,6 +3930,7 @@
       "name": "identity-all",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3737,6 +4039,7 @@
       "name": "identity-filtered",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3847,6 +4150,7 @@
       "name": "identity-properties",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -3955,6 +4259,7 @@
       "name": "identity-changes",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4039,6 +4344,7 @@
       "name": "identity-mutations",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4143,6 +4449,7 @@
       "name": "submission-get",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4233,6 +4540,7 @@
       "name": "submission-query",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4322,6 +4630,7 @@
       "name": "submission-changes",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4406,6 +4715,7 @@
       "name": "submission-query-changes",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4490,6 +4800,7 @@
       "name": "empty-set",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4582,6 +4893,7 @@
       "name": "unsupported-mutations",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4682,6 +4994,7 @@
       "name": "missing-identity",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4781,6 +5094,7 @@
       "name": "invalid-identity",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4880,6 +5194,7 @@
       "name": "wrong-identity-address",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -4977,6 +5292,32 @@
       "name": "alias-identity",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5185,6 +5526,7 @@
       "name": "missing-email",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5285,6 +5627,7 @@
       "name": "unknown-email",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5385,6 +5728,7 @@
       "name": "wrong-account",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5469,6 +5813,32 @@
       "name": "duplicate-submissions",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5685,6 +6055,32 @@
       "name": "success-options",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -5893,6 +6289,26 @@
       "name": "no-file",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6072,6 +6488,26 @@
       "name": "missing-file",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6246,6 +6682,26 @@
       "name": "trashed-file",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6420,6 +6876,32 @@
       "name": "wrong-size",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6628,6 +7110,68 @@
       "name": "file-count",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$attachment-1",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-2",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-3",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-4",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-5",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-6",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-7",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-8",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-9",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-10",
+              "prefix": null,
+              "suffixLength": 12,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6885,6 +7429,7 @@
       "name": "file-limit",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -6982,6 +7527,7 @@
       "name": "foreign-draft",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7082,6 +7628,7 @@
       "name": "wrong-mailbox",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7182,6 +7729,7 @@
       "name": "sent-draft",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7282,6 +7830,32 @@
       "name": "inbound-draft",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7490,6 +8064,32 @@
       "name": "null-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7698,6 +8298,32 @@
       "name": "empty-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -7906,6 +8532,32 @@
       "name": "long-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8114,6 +8766,7 @@
       "name": "too-long-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8211,6 +8864,7 @@
       "name": "empty-to",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8308,6 +8962,32 @@
       "name": "invalid-to",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8516,6 +9196,32 @@
       "name": "single-label-to",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8724,6 +9430,32 @@
       "name": "empty-body",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -8928,6 +9660,32 @@
       "name": "html-only",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -9134,6 +9892,32 @@
       "name": "threading",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -9375,6 +10159,32 @@
       "name": "duplicates",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -9596,6 +10406,32 @@
       "name": "dirty-filename",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -9804,6 +10640,32 @@
       "name": "upper-type",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -10012,6 +10874,32 @@
       "name": "inline-no-cid",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -10219,6 +11107,32 @@
       "name": "attachment-cid",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -10426,6 +11340,32 @@
       "name": "raw-mime",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -10634,6 +11574,32 @@
       "name": "agent",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -10842,6 +11808,32 @@
       "name": "cleanup-failure",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -11098,6 +12090,32 @@
       "name": "database-cleanup-failure",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -11350,6 +12368,7 @@
       "name": "unknown-grant-identities",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -11458,6 +12477,26 @@
       "name": "provider-failure",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -11675,6 +12714,50 @@
       "name": "first-fails-retry",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$outbound-2",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-2",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-2",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -11994,6 +13077,32 @@
       "name": "created-reference",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [
@@ -12203,6 +13312,32 @@
       "name": "multiple-methods",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "methodResponses": [

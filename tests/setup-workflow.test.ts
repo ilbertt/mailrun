@@ -1,3 +1,5 @@
+import { identifierShape } from "./identifier-shape";
+import sourceIdentifiers from "./source-identifiers-contracts.json";
 import { beforeEach, afterEach, expect, test } from "bun:test";
 import { fixture, owner, stranger } from "./fixtures";
 import { cloudflareFixture } from "./cloudflare-fixture";
@@ -274,6 +276,20 @@ test("receive-only registration deploys/verifies the relay, creates the source a
 	expect(
 		state.db.query("SELECT local_part,use_all_domains FROM mailboxes").get(),
 	).toEqual({ local_part: "me", use_all_domains: 1 });
+	for (const [table, prefix] of [
+		["users", "usr"],
+		["mailboxes", "mbx"],
+	] as const) {
+		const expected = sourceIdentifiers.result.prefixed.find(
+			(row) => row.input === prefix,
+		);
+		if (!expected) throw new Error("Missing original setup identifier class");
+		const record = z
+			.object({ id: z.string() })
+			.parse(state.db.query("SELECT id FROM " + table).get());
+		expect(identifierShape(record.id)).toEqual(expected.shape);
+	}
+
 	expect(
 		state.db
 			.query(

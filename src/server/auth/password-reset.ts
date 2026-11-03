@@ -27,7 +27,7 @@ export async function requestPasswordReset(
 		digest = await hash(token);
 	await withDatabase(
 		(sql) =>
-			sql.NativeIssuePasswordReset`INSERT INTO password_reset_tokens(id,user_id,token_hash,expires_at,created_at) VALUES(${id("reset")},${user.id},${digest},${seconds() + 1800},${seconds()})`,
+			sql.NativeIssuePasswordReset`INSERT INTO password_reset_tokens(id,user_id,token_hash,expires_at,created_at) VALUES(${id()},${user.id},${digest},${seconds() + 1800},${seconds()})`,
 	);
 	const { appName } = await branding(),
 		link = `${origin}/reset-password?token=${encodeURIComponent(token)}`;

@@ -161,11 +161,11 @@ deployment. These release checks used no live email, mailbox/message mutation,
 credential/provider edit or restore/reset. The only live schema change is the
 additive, tested ledger migration.
 
-Generated identifier format is a known app-wide gap: the original common ID
-helper uses NanoID, while the native helper currently uses UUIDs and some
-prefixes differ. The captures' generated-ID normalization does not prove format
-or prefix parity. This needs correction against original writers before the app
-can be called indistinguishable.
+Generated identifier format was an app-wide gap at this checkpoint: the original common ID
+helper uses NanoID, while the former native helper used UUIDs and some
+prefixes differed. The captures' generated-ID normalization does not prove format
+or prefix parity. The later [identifier audit](identifiers-2026-11-03.md) adds format checks to
+these captures and corrects the common generator and identified writer prefixes.
 
 Assistant/calendar and other producer matrices, wider protocol/allowed-handler
 and wire/MIME/provider cases, successful external client interoperability,

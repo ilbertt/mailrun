@@ -22,6 +22,26 @@
       "name": "role-owner",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -147,6 +167,7 @@
       "name": "role-read_only",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -176,6 +197,26 @@
       "name": "role-send_on_behalf",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -301,6 +342,26 @@
       "name": "role-send_as",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -426,6 +487,26 @@
       "name": "role-full_access",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -551,6 +632,7 @@
       "name": "role-unknown",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -580,6 +662,7 @@
       "name": "role-unshared",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -609,6 +692,7 @@
       "name": "disabled-box",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -638,6 +722,7 @@
       "name": "personal-box",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -667,6 +752,7 @@
       "name": "no-team",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "You do not have permission to send from this mailbox"
@@ -696,6 +782,7 @@
       "name": "disabled-user",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -725,6 +812,7 @@
       "name": "deleted-key",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -749,6 +837,7 @@
       "name": "scopes-read",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -778,6 +867,26 @@
       "name": "scopes-*",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -903,6 +1012,26 @@
       "name": "scopes-send",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1028,6 +1157,26 @@
       "name": "scopes-send,read",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1153,6 +1302,7 @@
       "name": "scopes-send,mailboxes",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1182,6 +1332,7 @@
       "name": "scopes-accounts",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1211,6 +1362,7 @@
       "name": "scopes-",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1240,6 +1392,7 @@
       "name": "mailbox-scope-empty",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 404,
           "body": {
             "error": "Mailbox not found"
@@ -1269,6 +1422,7 @@
       "name": "mailbox-scope-other",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 404,
           "body": {
             "error": "Mailbox not found"
@@ -1298,6 +1452,26 @@
       "name": "mailbox-scope-all",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1423,6 +1597,7 @@
       "name": "auth-none",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1452,6 +1627,7 @@
       "name": "auth-basic",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1481,6 +1657,7 @@
       "name": "auth-invalid",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -1510,6 +1687,26 @@
       "name": "auth-trimmed",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1635,6 +1832,26 @@
       "name": "mcp-unrestricted-legacy",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1760,6 +1977,26 @@
       "name": "ordinary",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -1885,6 +2122,20 @@
       "name": "scheduled",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1",
@@ -1987,6 +2238,26 @@
       "name": "past",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -2113,6 +2384,26 @@
       "name": "subject-only",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -2234,6 +2525,7 @@
       "name": "no-from",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2270,6 +2562,7 @@
       "name": "wrong-from",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 403,
           "body": {
             "error": "Sender address does not match the selected mailbox"
@@ -2299,6 +2592,7 @@
       "name": "no-mailbox",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2335,6 +2629,7 @@
       "name": "unknown-mailbox",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 404,
           "body": {
             "error": "Mailbox not found"
@@ -2364,6 +2659,7 @@
       "name": "empty-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2400,6 +2696,7 @@
       "name": "long-subject",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2436,6 +2733,7 @@
       "name": "invalid-recipient",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2472,6 +2770,26 @@
       "name": "single-label-recipient",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -2597,6 +2915,7 @@
       "name": "no-to",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2633,6 +2952,26 @@
       "name": "threading",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -2798,6 +3137,26 @@
       "name": "duplicates",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -2936,6 +3295,7 @@
       "name": "bad-schedule",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -2972,6 +3332,7 @@
       "name": "too-many-total",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 500,
           "body": {
             "error": "A message can have at most 50 recipients"
@@ -3001,6 +3362,32 @@
       "name": "file",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3157,6 +3544,32 @@
       "name": "default-type",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3313,6 +3726,32 @@
       "name": "upper-type",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3469,6 +3908,32 @@
       "name": "padded-type",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3625,6 +4090,32 @@
       "name": "slash-name",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3781,6 +4272,32 @@
       "name": "nul-name",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -3937,6 +4454,32 @@
       "name": "whitespace-name",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -4093,6 +4636,32 @@
       "name": "whitespace-base64",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -4249,6 +4818,32 @@
       "name": "unpadded-base64",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -4405,6 +5000,32 @@
       "name": "empty-decoded",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -4561,6 +5182,7 @@
       "name": "invalid-base64",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 500,
           "body": {
             "error": "Invalid character"
@@ -4590,6 +5212,7 @@
       "name": "bad-padding",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 500,
           "body": {
             "error": "Invalid character"
@@ -4619,6 +5242,7 @@
       "name": "empty-base64",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -4655,6 +5279,26 @@
       "name": "scheduled-file",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1",
@@ -4781,6 +5425,38 @@
       "name": "two-files",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-1",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$attachment-2",
+              "prefix": "att",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$audit-1",
+              "prefix": "aud",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 200,
           "body": {
             "messageId": "$outbound-1"
@@ -4965,6 +5641,7 @@
       "name": "file-limit",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": "Attachments exceed the administrator's 0.000001 MB outgoing limit"
@@ -4994,6 +5671,7 @@
       "name": "decode-before-sender",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 500,
           "body": {
             "error": "Invalid character"
@@ -5023,6 +5701,7 @@
       "name": "scope-before-decode",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 404,
           "body": {
             "error": "Mailbox not found"
@@ -5052,6 +5731,20 @@
       "name": "provider-failure",
       "snapshot": {
         "snapshot": {
+          "identifiers": [
+            {
+              "id": "$outbound-1",
+              "prefix": "msg",
+              "suffixLength": 21,
+              "urlSafe": true
+            },
+            {
+              "id": "$job-1",
+              "prefix": "job",
+              "suffixLength": 21,
+              "urlSafe": true
+            }
+          ],
           "status": 500,
           "body": {
             "error": "Synthetic provider failure"
@@ -5163,6 +5856,7 @@
       "name": "raw-\"{\"",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": "Invalid send request"
@@ -5192,6 +5886,7 @@
       "name": "raw-\"null\"",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -5226,6 +5921,7 @@
       "name": "raw-\"[]\"",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -5260,6 +5956,7 @@
       "name": "raw-\"{}\"",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -5305,6 +6002,7 @@
       "name": "raw-\"\"",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 400,
           "body": {
             "error": {
@@ -5350,6 +6048,7 @@
       "name": "declared-overflow",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 413,
           "body": {
             "error": "Invalid send request"
@@ -5379,6 +6078,7 @@
       "name": "overflow-without-key",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -5408,6 +6108,7 @@
       "name": "overflow-invalid-key",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"
@@ -5437,6 +6138,7 @@
       "name": "overflow-read-key",
       "snapshot": {
         "snapshot": {
+          "identifiers": [],
           "status": 401,
           "body": {
             "error": "Unauthorized"

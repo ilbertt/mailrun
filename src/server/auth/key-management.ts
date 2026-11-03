@@ -119,13 +119,7 @@ export async function createManagedKey(
 			status: 400,
 		});
 	await withDatabase((sql) => keyActor(sql, user, kind === "admin"));
-	const alphabet =
-			"_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		key =
-			"ep_" +
-			[...crypto.getRandomValues(new Uint8Array(21))]
-				.map((byte) => alphabet.charAt(byte & 63))
-				.join(""),
+	const key = "ep_" + id(),
 		hash = await bcrypt.hash(key, 10),
 		prefix = key.slice(0, 12),
 		keyId = id("key");

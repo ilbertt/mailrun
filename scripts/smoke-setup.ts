@@ -1,3 +1,6 @@
+import { deepStrictEqual } from "node:assert";
+import { identifierShape } from "../tests/identifier-shape";
+import sourceIdentifiers from "../tests/source-identifiers-contracts.json";
 import { resolve } from "node:path";
 import { existsSync } from "node:fs";
 import { z } from "zod";
@@ -186,6 +189,20 @@ try {
 		!created.headers.get("Set-Cookie")?.includes("Max-Age=0")
 	)
 		throw new Error("Setup did not finish at the original login boundary");
+	for (const [table, prefix] of [
+		["users", "usr"],
+		["mailboxes", "mbx"],
+	] as const) {
+		const expected = sourceIdentifiers.result.prefixed.find(
+			(row) => row.input === prefix,
+		);
+		if (!expected)
+			throw new Error("Missing original setup identifier namespace");
+		const row = z
+			.object({ id: z.string() })
+			.parse(state.db.query("SELECT id FROM " + table).get());
+		deepStrictEqual(identifierShape(row.id), expected.shape);
+	}
 	if (provider.workerName !== previousWorker || provider.cf.identities.length)
 		throw new Error("Retry changed the Worker or ignored receive-only mode");
 	await stop();
@@ -216,15 +233,14 @@ try {
 		missingDomain.status !== 200 ||
 		!(await missingDomain.text()).includes("Loading")
 	)
-		throw new Error("Onboarding did not preserve the source browser-auth bootstrap");
+		throw new Error(
+			"Onboarding did not preserve the source browser-auth bootstrap",
+		);
 	const onboarding = await fetch(base + "/setup", {
 		headers: { Cookie: "ep_session=" + session.data.token },
 		redirect: "manual",
 	});
-	if (
-		!onboarding.ok ||
-		!(await onboarding.text()).includes("Loading")
-	)
+	if (!onboarding.ok || !(await onboarding.text()).includes("Loading"))
 		throw new Error("Original authenticated onboarding did not render");
 	const domainAgain = await fetch(base + "/api/domains", {
 		method: "POST",
@@ -308,6 +324,7 @@ try {
 		JSON.stringify(
 			{
 				originalSetupScreen: "passed",
+				originalIdentifierFormats: "passed",
 				originalAliases: "passed",
 				localChecks: "passed",
 				setupToken: "passed",

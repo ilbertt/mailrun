@@ -67,7 +67,7 @@ export async function provisionEmail(
 			ON CONFLICT(hostname) DO UPDATE SET zone_id=excluded.zone_id WHERE domains.user_id=excluded.user_id`;
 			await tx.InsertSetupMailbox`
 			INSERT INTO mailboxes (id,user_id,domain_id,local_part,display_name,created_at)
-			VALUES (${id("mb")},${user.id},${domainId},${data.localPart},${user.name},${seconds()})
+			VALUES (${id("mbx")},${user.id},${domainId},${data.localPart},${user.name},${seconds()})
 			ON CONFLICT(domain_id,local_part) DO NOTHING`;
 		}),
 	);
@@ -252,7 +252,7 @@ async function refreshRelayOwned(
 			.safeParse(await probe.json().catch(() => null)).success;
 	if (!reachable)
 		throw new RelayDeploymentError(
-			"Mailrun could not reach its public address before deploying the relay. Check APP_URL and retry.",
+			"Mailflare could not reach its public address before deploying the relay. Check APP_URL and retry.",
 		);
 	await authorizeRelayWrite(user, assertOwned);
 	const accountSubdomain = await ensureWorkersSubdomain(
@@ -340,7 +340,7 @@ export async function waitForRelayHealth(
 		}
 	}
 	throw new RelayDeploymentError(
-		`Relay deployed, but could not reach Mailrun${status == null ? "" : ` (HTTP ${status})`}. Check APP_URL and retry.`,
+		`Relay deployed, but could not reach Mailflare${status == null ? "" : ` (HTTP ${status})`}. Check APP_URL and retry.`,
 	);
 }
 

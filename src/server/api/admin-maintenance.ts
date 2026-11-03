@@ -54,7 +54,7 @@ export async function adminMaintenanceApi(
 			return json(
 				{
 					error:
-						"Self-hosted installs update by redeploying the new Mailrun binary on nibrun.",
+						"Self-hosted installs update by redeploying the new Mailflare binary on nibrun.",
 				},
 				400,
 			);

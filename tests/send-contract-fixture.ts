@@ -1,3 +1,4 @@
+import { identifierShape } from "./identifier-shape";
 import type { Database } from "bun:sqlite";
 import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
@@ -424,6 +425,10 @@ export async function sendSnapshot(
 		return value;
 	}
 	return normalize({
+		identifiers: [...identities].map(([value, key]) => ({
+			id: key,
+			...identifierShape(value),
+		})),
 		status: response.status,
 		body,
 		messages,
