@@ -19,8 +19,7 @@ const recipients = z
 		(values) =>
 			values.every(
 				(value) =>
-					!/[\r\n]/.test(value) &&
-					z.email().safeParse(getEmailAddress(value)).success,
+					!/[\r\n]/.test(value) && getEmailAddress(value).includes("@"),
 			),
 		"Enter valid email addresses",
 	)

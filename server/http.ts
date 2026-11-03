@@ -58,17 +58,16 @@ export async function startHttpServer(entrypoint: string) {
 			const response = await serveWithSourceContract(
 				request,
 				async (request) => {
-					// Drive parts stream directly to disk; other upload endpoints keep the mail limit.
+					// Drive parts stream to disk. Public send applies its own 40 MiB
+					// limit after key authentication, preserving the source error order.
 					if (
+						new URL(request.url).pathname !== "/api/v1/send" &&
 						!(
 							/^\/api\/drive\/upload\/[^/]+$/.test(
 								new URL(request.url).pathname,
 							) && request.method === "PUT"
 						) &&
-						Number(request.headers.get("content-length")) >
-							(new URL(request.url).pathname === "/api/v1/send" ? 40 : 30) *
-								1024 *
-								1024
+						Number(request.headers.get("content-length")) > 30 * 1024 * 1024
 					)
 						return Response.json(
 							{ error: "Request body too large" },

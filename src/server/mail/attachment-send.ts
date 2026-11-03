@@ -18,6 +18,13 @@ export async function prepareAttachments(
 		html?: string;
 		headers: Record<string, string>;
 		publicOrigin?: string;
+		submissionAttachments?: {
+			storageId: string;
+			filename: string;
+			type: string;
+			disposition?: string;
+			contentId?: string | null;
+		}[];
 	},
 	provider: "cloudflare" | "resend" | "ses" = "cloudflare",
 	sourceSnapshot = false,
@@ -30,16 +37,31 @@ export async function prepareAttachments(
 		const present = [];
 		for (const row of rows) {
 			const file = new LocalStorage().file(row.r2_key);
-			if (await file.exists())
+			if (await file.exists()) {
+				const submitted = message.submissionAttachments?.find(
+					(file) => file.storageId === row.id,
+				);
 				present.push({
 					...row,
+					filename: submitted?.filename ?? row.filename,
+					content_type: submitted?.type ?? row.content_type,
 					size: file.size,
-					disposition:
-						row.disposition === "inline" && row.content_id
+					disposition: submitted
+						? submitted.disposition === "inline" && submitted.contentId
+							? "inline"
+							: "attachment"
+						: row.disposition === "inline" && row.content_id
 							? "inline"
 							: "attachment",
-					content_id: row.disposition === "inline" ? row.content_id : null,
+					content_id: submitted
+						? submitted.disposition === "inline"
+							? (submitted.contentId ?? null)
+							: null
+						: row.disposition === "inline"
+							? row.content_id
+							: null,
 				});
+			}
 		}
 		rows = present;
 	}

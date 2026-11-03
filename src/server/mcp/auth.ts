@@ -14,7 +14,7 @@ export const MCP_SCOPES = new Set([
 const ADMIN_SCOPES = new Set(["domains", "accounts", "mailboxes", "storage"]);
 export async function authenticateMcpRequest(request: Request) {
 	if (!request.headers.get("authorization")?.startsWith("Bearer ")) return null;
-	const key = await authenticateApiKey(request);
+	const key = await authenticateApiKey(request, { requireMailboxScope: true });
 	if (!key || key.kind !== "mcp") return null;
 	const [row] = await withDatabase(
 		(sql) =>

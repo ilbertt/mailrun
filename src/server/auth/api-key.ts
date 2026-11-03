@@ -11,6 +11,7 @@ export type ApiKeyAuthorization = {
 };
 export async function authenticateApiKey(
 	request: Request,
+	options?: { requireMailboxScope?: boolean },
 ): Promise<ApiKeyAuthorization | null> {
 	const authorization = request.headers.get("authorization") ?? "";
 	let value = "";
@@ -39,7 +40,9 @@ export async function authenticateApiKey(
 				const [user] =
 					await tx.NativeLiveApiKeyUser`SELECT id,name,email,role,is_primary_admin FROM users WHERE id=${key.user_id} AND disabled=0`;
 				if (!user) return null;
-				const restricted = key.mailbox_scope_enabled || key.kind === "mcp",
+				// The public API honors the stored flag; MCP always uses explicit grants.
+				const restricted =
+						key.mailbox_scope_enabled || options?.requireMailboxScope,
 					allowed = restricted
 						? await tx.NativeKeyMailboxScope`SELECT mailbox_id FROM mcp_key_mailboxes WHERE key_id=${key.id}`
 						: null;

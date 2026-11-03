@@ -21,7 +21,7 @@ import { upsertContact } from "./contacts";
 import { deliveryPayloadSchema } from "../../shared/mail-contracts";
 import { deliveryHeaders } from "./delivery-headers";
 type Input = Omit<z.output<typeof sendEmailSchema>, "attachments">;
-type FileInput = {
+export type SourceSendAttachment = {
 	filename: string;
 	type: string;
 	blob: Blob;
@@ -86,6 +86,27 @@ export async function queueSessionSend(
 	origin: string,
 	draft?: { id: string; revision: number },
 ) {
+	return queueSourceSend(
+		user,
+		input,
+		files.map((file) => ({
+			filename: file.name,
+			type: file.type || "application/octet-stream",
+			blob: file,
+			disposition: "attachment",
+		})),
+		origin,
+		draft,
+	);
+}
+export async function queueSourceSend(
+	user: User,
+	input: Input,
+	files: SourceSendAttachment[],
+	origin: string,
+	draft?: { id: string; revision: number },
+	beforePublish?: (sql: AppSQL) => Promise<void>,
+) {
 	const run = async () => {
 		const current = draft ? await getDraft(user, draft.id) : undefined;
 		if (current && current.draft_revision !== draft?.revision)
@@ -95,12 +116,7 @@ export async function queueSessionSend(
 			);
 		const from = await sourceSendSender(user, input.mailboxId, input.from),
 			storage = new LocalStorage();
-		const attachments: FileInput[] = files.map((file) => ({
-			filename: file.name,
-			type: file.type || "application/octet-stream",
-			blob: file,
-			disposition: "attachment",
-		}));
+		const attachments: SourceSendAttachment[] = [...files];
 		for (const file of current?.attachments ?? []) {
 			const blob = storage.file(file.r2_key);
 			if (!(await blob.exists())) continue;
@@ -213,6 +229,7 @@ export async function queueSessionSend(
 			await withDatabase((sql) =>
 				sql.begin(async (sql) => {
 					await sql.SourceSessionSendFence`UPDATE app_settings SET updated_at=updated_at WHERE id='default'`;
+					if (beforePublish) await beforePublish(sql);
 					await mailboxAccess(user, input.mailboxId, "send", sql);
 					if (draft) {
 						const [touched] =

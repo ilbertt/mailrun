@@ -1,3 +1,4 @@
+import { authenticateMcpRequest } from "../src/server/mcp/auth";
 import { test, expect, beforeEach, afterEach, spyOn } from "bun:test";
 import bcrypt from "bcryptjs";
 import { fixture, owner, stranger, enableTeamSharing } from "./fixtures";
@@ -87,16 +88,23 @@ test("mail scopes require readable mailboxes and calendar-only keys can have non
 	const shared = await createManagedKey(stranger, "personal", input());
 	expect((await authenticate(shared.key))?.mailboxIds).toEqual(["mailbox"]);
 });
-test("MCP keys cannot silently become unrestricted, including source keys with the legacy flag", async () => {
+test("MCP keeps explicit mailbox grants when the public API legacy flag is off", async () => {
 	const created = await createManagedKey(owner, "mcp", input(["mcp:read"]));
 	state.db
 		.query("UPDATE api_keys SET mailbox_scope_enabled=0 WHERE id=?")
 		.run(created.id);
-	expect((await authenticate(created.key))?.mailboxIds).toEqual(["mailbox"]);
+	expect((await authenticate(created.key))?.mailboxIds).toBeNull();
+	const mcpRequest = () =>
+		new Request("https://mail.example.com/api/mcp", {
+			headers: { Authorization: "Bearer " + created.key },
+		});
+	expect((await authenticateMcpRequest(mcpRequest()))?.mailboxIds).toEqual([
+		"mailbox",
+	]);
 	state.db
 		.query("DELETE FROM mcp_key_mailboxes WHERE key_id=?")
 		.run(created.id);
-	expect((await authenticate(created.key))?.mailboxIds).toEqual([]);
+	expect((await authenticateMcpRequest(mcpRequest()))?.mailboxIds).toEqual([]);
 	expect((await listManagedKeys(owner, "mcp"))[0]?.id).toBe(created.id);
 });
 test("administrative keys require the current primary admin and remain separate from personal keys", async () => {

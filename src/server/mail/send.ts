@@ -156,6 +156,24 @@ export async function deliverJob(
 		}
 		const provider = await outboundConfig(payload.from, !!source);
 		const headers = deliveryHeaders(payload);
+		const submission =
+			source && candidate.scheduled_at === null
+				? z
+						.object({
+							attachments: z
+								.array(
+									z.object({
+										storageId: z.string(),
+										filename: z.string(),
+										type: z.string(),
+										disposition: z.string().optional(),
+										contentId: z.string().nullish(),
+									}),
+								)
+								.optional(),
+						})
+						.safeParse(raw)
+				: null;
 		const prepared = await prepareAttachments(
 			deliveredMessageId,
 			{
@@ -164,6 +182,9 @@ export async function deliverJob(
 				html: payload.html,
 				headers,
 				publicOrigin: source?.publicOrigin,
+				submissionAttachments: submission?.success
+					? submission.data.attachments
+					: undefined,
 			},
 			provider.provider,
 			!!source,

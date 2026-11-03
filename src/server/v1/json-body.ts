@@ -8,10 +8,10 @@ export async function readPublicSendBody(request: Request): Promise<unknown> {
 	const limit = 40 * 1024 * 1024,
 		length = Number(request.headers.get("content-length") ?? 0);
 	if (length > limit) throw new Error("Message too large");
-	if (length > 0 && length <= 512 * 1024)
-		return JSON.parse(
-			new TextDecoder().decode(await readLimitedBody(request, limit)),
-		);
+	if (length > 0 && length <= 512 * 1024) {
+		const bytes = await readLimitedBody(request, limit);
+		return bytes.byteLength ? JSON.parse(new TextDecoder().decode(bytes)) : {};
+	}
 	const path = new LocalStorage().path(`import-staging/${id("api-body")}.json`);
 	await mkdir(dirname(path), { recursive: true, mode: 0o700 });
 	try {
@@ -45,6 +45,7 @@ export async function readPublicSendBody(request: Request): Promise<unknown> {
 			}
 		})();
 		Bun.gc(true);
+		if (Bun.file(path).size === 0) return {};
 		const value: unknown = await Bun.file(path).json();
 		Bun.gc(true);
 		return value;

@@ -5135,18 +5135,6 @@ export interface INativeV1MessageBodiesResult {
     draft_scheduled_at: IMessagesColumns["draft_scheduled_at"];
 }
 
-/** Result of query `NativeV1QueueMessage`. */
-export interface INativeV1QueueMessageResult {
-}
-
-/** Result of query `NativeV1QueueAttachment`. */
-export interface INativeV1QueueAttachmentResult {
-}
-
-/** Result of query `NativeV1QueueSend`. */
-export interface INativeV1QueueSendResult {
-}
-
 /** Result of query `NativeWebhookAttemptRecord`. */
 export interface INativeWebhookAttemptRecordResult {
     id: string | null;
@@ -6001,9 +5989,6 @@ export interface Queries {
     NativeV1CancelMailboxJobs: INativeV1CancelMailboxJobsResult;
     NativeV1DeleteMailbox: INativeV1DeleteMailboxResult;
     NativeV1MessageBodies: INativeV1MessageBodiesResult;
-    NativeV1QueueMessage: INativeV1QueueMessageResult;
-    NativeV1QueueAttachment: INativeV1QueueAttachmentResult;
-    NativeV1QueueSend: INativeV1QueueSendResult;
     NativeWebhookAttemptRecord: INativeWebhookAttemptRecordResult;
     NativeClaimWebhookAttempt: INativeClaimWebhookAttemptResult;
     NativeExhaustWebhookDelivery: INativeExhaustWebhookDeliveryResult;

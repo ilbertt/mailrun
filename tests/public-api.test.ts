@@ -698,7 +698,7 @@ test("streamed send JSON rejects incomplete and trailing documents as syntax err
 		'{"x":1,}',
 		'{"x":1} {"x":2}',
 		'"unterminated',
-		"",
+		" \n",
 		"true false",
 	]) {
 		await expect(
@@ -707,6 +707,19 @@ test("streamed send JSON rejects incomplete and trailing documents as syntax err
 			),
 		).rejects.toBeInstanceOf(SyntaxError);
 	}
+});
+
+test("empty public send bodies decode as the original empty object", async () => {
+	for (const length of [undefined, "0", "10"])
+		expect(
+			await readPublicSendBody(
+				new Request("http://localhost/send", {
+					method: "POST",
+					body: "",
+					headers: length === undefined ? {} : { "Content-Length": length },
+				}),
+			),
+		).toEqual({});
 });
 
 test("streamed send JSON preserves the request decoder's invalid-UTF8 replacement behavior", async () => {

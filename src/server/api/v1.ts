@@ -121,26 +121,43 @@ export async function serveV1Api(
 		if (resource === "messages")
 			response = json({ messages: await v1Messages(request, key) });
 		else if (resource === "send") {
-			const input = sendEmailSchema.safeParse(
-				await readPublicSendBody(request),
-			);
+			let body: unknown;
+			try {
+				body = await readPublicSendBody(request);
+			} catch (error) {
+				return json(
+					{ error: "Invalid send request" },
+					error instanceof Error && error.message === "Message too large"
+						? 413
+						: 400,
+				);
+			}
+			const input = sendEmailSchema.safeParse(body);
 			if (!input.success) return json({ error: input.error.flatten() }, 400);
 			if (key.mailboxIds && !key.mailboxIds.includes(input.data.mailboxId))
 				return json({ error: "Mailbox not found" }, 404);
 			try {
-				response = json(await v1Send(actor, input.data, send));
+				response = json(await v1Send(actor, input.data, send, url.origin));
 			} catch (error) {
 				if (error instanceof Response) throw error;
 				const message = error instanceof Error ? error.message : "Send failed";
-				const status = /not found|permission|not assigned|not match/.test(
-					message,
-				)
-					? 403
-					: /Attachments exceed|Subject exceeds|Headers exceed|Message exceeds Cloudflare|At most 50|recipients|attachment limit/.test(
-								message,
-							)
+				const status =
+					message === "Mailbox is required" ||
+					message.startsWith("Attachments exceed") ||
+					message.startsWith("Subject exceeds") ||
+					message.startsWith("Headers exceed") ||
+					message.startsWith("Message exceeds Cloudflare") ||
+					message.startsWith("A message can include at most") ||
+					message.includes("exceeds the 25 MB attachment limit")
 						? 400
-						: 500;
+						: [
+									"Mailbox not found",
+									"Sender account not found",
+									"You do not have permission to send from this mailbox",
+									"Sender address does not match the selected mailbox",
+								].includes(message)
+							? 403
+							: 500;
 				return json({ error: message }, status);
 			}
 		} else if (resource === "storage") {
