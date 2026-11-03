@@ -93,13 +93,16 @@ export class LocalStorage {
 }
 
 /** A restored backup may contain several rows pointing at the same object. */
-export async function deleteUnreferencedObjects(keys: string[]) {
+export async function deleteUnreferencedObjects(
+	keys: string[],
+	excludingMessageId?: string,
+) {
 	const { withDatabase } = await import("./db");
 	const candidates = [...new Set(keys)];
 	if (!candidates.length) return;
 	const rows = await withDatabase(
 		(sql) =>
-			sql.NativeReferencedObjects`WITH candidates AS(SELECT value AS object_key FROM json_each(${JSON.stringify(candidates)})) SELECT object_key FROM candidates WHERE EXISTS(SELECT 1 FROM messages WHERE raw_r2_key=object_key) OR EXISTS(SELECT 1 FROM message_attachments WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM drive_items WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM backups WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM mailrun_jmap_uploads WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM users WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM mailboxes WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM contacts WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM app_settings WHERE icon_key=object_key)`,
+			sql.NativeReferencedObjects`WITH candidates AS(SELECT value AS object_key FROM json_each(${JSON.stringify(candidates)})) SELECT object_key FROM candidates WHERE EXISTS(SELECT 1 FROM messages WHERE raw_r2_key=object_key AND (${excludingMessageId ?? null} IS NULL OR id!=${excludingMessageId ?? null})) OR EXISTS(SELECT 1 FROM message_attachments WHERE r2_key=object_key AND (${excludingMessageId ?? null} IS NULL OR message_id!=${excludingMessageId ?? null})) OR EXISTS(SELECT 1 FROM drive_items WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM backups WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM mailrun_jmap_uploads WHERE r2_key=object_key) OR EXISTS(SELECT 1 FROM users WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM mailboxes WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM contacts WHERE avatar_key=object_key) OR EXISTS(SELECT 1 FROM app_settings WHERE icon_key=object_key)`,
 	);
 	const referenced = new Set(rows.map((row) => row.object_key));
 	await Promise.all(

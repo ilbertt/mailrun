@@ -380,7 +380,7 @@ export const mailboxSet: JmapMethodHandler = async (ctx, args) => {
 					await sql.NativeJmapDestroyFolderGuard`SELECT id FROM folders WHERE id=${ref.folderId} AND mailbox_id=${box.id}`;
 				if (!folder) throw new JmapError("notFound");
 				const [sending] =
-					await sql.NativeJmapFolderSending`SELECT j.id FROM outbound_jobs j JOIN messages m ON (m.id=j.message_id OR m.id=json_extract(CASE WHEN json_valid(j.payload) THEN j.payload ELSE '{}' END,'$.submittedDraftId')) WHERE m.folder_id=${ref.folderId} AND ((m.id=j.message_id AND j.status='sending') OR (m.id=json_extract(CASE WHEN json_valid(j.payload) THEN j.payload ELSE '{}' END,'$.submittedDraftId') AND j.status IN('queued','sending'))) LIMIT 1`;
+					await sql.NativeJmapFolderSending`SELECT j.id FROM outbound_jobs j JOIN messages m ON (m.id=j.message_id OR m.id=json_extract(CASE WHEN json_valid(j.payload) THEN j.payload ELSE '{}' END,'$.submittedDraftId')) WHERE m.folder_id=${ref.folderId} AND ((m.id=j.message_id AND j.status='sending') OR (m.id=json_extract(CASE WHEN json_valid(j.payload) THEN j.payload ELSE '{}' END,'$.submittedDraftId') AND j.status IN('queued','sending'))) UNION ALL SELECT j.id FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id JOIN messages m ON m.id=s.draft_id WHERE m.folder_id=${ref.folderId} AND j.status IN('queued','sending','sent') LIMIT 1`;
 				if (sending)
 					throw new JmapError("forbidden", "A message is being sent");
 				if (args.onDestroyRemoveEmails) {

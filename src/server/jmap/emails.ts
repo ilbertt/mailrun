@@ -1,3 +1,4 @@
+import { canUseLegacyOwnerScope } from "./access";
 import { z } from "zod";
 import { withDatabase, id, seconds } from "../db";
 import { LocalStorage, deleteUnreferencedObjects } from "../storage";
@@ -376,7 +377,7 @@ export async function destroyMessage(
 			await sql.NativeJmapDestroyMessageGuard`SELECT status,raw_r2_key FROM messages WHERE id=${row.id} AND mailbox_id=${row.mailboxId} AND (status!='draft' OR user_id=${ctx.auth.userId})`;
 		if (!current) throw new JmapError("notFound");
 		const [sending] =
-			await sql.NativeJmapMessageSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${row.id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${row.id}) LIMIT 1`;
+			await sql.NativeJmapMessageSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${row.id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${row.id}) UNION ALL SELECT j.id FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id WHERE (s.draft_id=${row.id} OR j.message_id=${row.id}) AND j.status IN('queued','sending','sent') LIMIT 1`;
 		if (sending) throw new JmapError("forbidden", "A message is being sent");
 		await sql.NativeJmapCancelMessageJobs`UPDATE outbound_jobs SET status='cancelled',updated_at=${seconds()} WHERE message_id=${row.id} AND status='queued'`;
 		if (force || current.status === "trash" || current.status === "draft") {
@@ -463,7 +464,7 @@ export const emailSet: JmapMethodHandler = async (ctx, args) => {
 						});
 				}
 				const [sending] =
-					await sql.NativeJmapUpdateSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${id}) LIMIT 1`;
+					await sql.NativeJmapUpdateSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${id} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${id}) UNION ALL SELECT j.id FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id WHERE (s.draft_id=${id} OR j.message_id=${id}) AND j.status IN('queued','sending','sent') LIMIT 1`;
 				if (sending && move)
 					throw new JmapError("forbidden", "A message is being sent");
 				if (move)
@@ -614,7 +615,7 @@ export const threadGet: JmapMethodHandler = async (ctx, args) => {
 		);
 	const ids = listIds(args.ids),
 		boxes = await scopeIds(ctx),
-		fallback = !boxes.length && !ctx.auth.mailboxIds;
+		fallback = !boxes.length && (await canUseLegacyOwnerScope(ctx));
 	const rows = await withDatabase(
 		(sql) =>
 			sql.NativeJmapThreads`/* @type thread string */ SELECT id,coalesce(thread_id,id) AS thread FROM messages WHERE coalesce(thread_id,id) IN(SELECT value FROM json_each(${JSON.stringify(ids)})) AND (mailbox_id IN(SELECT value FROM json_each(${JSON.stringify(boxes)})) OR (${fallback ? 1 : 0}=1 AND user_id=${ctx.auth.userId})) AND (status!='draft' OR user_id=${ctx.auth.userId}) ORDER BY created_at,rowid`,

@@ -3244,21 +3244,21 @@ export interface INativeJmapThreadsResult {
     thread: string;
 }
 
-/** Result of query `NativeJmapReserveSubmission`. */
-export interface INativeJmapReserveSubmissionResult {
+/** Result of query `SourceJmapDraftMetadata`. */
+export interface ISourceJmapDraftMetadataResult {
     id: IMessagesColumns["id"];
+    user_id: IMessagesColumns["user_id"];
+    mailbox_id: IMessagesColumns["mailbox_id"];
+    status: IMessagesColumns["status"];
 }
 
-/** Result of query `NativeJmapQueueSubmissionMessage`. */
-export interface INativeJmapQueueSubmissionMessageResult {
+/** Result of query `SourceJmapSubmissionDraft`. */
+export interface ISourceJmapSubmissionDraftResult {
+    id: string | null;
 }
 
-/** Result of query `NativeJmapQueueSubmissionAttachment`. */
-export interface INativeJmapQueueSubmissionAttachmentResult {
-}
-
-/** Result of query `NativeJmapQueueSubmissionJob`. */
-export interface INativeJmapQueueSubmissionJobResult {
+/** Result of query `ReserveSourceJmapDraft`. */
+export interface IReserveSourceJmapDraftResult {
 }
 
 /** Result of query `NativeJmapMailboxCounts`. */
@@ -4833,6 +4833,48 @@ export interface IApplySpamVerdictResult {
 export interface IObserveSpamReputationResult {
 }
 
+/** Result of query `SubmittedDraftCleanupContext`. */
+export interface ISubmittedDraftCleanupContextResult {
+    draft_id: IMailrunSubmissionDraftsColumns["draft_id"];
+    draft_revision: number;
+    user_id: string;
+    id: string | null;
+    raw_r2_key: IMessagesColumns["raw_r2_key"];
+    status: string | null;
+    current_revision: number | null;
+    draft_user_id: string | null;
+}
+
+/** Result of query `SubmittedDraftCleanupFiles`. */
+export interface ISubmittedDraftCleanupFilesResult {
+    r2_key: IMessageAttachmentsColumns["r2_key"];
+}
+
+/** Result of query `DeleteSubmittedSourceDraft`. */
+export interface IDeleteSubmittedSourceDraftResult {
+}
+
+/** Result of query `CompleteSubmittedDraftCleanup`. */
+export interface ICompleteSubmittedDraftCleanupResult {
+}
+
+/** Result of query `RecoverSubmittedDraftCleanups`. */
+export interface IRecoverSubmittedDraftCleanupsResult {
+    job_id: IMailrunSubmissionDraftsColumns["job_id"];
+}
+
+/** Result of query `ReleaseUnfinishedSubmissionCleanups`. */
+export interface IReleaseUnfinishedSubmissionCleanupsResult {
+    job_id: IMailrunSubmissionDraftsColumns["job_id"];
+}
+
+/** Result of query `SubmissionDeliveryOutcome`. */
+export interface ISubmissionDeliveryOutcomeResult {
+    status: IOutboundJobsColumns["status"];
+    error: IOutboundJobsColumns["error"];
+    cleanup_pending: unknown | null;
+}
+
 /** Result of query `NativeSystemMailSenders`. */
 export interface INativeSystemMailSendersResult {
     local_part: IMailboxesColumns["local_part"];
@@ -5715,10 +5757,9 @@ export interface Queries {
     NativeJmapCancelMovedJobs: INativeJmapCancelMovedJobsResult;
     NativeJmapUpdateEmail: INativeJmapUpdateEmailResult;
     NativeJmapThreads: INativeJmapThreadsResult;
-    NativeJmapReserveSubmission: INativeJmapReserveSubmissionResult;
-    NativeJmapQueueSubmissionMessage: INativeJmapQueueSubmissionMessageResult;
-    NativeJmapQueueSubmissionAttachment: INativeJmapQueueSubmissionAttachmentResult;
-    NativeJmapQueueSubmissionJob: INativeJmapQueueSubmissionJobResult;
+    SourceJmapDraftMetadata: ISourceJmapDraftMetadataResult;
+    SourceJmapSubmissionDraft: ISourceJmapSubmissionDraftResult;
+    ReserveSourceJmapDraft: IReserveSourceJmapDraftResult;
     NativeJmapMailboxCounts: INativeJmapMailboxCountsResult;
     NativeJmapCreateFolder: INativeJmapCreateFolderResult;
     NativeJmapRenameFolder: INativeJmapRenameFolderResult;
@@ -5945,6 +5986,13 @@ export interface Queries {
     SaveSpamFeedback: ISaveSpamFeedbackResult;
     ApplySpamVerdict: IApplySpamVerdictResult;
     ObserveSpamReputation: IObserveSpamReputationResult;
+    SubmittedDraftCleanupContext: ISubmittedDraftCleanupContextResult;
+    SubmittedDraftCleanupFiles: ISubmittedDraftCleanupFilesResult;
+    DeleteSubmittedSourceDraft: IDeleteSubmittedSourceDraftResult;
+    CompleteSubmittedDraftCleanup: ICompleteSubmittedDraftCleanupResult;
+    RecoverSubmittedDraftCleanups: IRecoverSubmittedDraftCleanupsResult;
+    ReleaseUnfinishedSubmissionCleanups: IReleaseUnfinishedSubmissionCleanupsResult;
+    SubmissionDeliveryOutcome: ISubmissionDeliveryOutcomeResult;
     NativeSystemMailSenders: INativeSystemMailSendersResult;
     NativeMcpCurrentKey: INativeMcpCurrentKeyResult;
     NativeMcpListMailboxGrants: INativeMcpListMailboxGrantsResult;
@@ -6722,6 +6770,21 @@ export interface IMailrunSesReceiptsTable {
     relationType: (typeof schema)["mailrun_ses_receipts"]["_relationType"];
     indexes: keyof (typeof schema)["mailrun_ses_receipts"]["_indexes"];
     constraints: keyof (typeof schema)["mailrun_ses_receipts"]["_constraints"];
+}
+
+/** Columns of `mailrun_submission_drafts`. */
+export interface IMailrunSubmissionDraftsColumns {
+    job_id: string;
+    draft_id: string;
+    draft_revision: number;
+}
+
+/** Schema of `mailrun_submission_drafts`. */
+export interface IMailrunSubmissionDraftsTable {
+    columns: IMailrunSubmissionDraftsColumns;
+    relationType: (typeof schema)["mailrun_submission_drafts"]["_relationType"];
+    indexes: keyof (typeof schema)["mailrun_submission_drafts"]["_indexes"];
+    constraints: keyof (typeof schema)["mailrun_submission_drafts"]["_constraints"];
 }
 
 /** Columns of `mcp_key_mailboxes`. */
@@ -7846,6 +7909,20 @@ export const schema = {
         },
         _constraints: {}
     },
+    mailrun_submission_drafts: {
+        _relationName: "mailrun_submission_drafts",
+        _relationType: "table",
+        _columns: {
+            job_id: { _columnName: "job_id", _foreignKeys: {} },
+            draft_id: { _columnName: "draft_id", _foreignKeys: {} },
+            draft_revision: { _columnName: "draft_revision", _foreignKeys: {} }
+        },
+        _indexes: {
+            mailrun_submission_drafts_draft: { _indexName: "mailrun_submission_drafts_draft" },
+            sqlite_autoindex_mailrun_submission_drafts_1: { _indexName: "sqlite_autoindex_mailrun_submission_drafts_1" }
+        },
+        _constraints: {}
+    },
     mcp_key_mailboxes: {
         _relationName: "mcp_key_mailboxes",
         _relationType: "table",
@@ -8304,6 +8381,7 @@ export interface Tables {
     mailrun_job_leases: IMailrunJobLeasesTable;
     mailrun_outbound_snapshots: IMailrunOutboundSnapshotsTable;
     mailrun_ses_receipts: IMailrunSesReceiptsTable;
+    mailrun_submission_drafts: IMailrunSubmissionDraftsTable;
     mcp_key_mailboxes: IMcpKeyMailboxesTable;
     message_attachments: IMessageAttachmentsTable;
     messages: IMessagesTable;

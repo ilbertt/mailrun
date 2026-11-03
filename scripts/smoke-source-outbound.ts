@@ -123,13 +123,14 @@ try {
 	assert.deepEqual(
 		sourceDb
 			.query(
-				"SELECT name FROM d1_migrations WHERE name IN ('0068_domain_relay_binding.sql','0069_cloudflare_global_key.sql','0070_outbound_transport_snapshots.sql') ORDER BY name",
+				"SELECT name FROM d1_migrations WHERE name IN ('0068_domain_relay_binding.sql','0069_cloudflare_global_key.sql','0070_outbound_transport_snapshots.sql','0071_submission_drafts.sql') ORDER BY name",
 			)
 			.all(),
 		[
 			{ name: "0068_domain_relay_binding.sql" },
 			{ name: "0069_cloudflare_global_key.sql" },
 			{ name: "0070_outbound_transport_snapshots.sql" },
+			{ name: "0071_submission_drafts.sql" },
 		],
 		"Compiled startup did not upgrade the source schema",
 	);

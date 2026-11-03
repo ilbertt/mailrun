@@ -16,7 +16,8 @@ export async function draftLock<T>(draftId: string, run: () => Promise<T>) {
 	const name = `draft:${draftId}`;
 	const [lock] = await withDatabase(
 		(sql) => sql.ClaimDraftLock`
-		INSERT INTO mailrun_job_leases (name,owner,expires_at) VALUES (${name},${owner},${seconds() + 180})
+		INSERT INTO mailrun_job_leases (name,owner,expires_at) SELECT ${name},${owner},${seconds() + 180}
+		WHERE NOT EXISTS(SELECT 1 FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id WHERE s.draft_id=${draftId} AND j.status IN('queued','sending','sent'))
 		ON CONFLICT(name) DO UPDATE SET owner=excluded.owner,expires_at=excluded.expires_at
 		WHERE mailrun_job_leases.expires_at<${seconds()} RETURNING owner`,
 	);

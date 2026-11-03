@@ -1,11 +1,10 @@
-import { listMailboxes } from "../mail/repository";
+import { z } from "zod";
+import { listMailboxMetadata } from "../mail/repository";
 import { withDatabase, type AppSQL } from "../db";
 import { assertApiPrincipal } from "../auth/key-principal";
 import type { JmapContext, AccessibleMailbox } from "./types";
 import { JmapError } from "./errors";
-export async function listJmapMailboxes(
-	ctx: JmapContext,
-): Promise<AccessibleMailbox[]> {
+export async function listJmapMailboxMetadata(ctx: JmapContext) {
 	// Event streams outlive authentication. Refresh mailbox grants as well as
 	// key/user validity so removing one grant takes effect on the next poll.
 	const grants = await withDatabase((sql) =>
@@ -16,11 +15,10 @@ export async function listJmapMailboxes(
 	);
 	const key = grants[0];
 	if (!key) throw new Response("Unauthorized", { status: 401 });
-	ctx.auth.mailboxIds =
-		!key.mailbox_scope_enabled && key.kind !== "mcp"
-			? null
-			: grants.flatMap((row) => (row.mailbox_id ? [row.mailbox_id] : []));
-	const rows = await listMailboxes(ctx.auth.user);
+	ctx.auth.mailboxIds = !key.mailbox_scope_enabled
+		? null
+		: grants.flatMap((row) => (row.mailbox_id ? [row.mailbox_id] : []));
+	const rows = await listMailboxMetadata(ctx.auth.user);
 	return rows
 		.filter(
 			(row) => !ctx.auth.mailboxIds || ctx.auth.mailboxIds.includes(row.id),
@@ -32,11 +30,25 @@ export async function listJmapMailboxes(
 			hostname: row.hostname,
 			displayName: row.display_name,
 			permission: row.permission,
-			type: row.type === "shared" ? "shared" : "personal",
+			type: row.type === "shared" ? ("shared" as const) : ("personal" as const),
 			isPrimary:
 				`${row.local_part}@${row.hostname}`.toLowerCase() ===
 				ctx.auth.email.toLowerCase(),
 		}));
+}
+export async function listJmapMailboxes(
+	ctx: JmapContext,
+): Promise<AccessibleMailbox[]> {
+	return (await listJmapMailboxMetadata(ctx)).flatMap((row) => {
+		const permission = z
+			.enum(["read_only", "send_as", "send_on_behalf", "full_access"])
+			.safeParse(row.permission);
+		return permission.success ? [{ ...row, permission: permission.data }] : [];
+	});
+}
+export async function canUseLegacyOwnerScope(ctx: JmapContext) {
+	const metadata = await listJmapMailboxMetadata(ctx);
+	return !ctx.auth.mailboxIds && metadata.length === 0;
 }
 export async function listAccessibleMailboxIdSet(ctx: JmapContext) {
 	return new Set((await listJmapMailboxes(ctx)).map((row) => row.id));
@@ -57,10 +69,10 @@ export async function listFoldersByMailbox(_ctx: JmapContext, ids: string[]) {
 }
 export async function listSendableAddresses(
 	ctx: JmapContext,
-	box: AccessibleMailbox,
+	box: Pick<AccessibleMailbox, "id">,
 ) {
 	return (
-		(await listMailboxes(ctx.auth.user)).find((row) => row.id === box.id)
+		(await listMailboxMetadata(ctx.auth.user)).find((row) => row.id === box.id)
 			?.senderAddresses ?? []
 	);
 }

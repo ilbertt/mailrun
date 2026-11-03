@@ -20,6 +20,8 @@ export const BACKUP_TABLES: DatabaseBackupTable[] = [
 	"outbound_jobs",
 	// Transport identity survives deletion of the message link and must be backed up.
 	"mailrun_outbound_snapshots",
+	// Protocol draft reservation/cleanup is durable user intent, not a transient lease.
+	"mailrun_submission_drafts",
 	"routing_rules",
 	"webhooks",
 	"webhook_deliveries",

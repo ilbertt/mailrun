@@ -19,6 +19,7 @@ import {
 } from "./drafts";
 import { deliveryPayloadSchema } from "../../shared/mail-contracts";
 import { normalizeMessageId } from "../../lib/email/threading";
+import { cleanupSubmittedDraft } from "./submission-drafts";
 import { prepareAttachments } from "./attachment-send";
 
 export async function sendMessage(
@@ -303,4 +304,7 @@ export async function deliverJob(
 		wakeWebhookDispatcher();
 		throw error;
 	}
+	await cleanupSubmittedDraft(job.id).catch((error) =>
+		console.warn("Submitted draft cleanup bookkeeping failed", error),
+	);
 }

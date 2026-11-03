@@ -1,3 +1,4 @@
+import { canUseLegacyOwnerScope } from "./access";
 import { normalizeMessageId } from "../../lib/email/threading";
 import { withDatabase } from "../db";
 import { scopeIds } from "./repository";
@@ -173,7 +174,7 @@ export async function queryEmailIds(
 	args: Record<string, unknown>,
 ) {
 	const ids = await scopeIds(ctx),
-		fallback = !ids.length && !ctx.auth.mailboxIds,
+		fallback = !ids.length && (await canUseLegacyOwnerScope(ctx)),
 		program = JSON.stringify(compileFilter(args.filter, new Set(ids))),
 		sort = JSON.stringify(compileSort(args.sort));
 	const rows = await withDatabase(

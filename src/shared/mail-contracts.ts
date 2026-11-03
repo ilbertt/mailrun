@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getEmailAddress, splitEmailAddressList } from "../lib/email/address";
+import { splitEmailAddressList } from "../lib/email/address";
 export const localPartSchema = z
 	.string()
 	.trim()
@@ -16,11 +16,7 @@ const recipients = z
 		Array.isArray(value) ? value : splitEmailAddressList(value),
 	)
 	.refine(
-		(values) =>
-			values.every(
-				(value) =>
-					!/[\r\n]/.test(value) && getEmailAddress(value).includes("@"),
-			),
+		(values) => values.every((value) => !/[\r\n]/.test(value)),
 		"Enter valid email addresses",
 	)
 	.refine((values) => values.length <= 50, "At most 50 recipients");

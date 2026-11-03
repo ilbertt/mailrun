@@ -1,8 +1,8 @@
 import { withDatabase } from "../db";
 import type { JmapContext } from "./types";
-import { listJmapMailboxes } from "./access";
+import { listJmapMailboxMetadata } from "./access";
 export async function getEmailState(ctx: JmapContext): Promise<string> {
-	const boxes = await listJmapMailboxes(ctx);
+	const boxes = await listJmapMailboxMetadata(ctx);
 	if (!boxes.length) return "[]";
 	const rows = await withDatabase(
 		(sql) =>

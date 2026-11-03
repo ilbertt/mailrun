@@ -30,6 +30,8 @@ export async function startSendProvider(directory: string) {
 		throw new Error("Could not create send fixture certificate");
 	const deliveries: unknown[] = [];
 	let fail = false;
+	let failuresRemaining = Infinity;
+	let beforeReply: (() => Promise<void>) | undefined;
 	const server = Bun.serve({
 		hostname: "127.0.0.1",
 		port: 0,
@@ -45,7 +47,8 @@ export async function startSendProvider(directory: string) {
 			if (request.headers.get("Authorization") !== "Bearer synthetic-token")
 				throw new Error("Unexpected synthetic credential");
 			deliveries.push(await request.json());
-			return fail
+			await beforeReply?.();
+			return fail && failuresRemaining-- > 0
 				? Response.json(
 						{
 							success: false,
@@ -77,9 +80,14 @@ export async function startSendProvider(directory: string) {
 		preload,
 		marker,
 		deliveries,
-		reset(value = false) {
+		beforeReply(run?: () => Promise<void>) {
+			beforeReply = run;
+		},
+		reset(value = false, maxFailures = Infinity) {
 			deliveries.length = 0;
 			fail = value;
+			failuresRemaining = maxFailures;
+			beforeReply = undefined;
 		},
 		stop: () => server.stop(true),
 	};

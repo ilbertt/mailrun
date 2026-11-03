@@ -25,6 +25,10 @@ export async function runJob(name: z.infer<typeof jobNameSchema>) {
 					console.error(`Scheduled send ${job.id} failed`, error),
 				);
 			}
+			const { recoverSubmittedDrafts } = await import(
+				"../mail/submission-drafts"
+			);
+			await recoverSubmittedDrafts();
 		} else if (name === "maintenance") {
 			const { clearSendingStaging } = await import("../mail/sending-staging");
 			const { runAvatarJobs } = await import("../avatars/jobs");

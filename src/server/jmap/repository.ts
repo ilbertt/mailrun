@@ -1,3 +1,4 @@
+import { canUseLegacyOwnerScope } from "./access";
 import { withDatabase } from "../db";
 import type { JmapContext } from "./types";
 import { listJmapMailboxes } from "./access";
@@ -58,7 +59,7 @@ export async function loadMessages(
 ): Promise<MessageRow[]> {
 	if (!ids.length) return [];
 	const scope = await scopeIds(ctx),
-		fallback = !scope.length && !ctx.auth.mailboxIds;
+		fallback = !scope.length && (await canUseLegacyOwnerScope(ctx));
 	const rows = await withDatabase(
 		(sql) =>
 			sql.NativeJmapMessages`SELECT * FROM messages WHERE id IN(SELECT value FROM json_each(${JSON.stringify(ids)})) AND (mailbox_id IN(SELECT value FROM json_each(${JSON.stringify(scope)})) OR (${fallback ? 1 : 0}=1 AND user_id=${ctx.auth.userId})) AND (status!='draft' OR user_id=${ctx.auth.userId}) ORDER BY rowid`,

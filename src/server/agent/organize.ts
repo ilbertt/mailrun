@@ -13,7 +13,7 @@ export async function applyAgentMoves(
 			await sql.NativeAgentMoveCurrent`SELECT status FROM messages WHERE id=${messageId} AND mailbox_id=${ctx.mailboxId} AND status NOT IN('draft','sent')`;
 		if (!current) throw new Error("Cannot move this message");
 		const [sending] =
-			await sql.NativeAgentMoveSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${messageId} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${messageId}) LIMIT 1`;
+			await sql.NativeAgentMoveSending`SELECT id FROM outbound_jobs WHERE status IN('queued','sending') AND ((message_id=${messageId} AND (status='sending' OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId') IS NOT NULL)) OR json_extract(CASE WHEN json_valid(payload) THEN payload ELSE '{}' END,'$.submittedDraftId')=${messageId}) UNION ALL SELECT j.id FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id WHERE (s.draft_id=${messageId} OR j.message_id=${messageId}) AND j.status IN('queued','sending','sent') LIMIT 1`;
 		if (sending) throw new Error("A message is being sent");
 		if (
 			destination === "spam" ||

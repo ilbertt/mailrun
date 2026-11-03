@@ -2,7 +2,10 @@ import { z } from "zod";
 import type { User } from "../../shared/contracts";
 import { userSchema } from "../../shared/contracts";
 import { sendEmailSchema } from "../../lib/validators";
-import { getEmailAddressList } from "../../lib/email/address";
+import {
+	splitEmailAddressList,
+	getEmailAddressList,
+} from "../../lib/email/address";
 import {
 	normalizeMessageId,
 	parseMessageIdList,
@@ -21,6 +24,17 @@ import { upsertContact } from "./contacts";
 import { deliveryPayloadSchema } from "../../shared/mail-contracts";
 import { deliveryHeaders } from "./delivery-headers";
 type Input = Omit<z.output<typeof sendEmailSchema>, "attachments">;
+export type SourceSendInput = Omit<
+	Input,
+	"to" | "cc" | "bcc" | "inReplyTo" | "references" | "threadId"
+> & {
+	to: string | string[];
+	cc?: string | string[];
+	bcc?: string | string[];
+	inReplyTo?: string | null;
+	references?: string | string[] | null;
+	threadId?: string | null;
+};
 export type SourceSendAttachment = {
 	filename: string;
 	type: string;
@@ -28,7 +42,8 @@ export type SourceSendAttachment = {
 	disposition: "attachment" | "inline";
 	contentId?: string | null;
 };
-const recipients = (values: string[] | undefined) => {
+const recipients = (value: string | string[] | undefined) => {
+	const values = Array.isArray(value) ? value : splitEmailAddressList(value);
 	const seen = new Set<string>();
 	return (values ?? [])
 		.filter((value) => {
@@ -101,11 +116,15 @@ export async function queueSessionSend(
 }
 export async function queueSourceSend(
 	user: User,
-	input: Input,
+	input: SourceSendInput,
 	files: SourceSendAttachment[],
 	origin: string,
 	draft?: { id: string; revision: number },
 	beforePublish?: (sql: AppSQL) => Promise<void>,
+	afterPublish?: (
+		sql: AppSQL,
+		queued: { messageId: string; jobId: string },
+	) => Promise<void>,
 ) {
 	const run = async () => {
 		const current = draft ? await getDraft(user, draft.id) : undefined;
@@ -143,6 +162,8 @@ export async function queueSourceSend(
 			throw new Error(
 				`Attachments exceed the administrator's ${limit / 1_000_000} MB outgoing limit`,
 			);
+		if (input.subject.length > 998)
+			throw new Error("Subject exceeds Cloudflare's 998-character limit");
 		const to = recipients(input.to),
 			cc = recipients(input.cc),
 			bcc = recipients(input.bcc);
@@ -152,7 +173,11 @@ export async function queueSourceSend(
 		for (const address of [...to, ...cc, ...bcc])
 			await upsertContact(user.id, address, "outbound", input.mailboxId);
 		const parent = normalizeMessageId(input.inReplyTo),
-			references = parseMessageIdList(input.references);
+			references = Array.isArray(input.references)
+				? input.references
+						.map(normalizeMessageId)
+						.filter((value): value is string => !!value)
+				: parseMessageIdList(input.references);
 		deliveryHeaders({ inReplyTo: parent, references });
 		const checked = deliveryPayloadSchema.parse({
 			from,
@@ -245,6 +270,7 @@ export async function queueSourceSend(
 					for (const file of stored)
 						await sql.SourceSessionSendFile`INSERT INTO message_attachments(id,message_id,filename,content_type,size,disposition,content_id,r2_key,created_at) VALUES(${file.id},${messageId},${file.filename},${file.type},${file.size},${file.disposition},${file.contentId ?? null},${file.key},${seconds()})`;
 					await sql.SourceSessionSendJob`INSERT INTO outbound_jobs(id,user_id,message_id,status,payload,scheduled_at,created_at,updated_at) VALUES(${jobId},${user.id},${messageId},'queued',${JSON.stringify(payload)},${scheduledAt},${seconds()},${seconds()})`;
+					if (afterPublish) await afterPublish(sql, { messageId, jobId });
 				}),
 			);
 			committed = true;

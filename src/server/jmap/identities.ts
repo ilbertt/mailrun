@@ -1,22 +1,23 @@
-import { withDatabase, id, seconds } from "../db";
-import { LocalStorage, deleteUnreferencedObjects } from "../storage";
-import { draftLock, formattedSender } from "../mail/drafts";
-import { deliverJob } from "../mail/send";
-import { deliveryPayloadSchema } from "../../shared/mail-contracts";
-import { buildSnippet } from "../../lib/email/parse";
-import { decodeIdentityId, identityId } from "./ids";
+import { LocalStorage } from "../storage";
+import { draftLock } from "../mail/drafts";
+import { withDatabase } from "../db";
 import {
-	listJmapMailboxes,
-	listSendableAddresses,
-	jmapMutation,
-} from "./access";
+	sourceSendSender,
+	queueSourceSend,
+	type SourceSendAttachment,
+} from "../mail/session-send";
+import { assertApiPrincipal } from "../auth/key-principal";
+import { awaitSubmissionOutcome } from "../mail/submission-drafts";
+import { deliverJob } from "../mail/send";
+import { decodeIdentityId, identityId } from "./ids";
+import { listJmapMailboxMetadata, listSendableAddresses } from "./access";
 import { getEmailState } from "./state";
 import { loadMessages, jmapAttachments } from "./repository";
 import { JmapError } from "./errors";
 import type { JmapContext, JmapMethodHandler } from "./types";
 export async function buildIdentities(ctx: JmapContext) {
 	const list: Record<string, unknown>[] = [];
-	for (const box of await listJmapMailboxes(ctx)) {
+	for (const box of await listJmapMailboxMetadata(ctx)) {
 		if (box.permission === "read_only") continue;
 		for (const address of await listSendableAddresses(ctx, box))
 			list.push({
@@ -74,8 +75,33 @@ async function submit(
 	ctx: JmapContext,
 	emailId: string,
 	identity: { mailboxId: string; address: string },
+	readableGrant: boolean,
 ) {
 	return draftLock(emailId, async () => {
+		if (!readableGrant) {
+			// Source metadata can carry an unknown historical grant. Preserve its
+			// validation response while requiring send authorization before body access.
+			const [metadata] = await withDatabase(
+				(sql) =>
+					sql.SourceJmapDraftMetadata`SELECT id,user_id,mailbox_id,status FROM messages WHERE id=${emailId}`,
+			);
+			if (
+				!metadata ||
+				metadata.status !== "draft" ||
+				metadata.user_id !== ctx.auth.userId ||
+				metadata.mailbox_id !== identity.mailboxId
+			)
+				throw new JmapError(
+					"invalidProperties",
+					"Not a draft of this account",
+					{ properties: ["emailId"] },
+				);
+			await sourceSendSender(
+				ctx.auth.user,
+				identity.mailboxId,
+				identity.address,
+			);
+		}
 		const [draft] = await loadMessages(ctx, [emailId]);
 		if (
 			!draft ||
@@ -86,63 +112,53 @@ async function submit(
 			throw new JmapError("invalidProperties", "Not a draft of this account", {
 				properties: ["emailId"],
 			});
-		const from = await formattedSender(
-				ctx.auth.user,
-				identity.mailboxId,
-				identity.address,
-			),
-			files = (await jmapAttachments(ctx, [draft.id])).get(draft.id) ?? [];
-		if (
-			files.length > 10 ||
-			files.reduce((sum, file) => sum + file.size, 0) > 25_000_000
-		)
-			throw new JmapError("tooLarge");
-		const payload = deliveryPayloadSchema.parse({
-			from,
-			to: draft.toAddr,
-			cc: draft.ccAddr ?? "",
-			bcc: draft.bccAddr ?? "",
-			subject: draft.subject ?? "(no subject)",
-			text: draft.textBody ?? undefined,
-			html: draft.htmlBody ?? undefined,
-			inReplyTo: draft.inReplyTo,
-			references: draft.references,
-			threadId: draft.threadId,
-			returnToDraft: false,
-			submittedDraftId: draft.id,
-		});
-
-		const messageId = id("msg"),
-			jobId = id("job"),
-			storage = new LocalStorage(),
-			written: string[] = [],
-			attachments: typeof files = [];
-		let queued = false;
-		try {
-			for (const file of files) {
-				const attachmentId = id("att"),
-					key = `attachments/${messageId}/${attachmentId}`;
-				await storage.put(key, storage.file(file.r2Key));
-				written.push(key);
-				attachments.push({ ...file, id: attachmentId, messageId, r2Key: key });
-			}
-			await jmapMutation(ctx, identity.mailboxId, "write", async (sql) => {
-				const [reserved] =
-					await sql.NativeJmapReserveSubmission`UPDATE messages SET status='queued' WHERE id=${draft.id} AND user_id=${ctx.auth.userId} AND status='draft' AND draft_revision=${draft.draftRevision} RETURNING id`;
-				if (!reserved) throw new JmapError("forbidden", "Draft changed");
-				await sql.NativeJmapQueueSubmissionMessage`INSERT INTO messages(id,user_id,mailbox_id,direction,from_addr,to_addr,cc_addr,bcc_addr,subject,snippet,text_body,html_body,status,read,thread_id,in_reply_to,references_header,created_at) VALUES(${messageId},${ctx.auth.userId},${identity.mailboxId},'outbound',${from},${draft.toAddr},${draft.ccAddr},${draft.bccAddr},${payload.subject},${buildSnippet(draft.textBody, draft.htmlBody)},${draft.textBody},${draft.htmlBody},'queued',1,${draft.threadId},${draft.inReplyTo},${draft.references},${seconds()})`;
-				for (const file of attachments)
-					await sql.NativeJmapQueueSubmissionAttachment`INSERT INTO message_attachments(id,message_id,filename,content_type,size,disposition,content_id,r2_key,created_at) VALUES(${file.id},${messageId},${file.filename},${file.contentType},${file.size},${file.disposition},${file.contentId},${file.r2Key},${seconds()})`;
-				await sql.NativeJmapQueueSubmissionJob`INSERT INTO outbound_jobs(id,user_id,message_id,status,payload,created_at,updated_at) VALUES(${jobId},${ctx.auth.userId},${messageId},'queued',${JSON.stringify(payload)},${seconds()},${seconds()})`;
-			});
-			queued = true;
-			await deliverJob(jobId, ctx.send);
-			return { messageId, threadId: draft.threadId ?? messageId };
-		} finally {
-			if (!queued) {
-				await deleteUnreferencedObjects(written);
-			}
+		const files: SourceSendAttachment[] = [];
+		for (const file of (await jmapAttachments(ctx, [draft.id])).get(draft.id) ??
+			[]) {
+			const blob = new LocalStorage().file(file.r2Key);
+			if (await blob.exists())
+				files.push({
+					filename: file.filename,
+					type: file.contentType,
+					blob,
+					disposition: file.disposition === "inline" ? "inline" : "attachment",
+					contentId: file.contentId,
+				});
 		}
+		const queued = await queueSourceSend(
+			ctx.auth.user,
+			{
+				from: identity.address,
+				to: draft.toAddr,
+				cc: draft.ccAddr ?? undefined,
+				bcc: draft.bccAddr ?? undefined,
+				subject: draft.subject ?? "(no subject)",
+				text: draft.textBody ?? undefined,
+				html: draft.htmlBody ?? undefined,
+				inReplyTo: draft.inReplyTo,
+				references: draft.references,
+				threadId: draft.threadId,
+				mailboxId: identity.mailboxId,
+			},
+			files,
+			ctx.origin,
+			undefined,
+			async (sql) => {
+				await assertApiPrincipal(sql, ctx.actor, identity.mailboxId);
+				const [current] =
+					await sql.SourceJmapSubmissionDraft`SELECT id FROM messages WHERE id=${draft.id} AND user_id=${ctx.auth.userId} AND mailbox_id=${identity.mailboxId} AND status='draft' AND draft_revision=${draft.draftRevision} AND NOT EXISTS(SELECT 1 FROM mailrun_submission_drafts s JOIN outbound_jobs j ON j.id=s.job_id WHERE s.draft_id=messages.id AND j.status IN('queued','sending','sent'))`;
+				if (!current) throw new JmapError("forbidden", "Draft changed");
+			},
+			async (sql, publication) => {
+				await sql.ReserveSourceJmapDraft`INSERT INTO mailrun_submission_drafts(job_id,draft_id,draft_revision) VALUES(${publication.jobId},${draft.id},${draft.draftRevision})`;
+			},
+		);
+		await deliverJob(queued.jobId, ctx.send);
+		await awaitSubmissionOutcome(queued.jobId);
+		return {
+			messageId: queued.messageId,
+			threadId: draft.threadId ?? queued.messageId,
+		};
 	});
 }
 export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
@@ -162,7 +178,7 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 				typeof value.identityId === "string"
 					? decodeIdentityId(value.identityId)
 					: null,
-			accessible = await listJmapMailboxes(ctx);
+			accessible = await listJmapMailboxMetadata(ctx);
 		if (
 			!identity ||
 			!accessible.some(
@@ -177,7 +193,14 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 			continue;
 		}
 		try {
-			const result = await submit(ctx, emailId, identity);
+			const box = accessible.find((box) => box.id === identity.mailboxId);
+			const result = await submit(
+				ctx,
+				emailId,
+				identity,
+				!!box &&
+					["send_as", "send_on_behalf", "full_access"].includes(box.permission),
+			);
 			destroyedEmails.push(emailId);
 			ctx.createdIds[creationId] = result.messageId;
 			created[creationId] = {
@@ -199,7 +222,11 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 					: {
 							type: "forbidden",
 							description:
-								error instanceof Error ? error.message : "Send failed",
+								error instanceof Response
+									? await error.text()
+									: error instanceof Error
+										? error.message
+										: "Send failed",
 						};
 		}
 	}
